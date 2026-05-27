@@ -1,0 +1,68 @@
+:root {
+  /* Color palette (preserved values) */
+  --color-background: #f8f9ff;
+  --color-surface: #f8f9ff;
+  --color-surface-variant: #ededf4;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #f2f3f9;
+  --color-surface-container: #ededf4;
+  --color-surface-container-high: #e7e8ee;
+  --color-on-surface: #191c20;
+  --color-on-surface-variant: #414750;
+
+  --color-primary-00: #005596; /* gradient start */
+  --color-primary-01: #003e6f; /* gradient end */
+  --color-primary-02: #3a5f94;
+  --color-accent-00: #003366;
+
+  --color-active-bg: #005596;
+  --color-active-fg: #a4caff;
+  --color-link-hover: #e7e8ee;
+
+  /* Typography */
+  --font-family-base: 'Inter', sans-serif;
+  --font-size-base: 16px;
+
+  /* Spacing & radii */
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --radius-pill: 9999px;
+
+  /* Elevation */
+  --shadow-elevated: 0 4px 20px rgba(0,0,0,0.08);
+}
+
+html, body {
+  height: 100%;
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 96px;
+  scroll-padding-bottom: 128px;
+}
+
+body {
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+  min-height: max(884px, 100dvh);
+  overflow-x: hidden;
+}
+
+body.tema-ciudadano {
+  background-color: var(--color-background);
+  color: var(--color-on-surface);
+}
+
+/* Material symbols helpers (keep variations) */
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}
+
+.material-symbols-filled,
+.icono-relleno {
+  font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+}

@@ -1,0 +1,172 @@
+PLAN DE TRABAJO – PRÁCTICAS PROFESIONALES SUPERVISADAS (PPS)
+Proyecto: Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos
+Carrera: Tecnicatura Universitaria en Desarrollo de Aplicaciones Informáticas (TUDAI)
+Carga horaria: 200 horas
+Institución beneficiaria: Área de Bromatología
+Duración estimada: 3 a 4 meses
+1. Fundamentación
+El proceso actual de gestión de manipuladores de alimentos presenta una fuerte fragmentación de herramientas (formularios, planillas, campus virtual, correo electrónico) y una alta carga de gestión manual. Esto genera problemas de trazabilidad, duplicación de datos, pérdida de información y dificultades para verificar el estado del trámite de los carnets.
+Además, la dependencia del envío de carnets por correo electrónico provoca situaciones frecuentes en las que los usuarios no pueden exhibir su carnet ante inspecciones, afectando tanto a los ciudadanos como a los controles sanitarios.
+En este contexto, se propone el desarrollo de un sistema web que centralice el proceso completo, desde la inscripción hasta la consulta del estado del carnet, complementando al sistema provincial DIPA, el cual continuará siendo el único encargado de la emisión oficial del carnet.
+El sistema propuesto permitirá ordenar la gestión administrativa, mejorar la trazabilidad del proceso y brindar herramientas de verificación accesibles para usuarios e inspectores, respetando criterios de seguridad y protección de datos personales.
+2. Objetivo general
+Desarrollar un sistema web que centralice la gestión del proceso de obtención y renovación del carnet de manipulador de alimentos, permitiendo la administración integral de inscripciones, documentación, resultados y estados del trámite, complementando el sistema DIPA.
+3. Objetivos específicos
+•	Centralizar la inscripción a cursos y mesas de examen
+•	Permitir la carga y validación de documentación
+•	Gestionar fechas, cupos y modalidades
+•	Registrar asistencia y resultados
+•	Permitir la carga de carnets generados externamente
+•	Implementar consulta por DNI
+•	Definir distintos roles de usuario
+•	Proteger datos personales sensibles
+4. Alcance del proyecto
+4.1 Alcance obligatorio
+•	Registro de usuarios
+•	Inscripción a cursos/exámenes
+•	Carga de documentación
+•	Gestión administrativa (fechas, cupos, asistencia)
+•	Registro de resultados
+•	Gestión del estado del trámite
+•	Descarga de documentación para DIPA
+•	Subida de carnets generados en DIPA
+•	Consulta del estado del carnet
+•	Roles diferenciados (inscripto, admin, inspector)
+4.2 Alcance recomendado (no obligatorio)
+•	Consulta pública limitada por DNI
+•	Auditoría de acciones
+5. Relación con sistema DIPA
+El sistema no reemplaza al sistema DIPA. Actúa como herramienta complementaria que organiza la información previa y posterior al proceso oficial de emisión del carnet. La carga en DIPA y la obtención del carnet se realiza de forma manual por parte del personal administrativo.
+6. Flujo del sistema (adjunto)
+7. Roles del sistema
+•	Usuario inscripto: gestiona inscripción y documentación
+•	Administrador: gestiona todo el proceso
+•	Inspector: verifica carnets
+•	Acceso público: consulta básica por DNI
+8. Seguridad y datos personales
+El sistema implementará distintos niveles de acceso para proteger la información. No se mostrará públicamente información sensible como domicilio o documentación. La consulta pública estará limitada al estado del carnet y su vigencia por cada DNI.
+9. Tecnologías
+•	Backend: PHP
+•	Base de datos: MySQL
+•	Frontend: HTML/CSS/JS
+•	Servidor: Apache
+•	Control de versiones: Git
+10. Organización del trabajo
+El estudiante desarrollará el proyecto de manera integral, abarcando análisis, diseño, desarrollo, pruebas y documentación, bajo supervisión de tutores.
+11. Distribución de horas
+•	Análisis: 20h
+•	Diseño: 30h
+•	Backend: 60h
+•	Frontend: 40h
+•	Base de datos: 20h
+•	Pruebas: 15h
+•	Documentación: 10h
+•	Despliegue: 5h
+12. Cronograma
+•	Mes 1: análisis y diseño
+•	Mes 2: desarrollo base
+•	Mes 3: funcionalidades principales
+•	Mes 4: pruebas y despliegue
+13. Entregables
+•	Sistema funcional
+•	Código fuente
+•	Documentación técnica
+•	Manual de usuario
+•	Informe final
+14. Criterios de aceptación
+•	Permite inscripción y carga de documentación
+•	Permite gestión administrativa completa
+•	Permite consulta por DNI
+•	Está operativo en entorno web
+•	Protege datos sensibles
+
+FLUJOS DEL SISTEMA – SEGÚN OBJETIVO DEL USUARIO
+1. Introducción
+El sistema contempla distintos flujos de uso según la situación del usuario. Cada flujo representa una forma diferente de acceder al examen y obtener el carnet, con reglas y validaciones específicas. A continuación, se describen de forma clara y separada.
+2. Flujo 1 – Usuario que realiza curso presencial
+Este flujo aplica a usuarios que se inscriben al curso presencial.
+•	El usuario se inscribe a una fecha de curso presencial.
+•	Carga la documentación (foto carnet y DNI)
+•	Asiste a las clases.
+•	Se registra la asistencia.
+•	Si cumple con la asistencia mínima requerida, queda automáticamente habilitado a rendir.
+•	Rinde el examen final sin necesidad de inscripción adicional.
+•	Se registra el resultado.
+•	Si aprueba, continúa el proceso de emisión del carnet.
+3. Flujo 2 – Usuario que realiza curso virtual (Moodle)
+Este flujo aplica a usuarios que realizan el curso en modalidad virtual.
+•	El usuario realiza el curso en el campus virtual (Moodle) y obtiene el certificado de finalización.
+•	Se inscribe a una fecha de examen presencial.
+•	Carga la documentación (foto carnet, DNI y certificado del curso virtual finalizado).
+•	Rinde el examen.
+•	Si aprueba, continúa el proceso de emisión del carnet.
+4. Flujo 3 – Usuario recursante (reexamen)
+Este flujo aplica a usuarios que ya realizaron el curso y desaprobaron el examen.
+•	El usuario ya rindió previamente y no aprobó.
+•	Puede volver a rendir sin repetir el curso.
+•	Debe hacerlo dentro de los 3 meses posteriores al examen desaprobado.
+•	Se inscribe a una nueva fecha de examen.
+•	Rinde nuevamente.
+•	Se registra el resultado.
+•	Si aprueba, continúa el trámite del carnet.
+5. Flujo 4 – Usuario que renueva carnet vencido
+Este flujo aplica a usuarios que ya poseen un carnet vencido.
+•	El usuario se inscribe directamente a una instancia de examen.
+•	No necesita realizar el curso nuevamente.
+•	Rinde el examen.
+•	Si aprueba, el personal administrativo verifica en DIPA la existencia de un carnet previo.
+•	Si el carnet previo existe, se tramita la renovación.
+•	Si no existe, el usuario deberá realizar el curso completo.
+6. Consideración general
+Todos los flujos convergen en una instancia de examen presencial, pero difieren en la forma de acceso y en los momentos en los que se realizan las validaciones. Esta diferenciación permite reflejar con precisión el proceso real y facilita su implementación en el sistema.
+La carga y validación de la documentación será requisito previo para acceder a la instancia de evaluación, independientemente de la modalidad del usuario, con el objetivo de garantizar la completitud del trámite y evitar demoras posteriores en la emisión del carnet.
+FLUJOS DEL SISTEMA – USUARIOS ADMINISTRATIVO E INSPECTOR
+1. Introducción
+Este apartado describe los flujos de trabajo de los perfiles administrativo e inspector dentro del sistema, detallando sus responsabilidades y acciones principales.
+2. Usuario Administrativo (Bromatología)
+•	Crear fechas de cursos y exámenes
+•	Gestionar cupos
+•	Ver inscriptos
+•	Registrar asistencia
+•	Validar documentación
+•	Registrar resultados
+•	Identificar recursantes (3 meses)
+•	Gestionar renovaciones
+•	Descargar documentación para cargar en DIPA
+•	Subir carnets emitidos por DIPA
+•	Actualizar estados del trámite
+3. Validaciones administrativas
+•	Asistencia (presencial)
+•	Curso Moodle (virtual)
+•	Plazo recursante (3 meses)
+•	Validación en DIPA (renovación)
+4. Usuario Inspector
+•	Buscar por DNI
+•	Ver estado del carnet
+•	Ver vigencia
+•	Descargar carnet
+•	Detectar irregularidades
+5. Diferencias con acceso público
+•	Inspector ve más información
+•	Público solo ve estado
+•	Inspector accede a carnet completo
+•	Público no accede a datos sensibles
+6. Cierre
+Estos flujos permiten una correcta gestión administrativa y verificación en territorio, manteniendo la seguridad de los datos.
+
+
+
+Tabla resumen
+Flujo – tipos de inscripción	Curso	Inscripción examen	Validación
+Presencial	Sí	No	Asistencia a 3 de 4 clases
+Virtual	Sí (Moodle)	Sí	Validación posterior manual contra Moodle
+Recursante	No	Sí	Resultado previo (desaprobado hasta 3 meses antes)
+Renovación	No	Sí	Validación posterior manual en DIPA
+
+Estados posibles: 
+Inscripto
+Aprobado – Pendiente de carnet
+Desaprobado
+Carnet emitido
+Rechazado (no cumple con alguna condición)
+

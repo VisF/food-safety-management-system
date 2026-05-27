@@ -1,0 +1,41 @@
+<?php
+declare(strict_types=1);
+class HistorialTramiteVista
+{
+	public static function mostrar(): void
+	{
+		$defaults = [
+			'title' => 'Historial de trámites',
+			'items' => []
+		];
+		$data = $defaults;
+		if (isset($_GET['data'])) {
+			$incoming = json_decode($_GET['data'], true);
+			if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
+		}
+		include __DIR__ . '/header.php';
+		?>
+		<main class="app-container">
+			<div class="app-vista-card">
+				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
+				<?php if (empty($data['items'])): ?>
+					<p class="mt-2 text-sm text-gray-600">No hay trámites registrados.</p>
+				<?php else: ?>
+					<ul class="mt-4 space-y-2">
+						<?php foreach ($data['items'] as $it): ?>
+							<li class="p-3 border rounded">
+								<strong><?php echo htmlspecialchars($it['titulo'] ?? 'Trámite'); ?></strong>
+								<div class="text-sm text-gray-600"><?php echo htmlspecialchars($it['estado'] ?? ''); ?></div>
+							</li>
+						<?php endforeach; ?>
+					</ul>
+				<?php endif; ?>
+			</div>
+		</main>
+		<?php
+		include __DIR__ . '/footer.php';
+	}
+}
+
+HistorialTramiteVista::mostrar();
+

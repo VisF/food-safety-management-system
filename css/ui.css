@@ -1,0 +1,831 @@
+/*
+  Sistema visual institucional mobile-first
+  Estilo: minimalista, confiable, alta legibilidad
+*/
+
+:root {
+  --gov-primary-900: #083b72;
+  --gov-primary-800: #0a4e93;
+  --gov-primary-700: #1462b5;
+  --gov-primary-500: #3b7fc6;
+
+  --gov-bg: #f2f4f7;
+  --gov-surface: #ffffff;
+  --gov-surface-soft: #f8fafc;
+  --gov-border: #d9e1ea;
+
+  --gov-text: #1f2f46;
+  --gov-text-soft: #5b6b80;
+
+  --gov-positive-bg: #ebf8ef;
+  --gov-positive-border: #b8e2c4;
+  --gov-positive-text: #2d6e43;
+
+  --gov-radius-card: 24px;
+  --gov-radius-pill: 999px;
+  --gov-radius-button: 18px;
+
+  --gov-shadow-soft: 0 10px 28px rgba(10, 47, 84, 0.08);
+  --gov-shadow-float: 0 16px 40px rgba(8, 34, 60, 0.12);
+
+  --gov-space-1: 4px;
+  --gov-space-2: 8px;
+  --gov-space-3: 12px;
+  --gov-space-4: 16px;
+  --gov-space-5: 20px;
+  --gov-space-6: 24px;
+  --gov-space-8: 32px;
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+}
+
+body.tema-ciudadano {
+  background:
+    radial-gradient(120% 80% at 10% -10%, rgba(20, 98, 181, 0.11) 0%, rgba(20, 98, 181, 0) 54%),
+    radial-gradient(100% 70% at 90% -15%, rgba(10, 78, 147, 0.14) 0%, rgba(10, 78, 147, 0) 58%),
+    var(--gov-bg);
+  color: var(--gov-text);
+  font-family: "Inter", "Poppins", "SF Pro Text", "Segoe UI", sans-serif;
+  letter-spacing: 0.01em;
+}
+
+.encabezado-principal.app-shell-header.topbar {
+  padding-top: max(14px, env(safe-area-inset-top));
+  background:
+    linear-gradient(175deg, var(--gov-primary-700) 0%, var(--gov-primary-800) 62%, var(--gov-primary-900) 100%);
+  box-shadow: 0 8px 26px rgba(8, 50, 95, 0.2);
+}
+
+.encabezado-principal,
+.app-shell-header {
+  height: 88px;
+  padding: 0 var(--gov-space-5);
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+}
+
+.encabezado-principal__grupo {
+  gap: var(--gov-space-3);
+}
+
+.encabezado-principal__boton {
+  width: 42px;
+  height: 42px;
+  border: 0;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.16);
+  color: #ffffff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 180ms ease, background-color 180ms ease;
+}
+
+.encabezado-principal__boton:hover,
+.encabezado-principal__boton:focus-visible {
+  background: rgba(255, 255, 255, 0.24);
+}
+
+.encabezado-principal__boton:active {
+  transform: scale(0.96);
+}
+
+.encabezado-principal__titulo {
+  color: #ffffff;
+  font-weight: 800;
+  font-size: clamp(1.12rem, 2.8vw, 1.35rem);
+  line-height: 1.2;
+  margin: 0;
+}
+
+.encabezado-principal__icono {
+  font-size: 1.45rem;
+}
+
+.contenido-principal,
+.app-page-content {
+  padding: calc(96px + var(--gov-space-5)) var(--gov-space-5) calc(120px + env(safe-area-inset-bottom));
+}
+
+.app-vista-card,
+.panel-admin-card,
+.panel-admin-action,
+.panel-admin-actividad {
+  background: var(--gov-surface);
+  border: 1px solid var(--gov-border);
+  border-radius: var(--gov-radius-card);
+  box-shadow: var(--gov-shadow-soft);
+}
+
+.app-vista-card {
+  overflow: hidden;
+  transition: transform 220ms ease, box-shadow 220ms ease;
+}
+
+.app-vista-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--gov-shadow-float);
+}
+
+.app-vista-card--surface {
+  background: var(--gov-surface-soft);
+}
+
+.app-vista-card--gradient {
+  background:
+    linear-gradient(160deg, var(--gov-primary-700) 0%, var(--gov-primary-800) 60%, var(--gov-primary-900) 100%);
+  border: 0;
+  color: #ffffff;
+}
+
+.app-vista-button,
+.app-vista-button--primary,
+.app-vista-button--secondary {
+  width: 100%;
+  min-height: 52px;
+  border-radius: var(--gov-radius-button);
+  padding: 14px 20px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  text-decoration: none;
+  border: 0;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.app-vista-button--primary,
+.boton-principal-gradiente,
+.main-button-gradient {
+  color: #ffffff;
+  background:
+    linear-gradient(170deg, var(--gov-primary-700) 0%, var(--gov-primary-800) 62%, var(--gov-primary-900) 100%);
+  box-shadow: 0 12px 24px rgba(8, 58, 106, 0.24);
+}
+
+.app-vista-button--primary:hover,
+.boton-principal-gradiente:hover,
+.main-button-gradient:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 16px 30px rgba(8, 58, 106, 0.27);
+}
+
+.app-vista-button--secondary {
+  color: var(--gov-text);
+  background: #ffffff;
+  border: 1px solid var(--gov-border);
+  box-shadow: 0 8px 16px rgba(15, 35, 64, 0.06);
+}
+
+.app-vista-button--secondary:hover {
+  background: #f9fcff;
+}
+
+.app-vista-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 12px;
+  border-radius: var(--gov-radius-pill);
+  border: 1px solid var(--gov-border);
+  background: #ffffff;
+  color: var(--gov-text-soft);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.app-vista-chip--vigente,
+.exam-pill,
+.panel-admin-fila__estado--pagado {
+  background: var(--gov-positive-bg);
+  border-color: var(--gov-positive-border);
+  color: var(--gov-positive-text);
+}
+
+.app-vista-section-title {
+  margin: 0;
+  color: var(--gov-primary-800);
+  font-size: clamp(1.22rem, 3.8vw, 1.52rem);
+  font-weight: 800;
+  line-height: 1.25;
+}
+
+.app-vista-section-subtitle {
+  margin: 6px 0 0;
+  color: var(--gov-text-soft);
+  font-size: 0.96rem;
+  font-weight: 500;
+}
+
+.pie-principal,
+.app-shell-footer {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 55;
+  height: 78px;
+  background: rgba(255, 255, 255, 0.96);
+  border-top: 1px solid var(--gov-border);
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  box-shadow: 0 -10px 24px rgba(16, 45, 84, 0.09);
+  backdrop-filter: blur(12px);
+  padding: 8px 12px calc(8px + env(safe-area-inset-bottom));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2px;
+}
+
+.pie-principal__enlace {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  padding: 8px 2px;
+  border-radius: 14px;
+  color: var(--gov-text-soft);
+  text-decoration: none;
+  transition: background-color 160ms ease, color 160ms ease, transform 160ms ease;
+}
+
+.pie-principal__enlace:hover {
+  background: #eef4fb;
+}
+
+.pie-principal__enlace--activo {
+  color: #ffffff;
+  background: var(--gov-primary-800);
+  box-shadow: 0 10px 20px rgba(8, 67, 128, 0.24);
+  transform: translateY(-4px);
+}
+
+.pie-principal__icono {
+  font-size: 21px;
+}
+
+.pie-principal__texto {
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.panel-admin-card {
+  min-height: 94px;
+  padding: 20px;
+  border-left: 0;
+}
+
+.panel-admin-card::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 5px;
+  background: linear-gradient(90deg, var(--gov-primary-700), var(--gov-primary-500));
+}
+
+.panel-admin-action {
+  min-height: 118px;
+  flex-direction: column;
+  justify-content: center;
+  text-align: center;
+  border-radius: 22px;
+  gap: 8px;
+}
+
+.panel-admin-action__icono {
+  font-size: 26px;
+}
+
+.panel-admin-action__texto {
+  font-size: 0.92rem;
+  line-height: 1.35;
+  max-width: 16ch;
+}
+
+.panel-admin-actividad {
+  padding: 20px;
+}
+
+.panel-admin-actividad__encabezado {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+
+.panel-admin-actividad__enlace {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--gov-primary-800);
+  text-decoration: none;
+}
+
+.panel-admin-fila {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  padding: 14px 0;
+}
+
+.panel-admin-fila__izquierda,
+.panel-admin-fila__derecha {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.panel-admin-fila__avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: #ecf3fb;
+  color: var(--gov-primary-700);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.panel-admin-fila__nombre {
+  margin: 0;
+  color: var(--gov-text);
+  font-size: 0.95rem;
+  font-weight: 700;
+}
+
+.panel-admin-fila__dni,
+.panel-admin-fila__estado-label {
+  margin: 2px 0 0;
+  color: var(--gov-text-soft);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.panel-admin-fila__estado {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: var(--gov-radius-pill);
+  border: 1px solid var(--gov-border);
+  background: #ffffff;
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.panel-admin-fila__estado--pendiente {
+  color: #8b5f00;
+  background: #fff8e8;
+  border-color: #f2d79d;
+}
+
+.panel-admin-fila__estado--rechazado {
+  color: #8b3144;
+  background: #fff1f2;
+  border-color: #f6c2cd;
+}
+
+.panel-admin-fila__boton {
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  border: 1px solid var(--gov-border);
+  background: #ffffff;
+  color: var(--gov-primary-800);
+}
+
+.status-card,
+.card {
+  background: #ffffff;
+  border-radius: var(--gov-radius-card);
+  border: 1px solid var(--gov-border);
+  box-shadow: var(--gov-shadow-soft);
+  padding: 18px;
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #ffffff;
+  border: 1px solid var(--gov-border);
+  border-radius: var(--gov-radius-pill);
+  padding: 8px 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--gov-text);
+}
+
+.chip.success {
+  background: var(--gov-positive-bg);
+  border-color: var(--gov-positive-border);
+  color: var(--gov-positive-text);
+}
+
+.grid {
+  display: grid;
+  gap: 14px;
+}
+
+.grid-cols-2 {
+  grid-template-columns: 1fr;
+}
+
+.stack {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 18px;
+  border-radius: var(--gov-radius-button);
+  border: 0;
+  color: #ffffff;
+  background: var(--gov-primary-800);
+}
+
+.btn.secondary {
+  color: var(--gov-primary-800);
+  background: #ffffff;
+  border: 1px solid var(--gov-border);
+}
+
+label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--gov-text-soft);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+select,
+textarea {
+  width: 100%;
+  min-height: 44px;
+  border-radius: 12px;
+  border: 1px solid var(--gov-border);
+  background: #ffffff;
+  color: var(--gov-text);
+  padding: 10px 12px;
+}
+
+button,
+a,
+input,
+select,
+textarea {
+  -webkit-tap-highlight-color: transparent;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid #4a95e3;
+  outline-offset: 2px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+@media (min-width: 640px) {
+  .contenido-principal,
+  .app-page-content {
+    max-width: 460px;
+    margin: 0 auto;
+  }
+
+  .grid-cols-2 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (min-width: 1024px) {
+  .contenido-principal,
+  .app-page-content,
+  .contenido-principal--ancho {
+    max-width: 1080px;
+  }
+
+  .pie-principal,
+  .app-shell-footer {
+    max-width: 560px;
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+  }
+}
+
+@media (min-width: 640px) and (max-width: 1023.98px) {
+  .crear-examen-vista {
+    max-width: none !important;
+    width: 100% !important;
+    padding-inline: 12px !important;
+  }
+
+  .crear-examen-vista__shell {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .crear-examen-vista__card,
+  .crear-examen-vista__hint {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .crear-examen-vista h2 {
+    font-size: 1.55rem;
+  }
+
+  .crear-examen-vista .font-body-md,
+  .crear-examen-vista p {
+    font-size: 1rem;
+  }
+
+  .crear-examen-vista__title {
+    font-size: 2rem;
+    line-height: 1.1;
+  }
+
+  .crear-examen-vista__subtitle {
+    font-size: 1.08rem;
+    line-height: 1.5;
+  }
+
+  .crear-examen-vista__label {
+    font-size: 0.98rem;
+  }
+
+  .crear-examen-vista__input {
+    min-height: 56px;
+    font-size: 1.05rem;
+  }
+}
+
+@media (max-width: 767.98px) {
+  .crear-examen-vista {
+    max-width: none !important;
+    width: 100% !important;
+    padding-inline: 8px !important;
+  }
+
+  .crear-examen-vista__shell {
+    width: 100% !important;
+    max-width: none !important;
+    gap: 14px !important;
+  }
+
+  .crear-examen-vista__card,
+  .crear-examen-vista__hint {
+    width: 100% !important;
+    max-width: none !important;
+  }
+
+  .crear-examen-vista h2 {
+    font-size: 1.45rem;
+    line-height: 1.15;
+  }
+
+  .crear-examen-vista .font-body-md,
+  .crear-examen-vista p {
+    font-size: 1rem;
+    line-height: 1.5;
+  }
+
+  .crear-examen-vista__title {
+    font-size: 1.75rem;
+    line-height: 1.1;
+  }
+
+  .crear-examen-vista__eyebrow {
+    font-size: 0.82rem;
+  }
+
+  .crear-examen-vista__subtitle {
+    font-size: 1rem;
+    line-height: 1.55;
+  }
+
+  .crear-examen-vista__notice-text,
+  .crear-examen-vista__hint-text,
+  .crear-examen-vista__help-inline {
+    font-size: 0.95rem;
+    line-height: 1.45;
+  }
+
+  .crear-examen-vista__label {
+    font-size: 0.98rem;
+  }
+
+  .crear-examen-vista__input {
+    min-height: 56px;
+    font-size: 16px;
+    line-height: 1.25;
+    border-radius: 18px;
+    padding: 14px 16px;
+  }
+
+  .crear-examen-vista__actions {
+    gap: 12px;
+    margin-top: 2px;
+  }
+
+  .crear-examen-vista__primary,
+  .crear-examen-vista__secondary {
+    min-height: 54px;
+    font-size: 1rem;
+  }
+
+  .crear-examen-vista__card,
+  .crear-examen-vista__hint,
+  .crear-examen-vista__notice {
+    padding: 18px !important;
+  }
+
+  .crear-examen-vista__shell {
+    gap: 18px !important;
+  }
+
+  .crear-examen-vista__field {
+    gap: 8px;
+  }
+}
+
+.crear-examen-vista__shell {
+  display: grid;
+  gap: 18px;
+  width: 100%;
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.crear-examen-vista__intro {
+  display: grid;
+  gap: 8px;
+  padding-inline: 2px;
+}
+
+.crear-examen-vista__eyebrow {
+  margin: 0;
+  color: var(--gov-primary-800);
+  font-size: 0.82rem;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.crear-examen-vista__title {
+  margin: 0;
+  color: var(--gov-text);
+  font-size: clamp(1.9rem, 5vw, 2.25rem);
+  line-height: 1.08;
+  font-weight: 800;
+}
+
+.crear-examen-vista__subtitle {
+  margin: 0;
+  color: var(--gov-text-soft);
+  font-size: 1rem;
+  line-height: 1.55;
+}
+
+.crear-examen-vista__notice {
+  padding: 14px 16px;
+}
+
+.crear-examen-vista__notice--error {
+  border-color: #f3c0c0;
+  background: #fff6f6;
+}
+
+.crear-examen-vista__notice--success {
+  border-color: #b8e2c4;
+  background: #ebf8ef;
+}
+
+.crear-examen-vista__notice-text,
+.crear-examen-vista__hint-text,
+.crear-examen-vista__help-inline {
+  margin: 0;
+  color: var(--gov-text-soft);
+  font-size: 0.96rem;
+  line-height: 1.5;
+}
+
+.crear-examen-vista__notice--error .crear-examen-vista__notice-text {
+  color: #a13232;
+  font-weight: 600;
+}
+
+.crear-examen-vista__notice--success .crear-examen-vista__notice-text {
+  color: #2d6e43;
+  font-weight: 600;
+}
+
+.crear-examen-vista__card,
+.crear-examen-vista__hint {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 20px;
+}
+
+.crear-examen-vista__form {
+  display: grid;
+  gap: 16px;
+}
+
+.crear-examen-vista__field {
+  display: grid;
+  gap: 8px;
+}
+
+.crear-examen-vista__label {
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--gov-text);
+}
+
+.crear-examen-vista__input {
+  width: 100%;
+  min-height: 56px;
+  border-radius: 18px;
+  border: 1px solid var(--gov-border);
+  background: #ffffff;
+  color: var(--gov-text);
+  padding: 14px 16px;
+  font-size: 16px;
+  line-height: 1.25;
+  box-shadow: 0 4px 12px rgba(15, 35, 64, 0.04);
+  transition: border-color 160ms ease, box-shadow 160ms ease, transform 160ms ease, background-color 160ms ease;
+}
+
+.crear-examen-vista__input::placeholder {
+  color: #8ea0b3;
+}
+
+.crear-examen-vista__input:focus {
+  border-color: var(--gov-primary-800);
+  box-shadow: 0 0 0 4px rgba(10, 78, 147, 0.12);
+  outline: none;
+}
+
+.crear-examen-vista__input:disabled {
+  background: #f3f5f8;
+  color: #90a0b2;
+}
+
+.crear-examen-vista__input:invalid:not(:placeholder-shown) {
+  border-color: #d96060;
+}
+
+.crear-examen-vista__actions {
+  display: grid;
+  gap: 12px;
+  margin-top: 2px;
+}
+
+.crear-examen-vista__primary,
+.crear-examen-vista__secondary {
+  min-height: 56px;
+  border-radius: 18px;
+  font-size: 1rem;
+}
+
+.crear-examen-vista__secondary {
+  box-shadow: 0 8px 16px rgba(15, 35, 64, 0.06);
+}
