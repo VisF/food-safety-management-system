@@ -78,15 +78,44 @@ class UsuarioControlador
      */
     public function listarUsuarios(): array
     {
-        // TODO: Llamar a $this->usuarioModelo->obtenerTodos()
-        // TODO: Retornar array con usuarios
-        
-        return [
-            'success' => false,
-            'message' => 'Modelo de usuario no disponible',
-            'usuarios' => [],
-            'total' => 0
-        ];
+        try {
+            // Preferir modelo si está disponible
+            if ($this->usuarioModelo) {
+                // No existe método obtenerTodos en el modelo, usar búsqueda amplia
+                $usuarios = $this->usuarioModelo->buscar('nombre', '');
+                // buscar con criterio vacío puede no retornar nada; fallback a consulta directa
+                if (empty($usuarios)) {
+                    $connFile = __DIR__ . '/../db/Connection.php';
+                    if (file_exists($connFile)) {
+                        require_once $connFile;
+                        $pdo = Connection::getPDO();
+                        $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
+                        $stmt->execute();
+                        $usuarios = $stmt->fetchAll();
+                    }
+                }
+            } else {
+                $usuarios = [];
+                $connFile = __DIR__ . '/../db/Connection.php';
+                if (file_exists($connFile)) {
+                    require_once $connFile;
+                    $pdo = Connection::getPDO();
+                    $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
+                    $stmt->execute();
+                    $usuarios = $stmt->fetchAll();
+                }
+            }
+
+            return [
+                'success' => true,
+                'message' => 'Usuarios listados',
+                'usuarios' => $usuarios ?: [],
+                'total' => count($usuarios ?: [])
+            ];
+        } catch (\Exception $e) {
+            $this->log('ERROR_LISTAR_USUARIOS', 'ERROR', ['error' => $e->getMessage()]);
+            return ['success' => false, 'message' => 'Error listando usuarios', 'usuarios' => [], 'total' => 0];
+        }
     }
 
     /**
@@ -105,20 +134,26 @@ class UsuarioControlador
      */
     public function obtenerUsuario(int $id): array
     {
+        // Validación de entrada: el ID debe ser positivo
         if ($id <= 0) {
             return ['success' => false, 'error' => 'ID de usuario inválido'];
         }
 
-        // TODO: Llamar a $this->usuarioModelo->obtenerPorId($id)
-        // TODO: Llamar a $this->usuarioRolModelo->obtenerRolesPorUsuario($id)
-        // TODO: Retornar array con usuario y roles
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible',
-            'usuario' => null,
-            'roles' => []
-        ];
+        try {
+            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible', 'usuario' => null, 'roles' => []];
+            $usuario = $this->usuarioModelo->obtenerPorId($id);
+            if (!$usuario) return ['success' => false, 'error' => 'Usuario no encontrado', 'usuario' => null, 'roles' => []];
+
+            $roles = [];
+            if ($this->usuarioRolModelo) {
+                $roles = $this->usuarioRolModelo->obtenerRolesPorUsuario($id);
+            }
+
+            return ['success' => true, 'usuario' => $usuario, 'roles' => $roles, 'error' => null];
+        } catch (\Exception $e) {
+            $this->log('ERROR_OBTENER_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error obteniendo usuario', 'usuario' => null, 'roles' => []];
+        }
     }
 
     /**
@@ -138,6 +173,7 @@ class UsuarioControlador
     public function buscarUsuarios(string $termino): array
     {
         $termino = trim($termino);
+        // Validación simple del término de búsqueda para evitar consultas muy amplias
         if (strlen($termino) < 3) {
             return [
                 'success' => false,
@@ -147,17 +183,22 @@ class UsuarioControlador
             ];
         }
 
-        // TODO: Determinar si es email, dni o nombre
-        // TODO: Llamar a $this->usuarioModelo->buscar($criterio, $termino)
-        // TODO: Retornar array con usuarios encontrados
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible',
-            'usuarios' => [],
-            'total' => 0,
-            'termino' => $termino
-        ];
+        try {
+            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
+
+            $criterio = 'nombre';
+            if (filter_var($termino, FILTER_VALIDATE_EMAIL)) {
+                $criterio = 'email';
+            } elseif (preg_match('/^[0-9]{6,10}$/', $termino)) {
+                $criterio = 'dni';
+            }
+
+            $usuarios = $this->usuarioModelo->buscar($criterio, $termino);
+            return ['success' => true, 'usuarios' => $usuarios, 'total' => count($usuarios), 'termino' => $termino];
+        } catch (\Exception $e) {
+            $this->log('ERROR_BUSCAR_USUARIOS', 'ERROR', ['termino' => $termino, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error en búsqueda', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
+        }
     }
 
     /**
@@ -172,20 +213,41 @@ class UsuarioControlador
      */
     public function actualizarUsuario(int $id, array $datos): array
     {
+        // Validación de entrada: ID válido
         if ($id <= 0) {
             return ['success' => false, 'error' => 'ID de usuario inválido'];
         }
 
-        // TODO: Validar que el usuario exista
-        // TODO: Validar cada campo de $datos
-        // TODO: Llamar a $this->usuarioModelo->actualizar($id, $datos)
-        // TODO: Registrar en log
-        // TODO: Retornar resultado
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible'
-        ];
+        try {
+            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
+            $existe = $this->usuarioModelo->obtenerPorId($id);
+            if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
+
+            // Validar campos permitidos
+            $allowed = ['nombre','apellido','telefono','domicilio','email'];
+            $update = [];
+            foreach ($allowed as $f) {
+                if (isset($datos[$f])) {
+                    $val = trim((string)$datos[$f]);
+                    if ($f === 'email' && $val !== '' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
+                        return ['success' => false, 'error' => 'Email inválido'];
+                    }
+                    $update[$f] = $val;
+                }
+            }
+            if (empty($update)) return ['success' => false, 'error' => 'No hay campos válidos para actualizar'];
+
+            $ok = $this->usuarioModelo->actualizar($id, $update);
+            if ($ok) {
+                $this->log('USUARIO_ACTUALIZADO', 'INFO', ['id' => $id, 'campos' => array_keys($update)]);
+                $usuario = $this->usuarioModelo->obtenerPorId($id);
+                return ['success' => true, 'message' => 'Usuario actualizado', 'usuario' => $usuario];
+            }
+            return ['success' => false, 'error' => 'Error al actualizar usuario'];
+        } catch (\Exception $e) {
+            $this->log('ERROR_ACTUALIZAR_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error al actualizar usuario'];
+        }
     }
 
     /**
@@ -198,6 +260,7 @@ class UsuarioControlador
      */
     public function cambiarPassword(int $id, array $datos): array
     {
+        // Validación de entrada: ID válido
         if ($id <= 0) {
             return ['success' => false, 'error' => 'ID de usuario inválido'];
         }
@@ -206,16 +269,39 @@ class UsuarioControlador
         $passwordNueva = trim((string)($datos['password_nueva'] ?? ''));
         $passwordConfirm = trim((string)($datos['password_confirm'] ?? ''));
 
-        // TODO: Validar que password_nueva sea fuerte (min 8 caracteres, mayús, minús, números)
-        // TODO: Validar que password_nueva === password_confirm
-        // TODO: Obtener usuario actual y verificar password_actual con password_verify()
-        // TODO: Llamar a $this->usuarioModelo->cambiarPassword($id, $passwordNueva)
-        // TODO: Registrar en log
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible'
-        ];
+        try {
+            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
+
+            // Validaciones
+            if (strlen($passwordNueva) < 8 || !preg_match('/[A-Z]/', $passwordNueva) || !preg_match('/[a-z]/', $passwordNueva) || !preg_match('/[0-9]/', $passwordNueva)) {
+                return ['success' => false, 'error' => 'La nueva contraseña no cumple los requisitos de seguridad'];
+            }
+            if ($passwordNueva !== $passwordConfirm) return ['success' => false, 'error' => 'Las contraseñas no coinciden'];
+
+            // Obtener hash actual desde BD
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return ['success' => false, 'error' => 'Conexión a BD no disponible'];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+            $stmt = $pdo->prepare('SELECT password FROM usuarios WHERE id = :id');
+            $stmt->execute([':id' => $id]);
+            $row = $stmt->fetch();
+            if (!$row || !isset($row['password'])) return ['success' => false, 'error' => 'Usuario no encontrado'];
+
+            if (!password_verify($passwordActual, $row['password'])) {
+                return ['success' => false, 'error' => 'Contraseña actual incorrecta'];
+            }
+
+            $ok = $this->usuarioModelo->cambiarPassword($id, $passwordNueva);
+            if ($ok) {
+                $this->log('PASSWORD_CAMBIADO', 'INFO', ['id' => $id]);
+                return ['success' => true, 'message' => 'Contraseña actualizada correctamente'];
+            }
+            return ['success' => false, 'error' => 'Error al actualizar contraseña'];
+        } catch (\Exception $e) {
+            $this->log('ERROR_CAMBIAR_PASSWORD', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error cambiando contraseña'];
+        }
     }
 
     /**
@@ -231,14 +317,21 @@ class UsuarioControlador
             return ['success' => false, 'error' => 'ID de usuario inválido'];
         }
 
-        // TODO: Validar que el usuario exista
-        // TODO: Llamar a $this->usuarioModelo->eliminar($id) [que marca como inactivo]
-        // TODO: Registrar en log
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible'
-        ];
+        try {
+            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
+            $existe = $this->usuarioModelo->obtenerPorId($id);
+            if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
+
+            $ok = $this->usuarioModelo->eliminar($id);
+            if ($ok) {
+                $this->log('USUARIO_DESACTIVADO', 'INFO', ['id' => $id]);
+                return ['success' => true, 'message' => 'Usuario desactivado'];
+            }
+            return ['success' => false, 'error' => 'Error al desactivar usuario'];
+        } catch (\Exception $e) {
+            $this->log('ERROR_DESACTIVAR_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error desactivando usuario'];
+        }
     }
 
     /**
@@ -255,15 +348,21 @@ class UsuarioControlador
             return ['success' => false, 'error' => 'IDs inválidos'];
         }
 
-        // TODO: Validar que usuario exista
-        // TODO: Validar que rol exista
-        // TODO: Llamar a $this->usuarioRolModelo->asignarRol($id_usuario, $id_rol)
-        // TODO: Registrar en log
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible'
-        ];
+        try {
+            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible'];
+            // Validar existencia de usuario
+            if ($this->usuarioModelo && !$this->usuarioModelo->obtenerPorId($id_usuario)) return ['success' => false, 'error' => 'Usuario no encontrado'];
+
+            $ok = $this->usuarioRolModelo->asignarRol($id_usuario, $id_rol);
+            if ($ok) {
+                $this->log('ROL_ASIGNADO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
+                return ['success' => true, 'message' => 'Rol asignado correctamente'];
+            }
+            return ['success' => false, 'error' => 'Error al asignar rol (posible duplicado o rol inexistente)'];
+        } catch (\Exception $e) {
+            $this->log('ERROR_ASIGNAR_ROL', 'ERROR', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error asignando rol'];
+        }
     }
 
     /**
@@ -280,14 +379,18 @@ class UsuarioControlador
             return ['success' => false, 'error' => 'IDs inválidos'];
         }
 
-        // TODO: Validar que la asignación exista
-        // TODO: Llamar a $this->usuarioRolModelo->removerRol($id_usuario, $id_rol)
-        // TODO: Registrar en log
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible'
-        ];
+        try {
+            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible'];
+            $ok = $this->usuarioRolModelo->removerRol($id_usuario, $id_rol);
+            if ($ok) {
+                $this->log('ROL_REMOVIDO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
+                return ['success' => true, 'message' => 'Rol removido correctamente'];
+            }
+            return ['success' => false, 'error' => 'Asignación no existe o error al remover'];
+        } catch (\Exception $e) {
+            $this->log('ERROR_REMOVER_ROL', 'ERROR', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error removiendo rol'];
+        }
     }
 
     /**
@@ -307,15 +410,14 @@ class UsuarioControlador
             return ['success' => false, 'error' => 'ID de usuario inválido', 'roles' => [], 'total' => 0];
         }
 
-        // TODO: Llamar a $this->usuarioRolModelo->obtenerRolesPorUsuario($id)
-        // TODO: Retornar array con roles
-        
-        return [
-            'success' => false,
-            'error' => 'Modelo no disponible',
-            'roles' => [],
-            'total' => 0
-        ];
+        try {
+            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible', 'roles' => [], 'total' => 0];
+            $roles = $this->usuarioRolModelo->obtenerRolesPorUsuario($id);
+            return ['success' => true, 'roles' => $roles, 'total' => count($roles)];
+        } catch (\Exception $e) {
+            $this->log('ERROR_OBTENER_ROLES_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
+            return ['success' => false, 'error' => 'Error obteniendo roles', 'roles' => [], 'total' => 0];
+        }
     }
 
     /**
@@ -326,13 +428,25 @@ class UsuarioControlador
      */
     public function obtenerEstadisticas(): array
     {
-        // TODO: Contar usuarios activos e inactivos
-        // TODO: Retornar estadísticas
-        
-        return [
-            'total_usuarios' => 0,
-            'usuarios_activos' => 0,
-            'usuarios_inactivos' => 0
-        ];
+        try {
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return ['total_usuarios' => 0, 'usuarios_activos' => 0, 'usuarios_inactivos' => 0];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM usuarios');
+            $stmt->execute();
+            $total = (int)$stmt->fetchColumn();
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) as activos FROM usuarios WHERE activo = 1');
+            $stmt->execute();
+            $activos = (int)$stmt->fetchColumn();
+
+            $inactivos = $total - $activos;
+            return ['total_usuarios' => $total, 'usuarios_activos' => $activos, 'usuarios_inactivos' => $inactivos];
+        } catch (\Exception $e) {
+            $this->log('ERROR_OBTENER_ESTADISTICAS', 'ERROR', ['error' => $e->getMessage()]);
+            return ['total_usuarios' => 0, 'usuarios_activos' => 0, 'usuarios_inactivos' => 0];
+        }
     }
 }

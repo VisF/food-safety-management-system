@@ -10,7 +10,7 @@ Responsables: TUDAI System Developer (Agente Personalizado)
 
 ## 📊 Resumen Ejecutivo
 
-Se ha completado con éxito la construcción de la **arquitectura base completa** del Sistema de Gestión de Carnets de Manipuladores de Alimentos (Bromatología TUDAI).
+Se ha completado con éxito la construcción de la **arquitectura base completa** del Sistema de Gestión de Carnets de Manipuladores de Alimentos (TUDAI).
 
 | Componente | Cantidad | Status |
 |---|---|---|
@@ -28,7 +28,7 @@ Se ha completado con éxito la construcción de la **arquitectura base completa*
 ## 🗂️ Estructura de Directorios Creada
 
 ```
-bromatologia/
+manipulaciondealimentos/
 │
 ├── .github/
 │   └── agents/

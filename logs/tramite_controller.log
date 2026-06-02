@@ -7,3 +7,4 @@
 [2026-05-26 19:11:26] Usuario: anonimo | Evento: ERROR_OBTENER_CARNET | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-26 19:12:51] Usuario: anonimo | Evento: ERROR_OBTENER_CARNET | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-26 20:46:32] Usuario: anonimo | Evento: ERROR_OBTENER_CARNET | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
+[2026-05-27 20:03:20] Usuario: anonimo | Evento: ERROR_OBTENER_CARNET | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}

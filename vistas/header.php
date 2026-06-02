@@ -1,3 +1,15 @@
+<!--
+ Vista: header.php
+ Propósito: Encabezado reutilizable. Carga dinámica y idempotente de assets (scripts y CSS).
+ Variables/entradas:
+  - Optional: `$page_title` (string) — se muestra escapado con `htmlspecialchars`.
+ Implementación técnica:
+  - Calcula `$assetBase` usando `dirname($_SERVER['SCRIPT_NAME'])` para resolver rutas relativas cuando las vistas se sirven desde `/vistas`.
+  - Evita duplicar assets comprobando selectores en `document.head` antes de inyectar tags.
+ Seguridad / despliegue:
+  - Recomienda validar `SCRIPT_NAME` en entornos con front-controllers personalizados.
+  - Evitar CDN en producción sin políticas CSP; preferir assets versionados y servidos desde el servidor.
+-->
 <header class="encabezado-principal app-shell-header encabezado-principal--alto encabezado-principal--fijo encabezado-principal--realzado encabezado-principal--primario text-on-primary topbar">
    <div class="encabezado-principal__grupo encabezado-principal__grupo--espaciado">
     <button aria-label="Abrir menú" class="encabezado-principal__boton" type="button">

@@ -36,10 +36,10 @@ class NotificacionControlador
     private const TIPO_COMPROBANTE = 'comprobante';
 
     private const EMAIL_CONFIG = [
-        'smtp_host' => 'localhost', // TODO: Configurar SMTP
+        'smtp_host' => 'localhost', // Configurado desde config/env.php en obtenerConfiguracionEmail()
         'smtp_port' => 587,
-        'remitente' => 'noreply@bromatologia.local',
-        'nombre_remitente' => 'Sistema de Bromatología'
+        'remitente' => 'noreply@ManipulacionDeAlimentos.local',
+        'nombre_remitente' => 'Sistema de Manipulacion de Alimentos'
     ];
 
     private ?NotificacionModelo $notificacionModelo = null;
@@ -54,12 +54,19 @@ class NotificacionControlador
         $this->inicializarModelos();
     }
 
+    private function pdo(): \PDO
+    {
+        require_once __DIR__ . '/../db/Connection.php';
+        return Connection::getPDO();
+    }
+
     /**
      * Inicializar todas las dependencias de modelos
      * @return void
      */
     private function inicializarModelos(): void
     {
+        // Instanciar modelos sólo si existen para permitir fallbacks en entornos de pruebas
         if (class_exists('NotificacionModelo')) {
             $this->notificacionModelo = new NotificacionModelo();
         }
@@ -102,30 +109,78 @@ class NotificacionControlador
     public function enviarNotificacion(int $id_usuario, string $tipo, array $datos): array
     {
         try {
-            // Validar usuario
-            // TODO: SELECT * FROM usuario WHERE id = $id_usuario
-            
-            // Generar plantilla
+            $pdo = $this->pdo();
+
+            // Resolver usuario destinatario: si $id_usuario es 0, intentar inferir desde datos
+            $destino_usuario_id = $id_usuario > 0 ? $id_usuario : null;
+            if (!$destino_usuario_id) {
+                if (!empty($datos['id_inscripcion'])) {
+                    $stmt = $pdo->prepare('SELECT usuario_id FROM inscripciones WHERE id = :id LIMIT 1');
+                    $stmt->execute([':id' => (int)$datos['id_inscripcion']]);
+                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($r) $destino_usuario_id = (int)$r['usuario_id'];
+                }
+                if (!$destino_usuario_id && !empty($datos['id_documento'])) {
+                    $stmt = $pdo->prepare('SELECT i.usuario_id FROM documentos d JOIN inscripciones i ON i.id = d.inscripcion_id WHERE d.id = :id LIMIT 1');
+                    $stmt->execute([':id' => (int)$datos['id_documento']]);
+                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($r) $destino_usuario_id = (int)$r['usuario_id'];
+                }
+                if (!$destino_usuario_id && !empty($datos['email'])) {
+                    $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :email LIMIT 1');
+                    $stmt->execute([':email' => $datos['email']]);
+                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
+                    if ($r) $destino_usuario_id = (int)$r['id'];
+                }
+            }
+
+            // Generar plantilla HTML y asunto simple
             $plantilla = $this->generarPlantilla($tipo, $datos);
+            $asunto = $datos['asunto'] ?? ucfirst(str_replace('_', ' ', $tipo));
 
-            // Obtener email del usuario
-            // TODO: $email = SELECT email FROM usuario WHERE id = $id_usuario
+            // Obtener email del usuario si existe
+            $email_destino = $datos['email'] ?? null;
+            if ($destino_usuario_id) {
+                $stmt = $pdo->prepare('SELECT email, nombre, apellido FROM usuarios WHERE id = :id LIMIT 1');
+                $stmt->execute([':id' => $destino_usuario_id]);
+                $u = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+                if ($u) {
+                    $email_destino = $u['email'];
+                }
+            }
 
-            // TODO: Enviar email usando PHPMailer o mail()
-            // TODO: INSERT en tabla notificacion
-            // TODO: Retornar ID de notificación creada
+            // Envío por mail (intento simple con mail())
+            $enviado = 0;
+            if ($email_destino && $this->validarEmailDestino($email_destino)) {
+                $headers = "MIME-Version: 1.0\r\n" .
+                           "Content-type: text/html; charset=utf-8\r\n" .
+                           "From: " . (self::EMAIL_CONFIG['nombre_remitente'] ?? 'Sistema') . " <" . (self::EMAIL_CONFIG['remitente'] ?? 'noreply@localhost') . ">\r\n";
+                    try {
+                        // Aplicar variables en plantilla
+                        $plantilla = $this->aplicarVariablesPlantilla($plantilla, $datos);
+                        $mailOk = @mail($email_destino, $asunto, $plantilla, $headers);
+                        $enviado = $mailOk ? 1 : 0;
+                    } catch (\Throwable $t) {
+                        $enviado = 0;
+                    }
+            }
 
-            $this->registrarLog('ENVIAR_NOTIFICACION', [
-                'id_usuario' => $id_usuario,
-                'tipo' => $tipo
-            ]);
+            // Insertar en tabla notificaciones solo si se pudo resolver usuario_id
+            $id_notificacion = 0;
+            if ($destino_usuario_id) {
+                $ins = $pdo->prepare('INSERT INTO notificaciones (usuario_id, tipo, asunto, mensaje, enviado, fecha_creacion) VALUES (:uid, :tipo, :asunto, :mensaje, :enviado, NOW())');
+                $ins->execute([':uid' => $destino_usuario_id, ':tipo' => $tipo, ':asunto' => $asunto, ':mensaje' => $plantilla, ':enviado' => $enviado]);
+                $id_notificacion = (int)$pdo->lastInsertId();
+            }
+
+            $this->registrarLog('ENVIAR_NOTIFICACION', ['id_usuario' => $destino_usuario_id, 'tipo' => $tipo, 'enviado' => $enviado, 'id_notificacion' => $id_notificacion]);
 
             return [
                 'éxito' => true,
-                'id_notificacion' => 0, // TODO: ID insertado
-                'id_usuario' => $id_usuario,
+                'id_notificacion' => $id_notificacion,
+                'id_usuario' => $destino_usuario_id,
                 'tipo' => $tipo,
-                'mensaje' => 'Notificación enviada correctamente'
+                'mensaje' => $enviado ? 'Notificación enviada correctamente' : 'Notificación encolada/registrada'
             ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_NOTIFICACION', ['error' => $e->getMessage()]);
@@ -137,6 +192,7 @@ class NotificacionControlador
                 'mensaje' => 'Error al enviar notificación: ' . $e->getMessage()
             ];
         }
+
     }
 
     /**
@@ -149,19 +205,42 @@ class NotificacionControlador
     public function enviarAlertaEstado(int $id_inscripcion, string $nuevo_estado): array
     {
         try {
-            // TODO: SELECT * FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: Obtener id_usuario de la inscripción
+            $pdo = $this->pdo();
+
+            // Obtener inscripción y usuario asociado
+            $stmt = $pdo->prepare('SELECT i.*, u.email, u.nombre, u.apellido FROM inscripciones i LEFT JOIN usuarios u ON u.id = i.usuario_id WHERE i.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $insc = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+            if (!$insc) {
+                // Si no existe, igualmente registrar pero avisar que no se pudo notificar
+                $datos = [
+                    'id_inscripcion' => $id_inscripcion,
+                    'nuevo_estado' => $nuevo_estado,
+                    'fecha_cambio' => date('Y-m-d H:i:s')
+                ];
+                $resultado = $this->enviarNotificacion(0, self::TIPO_CAMBIO_ESTADO, $datos);
+                $this->registrarLog('ENVIAR_ALERTA_ESTADO_NO_ENCONTRADA', ['id_inscripcion' => $id_inscripcion, 'nuevo_estado' => $nuevo_estado]);
+                return array_merge($resultado, ['nuevo_estado' => $nuevo_estado]);
+            }
+
+            $usuario_id = (int)($insc['usuario_id'] ?? 0);
+            $email = $insc['email'] ?? '';
 
             $datos = [
                 'id_inscripcion' => $id_inscripcion,
                 'nuevo_estado' => $nuevo_estado,
-                'fecha_cambio' => date('Y-m-d H:i:s')
+                'fecha_cambio' => date('Y-m-d H:i:s'),
+                'asunto' => 'Estado del Trámite Actualizado: ' . $nuevo_estado
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_CAMBIO_ESTADO, $datos);
+            if ($email) $datos['email'] = $email;
+
+            $resultado = $this->enviarNotificacion($usuario_id > 0 ? $usuario_id : 0, self::TIPO_CAMBIO_ESTADO, $datos);
 
             $this->registrarLog('ENVIAR_ALERTA_ESTADO', [
                 'id_inscripcion' => $id_inscripcion,
+                'usuario_id' => $usuario_id,
                 'nuevo_estado' => $nuevo_estado
             ]);
 
@@ -189,23 +268,46 @@ class NotificacionControlador
     public function enviarComprobante(int $id_inscripcion): array
     {
         try {
-            // TODO: SELECT * FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: Generar comprobante (PDF o HTML)
-            // TODO: Adjuntar a email y enviar
-            // TODO: Guardar referencia en notificación
+            $pdo = $this->pdo();
 
+            // Obtener datos de la inscripción y usuario
+            $stmt = $pdo->prepare('SELECT i.*, u.email, u.nombre, u.apellido FROM inscripciones i LEFT JOIN usuarios u ON u.id = i.usuario_id WHERE i.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            if (!$row) {
+                throw new \Exception('Inscripción no encontrada');
+            }
+
+            $usuario_id = (int)($row['usuario_id'] ?? 0);
+
+            // Generar contenido HTML del comprobante usando la plantilla básica
+            $plantilla = $this->plantillaComprobante(['id_inscripcion' => $id_inscripcion, 'fecha_comprobante' => date('Y-m-d H:i:s')]);
+            $contenido = $this->aplicarVariablesPlantilla($plantilla, ['id_inscripcion' => $id_inscripcion, 'fecha_comprobante' => date('Y-m-d H:i:s')] );
+
+            // Guardar comprobante en descargas/
+            $dir = __DIR__ . '/../descargas';
+            if (!is_dir($dir)) @mkdir($dir, 0755, true);
+            $comprobante_id = 'COMP-' . $id_inscripcion . '-' . date('YmdHis');
+            $filename = $comprobante_id . '.html';
+            $filepath = $dir . '/' . $filename;
+            file_put_contents($filepath, $contenido);
+
+            // Preparar datos para notificación (link relativo)
+            $link = '/descargas/' . $filename;
             $datos = [
                 'id_inscripcion' => $id_inscripcion,
-                'fecha_comprobante' => date('Y-m-d H:i:s')
+                'fecha_comprobante' => date('Y-m-d H:i:s'),
+                'ruta_comprobante' => $link,
+                'comprobante_id' => $comprobante_id
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_COMPROBANTE, $datos);
+            // Enviar notificación al usuario si existe, sino registrar notificación sin usuario
+            $resultado = $this->enviarNotificacion($usuario_id > 0 ? $usuario_id : 0, self::TIPO_COMPROBANTE, $datos);
 
-            $this->registrarLog('ENVIAR_COMPROBANTE', ['id_inscripcion' => $id_inscripcion]);
+            // Registrar referencia en logs y devolver resultado
+            $this->registrarLog('ENVIAR_COMPROBANTE', ['id_inscripcion' => $id_inscripcion, 'usuario_id' => $usuario_id, 'ruta' => $filepath]);
 
-            return array_merge($resultado, [
-                'comprobante_id' => 'COMP-' . $id_inscripcion . '-' . date('YmdHis')
-            ]);
+            return array_merge($resultado, ['comprobante_id' => $comprobante_id, 'ruta_archivo' => $filepath]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_COMPROBANTE', ['error' => $e->getMessage()]);
             return [
@@ -227,31 +329,50 @@ class NotificacionControlador
     {
         try {
             // Validar email
+            // Comprobar formato básico del email destino
             if (!$this->validarEmailDestino($email)) {
                 throw new \Exception('Email inválido');
             }
+            $pdo = $this->pdo();
 
-            // TODO: SELECT * FROM usuario WHERE email = $email
-            // TODO: Generar token único de recuperación
-            // TODO: Guardar en tabla recovery_tokens con TTL de 1 hora
-            // TODO: Generar link: /reset-password?token=$token
-            // TODO: Enviar email con link
+            // Generar token seguro
+            $token = bin2hex(random_bytes(16));
+
+            // Buscar usuario por email (si existe)
+            $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :email LIMIT 1');
+            $stmt->execute([':email' => $email]);
+            $u = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            $usuario_id = $u ? (int)$u['id'] : 0;
+
+            // Intentar persistir token en tabla recovery_tokens (si existe)
+            try {
+                $ins = $pdo->prepare('INSERT INTO recovery_tokens (usuario_id, token, expiracion) VALUES (:uid, :token, DATE_ADD(NOW(), INTERVAL 1 HOUR))');
+                $ins->execute([':uid' => $usuario_id, ':token' => $token]);
+            } catch (\Throwable $t) {
+                // Tabla recovery_tokens puede no existir en entornos simples; no detener el flujo
+            }
+
+            // Construir link de recuperación (ruta relativa)
+            $link = '/reset-password?token=' . $token;
 
             $datos = [
-                'email' => $email,
+                'link_recuperacion' => $link,
                 'fecha_solicitud' => date('Y-m-d H:i:s')
             ];
 
-            // Envío sin id_usuario
-            // TODO: INSERT directo en notificacion sin id_usuario
+            // Enviar notificación por correo si se encontró usuario
+            $enviado = false;
+            if ($usuario_id > 0) {
+                $res = $this->enviarNotificacion($usuario_id, self::TIPO_RECUPERACION_PASSWORD, $datos);
+                $enviado = !empty($res['id_notificacion']);
+            }
 
-            $this->registrarLog('ENVIAR_RECUPERACION_PASSWORD', ['email' => $email]);
+            $this->registrarLog('ENVIAR_RECUPERACION_PASSWORD', ['email' => $email, 'usuario_id' => $usuario_id, 'enviado' => $enviado]);
 
             return [
                 'éxito' => true,
                 'email' => $email,
-                'token_enviado' => true,
-                'mensaje' => 'Link de recuperación enviado al email'
+                'token_enviado' => $enviado
             ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_RECUPERACION_PASSWORD', ['error' => $e->getMessage()]);
@@ -273,21 +394,58 @@ class NotificacionControlador
     public function enviarConfirmacionInscripcion(int $id_inscripcion): array
     {
         try {
-            // TODO: SELECT * FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: Obtener detalles del curso/examen
-            // TODO: Generar confirmación con fecha, hora, lugar
+            $pdo = $this->pdo();
+
+            // Obtener datos de la inscripción y usuario
+            $stmt = $pdo->prepare('SELECT i.*, u.email, u.nombre, u.apellido FROM inscripciones i LEFT JOIN usuarios u ON u.id = i.usuario_id WHERE i.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            if (!$row) {
+                throw new \Exception('Inscripción no encontrada');
+            }
+
+            $usuario_id = (int)($row['usuario_id'] ?? 0);
+
+            // Intentar resolver nombre de curso/examen si está disponible
+            $curso_nombre = '';
+            if (!empty($row['curso_nombre'])) {
+                $curso_nombre = $row['curso_nombre'];
+            } elseif (!empty($row['curso'])) {
+                $curso_nombre = $row['curso'];
+            } elseif (!empty($row['curso_id'])) {
+                try {
+                    $s = $pdo->prepare('SELECT nombre FROM cursos WHERE id = :id LIMIT 1');
+                    $s->execute([':id' => (int)$row['curso_id']]);
+                    $r = $s->fetch(\PDO::FETCH_ASSOC);
+                    if ($r) $curso_nombre = $r['nombre'];
+                } catch (\Throwable $t) {
+                    // ignorar si tabla no existe
+                }
+            }
+
+            $lugar = $row['lugar'] ?? $row['sede'] ?? '';
+            $hora = $row['hora'] ?? $row['fecha_hora'] ?? '';
+
+            // Generar comprobante y obtener ruta (se envía también como notificación de tipo comprobante)
+            $comprobanteInfo = $this->enviarComprobante($id_inscripcion);
+            $ruta_comprobante = $comprobanteInfo['ruta_archivo'] ?? ($comprobanteInfo['ruta'] ?? '');
 
             $datos = [
                 'id_inscripcion' => $id_inscripcion,
-                'fecha_confirmacion' => date('Y-m-d H:i:s')
+                'fecha_confirmacion' => date('Y-m-d H:i:s'),
+                'curso' => $curso_nombre,
+                'lugar' => $lugar,
+                'hora' => $hora,
+                'ruta_comprobante' => $ruta_comprobante
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_CONFIRMACION_INSCRIPCION, $datos);
+            $resultado = $this->enviarNotificacion($usuario_id > 0 ? $usuario_id : 0, self::TIPO_CONFIRMACION_INSCRIPCION, $datos);
 
-            $this->registrarLog('ENVIAR_CONFIRMACION_INSCRIPCION', ['id_inscripcion' => $id_inscripcion]);
+            $this->registrarLog('ENVIAR_CONFIRMACION_INSCRIPCION', ['id_inscripcion' => $id_inscripcion, 'usuario_id' => $usuario_id, 'ruta_comprobante' => $ruta_comprobante]);
 
             return array_merge($resultado, [
-                'confirmacion' => true
+                'confirmacion' => true,
+                'ruta_comprobante' => $ruta_comprobante
             ]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_CONFIRMACION_INSCRIPCION', ['error' => $e->getMessage()]);
@@ -310,25 +468,73 @@ class NotificacionControlador
     public function enviarRechazoDocs(int $id_documento, string $motivo): array
     {
         try {
-            // TODO: SELECT * FROM documento WHERE id = $id_documento
-            // TODO: SELECT id_inscripcion FROM documento
-            // TODO: Obtener usuario de la inscripción
+            $pdo = $this->pdo();
+
+            // Obtener documento
+            $stmt = $pdo->prepare('SELECT * FROM documentos WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_documento]);
+            $doc = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            if (!$doc) {
+                throw new \Exception('Documento no encontrado');
+            }
+
+            $inscripcion_id = isset($doc['inscripcion_id']) ? (int)$doc['inscripcion_id'] : 0;
+            $ruta_doc = $doc['ruta'] ?? $doc['path'] ?? $doc['filename'] ?? '';
+            $nombre_doc = $doc['nombre'] ?? $doc['titulo'] ?? '';
+
+            // Resolver usuario a partir de la inscripción si es posible
+            $usuario_id = 0;
+            if ($inscripcion_id > 0) {
+                $s = $pdo->prepare('SELECT usuario_id FROM inscripciones WHERE id = :id LIMIT 1');
+                $s->execute([':id' => $inscripcion_id]);
+                $r = $s->fetch(\PDO::FETCH_ASSOC);
+                if ($r) $usuario_id = (int)$r['usuario_id'];
+            }
+
+            // Si aún no tenemos usuario, intentar si el documento guarda usuario_id
+            if ($usuario_id === 0 && !empty($doc['usuario_id'])) {
+                $usuario_id = (int)$doc['usuario_id'];
+            }
+
+            // Intentar obtener email si no hay usuario resuelto
+            $email = '';
+            if ($usuario_id > 0) {
+                $q = $pdo->prepare('SELECT email FROM usuarios WHERE id = :id LIMIT 1');
+                $q->execute([':id' => $usuario_id]);
+                $uu = $q->fetch(\PDO::FETCH_ASSOC);
+                if ($uu) $email = $uu['email'] ?? '';
+            }
+            if (!$email && !empty($doc['email'])) {
+                $email = $doc['email'];
+            }
 
             $datos = [
                 'id_documento' => $id_documento,
+                'id_inscripcion' => $inscripcion_id,
                 'motivo' => $motivo,
-                'fecha_rechazo' => date('Y-m-d H:i:s')
+                'fecha_rechazo' => date('Y-m-d H:i:s'),
+                'ruta_documento' => $ruta_doc,
+                'nombre_documento' => $nombre_doc,
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_RECHAZO_DOCUMENTACION, $datos);
+            if ($email) $datos['email'] = $email;
+
+            // Enviar notificación al usuario si existe, sino usar email si está disponible
+            $destino = $usuario_id > 0 ? $usuario_id : 0;
+            $resultado = $this->enviarNotificacion($destino, self::TIPO_RECHAZO_DOCUMENTACION, $datos);
 
             $this->registrarLog('ENVIAR_RECHAZO_DOCS', [
                 'id_documento' => $id_documento,
-                'motivo' => $motivo
+                'motivo' => $motivo,
+                'id_inscripcion' => $inscripcion_id,
+                'usuario_id' => $usuario_id,
+                'email' => $email
             ]);
 
             return array_merge($resultado, [
-                'documento_id' => $id_documento
+                'documento_id' => $id_documento,
+                'id_inscripcion' => $inscripcion_id,
+                'usuario_id' => $usuario_id
             ]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_RECHAZO_DOCS', ['error' => $e->getMessage()]);
@@ -350,20 +556,59 @@ class NotificacionControlador
     public function enviarAprobacionDocs(int $id_inscripcion): array
     {
         try {
-            // TODO: SELECT * FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: Contar documentos aprobados
+            $pdo = $this->pdo();
+
+            // Obtener inscripción y resolver usuario
+            $stmt = $pdo->prepare('SELECT i.*, u.email, u.nombre, u.apellido FROM inscripciones i LEFT JOIN usuarios u ON u.id = i.usuario_id WHERE i.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $ins = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            if (!$ins) {
+                throw new \Exception('Inscripción no encontrada');
+            }
+
+            $usuario_id = (int)($ins['usuario_id'] ?? 0);
+            $email = $ins['email'] ?? '';
+
+            // Contar documentos totales y aprobados para la inscripción
+            $totalDocsStmt = $pdo->prepare('SELECT COUNT(*) AS total FROM documentos WHERE inscripcion_id = :id');
+            $totalDocsStmt->execute([':id' => $id_inscripcion]);
+            $totalRow = $totalDocsStmt->fetch(\PDO::FETCH_ASSOC);
+            $total = $totalRow ? (int)$totalRow['total'] : 0;
+
+            // Aprobados: intentamos soportar campo booleano 'aprobado' o texto 'estado'
+            $approvedStmt = $pdo->prepare("SELECT COUNT(*) AS aprobados FROM documentos WHERE inscripcion_id = :id AND (aprobado = 1 OR estado = 'aprobado')");
+            $approvedStmt->execute([':id' => $id_inscripcion]);
+            $apRow = $approvedStmt->fetch(\PDO::FETCH_ASSOC);
+            $aprobados = $apRow ? (int)$apRow['aprobados'] : 0;
+
+            $todosAprobados = ($total > 0 && $aprobados >= $total) || ($total === 0 && $aprobados > 0);
 
             $datos = [
                 'id_inscripcion' => $id_inscripcion,
-                'fecha_aprobacion' => date('Y-m-d H:i:s')
+                'fecha_aprobacion' => date('Y-m-d H:i:s'),
+                'total_documentos' => $total,
+                'documentos_aprobados' => $aprobados,
+                'todos_aprobados' => $todosAprobados
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_APROBACION_DOCUMENTACION, $datos);
+            if ($email) $datos['email'] = $email;
 
-            $this->registrarLog('ENVIAR_APROBACION_DOCS', ['id_inscripcion' => $id_inscripcion]);
+            // Enviar notificación al usuario si se resolvió, si no se intentará con email
+            $destino = $usuario_id > 0 ? $usuario_id : 0;
+            $resultado = $this->enviarNotificacion($destino, self::TIPO_APROBACION_DOCUMENTACION, $datos);
+
+            $this->registrarLog('ENVIAR_APROBACION_DOCS', [
+                'id_inscripcion' => $id_inscripcion,
+                'usuario_id' => $usuario_id,
+                'total_documentos' => $total,
+                'documentos_aprobados' => $aprobados,
+                'todos_aprobados' => $todosAprobados
+            ]);
 
             return array_merge($resultado, [
-                'documentacion_aprobada' => true
+                'documentacion_aprobada' => (bool)$todosAprobados,
+                'total_documentos' => $total,
+                'documentos_aprobados' => $aprobados
             ]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_APROBACION_DOCS', ['error' => $e->getMessage()]);
@@ -380,33 +625,68 @@ class NotificacionControlador
      * Enviar resultado de examen (aprobado o reprobado)
      *
      * @param int $id_resultado ID del resultado del examen
-     * @return array ['éxito' => bool, 'id_notificacion' => int, 'resultado' => string]
+     * @return array ['éxito' => bool, 'id_notificacion' => int, 'resultado' => string, 'nota' => float, 'aprobado' => bool]
      */
     public function enviarResultadoExamen(int $id_resultado): array
     {
         try {
-            // TODO: SELECT * FROM resultado_examen WHERE id = $id_resultado
-            // TODO: SELECT nota, aprobado FROM resultado_examen
-            // TODO: Obtener datos de la inscripción y usuario
+            $pdo = $this->pdo();
+
+            // Obtener resultado del examen con inscripción
+            $stmt = $pdo->prepare('SELECT r.*, i.usuario_id, i.id as inscripcion_id FROM resultado_examen r LEFT JOIN inscripciones i ON i.id = r.inscripcion_id WHERE r.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_resultado]);
+            $res = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+            if (!$res) {
+                throw new \Exception('Resultado de examen no encontrado');
+            }
+
+            $usuario_id = (int)($res['usuario_id'] ?? 0);
+            $nota = (float)($res['nota'] ?? 0.0);
+            $aprobado = (bool)($res['aprobado'] ?? false);
+            $inscripcion_id = (int)($res['inscripcion_id'] ?? 0);
+
+            // Obtener usuario si existe
+            $email = '';
+            if ($usuario_id > 0) {
+                $q = $pdo->prepare('SELECT email, nombre, apellido FROM usuarios WHERE id = :id LIMIT 1');
+                $q->execute([':id' => $usuario_id]);
+                $u = $q->fetch(\PDO::FETCH_ASSOC);
+                if ($u) $email = $u['email'] ?? '';
+            }
+
+            $estado = $aprobado ? 'APROBADO' : 'REPROBADO';
+            $asunto = 'Resultado del Examen: ' . $estado;
 
             $datos = [
                 'id_resultado' => $id_resultado,
-                'fecha_resultado' => date('Y-m-d H:i:s')
+                'id_inscripcion' => $inscripcion_id,
+                'nota' => $nota,
+                'aprobado' => $aprobado,
+                'estado' => $estado,
+                'fecha_resultado' => date('Y-m-d H:i:s'),
+                'asunto' => $asunto
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_RESULTADO_EXAMEN, $datos);
+            if ($email) $datos['email'] = $email;
 
-            $this->registrarLog('ENVIAR_RESULTADO_EXAMEN', ['id_resultado' => $id_resultado]);
+            // Enviar notificación
+            $resultado = $this->enviarNotificacion($usuario_id > 0 ? $usuario_id : 0, self::TIPO_RESULTADO_EXAMEN, $datos);
+
+            $this->registrarLog('ENVIAR_RESULTADO_EXAMEN', ['id_resultado' => $id_resultado, 'usuario_id' => $usuario_id, 'nota' => $nota, 'aprobado' => $aprobado]);
 
             return array_merge($resultado, [
-                'resultado' => 'pendiente_lectura'
+                'resultado' => $estado,
+                'nota' => $nota,
+                'aprobado' => $aprobado
             ]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_RESULTADO_EXAMEN', ['error' => $e->getMessage()]);
             return [
                 'éxito' => false,
                 'id_notificacion' => 0,
-                'id_resultado' => $id_resultado
+                'id_resultado' => $id_resultado,
+                'mensaje' => 'Error al enviar resultado: ' . $e->getMessage()
             ];
         }
     }
@@ -415,33 +695,85 @@ class NotificacionControlador
      * Enviar notificación de carnet emitido
      *
      * @param int $id_carnet ID del carnet
-     * @return array ['éxito' => bool, 'id_notificacion' => int, 'carnet_numero' => string]
+     * @return array ['éxito' => bool, 'id_notificacion' => int, 'carnet_numero' => string, 'ruta_descarga' => string]
      */
     public function enviarCarnetEmitido(int $id_carnet): array
     {
         try {
-            // TODO: SELECT * FROM carnet WHERE id = $id_carnet
-            // TODO: Obtener inscripción y usuario
-            // TODO: Generar link a descarga/consulta del carnet
+            $pdo = $this->pdo();
+
+            // Obtener carnet con inscripción y usuario
+            $stmt = $pdo->prepare('SELECT c.*, i.usuario_id, i.id as inscripcion_id FROM carnets c LEFT JOIN inscripciones i ON i.id = c.inscripcion_id WHERE c.id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_carnet]);
+            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+            if (!$carnet) {
+                throw new \Exception('Carnet no encontrado');
+            }
+
+            $usuario_id = (int)($carnet['usuario_id'] ?? 0);
+            $inscripcion_id = (int)($carnet['inscripcion_id'] ?? 0);
+            $numero_carnet = $carnet['numero_carnet'] ?? ('CARNET-' . $id_carnet . '-' . date('Y'));
+            $fecha_emision = $carnet['fecha_emision'] ?? date('Y-m-d');
+            $fecha_vencimiento = $carnet['fecha_vencimiento'] ?? date('Y-m-d', strtotime('+2 years'));
+            $ruta_pdf = $carnet['ruta_pdf'] ?? '';
+
+            // Obtener usuario si existe
+            $email = '';
+            $nombre = '';
+            if ($usuario_id > 0) {
+                $q = $pdo->prepare('SELECT email, nombre, apellido FROM usuarios WHERE id = :id LIMIT 1');
+                $q->execute([':id' => $usuario_id]);
+                $u = $q->fetch(\PDO::FETCH_ASSOC);
+                if ($u) {
+                    $email = $u['email'] ?? '';
+                    $nombre = ($u['nombre'] ?? '') . ' ' . ($u['apellido'] ?? '');
+                }
+            }
+
+            // Construir link de descarga relativo
+            $ruta_descarga = '';
+            if ($ruta_pdf) {
+                // Si la ruta es absoluta o relativa, normalizarla
+                $ruta_descarga = strpos($ruta_pdf, '/') === 0 ? substr($ruta_pdf, 1) : $ruta_pdf;
+            } else {
+                // Generar ruta por defecto si no existe
+                $ruta_descarga = 'descargas/carnet_' . $id_carnet . '.pdf';
+            }
+
+            $asunto = 'Tu Carnet de Manipulador de Alimentos está disponible';
 
             $datos = [
                 'id_carnet' => $id_carnet,
-                'fecha_emision' => date('Y-m-d H:i:s')
+                'id_inscripcion' => $inscripcion_id,
+                'numero_carnet' => $numero_carnet,
+                'titular' => $nombre,
+                'fecha_emision' => $fecha_emision,
+                'fecha_vencimiento' => $fecha_vencimiento,
+                'ruta_descarga' => $ruta_descarga,
+                'link_descarga' => 'Router.php?r=carnet_emitido&id_carnet=' . $id_carnet,
+                'asunto' => $asunto
             ];
 
-            $resultado = $this->enviarNotificacion(0, self::TIPO_CARNET_EMITIDO, $datos);
+            if ($email) $datos['email'] = $email;
 
-            $this->registrarLog('ENVIAR_CARNET_EMITIDO', ['id_carnet' => $id_carnet]);
+            // Enviar notificación
+            $resultado = $this->enviarNotificacion($usuario_id > 0 ? $usuario_id : 0, self::TIPO_CARNET_EMITIDO, $datos);
+
+            $this->registrarLog('ENVIAR_CARNET_EMITIDO', ['id_carnet' => $id_carnet, 'usuario_id' => $usuario_id, 'numero' => $numero_carnet]);
 
             return array_merge($resultado, [
-                'carnet_numero' => 'CARNET-' . $id_carnet . '-' . date('Y')
+                'carnet_numero' => $numero_carnet,
+                'ruta_descarga' => $ruta_descarga,
+                'fecha_vencimiento' => $fecha_vencimiento
             ]);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ENVIAR_CARNET_EMITIDO', ['error' => $e->getMessage()]);
             return [
                 'éxito' => false,
                 'id_notificacion' => 0,
-                'id_carnet' => $id_carnet
+                'id_carnet' => $id_carnet,
+                'mensaje' => 'Error al enviar notificación de carnet: ' . $e->getMessage()
             ];
         }
     }
@@ -459,12 +791,17 @@ class NotificacionControlador
             // WHERE id_usuario = $id_usuario AND enviado = 0
             // ORDER BY fecha_creacion DESC
 
+            $pdo = $this->pdo();
+            $stmt = $pdo->prepare('SELECT * FROM notificaciones WHERE usuario_id = :uid AND enviado = 0 ORDER BY fecha_creacion DESC');
+            $stmt->execute([':uid' => $id_usuario]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
             $this->registrarLog('OBTENER_NOTIFICACIONES_PENDIENTES', ['id_usuario' => $id_usuario]);
 
             return [
                 'id_usuario' => $id_usuario,
-                'total' => 0,
-                'notificaciones' => []
+                'total' => count($rows),
+                'notificaciones' => $rows
             ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_NOTIFICACIONES_PENDIENTES', ['error' => $e->getMessage()]);
@@ -491,12 +828,17 @@ class NotificacionControlador
             // ORDER BY fecha_creacion DESC
             // LIMIT 100
 
+            $pdo = $this->pdo();
+            $stmt = $pdo->prepare('SELECT * FROM notificaciones WHERE usuario_id = :uid ORDER BY fecha_creacion DESC LIMIT 100');
+            $stmt->execute([':uid' => $id_usuario]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
             $this->registrarLog('OBTENER_HISTORIAL_NOTIFICACIONES', ['id_usuario' => $id_usuario]);
 
             return [
                 'id_usuario' => $id_usuario,
-                'total' => 0,
-                'notificaciones' => []
+                'total' => count($rows),
+                'notificaciones' => $rows
             ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_HISTORIAL_NOTIFICACIONES', ['error' => $e->getMessage()]);
@@ -520,12 +862,16 @@ class NotificacionControlador
             // TODO: UPDATE notificacion SET enviado = 1, fecha_envio = NOW()
             // WHERE id = $id_notificacion
 
+            $pdo = $this->pdo();
+            $upd = $pdo->prepare('UPDATE notificaciones SET enviado = 1, fecha_envio = NOW() WHERE id = :id');
+            $upd->execute([':id' => $id_notificacion]);
+            $ok = $upd->rowCount() > 0;
             $timestamp = date('Y-m-d H:i:s');
 
-            $this->registrarLog('MARCAR_ENVIADA', ['id_notificacion' => $id_notificacion]);
+            $this->registrarLog('MARCAR_ENVIADA', ['id_notificacion' => $id_notificacion, 'ok' => $ok]);
 
             return [
-                'éxito' => true,
+                'éxito' => $ok,
                 'id_notificacion' => $id_notificacion,
                 'fecha_envio' => $timestamp
             ];
@@ -551,13 +897,18 @@ class NotificacionControlador
             // TODO: SELECT * FROM notificacion WHERE tipo = $tipo
             // ORDER BY fecha_creacion DESC
 
+            $allowed = [self::TIPO_EMAIL, self::TIPO_SMS, self::TIPO_SISTEMA, self::TIPO_CONFIRMACION_INSCRIPCION, self::TIPO_CAMBIO_ESTADO, self::TIPO_RECHAZO_DOCUMENTACION, self::TIPO_APROBACION_DOCUMENTACION, self::TIPO_RESULTADO_EXAMEN, self::TIPO_CARNET_EMITIDO, self::TIPO_RECUPERACION_PASSWORD, self::TIPO_COMPROBANTE];
+            if (!in_array($tipo, $allowed, true)) {
+                return ['tipo' => $tipo, 'total' => 0, 'notificaciones' => []];
+            }
+            $pdo = $this->pdo();
+            $stmt = $pdo->prepare('SELECT * FROM notificaciones WHERE tipo = :tipo ORDER BY fecha_creacion DESC');
+            $stmt->execute([':tipo' => $tipo]);
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
             $this->registrarLog('OBTENER_NOTIFICACIONES_POR_TIPO', ['tipo' => $tipo]);
 
-            return [
-                'tipo' => $tipo,
-                'total' => 0,
-                'notificaciones' => []
-            ];
+            return ['tipo' => $tipo, 'total' => count($rows), 'notificaciones' => $rows];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_NOTIFICACIONES_POR_TIPO', ['error' => $e->getMessage()]);
             return [
@@ -580,13 +931,14 @@ class NotificacionControlador
             // TODO: DELETE FROM notificacion WHERE id = $id
             // TODO: Verificar que se eliminó
 
-            $this->registrarLog('ELIMINAR_NOTIFICACION', ['id' => $id]);
+            $pdo = $this->pdo();
+            $del = $pdo->prepare('DELETE FROM notificaciones WHERE id = :id');
+            $del->execute([':id' => $id]);
+            $ok = $del->rowCount() > 0;
 
-            return [
-                'éxito' => true,
-                'id' => $id,
-                'eliminada' => true
-            ];
+            $this->registrarLog('ELIMINAR_NOTIFICACION', ['id' => $id, 'ok' => $ok]);
+
+            return ['éxito' => $ok, 'id' => $id, 'eliminada' => $ok];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ELIMINAR_NOTIFICACION', ['error' => $e->getMessage()]);
             return [
@@ -605,18 +957,81 @@ class NotificacionControlador
     public function procesarColaNotificaciones(): array
     {
         try {
-            // TODO: SELECT * FROM notificacion WHERE enviado = 0
-            // TODO: Procesar cada una
-            // TODO: Manejar reintentos
-            // TODO: Marcar como enviada si es exitosa
+            $pdo = $this->pdo();
+
+            $cfg = $this->obtenerConfiguracionEmail();
+            $maxRetries = (int)(getenv('NOTIF_MAX_RETRIES') ?: 3);
 
             $procesadas = 0;
             $exitosas = 0;
             $errores = 0;
 
-            // TODO: foreach notificaciones_pendientes
-            // TODO: Intentar envío
-            // TODO: Actualizar estado
+            $stmt = $pdo->prepare('SELECT * FROM notificaciones WHERE enviado = 0 ORDER BY fecha_creacion ASC LIMIT 100');
+            $stmt->execute();
+            $pendientes = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
+
+            foreach ($pendientes as $n) {
+                $procesadas++;
+                $id = (int)$n['id'];
+                $usuario_id = (int)($n['usuario_id'] ?? 0);
+                $tipo = $n['tipo'] ?? '';
+                $asunto = $n['asunto'] ?? ($tipo ?: 'Notificación');
+
+                // Resolver email destino
+                $email = '';
+                if ($usuario_id > 0) {
+                    $q = $pdo->prepare('SELECT email FROM usuarios WHERE id = :id LIMIT 1');
+                    $q->execute([':id' => $usuario_id]);
+                    $u = $q->fetch(\PDO::FETCH_ASSOC);
+                    if ($u) $email = $u['email'] ?? '';
+                }
+
+                if (!$email && !empty($n['mensaje'])) {
+                    // intentar extraer email simple desde el campo mensaje (no siempre presente)
+                    if (preg_match('/[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}/', $n['mensaje'], $m)) {
+                        $email = $m[0];
+                    }
+                }
+
+                if (!$email) {
+                    $errores++;
+                    $upd = $pdo->prepare('UPDATE notificaciones SET attempts = attempts + 1, last_error = :err WHERE id = :id');
+                    $errMsg = 'No se pudo resolver email destino';
+                    $upd->execute([':err' => $errMsg, ':id' => $id]);
+                    $this->registrarLog('PROCESAR_COLA_NOTIF_NO_EMAIL', ['id' => $id]);
+                    continue;
+                }
+
+                // Preparar contenido (usar mensaje almacenado si existe, sino generar plantilla)
+                $plantilla = $n['mensaje'] ?: $this->generarPlantilla($tipo, []);
+                $plantilla = $this->aplicarVariablesPlantilla($plantilla, []);
+
+                $headers = "MIME-Version: 1.0\r\n" .
+                           "Content-type: text/html; charset=utf-8\r\n" .
+                           "From: " . ($cfg['nombre_remitente'] ?? 'Sistema') . " <" . ($cfg['remitente'] ?? 'noreply@localhost') . ">\r\n";
+
+                try {
+                    $mailOk = @mail($email, $asunto, $plantilla, $headers);
+                    if ($mailOk) {
+                        $upd = $pdo->prepare('UPDATE notificaciones SET enviado = 1, fecha_envio = NOW() WHERE id = :id');
+                        $upd->execute([':id' => $id]);
+                        $exitosas++;
+                        $this->registrarLog('NOTIF_ENVIADA', ['id' => $id, 'email' => $email, 'tipo' => $tipo]);
+                    } else {
+                        $errores++;
+                        $upd = $pdo->prepare('UPDATE notificaciones SET attempts = attempts + 1, last_error = :err WHERE id = :id');
+                        $errMsg = 'mail() returned false';
+                        $upd->execute([':err' => $errMsg, ':id' => $id]);
+                        $this->registrarLog('NOTIF_ERROR_ENVIO', ['id' => $id, 'email' => $email, 'error' => $errMsg]);
+                    }
+                } catch (\Throwable $t) {
+                    $errores++;
+                    $upd = $pdo->prepare('UPDATE notificaciones SET attempts = attempts + 1, last_error = :err WHERE id = :id');
+                    $errMsg = $t->getMessage();
+                    $upd->execute([':err' => $errMsg, ':id' => $id]);
+                    $this->registrarLog('NOTIF_EXCEPTION_ENVIO', ['id' => $id, 'email' => $email, 'error' => $errMsg]);
+                }
+            }
 
             $this->registrarLog('PROCESAR_COLA_NOTIFICACIONES', [
                 'procesadas' => $procesadas,
@@ -639,6 +1054,24 @@ class NotificacionControlador
                 'error' => $e->getMessage()
             ];
         }
+    }
+
+    /**
+     * Reemplaza placeholders de plantilla del tipo {key} por valores provistos.
+     * Escapa los valores con htmlspecialchars para evitar inyección de HTML.
+     *
+     * @param string $html
+     * @param array $vars
+     * @return string
+     */
+    private function aplicarVariablesPlantilla(string $html, array $vars): string
+    {
+        if (empty($vars)) return $html;
+        foreach ($vars as $k => $v) {
+            $val = is_scalar($v) ? (string)$v : json_encode($v);
+            $html = str_replace('{' . $k . '}', htmlspecialchars($val, ENT_QUOTES | ENT_SUBSTITUTE, 'UTF-8'), $html);
+        }
+        return $html;
     }
 
     /**
@@ -845,8 +1278,21 @@ class NotificacionControlador
      */
     public function obtenerConfiguracionEmail(): array
     {
-        // TODO: Leer de archivo de configuración o .env
-        return self::EMAIL_CONFIG;
+        // Leer valores desde variables de entorno (.env) cargadas por `config/env.php`
+        // Se mantiene `self::EMAIL_CONFIG` como valores por defecto.
+        require_once __DIR__ . '/../config/env.php';
+
+        $cfg = self::EMAIL_CONFIG;
+
+        $cfg['smtp_host'] = getenv('SMTP_HOST') ?: $cfg['smtp_host'] ?? 'localhost';
+        $cfg['smtp_port'] = (int)(getenv('SMTP_PORT') ?: $cfg['smtp_port'] ?? 587);
+        $cfg['smtp_user'] = getenv('SMTP_USER') ?: getenv('MAIL_USERNAME') ?: ($cfg['smtp_user'] ?? '');
+        $cfg['smtp_pass'] = getenv('SMTP_PASS') ?: getenv('MAIL_PASSWORD') ?: ($cfg['smtp_pass'] ?? '');
+        $cfg['smtp_secure'] = getenv('SMTP_SECURE') ?: $cfg['smtp_secure'] ?? 'tls';
+        $cfg['remitente'] = getenv('EMAIL_FROM') ?: getenv('MAIL_FROM') ?: ($cfg['remitente'] ?? 'noreply@localhost');
+        $cfg['nombre_remitente'] = getenv('EMAIL_NAME') ?: getenv('MAIL_FROM_NAME') ?: ($cfg['nombre_remitente'] ?? 'Sistema');
+
+        return $cfg;
     }
 
     /**

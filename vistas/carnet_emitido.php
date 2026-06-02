@@ -1,8 +1,15 @@
 <?php
-
+/**
+ * Vista: carnet_emitido.php
+ * Propósito: Presentación visual del carnet emitido al titular.
+ * Datos de entrada (pueden venir vía GET para pruebas): numero, titular, fecha_emision, fecha_vencimiento
+ * Notas técnicas:
+ *  - Para una versión oficial/firmada, el backend debe generar un PDF o arte final con metadatos y control de acceso.
+ *  - Evitar depender de GET para datos reales en producción; usar sesiones o APIs autenticadas.
+ */
 class CarnetEmitidoVista
 {
-    private string $baseURL = '/bromatologiaAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
     private function getHeader(): void
     {

@@ -1,5 +1,11 @@
 <?php
 declare(strict_types=1);
+/**
+ * Vista: inscripcion_exitosa.php
+ * Propósito: Mensaje de confirmación tras completar una inscripción a examen.
+ * Entradas: GET 'data' con 'title' y 'message' opcionalmente.
+ * Nota: usar esta vista sólo para UX; la lógica de negocio reside en el controlador.
+ */
 class InscripcionExitosaVista
 {
     public static function mostrar(): void
@@ -9,6 +15,7 @@ class InscripcionExitosaVista
             'message' => 'Tu inscripción fue registrada correctamente.',
         ];
         $data = $defaults;
+        // Permite pasar `data` por GET para títulos/mensajes en pruebas; producción debe usar datos del controlador.
         if (isset($_GET['data'])) {
             $incoming = json_decode($_GET['data'], true);
             if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
@@ -25,7 +32,7 @@ class InscripcionExitosaVista
                 </p>
 
                 <div style="margin-top:1.25rem;display:flex;justify-content:center;">
-                    <a href="/Router.php?r=index" class="btn" role="button">Ir al inicio</a>
+                    <a href="Router.php?r=index" class="btn" role="button">Ir al inicio</a>
                 </div>
             </section>
         </main>

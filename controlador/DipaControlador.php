@@ -94,6 +94,7 @@ class DipaControlador
             $rows = $stmt->fetchAll();
 
             $registros = [];
+            // Normalizar filas resultantes para estructura DIPA
             foreach ($rows as $r) {
                 $registros[] = [
                     'id_inscripcion' => (int)$r['inscripcion_id'],
@@ -131,6 +132,7 @@ class DipaControlador
             $importados = 0;
             $errores = [];
 
+            // Iterar carnets recibidos desde DIPA y validar cada uno antes de insertar
             foreach ($datos_carnets as $carnet_data) {
                 try {
                     // Validar formato

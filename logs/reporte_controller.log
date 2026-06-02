@@ -9,3 +9,5 @@
 [2026-05-26 20:49:23] [ERROR] Error al obtener actividad reciente | {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-27 19:51:27] [ERROR] Error al obtener actividad reciente | {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-27 19:51:32] [ERROR] Error al obtener actividad reciente | {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
+[2026-05-27 20:03:30] [ERROR] Error al obtener actividad reciente | {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
+[2026-05-27 20:03:32] [ERROR] Error al obtener actividad reciente | {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}

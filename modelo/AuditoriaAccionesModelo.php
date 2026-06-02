@@ -43,11 +43,30 @@ class AuditoriaAccionesModelo
      */
     public function registrar(array $data)
     {
-        // TODO: Validar que id_usuario exista
-        // TODO: Validar que accion sea INSERT, UPDATE o DELETE
-        // TODO: INSERT en tabla auditoria_acciones
-        // TODO: Retornar ['id' => $id, 'id_usuario' => $id_usuario, ...]
-        
+        // preparar conexión PDO
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else {
+            $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); }
+        }
+        if (!$pdo) return false;
+
+        $id_usuario = isset($data['id_usuario']) ? ($data['id_usuario'] === null ? null : (int)$data['id_usuario']) : null;
+        $tabla = $data['tabla_afectada'] ?? ($data['tabla'] ?? '');
+        $accion = strtoupper($data['accion'] ?? '');
+        $validAcc = in_array($accion, ['INSERT','UPDATE','DELETE','SELECT'], true) ? $accion : 'UPDATE';
+        $datos_prev = isset($data['datos_anteriores']) ? (is_string($data['datos_anteriores']) ? $data['datos_anteriores'] : json_encode($data['datos_anteriores'])) : null;
+        $datos_new = isset($data['datos_nuevos']) ? (is_string($data['datos_nuevos']) ? $data['datos_nuevos'] : json_encode($data['datos_nuevos'])) : null;
+        $ip = $data['ip'] ?? $_SERVER['REMOTE_ADDR'] ?? '';
+        $ua = $data['user_agent'] ?? $_SERVER['HTTP_USER_AGENT'] ?? '';
+
+        $sql = 'INSERT INTO auditoria_acciones (id_usuario, tabla_afectada, accion, datos_anteriores, datos_nuevos, fecha, ip, user_agent) VALUES (:uid, :tabla, :accion, :prev, :new, NOW(), :ip, :ua)';
+        $stmt = $pdo->prepare($sql);
+        $ok = $stmt->execute([':uid' => $id_usuario, ':tabla' => $tabla, ':accion' => $validAcc, ':prev' => $datos_prev, ':new' => $datos_new, ':ip' => $ip, ':ua' => $ua]);
+        if ($ok) {
+            $id = (int)$pdo->lastInsertId();
+            return ['id' => $id, 'id_usuario' => $id_usuario, 'tabla_afectada' => $tabla, 'accion' => $validAcc];
+        }
         return false;
     }
 
@@ -58,10 +77,13 @@ class AuditoriaAccionesModelo
      */
     public function obtenerPorUsuario(int $id_usuario): array
     {
-        // TODO: SELECT * FROM auditoria_acciones WHERE id_usuario = $id_usuario ORDER BY fecha DESC
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else { $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); } }
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare('SELECT * FROM auditoria_acciones WHERE id_usuario = :uid ORDER BY fecha DESC');
+        $stmt->execute([':uid' => $id_usuario]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -71,10 +93,13 @@ class AuditoriaAccionesModelo
      */
     public function obtenerPorTabla(string $tabla_afectada): array
     {
-        // TODO: SELECT * FROM auditoria_acciones WHERE tabla_afectada = $tabla_afectada ORDER BY fecha DESC
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else { $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); } }
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare('SELECT * FROM auditoria_acciones WHERE tabla_afectada = :tabla ORDER BY fecha DESC');
+        $stmt->execute([':tabla' => $tabla_afectada]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -85,10 +110,13 @@ class AuditoriaAccionesModelo
      */
     public function obtenerPorFecha(string $fecha_inicio, string $fecha_fin): array
     {
-        // TODO: SELECT * FROM auditoria_acciones WHERE fecha >= $fecha_inicio AND fecha <= $fecha_fin ORDER BY fecha DESC
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else { $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); } }
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare('SELECT * FROM auditoria_acciones WHERE fecha >= :inicio AND fecha <= :fin ORDER BY fecha DESC');
+        $stmt->execute([':inicio' => $fecha_inicio, ':fin' => $fecha_fin]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -98,10 +126,14 @@ class AuditoriaAccionesModelo
      */
     public function obtenerRecientes(int $cantidad = 10): array
     {
-        // TODO: SELECT * FROM auditoria_acciones ORDER BY fecha DESC LIMIT $cantidad
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else { $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); } }
+        if (!$pdo) return [];
+        $stmt = $pdo->prepare('SELECT * FROM auditoria_acciones ORDER BY fecha DESC LIMIT :cant');
+        $stmt->bindValue(':cant', (int)$cantidad, \PDO::PARAM_INT);
+        $stmt->execute();
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -112,11 +144,21 @@ class AuditoriaAccionesModelo
      */
     public function buscar(string $criterio, string $valor): array
     {
-        // TODO: Validar que $criterio sea uno de los permitidos
-        // TODO: SELECT * FROM auditoria_acciones WHERE $criterio LIKE %$valor% ORDER BY fecha DESC
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $allowed = ['tabla_afectada', 'accion', 'id_usuario'];
+        if (!in_array($criterio, $allowed, true)) return [];
+        $pdo = null;
+        if ($this->conexion instanceof \PDO) $pdo = $this->conexion;
+        else { $conn = __DIR__ . '/../db/Connection.php'; if (file_exists($conn)) { require_once $conn; $pdo = Connection::getPDO(); } }
+        if (!$pdo) return [];
+        if ($criterio === 'id_usuario') {
+            $stmt = $pdo->prepare('SELECT * FROM auditoria_acciones WHERE id_usuario = :val ORDER BY fecha DESC');
+            $stmt->execute([':val' => $valor]);
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        $sql = "SELECT * FROM auditoria_acciones WHERE {$criterio} LIKE :val ORDER BY fecha DESC";
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute([':val' => "%{$valor}%"]);
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     // Getters

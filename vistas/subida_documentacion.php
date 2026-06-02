@@ -1,8 +1,18 @@
 <?php
-
+/**
+ * Vista: Subida de documentación
+ * Propósito: Mostrar lista de documentos requeridos y botones para subir/corregir archivos.
+ * Estructura esperada (`getDefaultData()`):
+ *  - documents: array[{icon, title, description, status, status_icon, status_class}]
+ * Implementación técnica:
+ *  - El loop `foreach ($data['documents'] as $document)` renderiza cada tarjeta usando `e()` para escapar.
+ *  - Los botones de acción deben apuntar a rutas gestionadas por `Router.php` donde el controlador valida y almacena archivos.
+ * Seguridad:
+ *  - Mantener la lógica de validación/almacenamiento fuera de la vista; evitar mostrar rutas de filesystem o nombres reales.
+ */
 class SubidaDocumentacionVista
 {
-  private string $baseURL = '/bromatologiaAPI/';
+  private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
   private function getDefaultData(): array
   {
@@ -126,7 +136,8 @@ class SubidaDocumentacionVista
          <?php echo $this->e($data['documents_title']); ?>
         </h3>
 
-        <?php foreach ($data['documents'] as $document): ?>
+        <?php // Itera documentos requeridos; evitar pasar objetos grandes a la vista y escapar todas las propiedades.
+        foreach ($data['documents'] as $document): ?>
         <article class="app-vista-card" style="padding: 16px; display: grid; gap: 14px;">
          <div style="display: flex; gap: 12px; align-items: flex-start;">
           <div style="width: 42px; height: 42px; border-radius: 12px; background: #e9f2fb; color: #0a4e93; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;">

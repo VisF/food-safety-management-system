@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * Vista: panel_admin.php
+ * Propósito: Panel administrativo con métricas y actividad reciente.
+ * Entradas: puede recibir datos vía GET 'data' para sobreescribir valores por defecto.
+ * Nota: Usar métodos `e()` para escapar salida al renderizar nombres/valores.
+ */
 class PanelAdminVista
 {
-    private string $baseURL = '/bromatologiaAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
     private function getDefaultData(): array
     {
@@ -160,7 +165,8 @@ class PanelAdminVista
              </p>
             </section>
             <section class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <?php foreach ($panelAdminData['stats'] as $stat): ?>
+        <?php // Itera métricas 'stats' para mostrar cards; asegurar estructura esperada en el controlador.
+        foreach ($panelAdminData['stats'] as $stat): ?>
              <article class="panel-admin-card <?php echo $this->cardStyleClass((string) $stat['style']); ?> app-vista-card">
               <p class="panel-admin-card__etiqueta">
                <?php echo $this->e($stat['label']); ?>
@@ -241,7 +247,8 @@ class PanelAdminVista
               </a>
              </div>
              <div class="divide-y divide-surface-container-high">
-        <?php foreach ($activityLimitedRows as $activity): ?>
+        <?php // Itera actividades recientes (limitadas). No iterar colecciones sin límites desde la vista.
+        foreach ($activityLimitedRows as $activity): ?>
               <article class="panel-admin-fila">
                <div class="panel-admin-fila__izquierda">
                 <div class="panel-admin-fila__avatar">

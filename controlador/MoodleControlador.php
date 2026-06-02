@@ -1,4 +1,14 @@
 <?php
+/**
+ * MoodleControlador - Integración ligera con Moodle
+ *
+ * Responsabilidades:
+ * - Descargar y registrar certificados desde Moodle
+ * - Importar certificados ya subidos
+ * - Listar certificados pendientes para validación
+ *
+ * Dependencias: MoodleModelo, DocumentoModelo
+ */
 require_once __DIR__ . '/../modelo/MoodleModelo.php';
 require_once __DIR__ . '/../modelo/DocumentoModelo.php';
 
@@ -16,6 +26,7 @@ class MoodleControlador {
     public function webhookRecepcionCertificado(array $payload) {
         $id_inscripcion = (int)($payload['id_inscripcion'] ?? 0);
         $url = $payload['url'] ?? '';
+        // Validación mínima del payload recibido por webhook
         if ($id_inscripcion <= 0 || !$url) return ['success' => false, 'message' => 'Payload inválido'];
 
         $ruta = $this->moodleModel->descargarCertificado($url);
@@ -28,6 +39,7 @@ class MoodleControlador {
 
     // Importar certificado manualmente (archivo ya subido)
     public function importarCertificadoManual(int $idInscripcion, string $filePath) {
+        // Validar existencia del archivo antes de delegar a modelo
         if ($idInscripcion <= 0 || !file_exists($filePath)) return ['success' => false, 'message' => 'Parámetros inválidos'];
         $res = $this->moodleModel->guardarCertificado(['id_inscripcion' => $idInscripcion, 'ruta' => $filePath, 'tipo' => 'certificado_moodle']);
         return $res ? ['success' => true, 'documento' => $res] : ['success' => false, 'message' => 'Error al guardar certificado'];

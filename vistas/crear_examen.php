@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
-
+/**
+ * Vista: crear_examen.php
+ * Propósito: Formulario administrativo para planificar una fecha de examen.
+ * Campos esperados (ejemplo POST): fecha, hora, ubicacion, capacidad
+ * Requisitos técnicos:
+ *  - Validar fecha/hora en backend (timezone-aware) y comprobar colisiones/recursos.
+ *  - Escapar cualquier texto de salida; el formulario no debe hacer decisiones de negocio.
+ */
 class CrearExamenVista
 {
     private function e(mixed $value): string

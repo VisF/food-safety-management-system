@@ -32,6 +32,7 @@ class InspectorControlador
      */
     private function inicializarModelos(): void
     {
+        // Instanciar modelos sólo si las clases están definidas (fallback testable)
         if (class_exists('UsuarioModelo')) {
             $this->usuarioModelo = new UsuarioModelo();
         }
@@ -76,17 +77,61 @@ class InspectorControlador
     public function buscarPorDNI(string $dni): array
     {
         try {
-            // TODO: Validar formato de DNI
-            // TODO: Llamar a $this->usuarioModelo->obtenerPorDNI($dni)
-            // TODO: Si existe, obtener carnet vigente
-            // TODO: Registrar búsqueda en auditoría
-            
-            $this->log('Búsqueda por DNI', 'INFO', ['dni' => substr($dni, 0, 2) . '***']);
+            // Validar formato de DNI (Argentina: 7-8 dígitos)
+            $dni_limpio = preg_replace('/[^0-9]/', '', $dni);
+            if (strlen($dni_limpio) < 7 || strlen($dni_limpio) > 8) {
+                return [
+                    'success' => false,
+                    'usuario' => null,
+                    'message' => 'Formato de DNI inválido. Debe contener 7-8 dígitos.'
+                ];
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) {
+                return ['success' => false, 'usuario' => null, 'message' => 'Conexión a BD no disponible'];
+            }
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Obtener usuario por DNI
+            $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email FROM usuarios WHERE dni = :dni LIMIT 1');
+            $stmt->execute([':dni' => $dni_limpio]);
+            $usuario = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            if (!$usuario) {
+                $this->log('DNI no encontrado', 'INFO', ['dni' => substr($dni, 0, 2) . '***']);
+                return [
+                    'success' => true,
+                    'usuario' => null,
+                    'message' => 'Usuario no encontrado'
+                ];
+            }
+
+            // Obtener carnet vigente
+            $stmt = $pdo->prepare('SELECT * FROM carnets WHERE usuario_id = :uid ORDER BY fecha_emision DESC LIMIT 1');
+            $stmt->execute([':uid' => (int)$usuario['id']]);
+            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            // Agregar datos de carnet al usuario
+            if ($carnet) {
+                $carnet['vigente'] = strtotime($carnet['fecha_vencimiento'] ?? '') > time();
+                $usuario['carnet'] = $carnet;
+            }
+
+            // Registrar búsqueda en auditoría
+            $this->registrarAuditoria('BUSQUEDA_INSPECTOR', [
+                'tipo_busqueda' => 'DNI',
+                'usuario_id' => $usuario['id'] ?? null,
+                'encontrado' => true
+            ]);
+
+            $this->log('Usuario encontrado por DNI', 'INFO', ['usuario_id' => $usuario['id']]);
             
             return [
                 'success' => true,
-                'usuario' => null,
-                'message' => 'Usuario no encontrado'
+                'usuario' => $usuario,
+                'message' => 'Usuario encontrado'
             ];
         } catch (Exception $e) {
             $this->log('Error en búsqueda por DNI', 'ERROR', ['error' => $e->getMessage()]);
@@ -116,11 +161,51 @@ class InspectorControlador
     public function obtenerEstadoCarnet(string $dni): ?array
     {
         try {
-            // TODO: Validar formato de DNI
-            // TODO: Llamar a $this->carnetModelo->obtenerPorDNI($dni)
-            // TODO: Calcular estado basado en fecha de vencimiento
-            
-            return null;
+            // Validar formato de DNI
+            $dni_limpio = preg_replace('/[^0-9]/', '', $dni);
+            if (strlen($dni_limpio) < 7 || strlen($dni_limpio) > 8) {
+                $this->log('DNI inválido al consultar estado', 'WARNING', ['dni' => substr($dni, 0, 2) . '***']);
+                return null;
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return null;
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Obtener usuario
+            $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE dni = :dni LIMIT 1');
+            $stmt->execute([':dni' => $dni_limpio]);
+            $usr = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$usr) return null;
+
+            // Obtener carnet más reciente
+            $stmt = $pdo->prepare('SELECT * FROM carnets WHERE usuario_id = :uid ORDER BY fecha_emision DESC LIMIT 1');
+            $stmt->execute([':uid' => (int)$usr['id']]);
+            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$carnet) return null;
+
+            // Calcular estado basado en fecha de vencimiento
+            $hoy = time();
+            $fecha_venc = strtotime($carnet['fecha_vencimiento'] ?? '');
+            $vigente = $fecha_venc > $hoy;
+            $dias_para_vencer = $vigente ? (int)floor(($fecha_venc - $hoy) / 86400) : null;
+
+            if ($vigente) {
+                $estado = 'vigente';
+            } else {
+                $estado = 'vencido';
+            }
+
+            return [
+                'id' => (int)$carnet['id'],
+                'numero_carnet' => $carnet['numero_carnet'] ?? '',
+                'estado' => $estado,
+                'fecha_emision' => $carnet['fecha_emision'] ?? '',
+                'fecha_vencimiento' => $carnet['fecha_vencimiento'] ?? '',
+                'vigente' => $vigente,
+                'dias_para_vencer' => $dias_para_vencer
+            ];
         } catch (Exception $e) {
             $this->log('Error al obtener estado del carnet', 'ERROR', ['error' => $e->getMessage()]);
             return null;
@@ -141,15 +226,26 @@ class InspectorControlador
     public function verificarVigencia(string $dni): array
     {
         try {
-            // TODO: Obtener carnet del usuario
-            // TODO: Comparar fecha de vencimiento con fecha actual
-            // TODO: Retornar estado de vigencia
-            
+            // Obtener carnet del usuario
+            $carnet = $this->obtenerEstadoCarnet($dni);
+            if (!$carnet) {
+                return [
+                    'success' => true,
+                    'vigente' => false,
+                    'mensaje' => 'Carnet no encontrado',
+                    'carnet' => null
+                ];
+            }
+
+            // Comparar fecha de vencimiento con fecha actual (ya hecho en obtenerEstadoCarnet)
+            $vigente = (bool)($carnet['vigente'] ?? false);
+
+            // Retornar estado de vigencia
             return [
                 'success' => true,
-                'vigente' => false,
-                'mensaje' => 'Carnet no encontrado o vencido',
-                'carnet' => null
+                'vigente' => $vigente,
+                'mensaje' => $vigente ? 'Carnet vigente' : 'Carnet vencido',
+                'carnet' => $carnet
             ];
         } catch (Exception $e) {
             $this->log('Error al verificar vigencia', 'ERROR', ['error' => $e->getMessage()]);
@@ -176,16 +272,56 @@ class InspectorControlador
     public function obtenerCarnetPDF(string $dni): array
     {
         try {
-            // TODO: Validar que el usuario existe
-            // TODO: Validar que tiene carnet
-            // TODO: Obtener ruta del archivo PDF guardado
-            // TODO: Retornar URL relativa para descarga
+            $dni_limpio = preg_replace('/[^0-9]/', '', $dni);
+            if (strlen($dni_limpio) < 7 || strlen($dni_limpio) > 8) {
+                return [
+                    'success' => false,
+                    'pdf_url' => null,
+                    'mensaje' => 'DNI inválido',
+                    'archivo' => null
+                ];
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) {
+                return ['success' => false, 'pdf_url' => null, 'mensaje' => 'BD no disponible', 'archivo' => null];
+            }
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Validar que el usuario existe
+            $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE dni = :dni LIMIT 1');
+            $stmt->execute([':dni' => $dni_limpio]);
+            $usr = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$usr) {
+                return ['success' => false, 'pdf_url' => null, 'mensaje' => 'Usuario no encontrado', 'archivo' => null];
+            }
+
+            // Validar que tiene carnet y obtener ruta PDF
+            $stmt = $pdo->prepare('SELECT ruta_pdf FROM carnets WHERE usuario_id = :uid ORDER BY fecha_emision DESC LIMIT 1');
+            $stmt->execute([':uid' => (int)$usr['id']]);
+            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$carnet || !$carnet['ruta_pdf']) {
+                return ['success' => false, 'pdf_url' => null, 'mensaje' => 'Carnet no disponible', 'archivo' => null];
+            }
+
+            // Obtener ruta del archivo PDF guardado
+            $ruta_pdf = $carnet['ruta_pdf'];
+            if (!file_exists($ruta_pdf)) {
+                return ['success' => false, 'pdf_url' => null, 'mensaje' => 'Archivo PDF no encontrado en servidor', 'archivo' => null];
+            }
+
+            // Retornar URL relativa para descarga (normalizar ruta)
+            $url_relativa = strpos($ruta_pdf, '/') === 0 ? substr($ruta_pdf, 1) : $ruta_pdf;
+            $nombre_archivo = basename($ruta_pdf);
+
+            $this->log('PDF de carnet solicitado', 'INFO', ['usuario_id' => $usr['id']]);
             
             return [
                 'success' => true,
-                'pdf_url' => null,
-                'mensaje' => 'Carnet no disponible',
-                'archivo' => null
+                'pdf_url' => $url_relativa,
+                'mensaje' => 'PDF disponible',
+                'archivo' => $nombre_archivo
             ];
         } catch (Exception $e) {
             $this->log('Error al obtener PDF', 'ERROR', ['error' => $e->getMessage()]);
@@ -214,14 +350,39 @@ class InspectorControlador
     public function buscarPorApellido(string $apellido): array
     {
         try {
-            // TODO: Llamar a $this->usuarioModelo->buscarPorApellido($apellido)
-            // TODO: Limitar resultados (max 50)
-            // TODO: Incluir estado de carnet para cada usuario
+            if (trim($apellido) === '') {
+                return ['success' => false, 'usuarios' => [], 'total' => 0];
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return ['success' => false, 'usuarios' => [], 'total' => 0];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Buscar usuarios por apellido (limitar a 50)
+            $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email FROM usuarios WHERE apellido LIKE :ap ORDER BY apellido, nombre LIMIT 50');
+            $stmt->execute([':ap' => '%' . $apellido . '%']);
+            $usuarios = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            // Incluir estado de carnet para cada usuario
+            foreach ($usuarios as &$usr) {
+                $stmtC = $pdo->prepare('SELECT id, numero_carnet, fecha_vencimiento FROM carnets WHERE usuario_id = :uid ORDER BY fecha_emision DESC LIMIT 1');
+                $stmtC->execute([':uid' => (int)$usr['id']]);
+                $carnet = $stmtC->fetch(\PDO::FETCH_ASSOC);
+                if ($carnet) {
+                    $carnet['vigente'] = strtotime($carnet['fecha_vencimiento'] ?? '') > time();
+                    $usr['carnet'] = $carnet;
+                } else {
+                    $usr['carnet'] = null;
+                }
+            }
+
+            $this->log('Búsqueda por apellido realizada', 'INFO', ['apellido' => $apellido, 'resultados' => count($usuarios)]);
             
             return [
                 'success' => true,
-                'usuarios' => [],
-                'total' => 0
+                'usuarios' => $usuarios,
+                'total' => count($usuarios)
             ];
         } catch (Exception $e) {
             $this->log('Error en búsqueda por apellido', 'ERROR', ['error' => $e->getMessage()]);
@@ -251,13 +412,48 @@ class InspectorControlador
     public function obtenerDatosPublicos(string $dni): array
     {
         try {
-            // TODO: Obtener usuario por DNI
-            // TODO: Retornar solo información pública (sin email, domicilio, etc.)
-            // TODO: Incluir estado del carnet
-            
+            $dni_limpio = preg_replace('/[^0-9]/', '', $dni);
+            if (strlen($dni_limpio) < 7 || strlen($dni_limpio) > 8) {
+                return ['success' => false, 'datos' => null];
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return ['success' => false, 'datos' => null];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Obtener usuario por DNI
+            $stmt = $pdo->prepare('SELECT id, nombre, apellido FROM usuarios WHERE dni = :dni LIMIT 1');
+            $stmt->execute([':dni' => $dni_limpio]);
+            $usr = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$usr) {
+                return ['success' => false, 'datos' => null];
+            }
+
+            // Obtener estado del carnet
+            $stmt = $pdo->prepare('SELECT numero_carnet, fecha_vencimiento FROM carnets WHERE usuario_id = :uid ORDER BY fecha_emision DESC LIMIT 1');
+            $stmt->execute([':uid' => (int)$usr['id']]);
+            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            $carnet_vigente = false;
+            $numero_carnet = null;
+            $fecha_vencimiento = null;
+            if ($carnet) {
+                $carnet_vigente = strtotime($carnet['fecha_vencimiento'] ?? '') > time();
+                $numero_carnet = $carnet['numero_carnet'];
+                $fecha_vencimiento = $carnet['fecha_vencimiento'];
+            }
+
+            // Retornar solo información pública
             return [
                 'success' => true,
-                'datos' => null
+                'datos' => [
+                    'nombre' => $usr['nombre'],
+                    'apellido' => $usr['apellido'],
+                    'carnet_vigente' => $carnet_vigente,
+                    'numero_carnet' => $numero_carnet,
+                    'fecha_vencimiento' => $fecha_vencimiento
+                ]
             ];
         } catch (Exception $e) {
             $this->log('Error al obtener datos públicos', 'ERROR', ['error' => $e->getMessage()]);

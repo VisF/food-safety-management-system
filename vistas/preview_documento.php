@@ -1,5 +1,14 @@
 <?php
 declare(strict_types=1);
+/**
+ * Vista: preview_documento.php
+ * Propósito: Previsualizar un archivo subido usando un `<iframe>` apuntando a `/uploads/{file}`.
+ * Seguridad/validación:
+ *  - `fileName` debe ser validado/normalizado por el backend para evitar path traversal o exposición de archivos privados.
+ *  - Evitar pasar rutas absolutas; usar identificadores referenciados desde la base de datos.
+ * Implementación técnica:
+ *  - Usa `rawurlencode()` al construir la URL del `iframe`.
+ */
 class PreviewDocumentoVista
 {
     public static function mostrar(): void
@@ -9,6 +18,7 @@ class PreviewDocumentoVista
             'fileName' => ''
         ];
         $data = $defaults;
+        // Decode GET['data'] JSON opcional para inicializar la vista; backend debe validar y mapear a IDs seguros.
         if (isset($_GET['data'])) {
             $incoming = json_decode($_GET['data'], true);
             if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
@@ -25,8 +35,8 @@ class PreviewDocumentoVista
                 </div>
 
                 <div class="mt-4">
-                    <a href="/Router.php?r=subir_archivo" class="app-vista-button app-vista-button--secondary">Volver</a>
-                    <a href="/Router.php?r=documento_subido" class="app-vista-button app-vista-button--primary">Confirmar</a>
+                    <a href="Router.php?r=subir_archivo" class="app-vista-button app-vista-button--secondary">Volver</a>
+                    <a href="Router.php?r=documento_subido" class="app-vista-button app-vista-button--primary">Confirmar</a>
                 </div>
             </div>
         </main>

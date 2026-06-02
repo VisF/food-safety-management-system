@@ -66,18 +66,19 @@ class DocumentoControlador
     public function subirDocumento(int $id_inscripcion, array $archivo): array
     {
         try {
-            // validar inscripción
+            // Validación: comprobar que el modelo de inscripción esté disponible
             if (!$this->inscripcionModelo || !method_exists($this->inscripcionModelo, 'obtenerPorId')) return ['success' => false, 'id' => null, 'mensaje' => 'Modelo de inscripción no disponible', 'documento' => null];
             $ins = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
+            // Validación: la inscripción debe existir
             if (!$ins) return ['success' => false, 'id' => null, 'mensaje' => 'Inscripción no encontrada', 'documento' => null];
 
-            // validar pertenencia (si no admin)
+            // Comprobación de autorización: sólo el propietario o admin puede subir en esta inscripción
             $current = $_SESSION['user_id'] ?? null;
             if (!empty($current) && empty($_SESSION['is_admin']) && ((int)$ins['usuario_id'] !== (int)$current)) {
                 return ['success' => false, 'id' => null, 'mensaje' => 'No autorizado para subir documento en esta inscripción', 'documento' => null];
             }
 
-            // validar archivo mínimo
+            // Validación mínima del array de archivo esperado (estructura de $_FILES)
             $requiredKeys = ['name','type','size','tmp_name','error'];
             foreach ($requiredKeys as $k) if (!array_key_exists($k, $archivo)) return ['success' => false, 'id' => null, 'mensaje' => 'Archivo inválido', 'documento' => null];
             if ($archivo['error'] !== 0) return ['success' => false, 'id' => null, 'mensaje' => 'Error en upload: ' . $archivo['error'], 'documento' => null];
@@ -92,11 +93,12 @@ class DocumentoControlador
                 }
             }
 
-            // procesar carga: preferir UploadControlador si existe
+            // Procesamiento de carga: preferir delegar a UploadControlador si está disponible
             $uploadsDir = __DIR__ . '/../uploads/documentos'; @mkdir($uploadsDir, 0755, true);
             $basename = preg_replace('/[^a-zA-Z0-9_\-\.]/','_',basename($archivo['name']));
             $target = $uploadsDir . '/doc_' . time() . '_' . uniqid() . '_' . $basename;
             $moved = false;
+            // Intentar usar controlador dedicado para subir archivos (encapsula validaciones/movimientos)
             if (class_exists('UploadControlador')) {
                 try { $up = new UploadControlador(); if (method_exists($up, 'subirArchivo')) { $res = $up->subirArchivo($archivo, $target); $moved = $res['success'] ?? false; } }
                 catch (Exception $e) { $moved = false; }

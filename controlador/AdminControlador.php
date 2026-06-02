@@ -99,6 +99,7 @@ class AdminControlador
             }
 
             if (!$this->cursoModelo || !method_exists($this->cursoModelo, 'crear')) {
+                // Si no hay modelo de curso disponible, registrar y devolver error
                 $this->log('Intento crear curso sin modelo disponible', 'WARN', $datos);
                 return ['success' => false, 'message' => 'Modelo de curso no disponible', 'id_curso' => null, 'data' => []];
             }
@@ -209,6 +210,7 @@ class AdminControlador
 
             // verificar inscripciones activas
             $pdoFile = __DIR__ . '/../db/Connection.php';
+            // Comprobación de integridad: si existe conexión a BD, verificar inscripciones activas
             if (file_exists($pdoFile)) {
                 require_once $pdoFile;
                 $pdo = Connection::getPDO();

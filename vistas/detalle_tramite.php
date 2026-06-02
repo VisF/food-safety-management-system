@@ -1,5 +1,14 @@
 <?php
 declare(strict_types=1);
+/**
+ * Vista: detalle_tramite.php
+ * Propósito: Mostrar metadata detallada de un trámite.
+ * Estructura esperada:
+ *  - tramite: array{tipo?:string, estado?:string, ...}
+ * Recomendaciones técnicas:
+ *  - El controlador debe normalizar y validar la estructura `tramite` antes de inyectarla.
+ *  - Escapar con `htmlspecialchars` (como ya hace la vista) para prevenir XSS.
+ */
 class DetalleTramiteVista
 {
 	public static function mostrar(): void
@@ -9,6 +18,7 @@ class DetalleTramiteVista
 			'tramite' => []
 		];
 		$data = $defaults;
+		// Mergea `data` JSON enviada por GET para facilitar pruebas; el controlador debe normalizar la estructura.
 		if (isset($_GET['data'])) {
 			$incoming = json_decode($_GET['data'], true);
 			if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
@@ -22,8 +32,8 @@ class DetalleTramiteVista
 				<p>Estado: <?php echo htmlspecialchars($data['tramite']['estado'] ?? ''); ?></p>
 
 				<div class="mt-4">
-					<a href="/Router.php?r=historial_tramite" class="app-vista-button app-vista-button--secondary">Historial</a>
-					<a href="/Router.php?r=comprobante_tramite" class="app-vista-button app-vista-button--primary">Descargar comprobante</a>
+					<a href="Router.php?r=historial_tramite" class="app-vista-button app-vista-button--secondary">Historial</a>
+					<a href="Router.php?r=comprobante_tramite" class="app-vista-button app-vista-button--primary">Descargar comprobante</a>
 				</div>
 			</div>
 		</main>

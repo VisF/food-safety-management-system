@@ -3,7 +3,7 @@
 ║       ✅ SISTEMA TUDAI - ARQUITECTURA BASE 100% COMPLETA                  ║
 ║                                                                            ║
 ║       Sistema de Gestión de Carnets de Manipuladores de Alimentos         ║
-║       Bromatología TUDAI - Mayo 2026                                      ║
+║       TUDAI - Mayo 2026                                      ║
 ║                                                                            ║
 ╚════════════════════════════════════════════════════════════════════════════╝
 
@@ -151,7 +151,7 @@
 📁 ESTRUCTURA DE ARCHIVOS
 ═══════════════════════════════════════════════════════════════════════════
 
-  /bromatologia
+  /manipulaciondealimentos
   ├── .github/agents/
   │   └── tudai-developer.agent.md              ✅ Custom Agent
   ├── modelo/                                    ✅ 15 Modelos OOP

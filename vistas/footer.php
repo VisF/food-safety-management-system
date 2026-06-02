@@ -1,4 +1,14 @@
 <?php
+/**
+ * Vista: footer.php
+ * Propósito: Barra de navegación inferior reutilizable (BottomNav).
+ * Implementación técnica:
+ *  - Determina `currentRoute` a partir de `basename($_SERVER['SCRIPT_NAME'])` y un `match` para mapear vistas a secciones.
+ *  - Calcula `$basePath` similar a header.php para resolver rutas cuando las vistas están en `/vistas`.
+ *  - `routeUrl($route)` devuelve `$basePath . '/Router.php?r=' . rawurlencode($route)` (usar `rawurlencode` para seguridad en URLs).
+ * Notas de despliegue:
+ *  - Si se cambia la estrategia de routing (front controller distinto), actualizar la resolución de `$basePath`.
+ */
 $currentFile = basename($_SERVER['SCRIPT_NAME'] ?? 'index.php');
 $currentRoute = match ($currentFile) {
    'panel_inspector.php' => 'mensajes',

@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * Vista: usuario_aprobado.php
+ * Propósito: Mostrar estado exitoso del usuario y pasos siguientes (comprobante/carnet).
+ * Entradas: valores por defecto en `getDefaultData()`; el controlador puede pasar datos reales.
+ * Nota: ofrecer rutas claras para descargar comprobantes o ver estado del trámite.
+ */
 class UsuarioAprobadoVista
 {
-  private string $baseURL = '/bromatologiaAPI/';
+  private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
   private function getDefaultData(): array
   {
@@ -151,7 +156,8 @@ class UsuarioAprobadoVista
        Próximos pasos
       </h4>
       <div class="grid grid-cols-1 gap-3">
-       <?php foreach ($data['steps'] as $step): ?>
+      <?php // Itera pasos a mostrar al usuario (UI). 'steps' debe ser un array estático y pequeño.
+      foreach ($data['steps'] as $step): ?>
       <div class="bg-white p-4 rounded-xl border border-surface-container flex gap-4 items-start app-vista-card app-vista-card--surface">
         <div class="<?php echo $this->e($step['bg_class']); ?> p-2 rounded-lg <?php echo $this->e($step['text_class']); ?>">
          <span class="pie-principal__icono material-symbols-outlined">

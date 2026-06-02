@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+use App\Middleware\CsrfMiddleware;
+
 /**
  * AuthControlador - Gestión de autenticación y registro de usuarios
  *
@@ -27,7 +29,6 @@ class AuthControlador
 {
     private const SESSION_TIMEOUT = 3600; // 1 hora
     private const SESSION_COOKIE_NAME = 'PHPSESSID';
-    private const CSRF_TOKEN_NAME = 'csrf_token';
     private const LOG_FILE = __DIR__ . '/../logs/auth_controller.log';
     private const MAX_LOGIN_ATTEMPTS = 5;
     private const LOCKOUT_TIME = 900; // 15 minutos
@@ -44,9 +45,11 @@ class AuthControlador
         $this->configurarSesion();
         
         // Inicializar modelo si existe
+        // Instanciar modelo de usuario si está disponible (permite testing sin DB)
         if (class_exists('UsuarioModelo')) {
             $this->usuarioModelo = new UsuarioModelo();
         }
+        // Validar estado de sesión y cargar posibles dependencias adicionales
         $this->validarSesion();
         $this->inicializarModeloSiExiste();
     }
@@ -67,6 +70,7 @@ class AuthControlador
 
     private function configurarSesion(): void
     {
+        // No iniciar sesión si ya está activa
         if (session_status() === PHP_SESSION_ACTIVE) {
             return;
         }
@@ -135,21 +139,6 @@ class AuthControlador
         return filter_var($ip, FILTER_VALIDATE_IP) ? $ip : '127.0.0.1';
     }
 
-    private function generarTokenCsrf(): string
-    {
-        if (empty($_SESSION[self::CSRF_TOKEN_NAME])) {
-            $_SESSION[self::CSRF_TOKEN_NAME] = bin2hex(random_bytes(32));
-        }
-        return (string) $_SESSION[self::CSRF_TOKEN_NAME];
-    }
-
-    public function validarTokenCsrf(string $token): bool
-    {
-        if (empty($_SESSION[self::CSRF_TOKEN_NAME])) {
-            return false;
-        }
-        return hash_equals((string) $_SESSION[self::CSRF_TOKEN_NAME], $token);
-    }
 
     private function renderView(string $viewPath, array $datosVista = []): void
     {
@@ -168,7 +157,7 @@ class AuthControlador
     {
         $datosVista = [
             'title' => 'Login - App Ciudadana',
-            'csrf_token' => $this->generarTokenCsrf(),
+            'csrf_token' => CsrfMiddleware::generateToken(),
             'error' => $datos['error'] ?? null,
             'email' => $datos['email'] ?? '',
         ];
@@ -180,7 +169,7 @@ class AuthControlador
     {
         $datosVista = [
             'title' => 'Registro - App Ciudadana',
-            'csrf_token' => $this->generarTokenCsrf(),
+            'csrf_token' => CsrfMiddleware::generateToken(),
             'error' => $datos['error'] ?? null,
             'errors' => $datos['errors'] ?? [],
             'nombre' => $datos['nombre'] ?? '',
@@ -212,7 +201,7 @@ class AuthControlador
         $datosVista = [
             'title' => 'Mi Perfil',
             'usuario' => $usuario,
-            'csrf_token' => $this->generarTokenCsrf(),
+            'csrf_token' => CsrfMiddleware::generateToken(),
             'info_sesion' => $this->obtenerInfoSesion(),
         ];
 
@@ -221,13 +210,11 @@ class AuthControlador
 
     public function procesarLogin(array $datos): array
     {
+        // Validación básica de entrada
         if (empty($datos['email']) || empty($datos['password'])) {
             return ['success' => false, 'error' => 'Email y contraseña requeridos'];
         }
 
-        if (!empty($datos['csrf_token']) && !$this->validarTokenCsrf((string) $datos['csrf_token'])) {
-            return ['success' => false, 'error' => 'Token de seguridad inválido'];
-        }
 
         $email = filter_var((string) $datos['email'], FILTER_SANITIZE_EMAIL);
         $password = (string) $datos['password'];
@@ -261,8 +248,11 @@ class AuthControlador
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
         $_SESSION['usuario_email'] = $usuario['email'];
         $_SESSION['usuario_rol'] = $usuario['rol'];
+        $_SESSION['roles'] = [
+            $usuario['rol']
+        ];
         $_SESSION['last_activity'] = time();
-        $_SESSION[self::CSRF_TOKEN_NAME] = bin2hex(random_bytes(32));
+        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
 
         $this->log('User logged in successfully', 'INFO', [
             'usuario_id' => $usuario['id'],
@@ -273,15 +263,12 @@ class AuthControlador
             'success' => true,
             'message' => 'Login exitoso',
             'usuario' => $usuario,
-            'csrf_token' => $this->generarTokenCsrf(),
+            'csrf_token' => CsrfMiddleware::generateToken(),
         ];
     }
 
     public function procesarRegistro(array $datos): array
     {
-        if (!empty($datos['csrf_token']) && !$this->validarTokenCsrf((string) $datos['csrf_token'])) {
-            return ['success' => false, 'error' => 'Token de seguridad inválido'];
-        }
 
         $email = filter_var((string)($datos['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $nombre = trim((string)($datos['nombre'] ?? ''));
@@ -351,9 +338,6 @@ class AuthControlador
             return ['success' => false, 'error' => 'No autenticado'];
         }
 
-        if (!$this->validarTokenCsrf((string)($datos['csrf_token'] ?? ''))) {
-            return ['success' => false, 'error' => 'Token de seguridad inválido'];
-        }
 
         $usuarioId = (int) $_SESSION['usuario_id'];
         $nombre = trim((string)($datos['nombre'] ?? ''));
@@ -408,7 +392,7 @@ class AuthControlador
     public function procesarLogout(): void
     {
         $this->logout();
-        header('Location: ../Router.php?r=login');
+        header('Location: Router.php?r=login');
         exit;
     }
 

@@ -1,4 +1,4 @@
--- Seed data for Sistema TUDAI - Bromatologia
+-- Seed data for Sistema TUDAI - Manipulacion de Alimentos
 -- Ejecutar despues de importar db/schema.sql
 
 SET FOREIGN_KEY_CHECKS = 0;
@@ -46,7 +46,7 @@ INSERT INTO usuarios (id, nombre, apellido, dni, email, password, telefono, domi
 (1, 'Juan', 'Perez', '35849201', 'juan.perez@example.com', '$2y$10$aP8cCRtR9..269TVbTLBEetee7GMiYmAxyff7vUVrD/Tp0iWS.dR.', '2604-111111', 'Calle 12 345', 1, '2026-05-01 08:00:00'),
 (2, 'Maria', 'Gomez', '27482910', 'maria.gomez@example.com', '$2y$10$H6T/J9tfjPRHqoN3ZY.uH.urv9x.y5Un7ZF81Lclho69a2YLcUbKi', '2604-222222', 'Av. San Martin 456', 1, '2026-05-02 09:15:00'),
 (3, 'Carlos', 'Rodriguez', '31902115', 'carlos.rodriguez@example.com', '$2y$10$G4Ppa2agTSJIg76FNlkoZ.S9POh/PM1HnKi0CzwKcxQBdsWJMTVuS', '2604-333333', 'Pasaje Sur 78', 1, '2026-05-03 10:20:00'),
-(4, 'Admin', 'Municipal', '20111222', 'admin@bromatologia.local', '$2y$10$pufBBzoEwWKzy9KyGXcTr.s3TsDolHdCCIqj.SxOhjCFMChuMCcc2', '2604-999999', 'Palacio Municipal', 1, '2026-05-01 07:30:00');
+(4, 'Admin', 'Municipal', '20111222', 'admin@ManipulacionDeAlimentos.local', '$2y$10$pufBBzoEwWKzy9KyGXcTr.s3TsDolHdCCIqj.SxOhjCFMChuMCcc2', '2604-999999', 'Palacio Municipal', 1, '2026-05-01 07:30:00');
 
 INSERT INTO usuario_roles (id, usuario_id, rol_id, fecha_asignacion) VALUES
 (1, 1, 1, '2026-05-01 08:05:00'),

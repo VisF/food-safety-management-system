@@ -1,8 +1,21 @@
 <?php
-
+/**
+ * Vista: Inicio
+ * Propósito: Página principal del usuario que muestra estado del trámite, documentos y exámenes.
+ * Entradas/estructura de datos (ejemplo):
+ *  - page_title: string
+ *  - welcome_text: string
+ *  - user_name: string
+ *  - documents: array[{label:string, icon:string, route:string, state:int}]
+ *  - exams: array[{month:string, day:string, title:string, time:string, place:string, available:int}]
+ * Fuente de datos: `getDefaultData()` y opcional `GET['data']` (JSON — se decodifica con `json_decode` y mergea).
+ * Notas técnicas:
+ *  - Use `e()` o `htmlspecialchars` para escapar toda salida; `getRoute()` genera enlaces a `Router.php` con `rawurlencode`.
+ *  - No confiar en estados enviados por cliente; validar la disponibilidad de exámenes y permisos en backend.
+ */
 class InicioVista
 {
-    private string $baseURL = '/bromatologiaAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
     private function getDefaultData(): array
     {
@@ -205,7 +218,8 @@ class InicioVista
                          Documentación Requerida
                         </h4>
                         <div class="grid grid-cols-2" style="gap: 12px;">
-                    <?php foreach ($inicioData['documents'] as $document): ?>
+                    <?php // Itera tarjetas de documentos; el array debe ser limitado y sanitizado por el backend.
+                    foreach ($inicioData['documents'] as $document): ?>
                         <a class="<?php echo $this->getDocumentCardClass((int) $document['state']); ?>" href="<?php echo $this->getRoute((string) $document['route']); ?>" role="button" style="text-decoration: none;">
                             <div style="width: 48px; height: 48px; border-radius: 16px; background: #e9f2fb; color: #0a4e93; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
                              <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>"><?php echo $this->e($document['icon']); ?></span>
@@ -223,7 +237,8 @@ class InicioVista
                          Próximos Exámenes
                         </h4>
                         <div style="display: grid; gap: 12px;">
-                    <?php foreach ($inicioData['exams'] as $exam): ?>
+                    <?php // Itera exámenes próximos; validar cupos en servidor antes de mostrar acciones habilitadas.
+                    foreach ($inicioData['exams'] as $exam): ?>
                          <article class="app-vista-card" style="padding: 0;">
                             <div style="display: grid; grid-template-columns: 82px 1fr; align-items: stretch;">
                              <div style="background: linear-gradient(160deg, #1462b5, #0a4e93); color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">

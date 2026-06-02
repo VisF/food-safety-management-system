@@ -1,8 +1,16 @@
 <?php
-
+/**
+ * Vista: inscripcion_examen.php
+ * Propósito: Mostrar requisitos y próximas fechas; permitir iniciar inscripción al examen.
+ * Estructura de `exams[]`:
+ *  - id:int, month:string, day:string, title:string, capacity:int, time:string, room:string
+ * Recomendaciones técnicas:
+ *  - Llamar a endpoints server-side para reservar cupo real (ACID-friendly) antes de confirmar inscripción.
+ *  - No confiar en `capacity` renderizado en cliente; usar siempre verificación en el controlador.
+ */
 class InscripcionExamenVista
 {
-    private string $baseURL = '/bromatologiaAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
     private function getDefaultData(): array
     {
@@ -178,7 +186,8 @@ class InscripcionExamenVista
                                 <?php echo $this->e($inscripcionData['requirements_title']); ?>
                             </h3>
                             <div class="chips">
-                        <?php foreach ($inscripcionData['requirements'] as $requirement): ?>
+                        <?php // Requisitos: iterar 'requirements' (array pequeño). Escapar texto y no confiar en flags del cliente.
+                        foreach ($inscripcionData['requirements'] as $requirement): ?>
                                 <span class="chip <?php echo ((int) $requirement['state'] === 1) ? 'success' : ''; ?>">
                                     <span class="material-symbols-outlined" style="font-size: 18px; color: inherit;">
                                         <?php echo $this->e($requirement['icon']); ?>
@@ -197,7 +206,8 @@ class InscripcionExamenVista
                                 <span class="material-symbols-outlined" data-icon="filter_list" style="color: #4c5f77;">filter_list</span>
                             </div>
 
-                            <?php foreach ($inscripcionData['exams'] as $exam): ?>
+                            <?php // Itera próximas fechas de examen. Verificar disponibilidad en servidor antes de confirmar.
+                            foreach ($inscripcionData['exams'] as $exam): ?>
                             <article class="app-vista-card" style="padding: 0; overflow: hidden;">
                                 <div style="display: grid; grid-template-columns: 82px 1fr; align-items: stretch;">
                                     <div style="background: linear-gradient(160deg, #1462b5, #0a4e93); color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">

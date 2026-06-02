@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * Vista: usuario_rechazado.php
+ * Propósito: Indicar motivos de rechazo y pasos a seguir para el usuario.
+ * Entradas: datos por defecto en `getDefaultData()` o vía GET 'data'.
+ * Nota: ofrecer acciones claras (corregir, solicitar revisión) y no exponer información sensible.
+ */
 class UsuarioRechazadoVista
 {
-  private string $baseURL = '/bromatologiaAPI/';
+  private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
   private function getDefaultData(): array
   {
@@ -115,7 +120,8 @@ class UsuarioRechazadoVista
         <?php echo $this->e($data['motivos_title']); ?>
        </h3>
        <div class="space-y-3">
-        <?php foreach ($data['motivos'] as $motivo): ?>
+        <?php // Itera motivos de rechazo. Cada motivo debe ser un array simple con 'icon' y 'texto'.
+        foreach ($data['motivos'] as $motivo): ?>
         <div class="flex items-start gap-3 p-3 bg-surface-container-low rounded-xl">
          <span class="material-symbols-outlined icono-relleno text-error text-[20px]" data-icon="<?php echo $this->e($motivo['icon']); ?>">
         <?php echo $this->e($motivo['icon']); ?>

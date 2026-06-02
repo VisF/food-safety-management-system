@@ -2,7 +2,7 @@ PLAN DE TRABAJO – PRÁCTICAS PROFESIONALES SUPERVISADAS (PPS)
 Proyecto: Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos
 Carrera: Tecnicatura Universitaria en Desarrollo de Aplicaciones Informáticas (TUDAI)
 Carga horaria: 200 horas
-Institución beneficiaria: Área de Bromatología
+Institución beneficiaria: Área de Manipulacion de Alimentos
 Duración estimada: 3 a 4 meses
 1. Fundamentación
 El proceso actual de gestión de manipuladores de alimentos presenta una fuerte fragmentación de herramientas (formularios, planillas, campus virtual, correo electrónico) y una alta carga de gestión manual. Esto genera problemas de trazabilidad, duplicación de datos, pérdida de información y dificultades para verificar el estado del trámite de los carnets.
@@ -123,7 +123,7 @@ La carga y validación de la documentación será requisito previo para acceder 
 FLUJOS DEL SISTEMA – USUARIOS ADMINISTRATIVO E INSPECTOR
 1. Introducción
 Este apartado describe los flujos de trabajo de los perfiles administrativo e inspector dentro del sistema, detallando sus responsabilidades y acciones principales.
-2. Usuario Administrativo (Bromatología)
+2. Usuario Administrativo (Manipulacion de Alimentos)
 •	Crear fechas de cursos y exámenes
 •	Gestionar cupos
 •	Ver inscriptos

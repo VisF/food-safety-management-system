@@ -46,6 +46,7 @@ class ValidacionControlador
      */
     private function inicializarModelos(): void
     {
+        // Instanciar modelos sólo si la clase está definida (facilita pruebas aisladas)
         if (class_exists('InscripcionModelo')) {
             $this->inscripcionModelo = new InscripcionModelo();
         }
@@ -152,6 +153,7 @@ class ValidacionControlador
             $docModel = new DocumentoModelo();
             $docs = $docModel->obtenerPorInscripcion($id_inscripcion);
             $presentes = [];
+            // Recorrer documentos cargados y acumular los validados
             foreach ($docs as $d) {
                 if ((int)($d['validado'] ?? 0) === 1) {
                     $presentes[] = $d['tipo_documento'];
@@ -186,6 +188,7 @@ class ValidacionControlador
 
             $curso_id = (int)($insc['curso_id'] ?? 0);
             $modalidad = 'presencial';
+            // Intentar resolución de modalidad vía conexión a BD si existe el archivo de conexión
             $connFile = __DIR__ . '/../db/Connection.php';
             if (file_exists($connFile)) {
                 require_once $connFile;
@@ -306,9 +309,15 @@ class ValidacionControlador
     public function obtenerMotivosRechazo(int $id_resultado): array
     {
         try {
-            // TODO: SELECT * FROM motivo_rechazo WHERE id_resultado_examen = $id_resultado ORDER BY fecha_registro DESC
-
-            return [];
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return [];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+            $sql = 'SELECT id, id_resultado_examen, motivo, fecha_registro FROM motivo_rechazo WHERE id_resultado_examen = :rid ORDER BY fecha_registro DESC';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':rid' => $id_resultado]);
+            $rows = $stmt->fetchAll();
+            return $rows ?: [];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_MOTIVOS_RECHAZO', ['id_resultado' => $id_resultado, 'error' => $e->getMessage()]);
             return [];
@@ -324,16 +333,31 @@ class ValidacionControlador
     public function procesarValidacion(int $id_inscripcion): array
     {
         try {
-            // TODO: SELECT i.*, c.modalidad, ti.nombre as tipo FROM inscripcion i
-            // TODO: LEFT JOIN curso c ON i.id_curso = c.id
-            // TODO: LEFT JOIN tipo_inscripcion ti ON i.id_tipo_inscripcion = ti.id
-            // TODO: WHERE i.id = $id_inscripcion
+            // Obtener información básica de la inscripción y contexto (curso, tipo)
+            $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id_inscripcion) : null;
+            $contexto = [];
+            if ($insc) {
+                $contexto['inscripcion'] = $insc;
+                $connFile = __DIR__ . '/../db/Connection.php';
+                if (file_exists($connFile)) {
+                    require_once $connFile;
+                    $pdo = Connection::getPDO();
+                    // curso
+                    $stmt = $pdo->prepare('SELECT id, nombre, modalidad FROM cursos WHERE id = :id');
+                    $stmt->execute([':id' => (int)($insc['curso_id'] ?? $insc['id_curso'] ?? 0)]);
+                    $contexto['curso'] = $stmt->fetch() ?: [];
+                    // tipo inscripcion
+                    $stmt = $pdo->prepare('SELECT id, nombre FROM tipo_inscripcion WHERE id = :id');
+                    $stmt->execute([':id' => (int)($insc['tipo_inscripcion_id'] ?? $insc['id_tipo_inscripcion'] ?? 0)]);
+                    $contexto['tipo_inscripcion'] = $stmt->fetch() ?: [];
+                }
+            }
 
             $validaciones = [
                 'documentacion' => $this->validarDocumentacion($id_inscripcion),
                 'asistencia' => $this->validarAsistencia($id_inscripcion),
                 'curso_moodle' => $this->validarCursoMoodle($id_inscripcion)
-                // TODO: Agregar validaciones según flujo (recursante, renovación)
+                // Agregar validaciones según flujo (recursante, renovación) si aplica
             ];
 
             $resultado_general = true;
@@ -351,7 +375,8 @@ class ValidacionControlador
             return [
                 'resultado_general' => $resultado_general,
                 'validaciones' => $validaciones,
-                'pueden_rendir' => $resultado_general
+                'pueden_rendir' => $resultado_general,
+                'contexto' => $contexto
             ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_PROCESAR_VALIDACION', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
@@ -372,23 +397,50 @@ class ValidacionControlador
     public function obtenerDetalleValidacion(int $id): array
     {
         try {
-            // TODO: SELECT i.*, u.nombre, u.apellido, c.nombre as curso_nombre, c.modalidad, ti.nombre as tipo_inscripcion
-            // TODO: FROM inscripcion i
-            // TODO: JOIN usuario u ON i.id_usuario = u.id
-            // TODO: LEFT JOIN curso c ON i.id_curso = c.id
-            // TODO: LEFT JOIN tipo_inscripcion ti ON i.id_tipo_inscripcion = ti.id
-            // TODO: WHERE i.id = $id
+            // Intentar obtener datos desde modelos y DB
+            $inscripcion = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id) : null;
+            $usuario = [];
+            $curso = [];
+            $tipo_inscripcion = [];
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if ($inscripcion && file_exists($connFile)) {
+                require_once $connFile;
+                $pdo = Connection::getPDO();
+                // usuario
+                $stmt = $pdo->prepare('SELECT id, nombre, apellido, email FROM usuario WHERE id = :uid');
+                $stmt->execute([':uid' => (int)($inscripcion['usuario_id'] ?? $inscripcion['id_usuario'] ?? 0)]);
+                $usuario = $stmt->fetch() ?: [];
+
+                // curso
+                $stmt = $pdo->prepare('SELECT id, nombre, modalidad FROM cursos WHERE id = :cid');
+                $stmt->execute([':cid' => (int)($inscripcion['curso_id'] ?? $inscripcion['id_curso'] ?? 0)]);
+                $curso = $stmt->fetch() ?: [];
+
+                // tipo_inscripcion
+                $stmt = $pdo->prepare('SELECT id, nombre FROM tipo_inscripcion WHERE id = :tid');
+                $stmt->execute([':tid' => (int)($inscripcion['tipo_inscripcion_id'] ?? $inscripcion['id_tipo_inscripcion'] ?? 0)]);
+                $tipo_inscripcion = $stmt->fetch() ?: [];
+            }
+
+            $documentos = $this->documentoModelo ? $this->documentoModelo->obtenerPorInscripcion($id) : [];
+            $asistencia = $this->obtenerAsistencia($id);
+            $resultadoExamen = $this->resultadoExamenModelo ? $this->resultadoExamenModelo->obtenerPorInscripcion($id) : null;
+            $motivos = [];
+            if ($resultadoExamen && isset($resultadoExamen['id'])) {
+                $motivos = $this->obtenerMotivosRechazo((int)$resultadoExamen['id']);
+            }
 
             $detalle = [
-                'inscripcion' => [],
-                'usuario' => [],
-                'curso' => [],
-                'tipo_inscripcion' => [],
+                'inscripcion' => $inscripcion ?: [],
+                'usuario' => $usuario,
+                'curso' => $curso,
+                'tipo_inscripcion' => $tipo_inscripcion,
                 'validaciones' => $this->procesarValidacion($id),
-                'documentos' => [],
-                'asistencia' => $this->obtenerAsistencia($id),
-                'resultado_examen' => [],
-                'motivos_rechazo' => []
+                'documentos' => $documentos,
+                'asistencia' => $asistencia,
+                'resultado_examen' => $resultadoExamen ?: [],
+                'motivos_rechazo' => $motivos
             ];
 
             return $detalle;
@@ -408,11 +460,44 @@ class ValidacionControlador
     public function generarMotivo(int $id_resultado, string $motivo): array
     {
         try {
-            // TODO: Validar que id_resultado existe en tabla resultado_examen
-            // TODO: Validar que motivo no sea vacío
-            // TODO: INSERT en tabla motivo_rechazo (id_resultado_examen, motivo, fecha_registro)
-            // TODO: UPDATE inscripcion SET id_estado = 4 (reprobado) WHERE id = resultado_examen.id_inscripcion
-            // TODO: Registrar en tabla auditoria_acciones
+            if (trim($motivo) === '') {
+                return ['success' => false, 'mensaje' => 'Motivo vacío'];
+            }
+
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) {
+                return ['success' => false, 'mensaje' => 'Conexión a BD no disponible'];
+            }
+            require_once $connFile;
+            $pdo = Connection::getPDO();
+
+            // Verificar que resultado exista
+            $stmt = $pdo->prepare('SELECT * FROM resultado_examen WHERE id = :id');
+            $stmt->execute([':id' => $id_resultado]);
+            $row = $stmt->fetch();
+            if (!$row) return ['success' => false, 'mensaje' => 'Resultado de examen no encontrado'];
+
+            // Insertar motivo_rechazo
+            $ins = $pdo->prepare('INSERT INTO motivo_rechazo (id_resultado_examen, motivo, fecha_registro) VALUES (:rid, :motivo, NOW())');
+            $ok = $ins->execute([':rid' => $id_resultado, ':motivo' => $motivo]);
+            if (!$ok) return ['success' => false, 'mensaje' => 'Error al insertar motivo de rechazo'];
+
+            // Actualizar estado de inscripcion (marcar como reprobado) si existe campo
+            $insc_id = (int)($row['inscripcion_id'] ?? $row['insc_id'] ?? 0);
+            if ($insc_id > 0) {
+                // Intentar actualizar inscripcion a estado 'reprobado' = 4 (según convención del proyecto)
+                $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 4 WHERE id = :id');
+                $upd->execute([':id' => $insc_id]);
+            }
+
+            // Registrar auditoría si existe tabla
+            try {
+                $aud = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, accion, detalles, fecha) VALUES (:uid, :accion, :detalles, NOW())');
+                $usuario_id = $_SESSION['user_id'] ?? null;
+                $aud->execute([':uid' => $usuario_id, ':accion' => 'MOTIVO_RECHAZO', ':detalles' => json_encode(['id_resultado' => $id_resultado, 'motivo' => $motivo])]);
+            } catch (\Throwable $t) {
+                // No crítico
+            }
 
             $this->registrarLog('MOTIVO_RECHAZO_GENERADO', [
                 'id_resultado' => $id_resultado,
@@ -440,14 +525,16 @@ class ValidacionControlador
     public function obtenerValidacionesPendientes(): array
     {
         try {
-            // TODO: SELECT i.*, u.nombre, u.apellido, c.nombre as curso_nombre
-            // TODO: FROM inscripcion i
-            // TODO: JOIN usuario u ON i.id_usuario = u.id
-            // TODO: LEFT JOIN curso c ON i.id_curso = c.id
-            // TODO: WHERE i.id_estado = 1 (pendiente)
-            // TODO: ORDER BY i.fecha_inscripcion ASC
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (!file_exists($connFile)) return [];
+            require_once $connFile;
+            $pdo = Connection::getPDO();
 
-            return [];
+            $sql = 'SELECT i.*, u.nombre as usuario_nombre, u.apellido as usuario_apellido, c.nombre as curso_nombre, c.modalidad FROM inscripciones i JOIN usuario u ON i.usuario_id = u.id LEFT JOIN cursos c ON i.curso_id = c.id WHERE i.estado_tramite_id = 1 ORDER BY i.fecha_inscripcion ASC';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute();
+            $rows = $stmt->fetchAll();
+            return $rows ?: [];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_VALIDACIONES_PENDIENTES', ['error' => $e->getMessage()]);
             return [];
@@ -461,13 +548,24 @@ class ValidacionControlador
      */
     private function obtenerAsistencia(int $id_inscripcion): array
     {
-        // TODO: SELECT COUNT(*) as total FROM asistencia WHERE id_inscripcion = $id_inscripcion
-        // TODO: SELECT COUNT(*) as presentes FROM asistencia WHERE id_inscripcion = $id_inscripcion AND presente = 1
-
-        return [
-            'total_sesiones' => 0,
-            'sesiones_presentes' => 0,
-            'porcentaje' => 0.0
-        ];
+        try {
+            $asistencia = new AsistenciaModelo();
+            $tot = $asistencia->obtenerTotalAsistencias($id_inscripcion);
+            $presentes = (int)($tot['presentes'] ?? 0);
+            $total = (int)($tot['total'] ?? 0);
+            $porcentaje = $total > 0 ? round(($presentes / $total) * 100.0, 2) : 0.0;
+            return [
+                'total_sesiones' => $total,
+                'sesiones_presentes' => $presentes,
+                'porcentaje' => $porcentaje
+            ];
+        } catch (\Exception $e) {
+            $this->registrarLog('ERROR_OBTENER_ASISTENCIA', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
+            return [
+                'total_sesiones' => 0,
+                'sesiones_presentes' => 0,
+                'porcentaje' => 0.0
+            ];
+        }
     }
 }

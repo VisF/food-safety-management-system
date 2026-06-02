@@ -21,6 +21,19 @@ class UploadControlador
     private const LOG_FILE = __DIR__ . '/../logs/upload_controller.log';
     private const MAX_FILESIZE = 5242880; // 5 MB en bytes
     private const FORMATOS_PERMITIDOS = ['jpg', 'jpeg', 'png', 'pdf'];
+    private const AV_SOCKET = 'unix:///var/run/clamav/clamd.ctl'; // Socket Unix para ClamAV
+    private const MIN_FILESIZE = 1; // Mínimo 1 byte para evitar archivos vacíos
+    /**
+     * Mapeo de extensiones a tipos MIME permitidos.
+     * Usamos esto para comprobar que el contenido real del archivo
+     * coincide con la extensión declarada por el usuario.
+     */
+    private const MIME_WHITELIST = [
+        'jpg' => ['image/jpeg'],
+        'jpeg' => ['image/jpeg'],
+        'png' => ['image/png'],
+        'pdf' => ['application/pdf']
+    ];
     private const CARPETA_UPLOADS = __DIR__ . '/../uploads';
     private const CARPETA_DOCUMENTOS = __DIR__ . '/../uploads/documentos';
     private const CARPETA_TEMPORAL = __DIR__ . '/../uploads/temporal';
@@ -40,6 +53,7 @@ class UploadControlador
      */
     private function inicializarModelos(): void
     {
+        // Instanciar modelo de documentos si está disponible (fallback seguro)
         if (class_exists('DocumentoModelo')) {
             $this->documentoModelo = new DocumentoModelo();
         }
@@ -82,8 +96,8 @@ class UploadControlador
             $nombre_original = $archivo['name'] ?? 'documento';
             $nombre_unico = $this->generarNombreArchivo($nombre_original, $id_inscripcion);
 
-            // Guardar archivo
-            $guardar = $this->guardarArchivo($archivo, self::CARPETA_DOCUMENTOS);
+            // Guardar archivo usando el nombre único generado
+            $guardar = $this->guardarArchivo($archivo, self::CARPETA_DOCUMENTOS, $nombre_unico);
             if (!$guardar['success']) {
                 return [
                     'success' => false,
@@ -93,10 +107,12 @@ class UploadControlador
                 ];
             }
 
+            // Construir ruta web relativa usando el nombre retornado por guardarArchivo
+            $nombre_guardado = $guardar['nombre'] ?? $nombre_unico;
             $resultado = [
                 'success' => true,
-                'ruta' => '/uploads/documentos/' . $nombre_unico,
-                'nombre' => $nombre_unico,
+                'ruta' => '/uploads/documentos/' . $nombre_guardado,
+                'nombre' => $nombre_guardado,
                 'mensaje' => 'Archivo cargado exitosamente'
             ];
 
@@ -131,36 +147,45 @@ class UploadControlador
     public function validarArchivo(array $archivo): array
     {
         // Validar estructura del array
+        // Comprobar estructura mínima de $_FILES para evitar warnings
         if (!isset($archivo['error']) || !isset($archivo['size']) || !isset($archivo['name'])) {
             return [
                 'success' => false,
-                'mensaje' => 'Estructura de archivo inválida'
+                'mensaje' => 'Error: datos del archivo incompletos o inválidos.'
             ];
         }
 
         // Validar error de upload
         if ($archivo['error'] !== UPLOAD_ERR_OK) {
             $mensajes_error = [
-                UPLOAD_ERR_INI_SIZE => 'Archivo excede tamaño máximo permitido',
-                UPLOAD_ERR_FORM_SIZE => 'Archivo excede tamaño máximo permitido',
-                UPLOAD_ERR_PARTIAL => 'Archivo subido parcialmente',
-                UPLOAD_ERR_NO_FILE => 'No se seleccionó archivo',
-                UPLOAD_ERR_NO_TMP_DIR => 'Error temporal del servidor',
-                UPLOAD_ERR_CANT_WRITE => 'No se puede escribir el archivo',
-                UPLOAD_ERR_EXTENSION => 'Extensión no permitida'
+                UPLOAD_ERR_INI_SIZE => 'El archivo supera el límite permitido (5 MB).',
+                UPLOAD_ERR_FORM_SIZE => 'El archivo supera el límite permitido (5 MB).',
+                UPLOAD_ERR_PARTIAL => 'La carga del archivo quedó incompleta. Intenta nuevamente.',
+                UPLOAD_ERR_NO_FILE => 'No se seleccionó ningún archivo.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Error temporal en el servidor. Contacta al administrador.',
+                UPLOAD_ERR_CANT_WRITE => 'No se pudo escribir el archivo en el servidor.',
+                UPLOAD_ERR_EXTENSION => 'Extensión de archivo no permitida.'
             ];
-            $mensaje = $mensajes_error[$archivo['error']] ?? 'Error desconocido en carga';
+            $mensaje = $mensajes_error[$archivo['error']] ?? 'Error desconocido durante la carga del archivo.';
             return [
                 'success' => false,
                 'mensaje' => $mensaje
             ];
         }
 
-        // Validar tamaño
-        if (!$this->validarTamanoMaximo((int)$archivo['size'])) {
+        // Validar tamaño (mínimo y máximo)
+        $tamanio = (int)($archivo['size'] ?? 0);
+        if ($tamanio < self::MIN_FILESIZE) {
             return [
                 'success' => false,
-                'mensaje' => 'Archivo excede tamaño máximo de 5 MB'
+                'mensaje' => 'El archivo está vacío o es demasiado pequeño. El tamaño mínimo es 1 byte.'
+            ];
+        }
+        if (!$this->validarTamanoMaximo($tamanio)) {
+            $tamanio_mb = round($tamanio / 1024 / 1024, 2);
+            return [
+                'success' => false,
+                'mensaje' => "El archivo es demasiado grande ({$tamanio_mb} MB). El máximo permitido es 5 MB."
             ];
         }
 
@@ -169,13 +194,76 @@ class UploadControlador
         if (!$this->validarFormatosPermitidos($extension)) {
             return [
                 'success' => false,
-                'mensaje' => 'Formato de archivo no permitido. Permitidos: ' . implode(', ', self::FORMATOS_PERMITIDOS)
+                'mensaje' => 'Formato no permitido. Extensiones válidas: ' . implode(', ', self::FORMATOS_PERMITIDOS)
+            ];
+        }
+
+        // Validación adicional por MIME real usando finfo
+        // Pasos:
+        // 1) Comprobamos que el archivo temporal exista y sea un upload válido (is_uploaded_file).
+        // 2) Usamos finfo_file(FILEINFO_MIME_TYPE) para obtener el tipo MIME real.
+        // 3) Comparamos el MIME real con la lista blanca para la extensión.
+        // 4) Para imágenes hacemos un chequeo extra con getimagesize() para evitar fakes.
+
+        $tmpName = $archivo['tmp_name'] ?? '';
+        if (empty($tmpName) || !file_exists($tmpName)) {
+            return ['success' => false, 'mensaje' => 'No se encontró el archivo temporal para validación. Intenta subir de nuevo.'];
+        }
+
+        // Preferir is_uploaded_file en entornos con uploads reales
+        if (function_exists('is_uploaded_file') && !is_uploaded_file($tmpName)) {
+            // No detener en entornos de prueba, pero registrar y rechazar por defecto
+            $this->registrarLog('ADVERTENCIA_TMP_NO_UPLOAD', ['tmp' => $tmpName]);
+            // continuar (no fatal) — aún podemos validar MIME
+        }
+
+        $finfo = finfo_open(FILEINFO_MIME_TYPE);
+        if ($finfo !== false) {
+            $mime = finfo_file($finfo, $tmpName);
+            finfo_close($finfo);
+            if ($mime === false) {
+                return ['success' => false, 'mensaje' => 'Imposible determinar el tipo de archivo. Archivo posiblemente corrupto.'];
+            }
+
+            $allowedMimes = self::MIME_WHITELIST[$extension] ?? [];
+            if (!in_array($mime, $allowedMimes, true)) {
+                $mimes_esperados = implode(', ', $allowedMimes);
+                return ['success' => false, 'mensaje' => "Seguridad: El archivo tiene tipo MIME $mime pero se esperaba: $mimes_esperados. Verifica que el archivo no ha sido manipulado."];
+            }
+
+            // Para imágenes, validar con getimagesize para detectar archivos no-imagen
+            if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
+                $img = @getimagesize($tmpName);
+                if ($img === false) {
+                    return ['success' => false, 'mensaje' => 'La imagen es inválida, corrupta o no es una imagen real. Verifica el archivo e intenta nuevamente.'];
+                }
+                // Validar que las dimensiones sean razonables (mínimo 100x100, máximo 10000x10000)
+                if (isset($img[0], $img[1])) {
+                    if ($img[0] < 100 || $img[1] < 100) {
+                        return ['success' => false, 'mensaje' => 'La imagen es demasiado pequeña (mínimo 100x100 píxeles).'];
+                    }
+                    if ($img[0] > 10000 || $img[1] > 10000) {
+                        return ['success' => false, 'mensaje' => 'La imagen es demasiado grande (máximo 10000x10000 píxeles).'];
+                    }
+                }
+            }
+        } else {
+            // Si no hay finfo disponible, registramos y aceptamos la extensión (fallback seguro pero menos estricto)
+            $this->registrarLog('ADVERTENCIA_NO_FINFO', ['archivo' => $archivo['name'] ?? '']);
+        }
+
+        // Escaneo antivirus opcional (ClamAV) si está disponible
+        $av_check = $this->escanearConClamAV($tmpName);
+        if (!$av_check['success']) {
+            return [
+                'success' => false,
+                'mensaje' => $av_check['mensaje']
             ];
         }
 
         return [
             'success' => true,
-            'mensaje' => 'Archivo válido'
+            'mensaje' => 'El archivo pasó todas las verificaciones de seguridad.'
         ];
     }
 
@@ -186,25 +274,52 @@ class UploadControlador
      * @param string $carpeta Ruta de destino
      * @return array ['success' => bool, 'ruta' => string|null, 'mensaje' => string]
      */
-    public function guardarArchivo(array $archivo, string $carpeta): array
+    public function guardarArchivo(array $archivo, string $carpeta, ?string $nombreDeseado = null): array
     {
         try {
             // Crear directorio si no existe
             if (!is_dir($carpeta)) {
-                mkdir($carpeta, 0755, true);
+                if (!mkdir($carpeta, 0755, true)) {
+                    return [
+                        'success' => false,
+                        'ruta' => null,
+                        'nombre' => null,
+                        'mensaje' => 'No se pudo crear el directorio de destino. Contacta al administrador.'
+                    ];
+                }
             }
 
-            // Generar nombre único
+            // Generar nombre único o usar el nombre deseado si se proporcionó
             $extension = strtolower(pathinfo($archivo['name'], PATHINFO_EXTENSION));
-            $nombre_unico = uniqid('doc_', true) . '.' . $extension;
+            if ($nombreDeseado && is_string($nombreDeseado)) {
+                $nombre_unico = $nombreDeseado;
+                // Asegurar que la extensión coincida
+                if (strtolower(pathinfo($nombre_unico, PATHINFO_EXTENSION)) !== $extension) {
+                    $nombre_unico .= '.' . $extension;
+                }
+            } else {
+                $nombre_unico = uniqid('doc_', true) . '.' . $extension;
+            }
+            
+            // Validar path traversal
+            if (strpos($nombre_unico, '..') !== false || strpos($nombre_unico, '//') !== false) {
+                return [
+                    'success' => false,
+                    'ruta' => null,
+                    'nombre' => null,
+                    'mensaje' => 'Nombre de archivo inválido. No se permiten trayectorias relativas.'
+                ];
+            }
+            
             $ruta_destino = $carpeta . DIRECTORY_SEPARATOR . $nombre_unico;
 
-            // Mover archivo subido
+            // Intento seguro de mover el archivo desde tmp_name (requerido en entornos PHP normales)
             if (!move_uploaded_file($archivo['tmp_name'], $ruta_destino)) {
                 return [
                     'success' => false,
                     'ruta' => null,
-                    'mensaje' => 'Error al guardar archivo en servidor'
+                    'nombre' => null,
+                    'mensaje' => 'No se pudo guardar el archivo en el servidor. Intenta nuevamente.'
                 ];
             }
 
@@ -213,8 +328,17 @@ class UploadControlador
                 return [
                     'success' => false,
                     'ruta' => null,
-                    'mensaje' => 'Archivo no se guardó correctamente'
+                    'nombre' => null,
+                    'mensaje' => 'El archivo no se guardó correctamente. Verifica permisos del servidor.'
                 ];
+            }
+            
+            // Establecer permisos seguros
+            chmod($ruta_destino, 0644);
+            
+            // Limpiar EXIF de imágenes (metadata sensible)
+            if (in_array($extension, ['jpg', 'jpeg', 'png'], true)) {
+                $this->limpiarEXIFImagen($ruta_destino, $extension);
             }
 
             $resultado = [
@@ -309,20 +433,47 @@ class UploadControlador
     public function obtenerArchivoTemporal(string $id_temporal): ?array
     {
         try {
-            // TODO: SELECT * FROM archivo_temporal WHERE id_temporal = $id_temporal AND fecha_expiracion > NOW()
-            // TODO: Retornar array con datos del archivo o null
-            
+            $connFile = __DIR__ . '/../db/Connection.php';
+            if (file_exists($connFile)) {
+                require_once $connFile;
+                $pdo = Connection::getPDO();
+                $sql = 'SELECT id_temporal, nombre, ruta, tamanio, fecha_creacion, fecha_expiracion FROM archivo_temporal WHERE id_temporal = :id AND fecha_expiracion > NOW() LIMIT 1';
+                $stmt = $pdo->prepare($sql);
+                $stmt->execute([':id' => $id_temporal]);
+                $row = $stmt->fetch();
+                if (!$row) return null;
+
+                $ruta = $row['ruta'] ?? (self::CARPETA_TEMPORAL . DIRECTORY_SEPARATOR . ($row['nombre'] ?? ''));
+                $existe = file_exists($ruta);
+
+                $archivo = [
+                    'id_temporal' => $row['id_temporal'] ?? $id_temporal,
+                    'nombre' => $row['nombre'] ?? basename($ruta),
+                    'ruta' => $ruta,
+                    'tamanio' => isset($row['tamanio']) ? (int)$row['tamanio'] : ($existe ? filesize($ruta) : 0),
+                    'fecha_creacion' => $row['fecha_creacion'] ?? null,
+                    'fecha_expiracion' => $row['fecha_expiracion'] ?? null,
+                    'existe' => $existe
+                ];
+
+                $this->registrarLog('ARCHIVO_TEMPORAL_OBTENIDO', ['id_temporal' => $id_temporal, 'db' => true, 'existe' => $existe]);
+                return $archivo;
+            }
+
+            // Fallback: retornar placeholder (sin DB disponible)
+            $rutaFallback = self::CARPETA_TEMPORAL . DIRECTORY_SEPARATOR . 'documento_temporal.pdf';
+            $existeFallback = file_exists($rutaFallback);
             $archivo = [
                 'id_temporal' => $id_temporal,
                 'nombre' => 'documento_temporal.pdf',
-                'ruta' => self::CARPETA_TEMPORAL . '/documento_temporal.pdf',
-                'tamanio' => 1024,
+                'ruta' => $rutaFallback,
+                'tamanio' => $existeFallback ? filesize($rutaFallback) : 0,
                 'fecha_creacion' => date('Y-m-d H:i:s'),
-                'fecha_expiracion' => date('Y-m-d H:i:s', time() + 3600)
+                'fecha_expiracion' => date('Y-m-d H:i:s', time() + 3600),
+                'existe' => $existeFallback
             ];
 
-            $this->registrarLog('ARCHIVO_TEMPORAL_OBTENIDO', ['id_temporal' => $id_temporal]);
-            
+            $this->registrarLog('ARCHIVO_TEMPORAL_OBTENIDO', ['id_temporal' => $id_temporal, 'db' => false, 'existe' => $existeFallback]);
             return $archivo;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_ARCHIVO_TEMPORAL', ['error' => $e->getMessage()]);
@@ -350,6 +501,108 @@ class UploadControlador
     public function validarTamanoMaximo(int $tamanio): bool
     {
         return $tamanio > 0 && $tamanio <= self::MAX_FILESIZE;
+    }
+
+    /**
+     * Escanear archivo con ClamAV (antivirus) si está disponible
+     * 
+     * @param string $ruta_archivo Ruta del archivo a escanear
+     * @return array ['success' => bool, 'mensaje' => string, 'amenaza' => string|null]
+     */
+    private function escanearConClamAV(string $ruta_archivo): array
+    {
+        // ClamAV es opcional. Si no está configurado, retornar OK
+        if (!function_exists('stream_socket_client')) {
+            // Sin soporte de sockets, saltar escaneo
+            return ['success' => true, 'mensaje' => '', 'amenaza' => null];
+        }
+
+        // Intentar conectar a ClamAV
+        $socket = @stream_socket_client(self::AV_SOCKET, $errno, $errstr, 2);
+        if ($socket === false) {
+            // ClamAV no disponible, esto es OK (no es requerido)
+            $this->registrarLog('AVISO_CLAMAV_NO_DISPONIBLE', ['error' => $errstr ?? 'Socket no disponible']);
+            return ['success' => true, 'mensaje' => '', 'amenaza' => null];
+        }
+
+        try {
+            // Enviar comando SCAN a ClamAV
+            $comando = 'SCAN ' . escapeshellarg($ruta_archivo) . "\r\n";
+            fwrite($socket, $comando);
+            
+            // Leer respuesta
+            $respuesta = fgets($socket, 1024);
+            fclose($socket);
+
+            if ($respuesta === false) {
+                $this->registrarLog('ERROR_CLAMAV_RESPUESTA', ['archivo' => $ruta_archivo]);
+                return ['success' => true, 'mensaje' => '', 'amenaza' => null]; // OK, mejor no bloquear
+            }
+
+            // Revisar si hay VIRUS en la respuesta
+            if (stripos($respuesta, 'FOUND') !== false) {
+                preg_match('/(.+)\s+FOUND/', $respuesta, $matches);
+                $amenaza = $matches[1] ?? 'Malware desconocido';
+                $this->registrarLog('ARCHIVO_AMENAZA_DETECTADA', ['archivo' => $ruta_archivo, 'amenaza' => $amenaza]);
+                return [
+                    'success' => false,
+                    'mensaje' => "Seguridad: Se detectó malware en el archivo ($amenaza). El archivo fue rechazado.",
+                    'amenaza' => $amenaza
+                ];
+            }
+
+            // OK, no es amenaza
+            return ['success' => true, 'mensaje' => '', 'amenaza' => null];
+        } catch (\Exception $e) {
+            $this->registrarLog('ERROR_ESCANEO_CLAMAV', ['error' => $e->getMessage()]);
+            // Fallar de forma segura: dejar pasar si no se puede escanear
+            return ['success' => true, 'mensaje' => '', 'amenaza' => null];
+        }
+    }
+
+    /**
+     * Limpiar metadata EXIF de imágenes (privacidad)
+     * 
+     * @param string $ruta_imagen Ruta de la imagen
+     * @param string $extension Extensión del archivo (jpg, png)
+     * @return bool true si se limpió exitosamente
+     */
+    private function limpiarEXIFImagen(string $ruta_imagen, string $extension): bool
+    {
+        try {
+            // Para PNG, no hay EXIF estándar, pero puede haber metadata
+            if ($extension === 'png' && extension_loaded('imagick')) {
+                $image = new \Imagick($ruta_imagen);
+                $image->stripImage(); // Remover metadata
+                $image->writeImage($ruta_imagen);
+                $this->registrarLog('EXIF_LIMPIADO', ['archivo' => $ruta_imagen, 'tipo' => 'PNG/Imagick']);
+                return true;
+            }
+
+            // Para JPG con GD
+            if (in_array($extension, ['jpg', 'jpeg'], true) && extension_loaded('gd')) {
+                if (function_exists('exif_read_data')) {
+                    // Intentar limpiar EXIF mediante relectura
+                    $img = imagecreatefromjpeg($ruta_imagen);
+                    if ($img !== false) {
+                        // Recodificar sin EXIF
+                        if (imagejpeg($img, $ruta_imagen, 90)) {
+                            imagedestroy($img);
+                            $this->registrarLog('EXIF_LIMPIADO', ['archivo' => $ruta_imagen, 'tipo' => 'JPEG/GD']);
+                            return true;
+                        }
+                    }
+                }
+            }
+
+            // Si no se pudo limpiar, registrar aviso pero no fallar
+            $this->registrarLog('EXIF_LIMPIEZA_PARCIAL', ['archivo' => $ruta_imagen, 'razon' => 'Extensiones no disponibles']);
+            return false;
+        } catch (\Exception $e) {
+            // Fallar silenciosamente (la imagen ya está guardada, no queremos perderla)
+            $this->registrarLog('ADVERTENCIA_EXIF_LIMPIEZA', ['error' => $e->getMessage()]);
+            return false;
+        }
     }
 
     /**

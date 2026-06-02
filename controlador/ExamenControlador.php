@@ -44,15 +44,19 @@ class ExamenControlador
      */
     private function inicializarModelos(): void
     {
+        // Instanciar modelos sólo si la clase está definida (evita errores en entornos parciales).
         if (class_exists('ExamenModelo')) {
             $this->examenModelo = new ExamenModelo();
         }
+        // Modelo de resultados (opcional en entornos de pruebas).
         if (class_exists('ResultadoExamenModelo')) {
             $this->resultadoExamenModelo = new ResultadoExamenModelo();
         }
+        // Modelo de asistencia (registro de sesiones presenciales).
         if (class_exists('AsistenciaModelo')) {
             $this->asistenciaModelo = new AsistenciaModelo();
         }
+        // Modelo de inscripciones.
         if (class_exists('InscripcionModelo')) {
             $this->inscripcionModelo = new InscripcionModelo();
         }
@@ -80,9 +84,11 @@ class ExamenControlador
     public function listarExamenes(): array
     {
         try {
+            // Preferir el modelo cuando esté disponible (mejor encapsulación y testabilidad).
             if ($this->examenModelo && method_exists($this->examenModelo, 'obtenerTodos')) {
                 return $this->examenModelo->obtenerTodos();
             }
+            // Fallback: consulta directa a la base de datos si no hay modelo.
             $conn = __DIR__ . '/../db/Connection.php';
             if (!file_exists($conn)) return [];
             require_once $conn;
@@ -105,9 +111,11 @@ class ExamenControlador
     public function obtenerExamen(int $id): ?array
     {
         try {
+            // Usar modelo si existe para obtener el examen por id.
             if ($this->examenModelo && method_exists($this->examenModelo, 'obtenerPorId')) {
                 return $this->examenModelo->obtenerPorId($id);
             }
+            // Fallback: consulta directa a DB
             $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) return null; require_once $conn; $pdo = Connection::getPDO();
             $stmt = $pdo->prepare('SELECT * FROM examenes WHERE id = :id'); $stmt->execute([':id' => $id]); $ex = $stmt->fetch(\PDO::FETCH_ASSOC);
             return $ex ?: null;
@@ -126,7 +134,7 @@ class ExamenControlador
     public function obtenerDetalleExamen(int $id): array
     {
         try {
-            // preferir modelo
+            // Preferir modelo para obtener detalle y cálculo de cupos (modelo encapsula reglas de negocio).
             if ($this->examenModelo && method_exists($this->examenModelo, 'obtenerPorId')) {
                 $e = $this->examenModelo->obtenerPorId($id);
                 $pdoFile = __DIR__ . '/../db/Connection.php'; if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE examen_id = :id'); $stmt->execute([':id' => $id]); $c = (int)$stmt->fetchColumn(); } else { $c = 0; }
@@ -192,21 +200,16 @@ class ExamenControlador
             $nota = (float) ($datos['nota'] ?? 0);
             $observaciones = $datos['observaciones'] ?? null;
 
-            // TODO: Validar que inscripción existe
-            // TODO: Validar que nota esté en rango válido (0-100)
-            // TODO: Validar que no exista resultado previo para esta inscripción
-            // TODO: Calcular aprobado: nota >= self::NOTA_MINIMA_APROBACION
-            // TODO: INSERT en tabla resultado_examen con (id_inscripcion, id_examen, nota, aprobado, observaciones)
-            // TODO: Si aprobado: UPDATE inscripcion SET id_estado = 3 (en trámite de carnet)
-            // TODO: Si reprobado: UPDATE inscripcion SET id_estado = 4 (reprobado), permitir re-inscripción
-            // TODO: Registrar en tabla auditoria_acciones
-
+            // Validaciones y guardado de resultado (implementado abajo)
+            
             // Validaciones básicas
+            // Validación: la nota debe estar en el rango permitido
             if ($nota < 0 || $nota > 100) return ['success' => false, 'aprobado' => false, 'mensaje' => 'Nota fuera de rango'];
 
+            // Asegurar que el modelo de resultados está disponible
             if (!$this->resultadoExamenModelo) return ['success' => false, 'aprobado' => false, 'mensaje' => 'Modelo de resultados no disponible'];
 
-            // verificar que no exista resultado previo para la misma inscripción
+            // Verificar existencia previa de resultado para evitar duplicados
             $prev = $this->resultadoExamenModelo->obtenerPorInscripcion($id_inscripcion);
             if ($prev) return ['success' => false, 'aprobado' => (bool)$prev['aprobado'], 'mensaje' => 'Ya existe un resultado registrado para esta inscripción'];
 

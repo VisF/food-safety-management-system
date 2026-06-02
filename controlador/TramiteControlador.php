@@ -3,35 +3,22 @@ declare(strict_types=1);
 
 /**
  * TramiteControlador - Gestión integral del trámite y cambios de estado
- * 
- * Responsabilidades:
- * - Obtener estado actual completo del trámite
- * - Gestionar historial de cambios de estado
- * - Cambiar estado del trámite
- * - Generar comprobantes descargables
- * - Verificar asociación de carnets
- * - Validar vigencia de carnets
- * - Registrar cambios de estado en auditoría
- * - Generar estadísticas para reportes
- * 
- * Dependencias:
- * - Modelos: InscripcionModelo, EstadoTramiteModelo, CarnetModelo, DocumentoModelo, ResultadoExamenModelo
  */
-
 class TramiteControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/tramite_controller.log';
-    
+
     private ?InscripcionModelo $inscripcionModelo = null;
     private ?EstadoTramiteModelo $estadoTramiteModelo = null;
     private ?CarnetModelo $carnetModelo = null;
     private ?DocumentoModelo $documentoModelo = null;
     private ?ResultadoExamenModelo $resultadoExamenModelo = null;
-        private function pdo(): \PDO
-        {
-            require_once __DIR__ . '/../db/Connection.php';
-            return Connection::getPDO();
-        }
+
+    private function pdo(): \PDO
+    {
+        require_once __DIR__ . '/../db/Connection.php';
+        return Connection::getPDO();
+    }
 
     public function __construct()
     {
@@ -39,31 +26,15 @@ class TramiteControlador
         $this->inicializarModelos();
     }
 
-    /**
-     * Inicializar todas las dependencias de modelos
-     */
     private function inicializarModelos(): void
     {
-        if (class_exists('InscripcionModelo')) {
-            $this->inscripcionModelo = new InscripcionModelo();
-        }
-        if (class_exists('EstadoTramiteModelo')) {
-            $this->estadoTramiteModelo = new EstadoTramiteModelo();
-        }
-        if (class_exists('CarnetModelo')) {
-            $this->carnetModelo = new CarnetModelo();
-        }
-        if (class_exists('DocumentoModelo')) {
-            $this->documentoModelo = new DocumentoModelo();
-        }
-        if (class_exists('ResultadoExamenModelo')) {
-            $this->resultadoExamenModelo = new ResultadoExamenModelo();
-        }
+        if (class_exists('InscripcionModelo')) $this->inscripcionModelo = new InscripcionModelo();
+        if (class_exists('EstadoTramiteModelo')) $this->estadoTramiteModelo = new EstadoTramiteModelo();
+        if (class_exists('CarnetModelo')) $this->carnetModelo = new CarnetModelo();
+        if (class_exists('DocumentoModelo')) $this->documentoModelo = new DocumentoModelo();
+        if (class_exists('ResultadoExamenModelo')) $this->resultadoExamenModelo = new ResultadoExamenModelo();
     }
 
-    /**
-     * Registrar evento en el log
-     */
     private function registrarLog(string $evento, array $datos = []): void
     {
         $timestamp = date('Y-m-d H:i:s');
@@ -72,48 +43,60 @@ class TramiteControlador
         @file_put_contents(self::LOG_FILE, $mensaje, FILE_APPEND);
     }
 
-    /**
-     * Obtener detalle completo del trámite (estado actual)
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array Detalles completos: [inscripcion, estado, documentacion, resultado_examen, carnet, ...]
-     */
     public function obtenerDetalleTramite(int $id_inscripcion): array
     {
         try {
-            // TODO: SELECT * FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: SELECT * FROM estado_tramite WHERE id = inscripcion.id_estado
-            // TODO: SELECT COUNT(*) as total, SUM(validado) as validados FROM documento WHERE id_inscripcion = $id_inscripcion
-            // TODO: SELECT * FROM resultado_examen WHERE id_inscripcion = $id_inscripcion (si existe)
-            // TODO: SELECT * FROM carnet WHERE id_inscripcion = $id_inscripcion (si existe)
-            
+            $pdo = $this->pdo();
+
+            $stmt = $pdo->prepare('SELECT * FROM inscripciones WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $insc = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$insc) return [];
+
+            $stmt = $pdo->prepare('SELECT id, nombre, descripcion FROM estado_tramite WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $insc['estado_tramite_id'] ?? $insc['id_estado'] ?? 0]);
+            $estado = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+            $stmt = $pdo->prepare('SELECT COUNT(*) as total, SUM(CASE WHEN validado = 1 THEN 1 ELSE 0 END) as validados FROM documentos WHERE id_inscripcion = :id');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $docStats = $stmt->fetch(\PDO::FETCH_ASSOC) ?: ['total' => 0, 'validados' => 0];
+            $totalDocs = (int)($docStats['total'] ?? 0);
+            $validados = (int)($docStats['validados'] ?? 0);
+
+            $stmt = $pdo->prepare('SELECT * FROM resultado_examen WHERE inscripcion_id = :id ORDER BY fecha_resultado DESC LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $resultado = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+
+            $stmt = $pdo->prepare('SELECT * FROM carnets WHERE inscripcion_id = :id ORDER BY fecha_emision DESC LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $carnetRow = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
+            $carnet = null;
+            if ($carnetRow) {
+                $carnet = [
+                    'id' => (int)$carnetRow['id'],
+                    'numero_carnet' => $carnetRow['numero_carnet'] ?? null,
+                    'fecha_emision' => $carnetRow['fecha_emision'] ?? null,
+                    'fecha_vencimiento' => $carnetRow['fecha_vencimiento'] ?? null,
+                    'ruta_pdf' => $carnetRow['ruta_pdf'] ?? null,
+                    'vigente' => isset($carnetRow['vigente']) ? (int)$carnetRow['vigente'] : null
+                ];
+            }
+
             $detalle = [
-                'inscripcion' => [
-                    'id' => $id_inscripcion,
-                    'id_usuario' => 1,
-                    'id_curso' => 1,
-                    'id_tipo_inscripcion' => 1,
-                    'fecha_inscripcion' => date('Y-m-d H:i:s'),
-                    'id_estado' => 1
-                ],
-                'estado' => [
-                    'id' => 1,
-                    'nombre' => 'Pendiente',
-                    'descripcion' => 'Inscripción creada, pendiente documentación'
-                ],
+                'inscripcion' => $insc,
+                'estado' => $estado,
                 'documentacion' => [
-                    'documentos_totales' => 2,
-                    'documentos_validados' => 1,
-                    'documentos_pendientes' => 1,
-                    'completada' => false
+                    'documentos_totales' => $totalDocs,
+                    'documentos_validados' => $validados,
+                    'documentos_pendientes' => max(0, $totalDocs - $validados),
+                    'completada' => ($totalDocs > 0 && $validados === $totalDocs)
                 ],
-                'resultado_examen' => null,
-                'carnet' => null,
-                'fecha_ultima_modificacion' => date('Y-m-d H:i:s')
+                'resultado_examen' => $resultado,
+                'carnet' => $carnet,
+                'fecha_ultima_modificacion' => $insc['fecha_ultima_modificacion'] ?? $insc['fecha_inscripcion'] ?? null
             ];
 
             $this->registrarLog('DETALLE_TRAMITE_OBTENIDO', ['id_inscripcion' => $id_inscripcion]);
-            
             return $detalle;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_DETALLE_TRAMITE', ['error' => $e->getMessage()]);
@@ -121,13 +104,6 @@ class TramiteControlador
         }
     }
 
-    /**
-     * Obtener historial de cambios de estado del trámite
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array Array de cambios de estado ordenados cronológicamente
-     *               [['id_estado_anterior' => int, 'id_estado_nuevo' => int, 'fecha_cambio' => string, 'usuario' => string], ...]
-     */
     public function obtenerHistorialTramite(int $id_inscripcion): array
     {
         try {
@@ -158,7 +134,6 @@ class TramiteControlador
             }
 
             $this->registrarLog('HISTORIAL_TRAMITE_OBTENIDO', ['id_inscripcion' => $id_inscripcion]);
-            
             return $historial;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_HISTORIAL_TRAMITE', ['error' => $e->getMessage()]);
@@ -166,114 +141,98 @@ class TramiteControlador
         }
     }
 
-    /**
-     * Actualizar estado del trámite
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @param int $id_estado_nuevo ID del nuevo estado
-     * @return array ['success' => bool, 'mensaje' => string, 'estado_anterior' => int, 'estado_nuevo' => int]
-     */
     public function actualizarEstadoTramite(int $id_inscripcion, int $id_estado_nuevo): array
     {
         try {
-            // TODO: SELECT id_estado FROM inscripcion WHERE id = $id_inscripcion
-            // TODO: Validar que id_estado_nuevo sea válido
-            // TODO: UPDATE inscripcion SET id_estado = $id_estado_nuevo, fecha_ultima_modificacion = NOW()
-            // TODO: INSERT en historial_tramite (id_inscripcion, id_estado_anterior, id_estado_nuevo, fecha_cambio)
-            // TODO: Registrar en auditoria_acciones
-            // TODO: Enviar notificación al usuario si corresponde
-            
-            $resultado = [
-                'success' => true,
-                'mensaje' => 'Estado actualizado exitosamente',
-                'estado_anterior' => 1,
-                'estado_nuevo' => $id_estado_nuevo
-            ];
+            $pdo = $this->pdo();
 
-            $this->registrarLog('ESTADO_TRAMITE_ACTUALIZADO', [
-                'id_inscripcion' => $id_inscripcion,
-                'estado_nuevo' => $id_estado_nuevo
-            ]);
+            $stmt = $pdo->prepare('SELECT estado_tramite_id FROM inscripciones WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_inscripcion]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$row) return ['success' => false, 'mensaje' => 'Inscripcion no encontrada', 'estado_anterior' => null, 'estado_nuevo' => $id_estado_nuevo];
+            $estado_anterior = (int)($row['estado_tramite_id'] ?? $row['id_estado'] ?? 0);
 
+            $stmt = $pdo->prepare('SELECT id FROM estado_tramite WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_estado_nuevo]);
+            if (!$stmt->fetch()) {
+                return ['success' => false, 'mensaje' => 'Estado destino inválido', 'estado_anterior' => $estado_anterior, 'estado_nuevo' => $id_estado_nuevo];
+            }
+
+            $pdo->beginTransaction();
+            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :nid, fecha_ultima_modificacion = NOW() WHERE id = :id');
+            $ok = $upd->execute([':nid' => $id_estado_nuevo, ':id' => $id_inscripcion]);
+
+            $hist = $pdo->prepare('INSERT INTO historial_tramite (inscripcion_id, estado_anterior_id, estado_nuevo_id, fecha_cambio, observaciones, usuario_admin_id) VALUES (:iid, :ant, :nuevo, NOW(), :obs, :uid)');
+            $usuario_admin = $_SESSION['user_id'] ?? null;
+            $hist->execute([':iid' => $id_inscripcion, ':ant' => $estado_anterior, ':nuevo' => $id_estado_nuevo, ':obs' => null, ':uid' => $usuario_admin]);
+
+            try {
+                $aud = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, tabla, id_registro, accion, datos_anteriores, datos_nuevos, fecha) VALUES (:uid, :tabla, :idregistro, :accion, :datosant, :datosnew, NOW())');
+                $aud->execute([
+                    ':uid' => $usuario_admin,
+                    ':tabla' => 'inscripciones',
+                    ':idregistro' => $id_inscripcion,
+                    ':accion' => 'CAMBIO_ESTADO',
+                    ':datosant' => json_encode(['estado_anterior' => $estado_anterior]),
+                    ':datosnew' => json_encode(['estado_nuevo' => $id_estado_nuevo])
+                ]);
+            } catch (\Throwable $t) {
+                // non critical
+            }
+
+            try { $pdo->commit(); } catch (\Throwable $t) { $this->registrarLog('ERROR_COMMIT_CAMBIO_ESTADO', ['error' => $t->getMessage()]); }
+
+            $resultado = ['success' => (bool)$ok, 'mensaje' => $ok ? 'Estado actualizado exitosamente' : 'Error al actualizar estado', 'estado_anterior' => $estado_anterior, 'estado_nuevo' => $id_estado_nuevo];
+
+            $this->registrarLog('ESTADO_TRAMITE_ACTUALIZADO', ['id_inscripcion' => $id_inscripcion, 'estado_anterior' => $estado_anterior, 'estado_nuevo' => $id_estado_nuevo]);
             return $resultado;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_ACTUALIZAR_ESTADO_TRAMITE', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'mensaje' => 'Error al actualizar estado: ' . $e->getMessage(),
-                'estado_anterior' => 0,
-                'estado_nuevo' => 0
-            ];
+            return ['success' => false, 'mensaje' => 'Error al actualizar estado: ' . $e->getMessage(), 'estado_anterior' => 0, 'estado_nuevo' => 0];
         }
     }
 
-    /**
-     * Obtener comprobante descargable (PDF)
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array ['success' => bool, 'ruta_pdf' => string|null, 'nombre' => string|null, 'mensaje' => string]
-     */
     public function obtenerComprobanteDescargable(int $id_inscripcion): array
     {
         try {
-            // TODO: Obtener datos de inscripción
-                $stmt = $this->pdo()->prepare('SELECT c.id, c.codigo_comprobante, c.fecha_emision, c.ruta_pdf, c.vigente, i.usuario_id, i.estado_tramite_id, u.nombre, u.apellido, u.dni
+            $stmt = $this->pdo()->prepare('SELECT c.id, c.codigo_comprobante, c.fecha_emision, c.ruta_pdf, c.vigente, i.usuario_id, i.estado_tramite_id, u.nombre, u.apellido, u.dni
                                                FROM comprobantes_tramite c
                                                INNER JOIN inscripciones i ON i.id = c.inscripcion_id
                                                INNER JOIN usuarios u ON u.id = i.usuario_id
                                                WHERE c.inscripcion_id = :id
                                                LIMIT 1');
-                $stmt->execute([':id' => $id_inscripcion]);
-                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $stmt->execute([':id' => $id_inscripcion]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$row) {
+                return ['success' => false, 'ruta_pdf' => null, 'nombre' => null, 'mensaje' => 'No se encontro comprobante para la inscripcion'];
+            }
 
-                if (!$row) {
-                    return [
-                        'success' => false,
-                        'ruta_pdf' => null,
-                        'nombre' => null,
-                        'mensaje' => 'No se encontro comprobante para la inscripcion'
-                    ];
-                }
-
-                $resultado = [
-                    'success' => true,
-                    'ruta_pdf' => $row['ruta_pdf'],
-                    'nombre' => 'comprobante_tramite_' . $id_inscripcion . '.pdf',
-                    'mensaje' => 'Comprobante generado',
-                    'comprobante' => [
-                        'id' => (int)$row['id'],
-                        'codigo_comprobante' => $row['codigo_comprobante'],
-                        'fecha_emision' => $row['fecha_emision'],
-                        'titular' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
-                        'dni' => $row['dni'] ?? '',
-                    ]
-                ];
+            $resultado = [
+                'success' => true,
+                'ruta_pdf' => $row['ruta_pdf'],
+                'nombre' => 'comprobante_tramite_' . $id_inscripcion . '.pdf',
+                'mensaje' => 'Comprobante generado',
+                'comprobante' => [
+                    'id' => (int)$row['id'],
+                    'codigo_comprobante' => $row['codigo_comprobante'],
+                    'fecha_emision' => $row['fecha_emision'],
+                    'titular' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
+                    'dni' => $row['dni'] ?? '',
+                ]
+            ];
 
             $this->registrarLog('COMPROBANTE_GENERADO', ['id_inscripcion' => $id_inscripcion]);
-            
             return $resultado;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_GENERAR_COMPROBANTE', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'ruta_pdf' => null,
-                'nombre' => null,
-                'mensaje' => 'Error al generar comprobante: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'ruta_pdf' => null, 'nombre' => null, 'mensaje' => 'Error al generar comprobante: ' . $e->getMessage()];
         }
     }
 
-    /**
-     * Obtener carnet asociado a una inscripción
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array|null Datos del carnet o null si no existe
-     */
     public function obtenerCarnet(int $id_inscripcion): ?array
     {
         try {
-            $sql = 'SELECT c.id, c.numero_carnet, c.fecha_emision, c.fecha_vencimiento, c.ruta_pdf, c.vigente,
-                           u.nombre, u.apellido
+            $sql = 'SELECT c.id, c.numero_carnet, c.fecha_emision, c.fecha_vencimiento, c.ruta_pdf, c.vigente, u.nombre, u.apellido
                     FROM carnets c
                     INNER JOIN inscripciones i ON i.id = c.inscripcion_id
                     INNER JOIN usuarios u ON u.id = i.usuario_id
@@ -282,148 +241,71 @@ class TramiteControlador
             $stmt = $this->pdo()->prepare($sql);
             $stmt->execute([':id' => $id_inscripcion]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-            if (!$row) {
-                return null;
-            }
-
-            $carnet = [
-                'id' => (int)$row['id'],
-                'id_inscripcion' => $id_inscripcion,
-                'numero_carnet' => $row['numero_carnet'],
-                'fecha_emision' => $row['fecha_emision'],
-                'fecha_vencimiento' => $row['fecha_vencimiento'],
-                'ruta_pdf' => $row['ruta_pdf'],
-                'vigente' => (int)$row['vigente'],
-                'titular' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
-            ];
-
-            $this->registrarLog('CARNET_OBTENIDO', ['id_inscripcion' => $id_inscripcion]);
-            
-            return $carnet;
+            if (!$row) return null;
+            return ['id' => (int)$row['id'], 'id_inscripcion' => $id_inscripcion, 'numero_carnet' => $row['numero_carnet'], 'fecha_emision' => $row['fecha_emision'], 'fecha_vencimiento' => $row['fecha_vencimiento'], 'ruta_pdf' => $row['ruta_pdf'], 'vigente' => (int)$row['vigente'], 'titular' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? ''))];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_CARNET', ['error' => $e->getMessage()]);
             return null;
         }
     }
 
-    /**
-     * Verificar vigencia del carnet
-     * 
-     * @param int $id_carnet ID del carnet
-     * @return array ['vigente' => bool, 'fecha_vencimiento' => string, 'dias_restantes' => int, 'mensaje' => string]
-     */
     public function verificarVigenciaCarnet(int $id_carnet): array
     {
         try {
-            // TODO: SELECT fecha_vencimiento FROM carnet WHERE id = $id_carnet
-            // TODO: Comparar fecha_vencimiento con hoy
-            // TODO: Calcular días restantes
-            // TODO: UPDATE carnet SET vigente = (fecha_vencimiento >= HOY) si cambió
-            
-            $fecha_vencimiento = date('Y-m-d', strtotime('+1 year'));
+            $pdo = $this->pdo();
+            $stmt = $pdo->prepare('SELECT fecha_vencimiento, vigente FROM carnets WHERE id = :id LIMIT 1');
+            $stmt->execute([':id' => $id_carnet]);
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            if (!$row) return ['vigente' => false, 'fecha_vencimiento' => '', 'dias_restantes' => 0, 'mensaje' => 'Carnet no encontrado'];
+            $fecha_vencimiento = $row['fecha_vencimiento'];
             $hoy = date('Y-m-d');
             $vigente = strtotime($fecha_vencimiento) >= strtotime($hoy);
-            $dias_restantes = ceil((strtotime($fecha_vencimiento) - strtotime($hoy)) / 86400);
-
-            $resultado = [
-                'vigente' => $vigente,
-                'fecha_vencimiento' => $fecha_vencimiento,
-                'dias_restantes' => $dias_restantes,
-                'mensaje' => $vigente ? "Carnet vigente ($dias_restantes días)" : 'Carnet vencido'
-            ];
-
-            $this->registrarLog('VIGENCIA_CARNET_VERIFICADA', ['id_carnet' => $id_carnet]);
-            
+            $dias_restantes = max(0, (int)ceil((strtotime($fecha_vencimiento) - strtotime($hoy)) / 86400));
+            $vigente_db = (int)($row['vigente'] ?? 0);
+            if (($vigente ? 1 : 0) !== $vigente_db) {
+                $upd = $pdo->prepare('UPDATE carnets SET vigente = :v WHERE id = :id');
+                $upd->execute([':v' => $vigente ? 1 : 0, ':id' => $id_carnet]);
+            }
+            $resultado = ['vigente' => $vigente, 'fecha_vencimiento' => $fecha_vencimiento, 'dias_restantes' => $dias_restantes, 'mensaje' => $vigente ? "Carnet vigente ($dias_restantes días)" : 'Carnet vencido'];
+            $this->registrarLog('VIGENCIA_CARNET_VERIFICADA', ['id_carnet' => $id_carnet, 'vigente' => $vigente]);
             return $resultado;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_VERIFICAR_VIGENCIA_CARNET', ['error' => $e->getMessage()]);
-            return [
-                'vigente' => false,
-                'fecha_vencimiento' => '',
-                'dias_restantes' => 0,
-                'mensaje' => 'Error al verificar vigencia: ' . $e->getMessage()
-            ];
+            return ['vigente' => false, 'fecha_vencimiento' => '', 'dias_restantes' => 0, 'mensaje' => 'Error al verificar vigencia: ' . $e->getMessage()];
         }
     }
 
-    /**
-     * Cambiar estado del trámite (helper)
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @param string $estado Nombre del estado (ej: 'aprobado', 'rechazado', 'pendiente')
-     * @return array ['success' => bool, 'mensaje' => string]
-     */
     public function cambiarEstadoTramite(int $id_inscripcion, string $estado): array
     {
         try {
-            // TODO: Mapear nombre de estado a id_estado
-            // TODO: SELECT id FROM estado_tramite WHERE nombre = $estado
-            // TODO: Llamar a actualizarEstadoTramite con id_estado obtenido
-            
-            $mapeo_estados = [
-                'pendiente' => 1,
-                'documentacion_completa' => 2,
-                'documentacion_rechazada' => 3,
-                'apto_examen' => 4,
-                'examen_rendido' => 5,
-                'aprobado' => 6,
-                'rechazado' => 7,
-                'carnet_emitido' => 8
-            ];
-
+            $mapeo_estados = ['pendiente' => 1, 'documentacion_completa' => 2, 'documentacion_rechazada' => 3, 'apto_examen' => 4, 'examen_rendido' => 5, 'aprobado' => 6, 'rechazado' => 7, 'carnet_emitido' => 8];
             $id_estado = $mapeo_estados[strtolower($estado)] ?? null;
             if ($id_estado === null) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'Estado no válido: ' . $estado
-                ];
+                $pdo = $this->pdo();
+                $stmt = $pdo->prepare('SELECT id FROM estado_tramite WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1');
+                $stmt->execute([':nombre' => $estado]);
+                $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+                if ($row) $id_estado = (int)$row['id'];
             }
-
+            if ($id_estado === null) return ['success' => false, 'mensaje' => 'Estado no válido: ' . $estado];
             return $this->actualizarEstadoTramite($id_inscripcion, $id_estado);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_CAMBIAR_ESTADO_TRAMITE', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'mensaje' => 'Error al cambiar estado: ' . $e->getMessage()
-            ];
+            return ['success' => false, 'mensaje' => 'Error al cambiar estado: ' . $e->getMessage()];
         }
     }
 
-    /**
-     * Obtener todos los trámites de un usuario
-     * 
-     * @param int $id_usuario ID del usuario
-     * @return array Array de trámites del usuario con estado actual
-     */
     public function obtenerTramitesUsuario(int $id_usuario): array
     {
         try {
-            $sql = 'SELECT i.id, i.usuario_id, i.curso_id, i.examen_id, i.tipo_inscripcion_id, i.fecha_inscripcion, i.estado_tramite_id,
-                           et.nombre AS estado_nombre
-                    FROM inscripciones i
-                    LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id
-                    WHERE i.usuario_id = :id
-                    ORDER BY i.fecha_inscripcion DESC';
+            $sql = 'SELECT i.id, i.usuario_id, i.curso_id, i.examen_id, i.tipo_inscripcion_id, i.fecha_inscripcion, i.estado_tramite_id, et.nombre AS estado_nombre FROM inscripciones i LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id WHERE i.usuario_id = :id ORDER BY i.fecha_inscripcion DESC';
             $stmt = $this->pdo()->prepare($sql);
             $stmt->execute([':id' => $id_usuario]);
-
             $tramites = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $tramites[] = [
-                    'id' => (int)$row['id'],
-                    'id_usuario' => (int)$row['usuario_id'],
-                    'id_curso' => $row['curso_id'] !== null ? (int)$row['curso_id'] : null,
-                    'id_examen' => $row['examen_id'] !== null ? (int)$row['examen_id'] : null,
-                    'id_tipo_inscripcion' => $row['tipo_inscripcion_id'] !== null ? (int)$row['tipo_inscripcion_id'] : null,
-                    'fecha_inscripcion' => $row['fecha_inscripcion'],
-                    'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente',
-                    'estado_id' => $row['estado_tramite_id'] !== null ? (int)$row['estado_tramite_id'] : 1,
-                ];
+                $tramites[] = ['id' => (int)$row['id'], 'id_usuario' => (int)$row['usuario_id'], 'id_curso' => $row['curso_id'] !== null ? (int)$row['curso_id'] : null, 'id_examen' => $row['examen_id'] !== null ? (int)$row['examen_id'] : null, 'id_tipo_inscripcion' => $row['tipo_inscripcion_id'] !== null ? (int)$row['tipo_inscripcion_id'] : null, 'fecha_inscripcion' => $row['fecha_inscripcion'], 'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente', 'estado_id' => $row['estado_tramite_id'] !== null ? (int)$row['estado_tramite_id'] : 1];
             }
-
             $this->registrarLog('TRAMITES_USUARIO_OBTENIDOS', ['id_usuario' => $id_usuario]);
-            
             return $tramites;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_TRAMITES_USUARIO', ['error' => $e->getMessage()]);
@@ -431,38 +313,17 @@ class TramiteControlador
         }
     }
 
-    /**
-     * Obtener trámites pendientes (admin)
-     * 
-     * @return array Array de trámites pendientes de acción administrativa
-     */
     public function obtenerTramitesPendientes(): array
     {
         try {
-            $sql = 'SELECT i.id, i.usuario_id, i.fecha_inscripcion, i.estado_tramite_id, u.nombre, u.apellido, et.nombre AS estado_nombre
-                    FROM inscripciones i
-                    INNER JOIN usuarios u ON u.id = i.usuario_id
-                    LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id
-                    WHERE i.estado_tramite_id IN (1,2,3,4,5)
-                    ORDER BY i.fecha_inscripcion ASC';
+            $sql = 'SELECT i.id, i.usuario_id, i.fecha_inscripcion, i.estado_tramite_id, u.nombre, u.apellido, et.nombre AS estado_nombre FROM inscripciones i INNER JOIN usuarios u ON u.id = i.usuario_id LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id WHERE i.estado_tramite_id IN (1,2,3,4,5) ORDER BY i.fecha_inscripcion ASC';
             $stmt = $this->pdo()->prepare($sql);
             $stmt->execute();
-
             $tramites = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $tramites[] = [
-                    'id' => (int)$row['id'],
-                    'id_usuario' => (int)$row['usuario_id'],
-                    'usuario_nombre' => $row['nombre'],
-                    'usuario_apellido' => $row['apellido'],
-                    'fecha_inscripcion' => $row['fecha_inscripcion'],
-                    'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente',
-                    'estado_id' => (int)$row['estado_tramite_id'],
-                ];
+                $tramites[] = ['id' => (int)$row['id'], 'id_usuario' => (int)$row['usuario_id'], 'usuario_nombre' => $row['nombre'], 'usuario_apellido' => $row['apellido'], 'fecha_inscripcion' => $row['fecha_inscripcion'], 'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente', 'estado_id' => (int)$row['estado_tramite_id']];
             }
-
             $this->registrarLog('TRAMITES_PENDIENTES_OBTENIDOS', []);
-            
             return $tramites;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_TRAMITES_PENDIENTES', ['error' => $e->getMessage()]);
@@ -470,88 +331,52 @@ class TramiteControlador
         }
     }
 
-    /**
-     * Obtener estadísticas de trámites para reportes
-     * 
-     * @return array ['total_tramites' => int, 'por_estado' => array, 'tasa_aprobacion' => float, ...]
-     */
     public function obtenerEstadisticasTramites(): array
     {
         try {
-            // TODO: SELECT COUNT(*) as total FROM inscripcion
-            // TODO: SELECT id_estado, COUNT(*) as cantidad FROM inscripcion GROUP BY id_estado
-            // TODO: SELECT COUNT(*) as aprobados FROM inscripcion WHERE id_estado = 6 (aprobado)
-            // TODO: SELECT COUNT(*) as rechazados FROM inscripcion WHERE id_estado = 7 (rechazado)
-            // TODO: Calcular tasas de aprobación, promedio de días en trámite, etc.
-            
-            $estadisticas = [
-                'total_tramites' => 100,
-                'por_estado' => [
-                    'pendiente' => 10,
-                    'documentacion_completa' => 20,
-                    'aprobado' => 50,
-                    'rechazado' => 20
-                ],
-                'aprobados' => 50,
-                'rechazados' => 20,
-                'en_tramite' => 30,
-                'tasa_aprobacion' => 71.4,
-                'tasa_rechazo' => 28.6,
-                'dias_promedio_tramite' => 15.2
-            ];
-
+            $pdo = $this->pdo();
+            $stmt = $pdo->query('SELECT COUNT(*) as total FROM inscripciones');
+            $total = (int)$stmt->fetchColumn();
+            $stmt = $pdo->query('SELECT estado_tramite_id as estado, COUNT(*) as cantidad FROM inscripciones GROUP BY estado_tramite_id');
+            $por_estado_rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $por_estado = [];
+            foreach ($por_estado_rows as $r) $por_estado[(string)$r['estado']] = (int)$r['cantidad'];
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id = :id');
+            $stmt->execute([':id' => 6]); $aprobados = (int)$stmt->fetchColumn();
+            $stmt->execute([':id' => 7]); $rechazados = (int)$stmt->fetchColumn();
+            $en_tramite = max(0, $total - ($aprobados + $rechazados));
+            $tasa_aprobacion = $total > 0 ? round(($aprobados / $total) * 100.0, 2) : 0.0;
+            $tasa_rechazo = $total > 0 ? round(($rechazados / $total) * 100.0, 2) : 0.0;
+            $stmt = $pdo->query("SELECT AVG(DATEDIFF(NOW(), fecha_inscripcion)) as dias_promedio FROM inscripciones WHERE estado_tramite_id IN (6,7)");
+            $dias_promedio = (float)($stmt->fetchColumn() ?: 0.0);
+            $estadisticas = ['total_tramites' => $total, 'por_estado' => $por_estado, 'aprobados' => $aprobados, 'rechazados' => $rechazados, 'en_tramite' => $en_tramite, 'tasa_aprobacion' => $tasa_aprobacion, 'tasa_rechazo' => $tasa_rechazo, 'dias_promedio_tramite' => round($dias_promedio, 2)];
             $this->registrarLog('ESTADISTICAS_TRAMITES_OBTENIDAS', []);
-            
             return $estadisticas;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_ESTADISTICAS_TRAMITES', ['error' => $e->getMessage()]);
-            return [
-                'total_tramites' => 0,
-                'por_estado' => [],
-                'aprobados' => 0,
-                'rechazados' => 0,
-                'en_tramite' => 0,
-                'tasa_aprobacion' => 0.0,
-                'tasa_rechazo' => 0.0,
-                'dias_promedio_tramite' => 0.0
-            ];
+            return ['total_tramites' => 0, 'por_estado' => [], 'aprobados' => 0, 'rechazados' => 0, 'en_tramite' => 0, 'tasa_aprobacion' => 0.0, 'tasa_rechazo' => 0.0, 'dias_promedio_tramite' => 0.0];
         }
     }
 
-    /**
-     * Registrar cambio de estado en auditoría
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @param int $estado_anterior ID del estado anterior
-     * @param int $estado_nuevo ID del nuevo estado
-     * @return array ['success' => bool, 'mensaje' => string, 'id_registro' => int|null]
-     */
     public function registrarCambioEstado(int $id_inscripcion, int $estado_anterior, int $estado_nuevo): array
     {
         try {
-            // TODO: INSERT en tabla historial_tramite (id_inscripcion, id_estado_anterior, id_estado_nuevo, fecha_cambio, usuario_admin)
-            // TODO: INSERT en tabla auditoria_acciones (id_usuario, tabla, id_registro, accion, datos_anteriores, datos_nuevos)
-            
-            $resultado = [
-                'success' => true,
-                'mensaje' => 'Cambio de estado registrado',
-                'id_registro' => 1
-            ];
-
-            $this->registrarLog('CAMBIO_ESTADO_REGISTRADO', [
-                'id_inscripcion' => $id_inscripcion,
-                'estado_anterior' => $estado_anterior,
-                'estado_nuevo' => $estado_nuevo
-            ]);
-
-            return $resultado;
+            $pdo = $this->pdo();
+            $pdo->beginTransaction();
+            $stmt = $pdo->prepare('INSERT INTO historial_tramite (inscripcion_id, estado_anterior_id, estado_nuevo_id, fecha_cambio, usuario_admin_id) VALUES (:iid, :ant, :nue, NOW(), :uid)');
+            $usuario_admin = $_SESSION['user_id'] ?? null;
+            $stmt->execute([':iid' => $id_inscripcion, ':ant' => $estado_anterior, ':nue' => $estado_nuevo, ':uid' => $usuario_admin]);
+            $id_hist = (int)$pdo->lastInsertId();
+            try {
+                $aud = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, tabla, id_registro, accion, datos_anteriores, datos_nuevos, fecha) VALUES (:uid, :tabla, :idregistro, :accion, :dant, :dnue, NOW())');
+                $aud->execute([':uid' => $usuario_admin, ':tabla' => 'inscripciones', ':idregistro' => $id_inscripcion, ':accion' => 'CAMBIO_ESTADO', ':dant' => json_encode(['estado_anterior' => $estado_anterior]), ':dnue' => json_encode(['estado_nuevo' => $estado_nuevo])]);
+            } catch (\Throwable $t) { }
+            $pdo->commit();
+            $this->registrarLog('CAMBIO_ESTADO_REGISTRADO', ['id_inscripcion' => $id_inscripcion, 'estado_anterior' => $estado_anterior, 'estado_nuevo' => $estado_nuevo, 'id_historial' => $id_hist]);
+            return ['success' => true, 'mensaje' => 'Cambio de estado registrado', 'id_registro' => $id_hist];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_REGISTRAR_CAMBIO_ESTADO', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'mensaje' => 'Error al registrar cambio de estado: ' . $e->getMessage(),
-                'id_registro' => null
-            ];
+            return ['success' => false, 'mensaje' => 'Error al registrar cambio de estado: ' . $e->getMessage(), 'id_registro' => null];
         }
     }
 }

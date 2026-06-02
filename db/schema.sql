@@ -1,4 +1,4 @@
--- Schema SQL for Sistema TUDAI - Bromatología
+-- Schema SQL for Sistema TUDAI - Manipulacion de Alimentos
 -- Generated May 2026
 -- Engine: InnoDB, Charset: utf8mb4
 
@@ -219,12 +219,26 @@ CREATE TABLE `notificaciones` (
   `tipo` VARCHAR(50) NOT NULL,
   `asunto` VARCHAR(255) DEFAULT NULL,
   `mensaje` TEXT DEFAULT NULL,
+  `attempts` INT UNSIGNED NOT NULL DEFAULT 0,
+  `last_error` TEXT DEFAULT NULL,
   `enviado` TINYINT(1) NOT NULL DEFAULT 0,
   `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `fecha_envio` DATETIME DEFAULT NULL,
   PRIMARY KEY (`id`),
   KEY `not_usuario_idx` (`usuario_id`),
   CONSTRAINT `not_usuario_fk` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE `recovery_tokens` (
+  `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
+  `usuario_id` INT UNSIGNED NOT NULL,
+  `token` VARCHAR(255) NOT NULL,
+  `expiracion` DATETIME NOT NULL,
+  `usado` TINYINT(1) NOT NULL DEFAULT 0,
+  `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  KEY `rt_usuario_idx` (`usuario_id`),
+  CONSTRAINT `rt_usuario_fk` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 SET FOREIGN_KEY_CHECKS = 1;

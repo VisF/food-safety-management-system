@@ -83,7 +83,7 @@ echo "   6. Realizar pruebas end-to-end\n\n";
 
 echo "╔══════════════════════════════════════════════════════════════════════════════╗\n";
 echo "║                                                                              ║\n";
-echo "║              Sistema Bromatología - TUDAI PPS                               ║\n";
+echo "║              Sistema Manipulacion de Alimentos - TUDAI PPS                               ║\n";
 echo "║              Fase 3D: Controladores Finales Completada ✓✓✓                 ║\n";
 echo "║                                                                              ║\n";
 echo "╚══════════════════════════════════════════════════════════════════════════════╝\n\n";

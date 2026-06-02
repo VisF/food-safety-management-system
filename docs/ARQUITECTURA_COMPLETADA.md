@@ -1,4 +1,4 @@
-# Sistema Bromatología - Arquitectura Completada
+# Sistema Manipulacion de Alimentos - Arquitectura Completada
 
 **Fecha**: Mayo 2026  
 **Proyecto**: Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos  
@@ -21,7 +21,7 @@
 ## 🗂️ Estructura de Carpetas
 
 ```
-bromatologia/
+manipulaciondealimentos/
 ├── .github/agents/
 │   └── tudai-developer.agent.md        # Custom Agent
 ├── modelo/                               # OOP MODELS (15 archivos)

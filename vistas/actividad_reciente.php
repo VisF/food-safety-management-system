@@ -1,8 +1,13 @@
 <?php declare(strict_types = 1);
-
+/**
+ * Vista: actividad_reciente.php
+ * Propósito: Listado de actividad reciente en el sistema (audit trail resumido).
+ * Entradas: acepta GET 'data' con 'activities' para datos de ejemplo; el backend debe proveer datos reales.
+ * Nota: mantener datos sensibles fuera de este listado público.
+ */
 class ActividadRecienteVista
 {
-  private string $baseURL = '/bromatologiaAPI/';
+  private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
   private function getDefaultData(): array
   {
@@ -106,7 +111,8 @@ class ActividadRecienteVista
 
         <section class="panel-admin-actividad">
          <div class="divide-y divide-surface-container-high">
-    <?php foreach ((array) $activityData['activities'] as $activity): ?>
+    <?php // Itera 'activities' y renderiza cada fila; el controlador debe paginar/limitar la colección para evitar cargas grandes.
+    foreach ((array) $activityData['activities'] as $activity): ?>
           <article class="panel-admin-fila">
            <div class="panel-admin-fila__izquierda">
             <div class="panel-admin-fila__avatar">

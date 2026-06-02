@@ -1,5 +1,11 @@
 <?php
 declare(strict_types=1);
+/**
+ * Vista: documento_subido.php
+ * Propósito: Mensaje de confirmación tras subir un documento.
+ * Entradas esperadas: opcional GET 'data' (JSON) con 'title' y 'message'.
+ * Nota: los enlaces apuntan a rutas en `Router.php`.
+ */
 class DocumentoSubidoVista
 {
     public static function mostrar(): void
@@ -9,6 +15,7 @@ class DocumentoSubidoVista
             'message' => ''
         ];
         $data = $defaults;
+        // Permite inyectar `data` de ejemplo por GET; el mensaje real debe venir del controlador tras procesar el archivo.
         if (isset($_GET['data'])) {
             $incoming = json_decode($_GET['data'], true);
             if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
@@ -21,8 +28,8 @@ class DocumentoSubidoVista
                 <p class="mt-2 text-sm text-gray-600"><?php echo htmlspecialchars($data['message']); ?></p>
 
                 <div class="mt-4">
-                    <a href="/Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary">Subir otro archivo</a>
-                    <a href="/Router.php?r=index" class="app-vista-button app-vista-button--primary">Ir al inicio</a>
+                    <a href="Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary">Subir otro archivo</a>
+                    <a href="Router.php?r=index" class="app-vista-button app-vista-button--primary">Ir al inicio</a>
                 </div>
             </div>
         </main>

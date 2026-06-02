@@ -1,8 +1,13 @@
 <?php
-
+/**
+ * Vista: panel_inspector.php
+ * Propósito: Interfaz para inspectores: búsqueda y verificación de carnets.
+ * Entradas: datos por defecto en `getDefaultData()`; resultados se obtienen desde el controlador.
+ * Nota: no exponer datos sensibles; validar entradas de búsqueda en backend.
+ */
 class PanelInspectorVista
 {
-  private string $baseURL = '/bromatologiaAPI/';
+  private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
   private function getDefaultData(): array
   {

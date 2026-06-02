@@ -34,7 +34,7 @@ Un sistema web centralizado que gestiona todo el proceso de obtención y renovac
 ## 🗂️ Estructura del Proyecto
 
 ```
-bromatologia/
+manipulaciondealimentos/
 ├── .github/agents/
 │   └── tudai-developer.agent.md       🤖 Custom Agent para desarrollo
 │
