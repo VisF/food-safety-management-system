@@ -17,56 +17,7 @@ class InicioVista
 {
     private string $baseURL = '/ManipulacionDeAlimentosAPI/';
 
-    private function getDefaultData(): array
-    {
-        return [
-            'page_title' => 'App Ciudadana - Inicio',
-            'welcome_text' => 'Bienvenido de nuevo,',
-            'user_name' => 'Juan Perez',
-            'tramite_label' => 'Estado del Trámite',
-            'tramite_title' => 'Carnet de Manipulador',
-            'tramite_status' => 'PENDIENTE',
-            'tramite_deadline' => 'Próximo vencimiento: 15/12/2025',
-            'tramite_progress' => 'Paso 2 de 3: Evaluación Técnica',
-            'documents' => [
-                [
-                    'label' => 'Subir DNI',
-                    'icon' => 'badge',
-                    'route' => 'subida_documentacion',
-                    'state' => 1,
-                ],
-                [
-                    'label' => 'Foto Carnet',
-                    'icon' => 'add_a_photo',
-                    'route' => 'subida_documentacion',
-                    'state' => 0,
-                ],
-            ],
-            'exams' => [
-                [
-                    'month' => 'OCT',
-                    'day' => '24',
-                    'title' => 'CRESTA',
-                    'time' => '09:00 AM',
-                    'place' => 'Aula 3',
-                    'available' => 1,
-                    'route' => 'inscripcion_examen',
-                ],
-                [
-                    'month' => 'NOV',
-                    'day' => '08',
-                    'title' => 'Polideportivo Municipal',
-                    'time' => '02:00 PM',
-                    'place' => 'Salón B',
-                    'available' => 0,
-                    'route' => 'inscripcion_examen',
-                ],
-            ],
-            'download_label' => 'Descargar Carnet',
-            'download_route' => 'carnet_emitido',
-            'download_enabled' => 1,
-        ];
-    }
+
 
     private function getHeader(array $inicioData): void
     {
@@ -111,15 +62,6 @@ class InicioVista
         <?php
     }
 
-    private function getIncomingData(): array
-    {
-        if (!isset($_GET['data'])) {
-            return [];
-        }
-
-        $decodedData = json_decode((string) $_GET['data'], true);
-        return is_array($decodedData) ? $decodedData : [];
-    }
 
     private function e(mixed $value): string
     {
@@ -162,10 +104,8 @@ class InicioVista
         return $basePath . '/Router.php?r=' . rawurlencode($route);
     }
 
-    public function mostrar(): void
+    public function mostrar(array $inicioData): void
     {
-        $inicioData = array_replace_recursive($this->getDefaultData(), $this->getIncomingData());
-
         $this->getHeader($inicioData);
         ?>
 
@@ -175,7 +115,9 @@ class InicioVista
                          <?php echo $this->e($inicioData['welcome_text']); ?>
                         </p>
                         <h2 style="margin: 4px 0 0; color: #0a4e93; font-size: clamp(1.5rem, 7vw, 1.85rem); font-weight: 800; line-height: 1.1;">
-                         Hola, <?php echo $this->e($inicioData['user_name']); ?>
+                                <?= $this->e(
+                                    $inicioData['usuario']['nombre'] ?? 'Invitado'
+                                ) ?>
                         </h2>
                      </section>
 
@@ -183,28 +125,28 @@ class InicioVista
                         <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px;">
                          <div>
                             <p style="margin: 0; color: #5b6b80; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
-                             <?php echo $this->e($inicioData['tramite_label']); ?>
+                             <?php echo $this->e($inicioData['tramite']['label']); ?>
                             </p>
                             <h3 style="margin: 6px 0 0; color: #0a4e93; font-size: 1.12rem; font-weight: 800; line-height: 1.25;">
-                             <?php echo $this->e($inicioData['tramite_title']); ?>
+                             <?php echo $this->e($inicioData['tramite']['titulo']); ?>
                             </h3>
                          </div>
                          <span class="app-vista-chip app-vista-chip--vigente" style="font-size: 0.72rem;">
                             <span style="width: 7px; height: 7px; border-radius: 50%; background: #2d6e43; box-shadow: 0 0 0 4px rgba(45,110,67,0.12);"></span>
-                            <?php echo $this->e($inicioData['tramite_status']); ?>
+                            <?php echo $this->e($inicioData['tramite']['estado']); ?>
                          </span>
                         </div>
 
                         <p style="display: flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #5b6b80; font-size: 0.9rem; font-weight: 500;">
                          <span class="material-symbols-outlined" data-icon="calendar_today" style="font-size: 17px;">calendar_today</span>
-                         <?php echo $this->e($inicioData['tramite_deadline']); ?>
+                         <?php echo $this->e($inicioData['tramite']['fecha_vencimiento']); ?>
                         </p>
 
                         <div style="height: 10px; border-radius: 999px; background: #e3ebf5; overflow: hidden;">
                          <div style="width: 67%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #1462b5, #0a4e93);"></div>
                         </div>
                         <p style="margin: 10px 0 16px; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
-                         <?php echo $this->e($inicioData['tramite_progress']); ?>
+                         <?php echo $this->e($inicioData['tramite']['progreso']); ?>
                         </p>
 
                         <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('inscripcion_examen'); ?>" role="button">
@@ -219,7 +161,7 @@ class InicioVista
                         </h4>
                         <div class="grid grid-cols-2" style="gap: 12px;">
                     <?php // Itera tarjetas de documentos; el array debe ser limitado y sanitizado por el backend.
-                    foreach ($inicioData['documents'] as $document): ?>
+                    foreach ($inicioData['documentos'] as $document): ?>
                         <a class="<?php echo $this->getDocumentCardClass((int) $document['state']); ?>" href="<?php echo $this->getRoute((string) $document['route']); ?>" role="button" style="text-decoration: none;">
                             <div style="width: 48px; height: 48px; border-radius: 16px; background: #e9f2fb; color: #0a4e93; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
                              <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>"><?php echo $this->e($document['icon']); ?></span>
@@ -238,7 +180,7 @@ class InicioVista
                         </h4>
                         <div style="display: grid; gap: 12px;">
                     <?php // Itera exámenes próximos; validar cupos en servidor antes de mostrar acciones habilitadas.
-                    foreach ($inicioData['exams'] as $exam): ?>
+                    foreach ($inicioData['examenes'] as $exam): ?>
                          <article class="app-vista-card" style="padding: 0;">
                             <div style="display: grid; grid-template-columns: 82px 1fr; align-items: stretch;">
                              <div style="background: linear-gradient(160deg, #1462b5, #0a4e93); color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
@@ -273,9 +215,9 @@ class InicioVista
                      </section>
 
                      <section style="padding-bottom: 6px;">
-                        <a class="app-vista-button app-vista-button--secondary" href="<?php echo $this->getRoute((string) $inicioData['download_route']); ?>" role="button">
+                        <a class="app-vista-button app-vista-button--secondary" href="<?php echo $this->getRoute((string) $inicioData['carnet']['ruta_descarga']); ?>" role="button">
                          <span class="material-symbols-outlined" data-icon="download">download</span>
-                         <?php echo $this->e($inicioData['download_label']); ?>
+                         <?php echo $this->e($inicioData['carnet']['etiqueta_descarga']); ?>
                         </a>
                         <p style="margin: 10px 0 0; text-align: center; color: #7a8798; font-size: 0.82rem; font-style: italic;">
                          Disponible una vez aprobado el examen.
@@ -289,4 +231,4 @@ class InicioVista
     }
 }
 
-(new InicioVista())->mostrar();
+

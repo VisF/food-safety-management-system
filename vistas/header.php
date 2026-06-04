@@ -28,6 +28,14 @@
    </button>
   </header>
 <?php
+$usuarioLogueado = !empty($_SESSION['usuario_id']);
+
+$nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
+$emailUsuario = $_SESSION['usuario_email'] ?? '';
+$rolUsuario = $_SESSION['usuario_rol'] ?? '';
+
+
+
 // Determine a reliable base path for assets.
 // If current script is under /vistas, strip that segment.
 $assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');

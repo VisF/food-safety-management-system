@@ -80,6 +80,55 @@ class InscripcionModelo
         return false;
     }
 
+
+    /// Obtener última inscripción de un usuario
+
+
+    public function obtenerUltimaInscripcionPorUsuario(int $usuarioId): ?array
+    {
+        if (!$this->conexion) {
+            return null;
+        }
+        $sql = "
+            SELECT
+                i.id,
+                i.fecha_inscripcion,
+                i.observaciones,
+
+                et.id AS estado_id,
+                et.nombre AS estado_nombre,
+                et.descripcion AS estado_descripcion,
+
+                ti.nombre AS tipo_inscripcion
+
+            FROM inscripciones i
+
+            INNER JOIN estados_tramite et
+                ON i.estado_tramite_id = et.id
+
+            INNER JOIN tipos_inscripcion ti
+                ON i.tipo_inscripcion_id = ti.id
+
+            WHERE i.usuario_id = :usuario_id
+
+            ORDER BY i.fecha_inscripcion DESC
+
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':usuario_id' => $usuarioId
+        ]);
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
+    }
+
+
+
     /**
      * Obtener inscripciones de un usuario
      * @param int $id_usuario ID del usuario

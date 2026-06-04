@@ -64,9 +64,9 @@ class PanelInspectorVista
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
   }
 
-  public function mostrar(): void
+  public function mostrar(array $inicioData): void
   {
-    $data = array_replace_recursive($this->getDefaultData(), []);
+    $data = array_replace_recursive($this->getDefaultData(), $inicioData);
 
     $this->getHeader($data);
     ?>
@@ -104,12 +104,12 @@ class PanelInspectorVista
          <div class="flex flex-wrap justify-between items-start gap-2">
         <div>
          <h3 class="font-headline-lg text-headline-lg text-on-background">
-          <?php echo $this->e($data['nombre']); ?>
+          <?php echo $this->e($inicioData['usuario']['nombre']); ?>
          </h3>
          <p class="font-body-md text-body-md text-outline">
           DNI:
           <span class="numero-dni">
-           <?php echo $this->e($data['dni']); ?>
+           <?php echo $this->e($inicioData['usuario']['dni']); ?>
           </span>
          </p>
         </div>
@@ -118,10 +118,10 @@ class PanelInspectorVista
           <span class="material-symbols-outlined icono-relleno text-[18px]">
            check_circle
           </span>
-          <?php echo $this->e($data['estado']); ?>
+          <?php echo $this->e($inicioData['tramite']['estado']); ?>
          </span>
          <span class="text-[#2e7d32] font-label-md text-label-md">
-          <?php echo $this->e($data['estado_label']); ?>
+          <?php echo $this->e($inicioData['estado_label']); ?>
          </span>
         </div>
          </div>
@@ -131,7 +131,7 @@ class PanelInspectorVista
           Vencimiento
          </p>
          <p class="font-headline-md text-headline-md text-primary">
-          <?php echo $this->e($data['vencimiento']); ?>
+          <?php echo $this->e($inicioData['vencimiento']); ?>
          </p>
         </div>
         <div class="bg-surface-container-low p-3 rounded-lg border border-outline-variant/30">
@@ -139,7 +139,7 @@ class PanelInspectorVista
           Categoría
          </p>
          <p class="font-headline-md text-headline-md text-primary">
-          <?php echo $this->e($data['categoria']); ?>
+          <?php echo $this->e($inicioData['categoria']); ?>
          </p>
         </div>
          </div>
@@ -188,7 +188,7 @@ class PanelInspectorVista
         <span class="encabezado-principal__icono material-symbols-outlined">
          warning
         </span>
-        <?php echo $this->e($data['alert_title']); ?>
+        <?php echo $this->e($inicioData['alert_title']); ?>
        </h4>
       <div class="bg-surface-container-low border-2 border-dashed border-outline-variant rounded-[24px] p-12 flex flex-col items-center justify-center text-center app-vista-card app-vista-card--surface">
         <div class="w-16 h-16 bg-surface-container-highest rounded-full flex items-center justify-center mb-4">
@@ -200,7 +200,7 @@ class PanelInspectorVista
          Sin infracciones registradas
         </p>
         <p class="font-body-md text-body-md text-outline">
-         <?php echo $this->e($data['alert_message']); ?>
+         <?php echo $this->e($inicioData['alert_message']); ?>
         </p>
        </div>
       </section>

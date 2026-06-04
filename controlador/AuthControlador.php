@@ -228,7 +228,7 @@ class AuthControlador
         if ($this->usuarioModelo !== null && method_exists($this->usuarioModelo, 'obtenerPorEmail')) {
             $usuario = $this->usuarioModelo->obtenerPorEmail($email);
 
-            if (!$usuario || !password_verify($password, (string) ($usuario['password_hash'] ?? ''))) {
+            if (!$usuario || !password_verify($password, (string) ($usuario['password'] ?? ''))) {
                 $this->log('Failed login attempt', 'WARNING', ['email' => $email]);
                 return ['success' => false, 'error' => 'Credenciales inválidas'];
             }
@@ -247,9 +247,11 @@ class AuthControlador
         $_SESSION['usuario_id'] = $usuario['id'];
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
         $_SESSION['usuario_email'] = $usuario['email'];
-        $_SESSION['usuario_rol'] = $usuario['rol'];
+        
+        $_SESSION['usuario_rol'] = 'usuario';
+        //Parche hasta armar los roles en la base de datos
         $_SESSION['roles'] = [
-            $usuario['rol']
+            'usuario'
         ];
         $_SESSION['last_activity'] = time();
         $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
@@ -272,6 +274,7 @@ class AuthControlador
 
         $email = filter_var((string)($datos['email'] ?? ''), FILTER_SANITIZE_EMAIL);
         $nombre = trim((string)($datos['nombre'] ?? ''));
+        $apellido = trim((string)($datos['apellido'] ?? ''));
         $password = (string)($datos['password'] ?? '');
         $passwordConfirm = (string)($datos['password_confirm'] ?? '');
         $dni = trim((string)($datos['dni'] ?? ''));
@@ -284,14 +287,19 @@ class AuthControlador
         if (mb_strlen($nombre) < 3 || mb_strlen($nombre) > 100) {
             $errors['nombre'] = 'El nombre debe tener entre 3 y 100 caracteres';
         }
+        if (mb_strlen($apellido) < 2) {
+            $errors['apellido'] = 'Apellido inválido';
+        }
         if (strlen($password) < 8) {
             $errors['password'] = 'La contraseña debe tener al menos 8 caracteres';
         }
         if ($password !== $passwordConfirm) {
             $errors['password_confirm'] = 'Las contraseñas no coinciden';
         }
-        if (!preg_match('/^\d{1,2}\.\d{3}\.\d{3}$/', $dni)) {
-            $errors['dni'] = 'Formato de DNI inválido (XX.XXX.XXX)';
+        $dniLimpio = preg_replace('/\D/', '', $dni);
+
+        if (strlen($dniLimpio) < 7 || strlen($dniLimpio) > 8) {
+            $errors['dni'] = 'DNI inválido';
         }
 
         if (!empty($errors)) {
@@ -307,16 +315,20 @@ class AuthControlador
             if (method_exists($this->usuarioModelo, 'crear')) {
                 $usuarioNuevo = $this->usuarioModelo->crear([
                     'nombre' => $nombre,
+                    'apellido' => $apellido,
                     'email' => $email,
-                    'password_hash' => password_hash($password, PASSWORD_BCRYPT),
                     'dni' => $dni,
-                    'rol' => 'usuario',
+                    'password' => $password,
+                    'telefono' => null
                 ]);
 
                 if (!$usuarioNuevo) {
                     return ['success' => false, 'error' => 'Error al registrar usuario'];
                 }
             }
+            return [
+                'success' => true
+            ];
         }
 
         $this->log('User registered successfully', 'INFO', ['email' => $email]);
@@ -470,4 +482,5 @@ class AuthControlador
 
         return in_array($rolActual, $rolesValidos, true);
     }
+    
 }

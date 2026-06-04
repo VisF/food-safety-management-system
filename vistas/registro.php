@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
 
-$title ??= 'Iniciar Sesión';
-$email ??= '';
+$title ??= 'Registro';
 $error ??= null;
 $csrf_token ??= '';
 
@@ -17,11 +16,11 @@ include __DIR__ . '/header.php';
             style="
                 font-size:72px;
                 color:#0a4e93;
-                margin-bottom:12px;
                 display:block;
+                margin-bottom:12px;
             "
         >
-            account_circle
+            person_add
         </span>
 
         <h2
@@ -32,7 +31,7 @@ include __DIR__ . '/header.php';
                 font-weight:800;
             "
         >
-            Iniciar Sesión
+            Crear Cuenta
         </h2>
 
         <p
@@ -41,7 +40,7 @@ include __DIR__ . '/header.php';
                 color:#5b6b80;
             "
         >
-            Sistema de Carnet de Manipulador de Alimentos
+            Complete los siguientes datos para registrarse.
         </p>
     </section>
 
@@ -70,7 +69,7 @@ include __DIR__ . '/header.php';
 
         <form
             method="POST"
-            action="Router.php?r=login"
+            action="Router.php?r=registro"
             style="
                 display:flex;
                 flex-direction:column;
@@ -85,72 +84,86 @@ include __DIR__ . '/header.php';
             >
 
             <div>
-                <label
-                    for="email"
-                    style="
-                        display:block;
-                        margin-bottom:6px;
-                        font-weight:600;
-                    "
+                <label for="nombre">Nombre</label>
+                <input
+                    id="nombre"
+                    name="nombre"
+                    type="text"
+                    required
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
-                    Correo Electrónico
-                </label>
+            </div>
 
+            <div>
+                <label for="apellido">Apellido</label>
+                <input
+                    id="apellido"
+                    name="apellido"
+                    type="text"
+                    required
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
+                >
+            </div>
+
+            <div>
+                <label for="dni">DNI</label>
+                <input
+                    id="dni"
+                    name="dni"
+                    type="number"
+                    required
+                    min="1"
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
+                >
+            </div>
+
+            <div>
+                <label for="email">Correo Electrónico</label>
                 <input
                     id="email"
                     name="email"
                     type="email"
                     required
-                    value="<?= htmlspecialchars($email, ENT_QUOTES, 'UTF-8') ?>"
-                    placeholder="ejemplo@correo.com"
-                    style="
-                        width:100%;
-                        border:1px solid #d8e1ea;
-                        border-radius:12px;
-                        padding:12px;
-                    "
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
             </div>
 
             <div>
-                <label
-                    for="password"
-                    style="
-                        display:block;
-                        margin-bottom:6px;
-                        font-weight:600;
-                    "
-                >
-                    Contraseña
-                </label>
-
+                <label for="password">Contraseña</label>
                 <input
-                    id="password"
+                    type="password"
                     name="password"
+                    id="password"
+                    required
+                    minlength="8"
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
+                >
+            </div>
+
+            <div>
+                <label for="password_confirm">Confirmar Contraseña</label>
+                <input
+                    id="password_confirm"
+                    name="password_confirm"
                     type="password"
                     required
-                    placeholder="Ingrese su contraseña"
-                    style="
-                        width:100%;
-                        border:1px solid #d8e1ea;
-                        border-radius:12px;
-                        padding:12px;
-                    "
+                    minlength="8"
+                    style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
             </div>
 
             <button
                 type="submit"
                 class="app-vista-button app-vista-button--primary"
-                style="width:100%;"
             >
                 <span class="material-symbols-outlined">
-                    login
+                    how_to_reg
                 </span>
-                Ingresar
+                Registrarse
             </button>
 
         </form>
+
     </article>
 
     <article
@@ -160,23 +173,18 @@ include __DIR__ . '/header.php';
             text-align:center;
         "
     >
-        <p
-            style="
-                margin:0 0 12px;
-                color:#5b6b80;
-            "
-        >
-            ¿No posee una cuenta?
+        <p style="margin-bottom:12px;">
+            ¿Ya posee una cuenta?
         </p>
 
         <a
-            href="Router.php?r=registro"
+            href="Router.php?r=login"
             class="app-vista-button"
         >
             <span class="material-symbols-outlined">
-                person_add
+                login
             </span>
-            Registrarse
+            Iniciar Sesión
         </a>
     </article>
 

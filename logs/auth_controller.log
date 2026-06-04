@@ -1,0 +1,3 @@
+[2026-06-03 19:06:30] [WARNING] IP: ::1 | Failed login attempt | {"email":"admin@cresta.edu.ar"}
+[2026-06-03 19:06:47] [WARNING] IP: ::1 | Failed login attempt | {"email":"admin@cresta.edu.ar"}
+[2026-06-03 19:41:56] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}

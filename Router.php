@@ -14,6 +14,8 @@ $reporteControllerFile = __DIR__ . '/controlador/ReporteControlador.php';
 $tramiteControllerFile = __DIR__ . '/controlador/TramiteControlador.php';
 $usuarioControllerFile = __DIR__ . '/controlador/UsuarioControlador.php';
 $adminControllerFile = __DIR__ . '/controlador/AdminControlador.php';
+$homeControllerFile = __DIR__ . '/controlador/HomeControlador.php';
+
 
 // ---------- MIDDLEWARES ----------
 
@@ -24,7 +26,8 @@ require_once __DIR__ . '/Middleware/CsrfMiddleware.php';
 require_once __DIR__ . '/Middleware/AuditMiddleware.php';
 require_once __DIR__ . '/Middleware/MaintenanceMiddleware.php';
 
-
+//---------- HELPERS ----------
+require_once __DIR__ . '/helpers/AuthHelper.php';
 
 if (file_exists($authControllerFile)) {
     require_once $authControllerFile;
@@ -44,7 +47,9 @@ if (file_exists($usuarioControllerFile)) {
 if (file_exists($adminControllerFile)) {
     require_once $adminControllerFile;
 }
-
+if (file_exists($homeControllerFile)) {
+    require_once $homeControllerFile;
+}
 use App\Middleware\AuthMiddleware;
 use App\Middleware\GuestMiddleware;
 use App\Middleware\RoleMiddleware;
@@ -81,7 +86,7 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             if ($method === 'POST') {
                 $result = $auth->procesarLogin($_POST);
                 if (!empty($result['success'])) {
-                    header('Location: Router.php?r=perfil');
+                    header('Location: Router.php?r=index');
                     exit;
                 }
                 $auth->mostrarLogin([
@@ -105,7 +110,7 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             CsrfMiddleware::validate();
             $result = $auth->procesarLogin($_POST);
             if (!empty($result['success'])) {
-                header('Location: Router.php?r=perfil');
+                header('Location: Router.php?r=index');
                 exit;
             }
             $auth->mostrarLogin([
@@ -157,18 +162,26 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             ]);
             exit;
 
-        case 'perfil':
-            AuthMiddleware::handle();
-            $auth->mostrarPerfil();
-            exit;
-
         case 'logout':
             AuthMiddleware::handle();   
             $auth->procesarLogout();
             exit;
     }
 }
+//----------INDEX---------- 
+if ($route === 'index') {
 
+    $homeControlador = new HomeControlador();
+
+    $datos = $homeControlador->mostrarIndex();
+
+    require_once __DIR__ . '/vistas/index.php';
+
+    $vista = new InicioVista();
+    $vista->mostrar($datos);
+
+    exit;
+}
 // ---------- USUARIO ----------
 if (in_array($route, ['usuarios', 'usuario_ver', 'usuario_editar', 'usuario_buscar', 'usuario_eliminar'], true)) {
     if (!class_exists('UsuarioControlador')) {

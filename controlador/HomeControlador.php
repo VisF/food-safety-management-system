@@ -44,26 +44,119 @@ class HomeControlador
      *   ]
      */
     public function mostrarIndex(): array
-    {
-        $userId = $_SESSION['user_id'] ?? null;
-        $userData = null;
-        $autenticado = false;
-        // Si hay sesión, intentar resolver datos del usuario vía modelo (si existe)
-        if ($userId) {
-            if (class_exists('UsuarioModelo')) {
-                try { $um = new UsuarioModelo(); if (method_exists($um, 'obtenerPorId')) $userData = $um->obtenerPorId((int)$userId); } catch (\Exception $e) { $userData = null; }
-            }
-            $autenticado = (bool)$userData;
+{
+    $usuario = AuthHelper::usuarioActual();
+
+
+    $inscripcion = null;
+
+    if (
+        $usuario !== null &&
+        class_exists('InscripcionModelo')
+    ) {
+        $inscripcionModelo = new InscripcionModelo();
+
+        $inscripcion =
+            $inscripcionModelo
+                ->obtenerUltimaInscripcionPorUsuario(
+                    (int)$usuario['id']
+                );
+    }
+    $documentos = [];
+
+    if (
+        $inscripcion !== null &&
+        class_exists('DocumentoControlador')
+    ) {
+        $documentoController =
+            new DocumentoControlador();
+
+        $documentos =
+            $documentoController
+                ->obtenerDocumentos(
+                    (int)$inscripcion['id']
+                );
+    }
+    $this->log(
+        'Index page visited',
+        'INFO',
+        [
+            'usuario_id' => $usuario['id'] ?? null
+        ]
+    );
+    $documentosVista = [];
+
+    foreach ($documentos as $doc) {
+
+        $icono = 'description';
+
+        switch (
+            strtoupper(
+                (string)$doc['tipo_documento']
+            )
+        ) {
+
+            case 'DNI':
+                $icono = 'badge';
+                break;
+
+            case 'FOTO':
+                $icono = 'add_a_photo';
+                break;
         }
 
-        $this->log('Index page visited', 'INFO', ['user_id' => $userId]);
-
-        return [
-            'title' => 'Sistema de Gestión de Carnets de Manipuladores',
-            'user_autenticado' => $autenticado,
-            'user_data' => $userData
+        $documentosVista[] = [
+            'label' => $doc['tipo_documento'],
+            'icon' => $icono,
+            'route' => 'subida_documentacion',
+            'state' => (int)$doc['validado']
         ];
     }
+
+    return [
+        'page_title' => 'App Ciudadana - Inicio',
+
+        'welcome_text' => 'Bienvenido de nuevo,',
+
+        'usuario' => $usuario,
+
+        'tramite' => [
+            'label' => 'Estado del Trámite',
+
+            'titulo' =>
+                $inscripcion['tipo_inscripcion']
+                ?? 'Carnet de Manipulador',
+
+            'estado' =>
+                $inscripcion['estado_nombre']
+                ?? 'SIN INSCRIPCIÓN',
+
+            'fecha_vencimiento' => null,
+
+            'progreso' => null
+        ],
+
+        'documentos' => $documentosVista,
+
+        'examenes' => [
+            [
+                'month' => 'OCT',
+                'day' => '24',
+                'title' => 'CRESTA',
+                'time' => '09:00 AM',
+                'place' => 'Aula 3',
+                'available' => 1,
+                'route' => 'inscripcion_examen',
+            ],
+        ],
+
+        'carnet' => [
+            'descarga_habilitada' => false,
+            'ruta_descarga' => 'carnet_emitido',
+            'etiqueta_descarga' => 'Descargar Carnet'
+        ]
+    ];
+}
 
     /**
      * Mostrar dashboard para usuarios autenticados
