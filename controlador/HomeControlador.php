@@ -10,15 +10,35 @@ declare(strict_types=1);
  *   - vistas/dashboard.php          (panel de control para usuarios autenticados)
  *   - vistas/consulta_publica.php   (búsqueda pública por DNI)
  */
+require_once __DIR__ . '/../helpers/AuthHelper.php';
+
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
+require_once __DIR__ . '/../modelo/InscripcionModelo.php';
+
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../modelo/DocumentoModelo.php';
+
 
 class HomeControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/home_controller.log';
+    private InscripcionService $inscripcionService;
+    private DocumentoService $documentoService;
 
     public function __construct()
     {
+        $this->inscripcionService =
+            new InscripcionService(
+                new InscripcionModelo()
+            );
+
+        $this->documentoService =
+            new DocumentoService(
+                new DocumentoModelo()
+            );
         @mkdir(dirname(self::LOG_FILE), 0755, true);
     }
+
 
     /**
      * Registrar eventos en log
@@ -44,73 +64,65 @@ class HomeControlador
      *   ]
      */
     public function mostrarIndex(): array
-{
-    $usuario = AuthHelper::usuarioActual();
+    {
+        $usuario = AuthHelper::usuarioActual();
 
 
-    $inscripcion = null;
+        $inscripcion = null;
 
-    if (
-        $usuario !== null &&
-        class_exists('InscripcionModelo')
-    ) {
-        $inscripcionModelo = new InscripcionModelo();
-
-        $inscripcion =
-            $inscripcionModelo
-                ->obtenerUltimaInscripcionPorUsuario(
-                    (int)$usuario['id']
-                );
-    }
-    $documentos = [];
-
-    if (
-        $inscripcion !== null &&
-        class_exists('DocumentoControlador')
-    ) {
-        $documentoController =
-            new DocumentoControlador();
-
-        $documentos =
-            $documentoController
-                ->obtenerDocumentos(
-                    (int)$inscripcion['id']
-                );
-    }
-    $this->log(
-        'Index page visited',
-        'INFO',
-        [
-            'usuario_id' => $usuario['id'] ?? null
-        ]
-    );
-    $documentosVista = [];
-
-    foreach ($documentos as $doc) {
-
-        $icono = 'description';
-
-        switch (
-            strtoupper(
-                (string)$doc['tipo_documento']
-            )
+        if (
+            $usuario !== null &&
+            class_exists('InscripcionModelo')
         ) {
-
-            case 'DNI':
-                $icono = 'badge';
-                break;
-
-            case 'FOTO':
-                $icono = 'add_a_photo';
-                break;
+            $inscripcion =
+                $this->inscripcionService
+                    ->obtenerUltimaPorUsuario(
+                        $usuario['id']
+                    );
         }
+        $documentos = [];
 
-        $documentosVista[] = [
-            'label' => $doc['tipo_documento'],
-            'icon' => $icono,
-            'route' => 'subida_documentacion',
-            'state' => (int)$doc['validado']
-        ];
+        if ($inscripcion !== null &&
+            class_exists('DocumentoService') &&
+            class_exists('DocumentoModelo')) 
+        {
+            $documentos =
+                $this->documentoService
+                    ->obtenerPorInscripcion(
+                        $inscripcion->getId()
+                    );
+        }
+        $this->log(
+            'Index page visited',
+            'INFO',
+            [
+                'usuario_id' => $usuario['id'] ?? null
+            ]
+        );
+        $documentosVista = [];
+
+        foreach ($documentos as $doc) {
+            $icono = 'description';
+            switch (
+                strtoupper(
+                    $doc->getTipoDocumento()
+                )) 
+            {
+                case 'DNI':
+                    $icono = 'badge';
+                    break;
+
+                case 'FOTO':
+                    $icono = 'add_a_photo';
+                    break;
+            }
+
+            $documentosVista[] = [
+                'label' => $doc->getTipoDocumento(),
+                'icon' => $icono,
+                'route' => 'subida_documentacion',
+                'state' => $doc->getValidado()
+            ];
     }
 
     return [
@@ -124,12 +136,14 @@ class HomeControlador
             'label' => 'Estado del Trámite',
 
             'titulo' =>
-                $inscripcion['tipo_inscripcion']
-                ?? 'Carnet de Manipulador',
+                    $inscripcion !== null
+                    ? $inscripcion->getTipoInscripcion()
+                    : 'Carnet de Manipulador',
 
             'estado' =>
-                $inscripcion['estado_nombre']
-                ?? 'SIN INSCRIPCIÓN',
+                    $inscripcion !== null
+                    ? $inscripcion->getEstadoNombre()
+                    : 'SIN INSCRIPCIÓN',
 
             'fecha_vencimiento' => null,
 

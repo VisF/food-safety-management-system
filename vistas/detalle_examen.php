@@ -34,8 +34,8 @@ class DetalleExamenVista
                 <p>Lugar: <?php echo htmlspecialchars($data['exam']['lugar']); ?></p>
 
                 <div class="mt-4">
-                    <a href="Router.php?r=confirmar_inscripcion_examen&data=" class="app-vista-button app-vista-button--primary">Inscribirme</a>
-                    <a href="Router.php?r=index" class="app-vista-button app-vista-button--secondary">Volver</a>
+                    <a href="<?= BASE_URL ?>/Router.php?r=confirmar_inscripcion_examen&data=" class="app-vista-button app-vista-button--primary">Inscribirme</a>
+                    <a href="<?= BASE_URL ?>/Router.php?r=index"class="app-vista-button app-vista-button--secondary">Volver</a>
                 </div>
             </div>
         </main>

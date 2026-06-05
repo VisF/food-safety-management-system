@@ -70,7 +70,7 @@ include __DIR__ . '/header.php';
 
         <form
             method="POST"
-            action="Router.php?r=login"
+            action="<?= BASE_URL ?>/Router.php?r=login"
             style="
                 display:flex;
                 flex-direction:column;
@@ -170,7 +170,7 @@ include __DIR__ . '/header.php';
         </p>
 
         <a
-            href="Router.php?r=registro"
+            href="<?= BASE_URL ?>/ Router.php?r=registro"
             class="app-vista-button"
         >
             <span class="material-symbols-outlined">

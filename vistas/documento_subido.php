@@ -28,8 +28,8 @@ class DocumentoSubidoVista
                 <p class="mt-2 text-sm text-gray-600"><?php echo htmlspecialchars($data['message']); ?></p>
 
                 <div class="mt-4">
-                    <a href="Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary">Subir otro archivo</a>
-                    <a href="Router.php?r=index" class="app-vista-button app-vista-button--primary">Ir al inicio</a>
+                    <a href="<?= BASE_URL ?>/Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary">Subir otro archivo</a>
+                    <a href="<?= BASE_URL ?>/Router.php?r=index" class="app-vista-button app-vista-button--primary">Ir al inicio</a>
                 </div>
             </div>
         </main>

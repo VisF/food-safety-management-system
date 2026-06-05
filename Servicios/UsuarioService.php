@@ -1,5 +1,6 @@
 <?php
 require_once __DIR__ . '/../dto/UsuarioDTO.php';
+require_once __DIR__ . '/../modelo/UsuarioModelo.php';
 
 class UsuarioService
 {

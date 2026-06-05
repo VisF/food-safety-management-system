@@ -26,7 +26,7 @@ class CrearRespuestaAdminVista
 			<div class="app-vista-card">
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
 
-			<form action="Router.php?r=panel_admin" method="post" class="mt-4">
+			<form action="<?= BASE_URL ?>/Router.php?r=panel_admin" method="post" class="mt-4">
 					<label class="block text-sm font-medium">Respuesta</label>
 					<textarea name="respuesta" class="mt-1 block w-full" rows="6"></textarea>
 					<button type="submit" class="app-vista-button app-vista-button--primary mt-4">Enviar respuesta</button>

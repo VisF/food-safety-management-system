@@ -14,6 +14,48 @@ declare(strict_types=1);
  * - telefono: número de teléfono
  * - activo: estado del usuario (1=activo, 0=inactivo)
  * - fecha_creacion: timestamp de creación del registro
+ * 
+ * * Métodos principales:
+ *
+ * - crear(array $data): int|false
+ *      Crea un nuevo usuario.
+ *
+ * - obtenerPorId(int $id): ?array
+ *      Obtiene un usuario por ID.
+ *
+ * - obtenerPorEmail(string $email): ?array
+ *      Obtiene un usuario por email.
+ *
+ * - obtenerPorDni(string $dni): ?array
+ *      Obtiene un usuario por DNI.
+ *
+ * - obtenerTodos(): array
+ *      Lista todos los usuarios.
+ *
+ * - obtenerRoles(int $usuarioId): array
+ *      Obtiene los roles asociados al usuario.
+ *
+ * - actualizar(int $id, array $data): bool
+ *      Actualiza datos del usuario.
+ *
+ * - eliminar(int $id): bool
+ *      Desactiva un usuario.
+ *
+ * - buscar(string $criterio, string $valor): array
+ *      Busca usuarios por distintos criterios.
+ *
+ * - autenticar(string $email, string $password): ?array
+ *      Verifica credenciales.
+ *
+ * - cambiarPassword(int $id, string $nuevoPassword): bool
+ *      Actualiza la contraseña del usuario.
+ *
+ * - cambiarEstado(int $id, bool $activo): bool
+ *      Cambia el estado del usuario.
+ * - asignarRol(int $usuarioId, int $rolId): bool
+ *      Asigna un rol a un usuario.
+ * - quitarRol(int $usuarioId, int $rolId): bool
+ *      Quita un rol de un usuario.
  */
 
 class UsuarioModelo
@@ -25,6 +67,7 @@ class UsuarioModelo
     private string $email;
     private string $password;
     private string $telefono;
+    private ?string $domicilio = null;
     private int $activo;
     private string $fecha_creacion;
 
@@ -77,6 +120,7 @@ class UsuarioModelo
                 dni,
                 nombre,
                 apellido,
+                domicilio,
                 email,
                 telefono,
                 password
@@ -86,6 +130,7 @@ class UsuarioModelo
                 :dni,
                 :nombre,
                 :apellido,
+                :domicilio,
                 :email,
                 :telefono,
                 :password
@@ -124,7 +169,7 @@ class UsuarioModelo
             return null;
         }
 
-        $stmt = $this->conexion->prepare('SELECT id, nombre, apellido, dni, email, telefono, activo, fecha_creacion FROM usuarios WHERE id = :id AND activo = 1');
+        $stmt = $this->conexion->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo, fecha_creacion FROM usuarios WHERE id = :id AND activo = 1');
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch();
         return $row ?: null;
@@ -148,6 +193,7 @@ class UsuarioModelo
                                                 apellido,
                                                 email,
                                                 telefono,
+                                                domicilio,
                                                 password,
                                                 activo,
                                                 fecha_creacion
@@ -183,7 +229,63 @@ class UsuarioModelo
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    public function cambiarEstado(int $id,bool $activo): bool {
+        if (!$this->conexion) {
+            return false;
+        }
 
+        $stmt = $this->conexion->prepare(
+            'UPDATE usuarios
+            SET activo = :activo
+            WHERE id = :id'
+        );
+
+        return (bool)$stmt->execute([
+            ':activo' => $activo ? 1 : 0,
+            ':id' => $id
+        ]);
+    }
+    public function asignarRol(int $usuarioId,int $rolId): bool
+    {
+        if (!$this->conexion) {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'INSERT INTO usuario_rol
+            (
+                usuario_id,
+                rol_id
+            )
+            VALUES
+            (
+                :usuario,
+                :rol
+            )'
+        );
+
+        return (bool)$stmt->execute([
+            ':usuario' => $usuarioId,
+            ':rol' => $rolId
+        ]);
+    } 
+    public function quitarRol(int $usuarioId,int $rolId): bool
+    {
+        if (!$this->conexion) {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'DELETE FROM usuario_rol
+            WHERE usuario_id = :usuario
+            AND rol_id = :rol'
+        );
+
+        return (bool)$stmt->execute([
+            ':usuario' => $usuarioId,
+            ':rol' => $rolId
+        ]);
+    }
 
 
 
@@ -193,22 +295,32 @@ class UsuarioModelo
             return [];
         }
 
-        $stmt = $this->conexion->prepare('SELECT r.id, r.nombre FROM roles r JOIN usuario_rol ur ON r.id = ur.rol_id WHERE ur.usuario_id = :usuarioId');
-        $stmt->execute([':usuarioId' => $usuarioId]);
-        return $stmt->fetchAll();
+        $stmt = $this->conexion->prepare(
+            'SELECT r.nombre
+            FROM roles r
+            INNER JOIN usuario_rol ur
+                ON r.id = ur.rol_id
+            WHERE ur.usuario_id = :usuarioId'
+        );
+
+        $stmt->execute([
+            ':usuarioId' => $usuarioId
+        ]);
+
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
     /**
      * Obtener usuario por DNI
      * @param string $dni DNI del usuario
      * @return array|null Datos del usuario o null si no existe
      */
-    public function obtenerPorDNI(string $dni): ?array
+    public function obtenerPorDni(string $dni): ?array
     {
         if (!$this->conexion) {
             return null;
         }
 
-        $stmt = $this->conexion->prepare('SELECT id, nombre, apellido, dni, email, telefono, activo, fecha_creacion FROM usuarios WHERE dni = :dni AND activo = 1');
+        $stmt = $this->conexion->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo, fecha_creacion FROM usuarios WHERE dni = :dni AND activo = 1');
         $stmt->execute([':dni' => $dni]);
         $row = $stmt->fetch();
         return $row ?: null;
@@ -226,7 +338,7 @@ class UsuarioModelo
             return false;
         }
 
-        $allowed = ['nombre','apellido','telefono','email'];
+        $allowed = ['nombre','apellido','telefono','email', 'domicilio'];
         $sets = [];
         $params = [':id' => $id];
         foreach ($allowed as $field) {
@@ -272,7 +384,7 @@ class UsuarioModelo
         $allowed = ['email','dni','nombre','apellido'];
         if (!in_array($criterio, $allowed, true)) return [];
 
-        $sql = "SELECT id, nombre, apellido, dni, email, telefono, activo FROM usuarios WHERE {$criterio} LIKE :valor AND activo = 1 ORDER BY nombre ASC";
+        $sql = "SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE {$criterio} LIKE :valor AND activo = 1 ORDER BY nombre ASC";
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute([':valor' => "%{$valor}%"]);
         return $stmt->fetchAll();
@@ -337,9 +449,14 @@ class UsuarioModelo
   
     public function getActivo(): int { return $this->activo ?? 0; }
     public function getFechaCreacion(): string { return $this->fecha_creacion ?? ''; }
+    public function getDomicilio(): ?string{ return $this->domicilio;}
 
+
+    public function setDomicilio(?string $domicilio): void { $this->domicilio = $domicilio;}
     public function setNombre(string $nombre): void { $this->nombre = $nombre; }
     public function setApellido(string $apellido): void { $this->apellido = $apellido; }
     public function setTelefono(string $telefono): void { $this->telefono = $telefono; }
     public function setActivo(int $activo): void { $this->activo = $activo; }
+
+    public function desactivar(int $id): bool{ return $this->cambiarEstado($id, false);}
 }

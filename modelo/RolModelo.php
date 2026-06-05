@@ -8,6 +8,14 @@ declare(strict_types=1);
  * - id: identificador único del rol
  * - nombre: nombre del rol (usuario, administrador, inspector, acceso_publico)
  * - descripcion: descripción de las responsabilidades del rol
+ * 
+ * 
+ * -  obtenerTodos()
+ * -  obtenerPorId()
+ * -  obtenerPorNombre()
+ * -  crear()
+ * -  actualizar()
+ * -  eliminar()
  */
 
 class RolModelo
@@ -17,12 +25,26 @@ class RolModelo
     private string $descripcion;
 
     // Conexión a BD (placeholder)
-    private ?object $conexion = null;
+    //private ?object $conexion = null;
 
-    public function __construct(?object $conexion = null)
+    private ?\PDO $conexion = null;
+
+    public function __construct(?\PDO $conexion = null)
     {
-        $this->conexion = $conexion;
+        if ($conexion instanceof \PDO) {
+            $this->conexion = $conexion;
+            return;
     }
+
+        $connFile = __DIR__ . '/../db/Connection.php';
+
+        if (file_exists($connFile)) {
+            require_once $connFile;
+            $this->conexion = Connection::getPDO();
+        } else {
+            throw new \Exception("Archivo de conexión no encontrado: " . $connFile);
+    }
+}
 
     /**
      * Obtener todos los roles
@@ -30,11 +52,22 @@ class RolModelo
      */
     public function obtenerTodos(): array
     {
-        // TODO: SELECT * FROM roles
-        // TODO: Retornar array de roles
-        // Roles esperados: usuario, administrador, inspector, acceso_publico
-        
-        return [];
+        if (!$this->conexion) {
+            return [];
+        }
+
+        $stmt = $this->conexion->prepare(
+            'SELECT
+                id,
+                nombre,
+                descripcion
+            FROM roles
+            ORDER BY nombre'
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
     /**
@@ -42,13 +75,144 @@ class RolModelo
      * @param int $id ID del rol
      * @return array|null Datos del rol o null si no existe
      */
-    public function obtenerPorId(int $id): ?array
+    public function obtenerPorId(int $id): ?array 
     {
-        // TODO: SELECT * FROM roles WHERE id = $id
-        // TODO: Retornar array de datos o null
-        
-        return null;
+        if (!$this->conexion) {
+            return null;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'SELECT
+                id,
+                nombre,
+                descripcion
+            FROM roles
+            WHERE id = :id'
+        );
+
+        $stmt->execute([
+            ':id' => $id
+        ]);
+
+        $rol = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $rol ?: null;
     }
+    public function obtenerPorNombre(string $nombre): ?array 
+    {
+        if (!$this->conexion) {
+            return null;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'SELECT
+                id,
+                nombre,
+                descripcion
+            FROM roles
+            WHERE nombre = :nombre'
+        );
+
+        $stmt->execute([
+            ':nombre' => $nombre
+        ]);
+
+        $rol = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $rol ?: null;
+    }
+    public function crear(string $nombre,string $descripcion): int|false 
+    {
+        if (!$this->conexion) {
+            return false;
+        }
+
+        if ($this->obtenerPorNombre($nombre)) {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'INSERT INTO roles
+            (
+                nombre,
+                descripcion
+            )
+            VALUES
+            (
+                :nombre,
+                :descripcion
+            )'
+        );
+
+        $ok = $stmt->execute([
+            ':nombre' => $nombre,
+            ':descripcion' => $descripcion
+        ]);
+
+        if (!$ok) {
+            return false;
+        }
+
+        return (int)$this->conexion->lastInsertId();
+    }
+
+    public function actualizar(int $id,array $data    ): bool 
+    {
+        if (!$this->conexion) {
+            return false;
+        }
+
+        $allowed = [
+            'nombre',
+            'descripcion'
+        ];
+
+        $sets = [];
+        $params = [
+            ':id' => $id
+        ];
+
+        foreach ($allowed as $field) {
+
+            if (isset($data[$field])) {
+
+                $sets[] =
+                    "{$field} = :{$field}";
+
+                $params[":{$field}"] =
+                    $data[$field];
+            }
+        }
+
+        if (empty($sets)) {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'UPDATE roles
+            SET ' . implode(', ', $sets) . '
+            WHERE id = :id'
+        );
+
+        return (bool)$stmt->execute(
+            $params
+        );
+    }
+    public function eliminar(int $id): bool 
+    {
+        if (!$this->conexion) {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+            'DELETE FROM roles
+            WHERE id = :id'
+        );
+
+        return (bool)$stmt->execute([
+            ':id' => $id
+        ]);
+    }    
 
     /**
      * Obtener permisos de un rol
@@ -61,15 +225,15 @@ class RolModelo
      * - inspector: verificar_carnet, consultar_usuarios
      * - acceso_publico: consultar_por_dni
      */
-    public function obtenerPermisos(int $id_rol): array
-    {
+    //public function obtenerPermisos(int $id_rol): array
+    //{
         // TODO: SELECT p.* FROM permisos p 
         //       JOIN rol_permiso rp ON p.id = rp.id_permiso 
         //       WHERE rp.id_rol = $id_rol
         // TODO: Retornar array de permisos
         
-        return [];
-    }
+     //   return [];
+    //}
 
     /**
      * Crear nuevo rol

@@ -32,8 +32,8 @@ class DetalleTramiteVista
 				<p>Estado: <?php echo htmlspecialchars($data['tramite']['estado'] ?? ''); ?></p>
 
 				<div class="mt-4">
-					<a href="Router.php?r=historial_tramite" class="app-vista-button app-vista-button--secondary">Historial</a>
-					<a href="Router.php?r=comprobante_tramite" class="app-vista-button app-vista-button--primary">Descargar comprobante</a>
+					<a href="<?= BASE_URL ?>/Router.php?r=historial_tramite" class="app-vista-button app-vista-button--secondary">Historial</a>
+					<a href="<?= BASE_URL ?>/Router.php?r=comprobante_tramite" class="app-vista-button app-vista-button--primary">Descargar comprobante</a>
 				</div>
 			</div>
 		</main>

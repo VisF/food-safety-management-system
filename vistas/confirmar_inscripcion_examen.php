@@ -27,9 +27,9 @@ class ConfirmarInscripcionExamenVista
                 <h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
                 <p class="mt-2">Desea inscribirse al examen: <?php echo htmlspecialchars($data['examName']); ?>?</p>
 
-                <form action="Router.php?r=inscripcion_exitosa" method="post" class="mt-4">
+                <form action="<?= BASE_URL ?>/Router.phpr=inscripcion_exitosa" method="post" class="mt-4">
                     <button type="submit" class="app-vista-button app-vista-button--primary">Confirmar inscripción</button>
-                    <a href="Router.php?r=detalle_examen" class="app-vista-button app-vista-button--secondary">Cancelar</a>
+                    <a href="<?= BASE_URL ?>/Router.php?r=detalle_examen" class="app-vista-button app-vista-button--secondary">Cancelar</a>
                 </form>
             </div>
         </main>

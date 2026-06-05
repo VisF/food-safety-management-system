@@ -28,6 +28,8 @@ require_once __DIR__ . '/Middleware/MaintenanceMiddleware.php';
 
 //---------- HELPERS ----------
 require_once __DIR__ . '/helpers/AuthHelper.php';
+//----------CONFIG----------
+require_once __DIR__ . '/config/config.php';
 
 if (file_exists($authControllerFile)) {
     require_once $authControllerFile;

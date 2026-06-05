@@ -150,6 +150,17 @@ class DocumentoModelo
         $stmt->execute([':tipo' => $tipo_documento]);
         return $stmt->fetchAll();
     }
+    public function subirDocumento(int $id_inscripcion, string $tipo_documento, string $ruta_archivo): array|false
+    {
+        return $this->crear([
+            'id_inscripcion' => $id_inscripcion,
+            'tipo_documento' => $tipo_documento,
+            'ruta_archivo' => $ruta_archivo
+        ]);
+    }
+    
+
+
 
     /**
      * Eliminar documento

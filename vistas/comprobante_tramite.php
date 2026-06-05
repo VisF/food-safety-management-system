@@ -28,7 +28,7 @@ class ComprobanteTramiteVista
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
 				<p class="mt-2">Comprobante ID: <?php echo htmlspecialchars($data['comprobante']['id'] ?? ''); ?></p>
 				<div class="mt-4">
-				<a href="Router.php?r=detalle_tramite" class="app-vista-button app-vista-button--secondary">Volver</a>
+				<a href="<?= BASE_URL ?>/Router.php?r=detalle_tramite" class="app-vista-button app-vista-button--secondary">Volver</a>
 				</div>
 			</div>
 		</main>
