@@ -100,7 +100,12 @@ class InscripcionControlador
     {
         try {
             $pdo = $this->pdo();
-            $stmt = $pdo->prepare('SELECT i.*, c.nombre as curso_nombre, e.fecha as examen_fecha FROM inscripciones i LEFT JOIN cursos c ON i.curso_id = c.id LEFT JOIN examenes e ON i.examen_id = e.id WHERE i.usuario_id = :uid ORDER BY i.fecha_inscripcion DESC');
+            $stmt = $pdo->prepare('SELECT i.*, c.nombre as curso_nombre, e.fecha as examen_fecha 
+                                    FROM inscripciones i 
+                                    LEFT JOIN cursos c ON i.curso_id = c.id 
+                                    LEFT JOIN examenes e ON i.examen_id = e.id 
+                                    WHERE i.usuario_id = :uid 
+                                    ORDER BY i.fecha_inscripcion DESC');
             $stmt->execute([':uid' => $id_usuario]);
             return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_INSCRIPCIONES_POR_USUARIO', ['id_usuario' => $id_usuario, 'error' => $e->getMessage()]); return []; }
@@ -113,7 +118,23 @@ class InscripcionControlador
 
     public function obtenerInscripcionesActivas(int $id_usuario): array
     {
-        try { $pdo = $this->pdo(); $sql = 'SELECT i.*, c.nombre as curso_nombre, e.fecha as examen_fecha FROM inscripciones i LEFT JOIN cursos c ON i.curso_id = c.id LEFT JOIN examenes e ON i.examen_id = e.id WHERE i.usuario_id = :uid AND i.estado_tramite_id IN (1,2,3) ORDER BY i.fecha_inscripcion DESC'; $stmt = $pdo->prepare($sql); $stmt->execute([':uid' => $id_usuario]); return $stmt->fetchAll(\PDO::FETCH_ASSOC); } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_INSCRIPCIONES_ACTIVAS', ['id_usuario' => $id_usuario, 'error' => $e->getMessage()]); return []; }
+        try { 
+            $pdo = $this->pdo(); 
+            $sql = 'SELECT i.*, c.nombre as curso_nombre, e.fecha as examen_fecha 
+            FROM inscripciones i 
+            LEFT JOIN cursos c ON i.curso_id = c.id 
+            LEFT JOIN examenes e ON i.examen_id = e.id 
+            WHERE i.usuario_id = :uid 
+            AND i.estado_tramite_id IN (:estado1, :estado2, :estado3) 
+            ORDER BY i.fecha_inscripcion DESC'; 
+            $stmt = $pdo->prepare($sql); 
+            $stmt->execute([':uid' => $id_usuario, ':estado1' => EstadoTramite::PENDIENTE, ':estado2' => EstadoTramite::CURSANDO, ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN]); 
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC); } 
+        catch (\Exception $e) { 
+            $this->registrarLog('ERROR_OBTENER_INSCRIPCIONES_ACTIVAS', 
+            ['id_usuario' => $id_usuario, 'error' => $e->getMessage()]); 
+            return []; 
+            }
     }
 
     public function cancelarInscripcion(int $id): array
@@ -126,17 +147,62 @@ class InscripcionControlador
             $stmt->execute([':id' => $id]);
             $ins = $stmt->fetch(\PDO::FETCH_ASSOC);
             // Verificar existencia y estado actual antes de cancelar
-            if (!$ins) { $pdo->rollBack(); return ['success' => false, 'mensaje' => 'Inscripción no encontrada']; }
+            if (!$ins) 
+                { 
+                    $pdo->rollBack(); return ['success' => false, 'mensaje' => 'Inscripción no encontrada']; 
+                }
+
             $estado = (int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0);
-            if (in_array($estado, [4,5], true)) { $pdo->rollBack(); return ['success' => false, 'mensaje' => 'La inscripción no puede ser cancelada en su estado actual']; }
-            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 5 WHERE id = :id'); $upd->execute([':id' => $id]);
+
+            if (in_array(
+                        $estado,
+                        [EstadoTramite::EXAMEN_APROBADO,EstadoTramite::CARNET_EMITIDO],
+                        true
+                    )
+                )
+
+            $upd = $pdo->prepare('UPDATE inscripciones 
+                                    SET estado_tramite_id = :estado WHERE id = :id'); 
+            
+            $upd->execute([':id' => $id, ':estado' => EstadoTramite::CANCELADO]);
+
             $fechaId = (int)($ins['fecha_curso_id'] ?? $ins['id_fecha'] ?? 0);
-            if ($fechaId > 0) { $inc = $pdo->prepare('UPDATE fecha_curso SET cupos = cupos + 1 WHERE id = :fid'); $inc->execute([':fid' => $fechaId]); }
-            if (class_exists('AuditoriaAccionesModelo')) { try { $am = new AuditoriaAccionesModelo($pdo); if (method_exists($am, 'registrar')) { $am->registrar(['id_usuario' => $_SESSION['user_id'] ?? null, 'tabla_afectada' => 'inscripciones', 'accion' => 'UPDATE', 'datos_anteriores' => json_encode($ins), 'datos_nuevos' => json_encode(['estado_tramite_id' => 5]), 'ip' => $_SERVER['REMOTE_ADDR'] ?? '', 'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']); } } catch (\Exception $e) {} }
+
+            if ($fechaId > 0) { 
+                $inc = $pdo->prepare('UPDATE fecha_curso SET cupos = cupos + 1 
+                WHERE id = :fid'); $inc->execute([':fid' => $fechaId]); 
+                }
+
+            if (class_exists('AuditoriaAccionesModelo')) 
+                { 
+                    try { 
+                        $am = new AuditoriaAccionesModelo($pdo); 
+                        if (method_exists($am, 'registrar')) 
+                            { 
+                                $am->registrar(['id_usuario' => $_SESSION['user_id'] ?? null, 
+                                                'tabla_afectada' => 'inscripciones', 
+                                                'accion' => 'UPDATE', 
+                                                'datos_anteriores' => json_encode($ins), 
+                                                'datos_nuevos' => json_encode(['estado_tramite_id' => EstadoTramite::CANCELADO]),
+                                                 'ip' => $_SERVER['REMOTE_ADDR'] ?? '',
+                                                  'user_agent' => $_SERVER['HTTP_USER_AGENT'] ?? '']); 
+                            } 
+                        } 
+                    catch (\Exception $e) {
+                        //TODO: manejar error de logging sin afectar la operación principal
+                    } 
+                }
             $pdo->commit();
             $this->registrarLog('INSCRIPCION_CANCELADA', ['id' => $id]);
             return ['success' => true, 'mensaje' => 'Inscripción cancelada exitosamente'];
-        } catch (\Exception $e) { $this->registrarLog('ERROR_CANCELAR_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]); return ['success' => false, 'mensaje' => 'Error al cancelar inscripción: ' . $e->getMessage()]; }
+
+        } catch (\Exception $e) 
+            { 
+                $this->registrarLog('ERROR_CANCELAR_INSCRIPCION', 
+                                    ['id' => $id, 
+                                    'error' => $e->getMessage()]); 
+                return ['success' => false, 'mensaje' => 'Error al cancelar inscripción: ' . $e->getMessage()]; 
+            }
     }
 
     public function obtenerCursosDisponibles(): array
@@ -172,8 +238,8 @@ class InscripcionControlador
             if (!$v['valido']) return ['success' => false, 'mensaje' => 'Documentación incompleta: ' . implode(', ', $v['documentos_faltantes']), 'inscripcion' => null];
 
             $pdo = $this->pdo(); 
-            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 6 WHERE id = :id');  // HARDCODEADO a estado "inscripto_examen" 
-            $upd->execute([':id' => $id_inscripcion]);                                              // para evitar que queden inscripciones en estado "pendiente" sin confirmar
+            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');  
+            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::INSCRIPTO_EXAMEN]); 
 
             $examen_id = (int)($insc['examen_id'] ?? 0);
 
@@ -226,7 +292,7 @@ class InscripcionControlador
             'curso_id' => null,
             'examen_id' => $idExamen,
             'tipo_inscripcion_id' => (int)($datos['id_tipo_inscripcion'] ?? 1),
-            'estado_tramite_id' => 6, // inscripto_examen
+            'estado_tramite_id' => EstadoTramite::INSCRIPTO_EXAMEN, // inscripto_examen
             'observaciones' => $datos['observaciones'] ?? null
         ];
 
@@ -243,17 +309,46 @@ class InscripcionControlador
     {
         try {
             $pdo = $this->pdo();
-            $sql = 'SELECT i.*, u.nombre as usuario_nombre, u.apellido as usuario_apellido, u.email as usuario_email, c.nombre as curso_nombre, e.fecha as examen_fecha FROM inscripciones i LEFT JOIN usuarios u ON i.usuario_id = u.id LEFT JOIN cursos c ON i.curso_id = c.id LEFT JOIN examenes e ON i.examen_id = e.id WHERE i.id = :id';
+            $sql = 'SELECT i.*, u.nombre as usuario_nombre, 
+                                u.apellido as usuario_apellido, 
+                                u.email as usuario_email, 
+                                c.nombre as curso_nombre, 
+                                e.fecha as examen_fecha 
+                                FROM inscripciones i 
+                                LEFT JOIN usuarios u ON i.usuario_id = u.id 
+                                LEFT JOIN cursos c ON i.curso_id = c.id 
+                                LEFT JOIN examenes e ON i.examen_id = e.id 
+                                WHERE i.id = :id';
             $stmt = $pdo->prepare($sql);
             $stmt->execute([':id' => $id]);
             $ins = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$ins) return [];
-            $dstmt = $pdo->prepare('SELECT * FROM documento WHERE inscripcion_id = :id ORDER BY fecha_subida DESC'); $dstmt->execute([':id' => $id]); $docs = $dstmt->fetchAll(\PDO::FETCH_ASSOC);
-            $astmt = $pdo->prepare('SELECT * FROM asistencia WHERE inscripcion_id = :id ORDER BY fecha ASC'); $astmt->execute([':id' => $id]); $asis = $astmt->fetchAll(\PDO::FETCH_ASSOC);
-            $rstmt = $pdo->prepare('SELECT * FROM resultado_examen WHERE inscripcion_id = :id'); $rstmt->execute([':id' => $id]); $resEx = $rstmt->fetchAll(\PDO::FETCH_ASSOC);
+            $dstmt = $pdo->prepare('SELECT * FROM documento WHERE inscripcion_id = :id ORDER BY fecha_subida DESC'); 
+            $dstmt->execute([':id' => $id]); $docs = $dstmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $astmt = $pdo->prepare('SELECT * FROM asistencia WHERE inscripcion_id = :id ORDER BY fecha ASC'); 
+            $astmt->execute([':id' => $id]); $asis = $astmt->fetchAll(\PDO::FETCH_ASSOC);
+
+            $rstmt = $pdo->prepare('SELECT * FROM resultado_examen WHERE inscripcion_id = :id'); 
+            $rstmt->execute([':id' => $id]); $resEx = $rstmt->fetchAll(\PDO::FETCH_ASSOC);
+           
             $estado = [];
-            if (isset($ins['estado_tramite_id'])) { $est = $pdo->prepare('SELECT * FROM estado_tramite WHERE id = :id'); $est->execute([':id' => $ins['estado_tramite_id']]); $estado = $est->fetch(\PDO::FETCH_ASSOC) ?: []; }
-            return ['inscripcion' => $ins, 'usuario' => ['nombre' => $ins['usuario_nombre'] ?? '', 'apellido' => $ins['usuario_apellido'] ?? '', 'email' => $ins['usuario_email'] ?? ''], 'curso' => ['nombre' => $ins['curso_nombre'] ?? ''], 'examen' => ['fecha' => $ins['examen_fecha'] ?? null], 'documentos' => $docs, 'asistencia' => $asis, 'resultado_examen' => $resEx, 'estado_actual' => $estado];
+            if (isset($ins['estado_tramite_id'])) 
+                { 
+                    $est = $pdo->prepare('SELECT * FROM estados_tramite WHERE id = :id'); 
+                    $est->execute([':id' => $ins['estado_tramite_id']]); 
+                    $estado = $est->fetch(\PDO::FETCH_ASSOC) ?: []; 
+                    }
+
+            return ['inscripcion' => $ins, 
+                    'usuario' => ['nombre' => $ins['usuario_nombre'] ?? '', 
+                    'apellido' => $ins['usuario_apellido'] ?? '',
+                     'email' => $ins['usuario_email'] ?? ''], 
+                     'curso' => ['nombre' => $ins['curso_nombre'] ?? ''],
+                      'examen' => ['fecha' => $ins['examen_fecha'] ?? null],
+                       'documentos' => $docs, 
+                       'asistencia' => $asis, 
+                       'resultado_examen' => $resEx, 'estado_actual' => $estado];
         } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_DETALLE_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]); return []; }
     }
 
@@ -265,13 +360,14 @@ class InscripcionControlador
             SELECT COUNT(*)
             FROM inscripciones i
             WHERE i.usuario_id = :usuario
-            AND i.estado_tramite_id = 5
+            AND i.estado_tramite_id = :estado
         ";
 
         $stmt = $pdo->prepare($sql);
 
         $stmt->execute([
-            ':usuario' => $idUsuario
+            ':usuario' => $idUsuario,
+            ':estado' => EstadoTramite::INSCRIPTO_EXAMEN
         ]);
 
         return (int)$stmt->fetchColumn() > 0;

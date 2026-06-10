@@ -230,7 +230,9 @@ class DocumentoControlador
                 $count = (int)$pdo->prepare('SELECT COUNT(*) FROM documento WHERE id_inscripcion = :iid AND validado = 0')->execute([':iid' => $doc['id_inscripcion']]) ? $pdo->query("SELECT COUNT(*) FROM documento WHERE id_inscripcion = {$doc['id_inscripcion']} AND validado = 0")->fetchColumn() : 0;
                 if ((int)$count === 0) {
                     // marcar inscripcion como documentacion completa (estado 2 asumido)
-                    $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 2 WHERE id = :id')->execute([':id' => $doc['id_inscripcion']]);
+                    $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
+                                    WHERE id = :id')
+                                    ->execute([':id' => $doc['id_inscripcion'], ':estado' => EstadoTramite::EXAMEN_APROBADO]);
                 }
             }
 
@@ -270,7 +272,8 @@ class DocumentoControlador
             if (!$doc) return ['success' => false, 'mensaje' => 'Documento no encontrado', 'documento' => null];
             $upd = $pdo->prepare('UPDATE documento SET validado = 0, motivo_rechazo = :mot, fecha_rechazo = NOW() WHERE id = :id'); $upd->execute([':mot' => $motivo, ':id' => $id]);
             // marcar inscripcion como documentacion rechazada (estado 7 asumido)
-            $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 7 WHERE id = :id')->execute([':id' => $doc['id_inscripcion']]);
+            $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
+                            WHERE id = :id')->execute([':id' => $doc['id_inscripcion'], ':estado' => EstadoTramite::DOCUMENTACION_RECHAZADA]);
             // notificar
             if (class_exists('NotificacionControlador')) {
                 try { $nc = new NotificacionControlador(); if (method_exists($nc, 'enviarNotificacion')) $nc->enviarNotificacion((int)$doc['usuario_id'] ?? (int)$ins['usuario_id'] ?? null, 'documento_rechazado', ['motivo' => $motivo, 'documento_id' => $id]); } catch (Exception $e) {}

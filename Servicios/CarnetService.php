@@ -57,7 +57,7 @@ class CarnetService
             }
 
             // La inscripción debe estar en estado examen_aprobado
-            if ((int)$inscripcion['estado_tramite_id'] !== 7) {
+            if ((int)$inscripcion['estado_tramite_id'] !== EstadoTramite::EXAMEN_APROBADO) {
                 return [
                     'success' => false,
                     'mensaje' => 'La inscripción no se encuentra en estado examen_aprobado'
@@ -128,11 +128,12 @@ class CarnetService
             // 8 = carnet_emitido
             $stmt = $this->conexion->prepare(
                 'UPDATE inscripciones
-                SET estado_tramite_id = 8
+                SET estado_tramite_id = :estado
                 WHERE id = :id'
             );
 
             $stmt->execute([
+                ':estado' => EstadoTramite::CARNET_EMITIDO,
                 ':id' => $idInscripcion
             ]);
 

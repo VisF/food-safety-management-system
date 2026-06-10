@@ -11,3 +11,4 @@
 [2026-06-09 19:52:42] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
 [2026-06-09 19:57:26] [WARNING] IP: ::1 | Failed login attempt | {"email":"admin@cresta.com"}
 [2026-06-09 19:57:31] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-10 20:42:42] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}

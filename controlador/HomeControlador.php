@@ -206,7 +206,15 @@ class HomeControlador
 
         // Filtrar inscripciones para mostrar solo las que requieren acción (estados 1 y 2)
         $tramitesPendientes = [];
-        foreach ($inscripciones as $ins) { if (in_array((int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0), [1,2], true)) $tramitesPendientes[] = $ins; }
+        foreach ($inscripciones as $ins) 
+        { 
+            if (in_array((int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0), 
+                [EstadoTramite::PENDIENTE,
+                EstadoTramite::CURSANDO,
+                EstadoTramite::HABILITADO_EXAMEN,
+                EstadoTramite::INSCRIPTO_EXAMEN], 
+                true)) $tramitesPendientes[] = $ins; 
+        }
 
         $actividad = [];
         if (class_exists('AuditoriaAccionesModelo')) { try { $am = new AuditoriaAccionesModelo(); if (method_exists($am, 'obtenerRecientes')) $actividad = $am->obtenerRecientes(10); } catch (\Exception $e) { $actividad = []; } }
@@ -328,7 +336,14 @@ class HomeControlador
         try {
             $totalUsuarios = (int)$pdo->query('SELECT COUNT(*) FROM usuarios WHERE activo = 1')->fetchColumn();
             $carnets = (int)$pdo->query('SELECT COUNT(*) FROM carnets WHERE vigente = 1')->fetchColumn();
-            $tramites = (int)$pdo->query("SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id IN (1,2)")->fetchColumn();
+            $tramites = (int)$pdo->query("SELECT COUNT(*) 
+                                        FROM inscripciones 
+                                        WHERE estado_tramite_id IN (:estado1, :estado2)")
+                                        ->execute([':estado1' => EstadoTramite::PENDIENTE,
+                                         ':estado2' => EstadoTramite::CURSANDO]) ? 
+                                         $pdo->query("SELECT COUNT(*) 
+                                                        FROM inscripciones 
+                                                        WHERE estado_tramite_id IN (:estado1, :estado2)")->fetchColumn() : 0;
             $inicioMes = date('Y-m-01 00:00:00'); $ahora = date('Y-m-d H:i:s');
             $insMes = (int)$pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN :inicio AND :fin')->execute([':inicio' => $inicioMes, ':fin' => $ahora]) ? $pdo->query("SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN '$inicioMes' AND '$ahora'")->fetchColumn() : 0;
             return ['total_usuarios' => $totalUsuarios, 'carnets_vigentes' => $carnets, 'tramites_en_proceso' => $tramites, 'inscripciones_este_mes' => (int)$insMes];

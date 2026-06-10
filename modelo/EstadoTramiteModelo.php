@@ -30,7 +30,7 @@ class EstadoTramiteModelo
      */
     public function obtenerTodos(): array
     {
-        // TODO: SELECT * FROM estado_tramite ORDER BY nombre ASC
+        // TODO: SELECT * FROM estados_tramite ORDER BY nombre ASC
         // TODO: Retornar array de resultados
         
         return [];
@@ -43,7 +43,7 @@ class EstadoTramiteModelo
      */
     public function obtenerPorId(int $id): ?array
     {
-        // TODO: SELECT * FROM estado_tramite WHERE id = $id
+        // TODO: SELECT * FROM estados_tramite WHERE id = $id
         // TODO: Retornar array de datos o null
         
         return null;
@@ -56,7 +56,7 @@ class EstadoTramiteModelo
      */
     public function obtenerHistorial(int $id_tramite): array
     {
-        // TODO: SELECT et.*, h.fecha_cambio FROM estado_tramite et JOIN historial_tramite h ON et.id = h.id_estado_tramite WHERE h.id_tramite = $id_tramite ORDER BY h.fecha_cambio DESC
+        // TODO: SELECT et.*, h.fecha_cambio FROM estados_tramite et JOIN historial_tramite h ON et.id = h.id_estado_tramite WHERE h.id_tramite = $id_tramite ORDER BY h.fecha_cambio DESC
         // TODO: Retornar array de resultados
         
         return [];

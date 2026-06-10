@@ -170,8 +170,8 @@ class DipaControlador
                     if (!$ok) throw new \Exception('No se pudo insertar carnet');
 
                     // actualizar estado de inscripción a 'carnet_emitido' (id 8 según mapeo en TramiteControlador)
-                    $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 8 WHERE id = :id');
-                    $upd->execute([':id' => $id_insc]);
+                    $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');
+                    $upd->execute([':id' => $id_insc, ':estado' => EstadoTramite::CARNET_EMITIDO]);
 
                     $this->registrarSincronizacion($id_insc, $carnet_data['numero_carnet']);
                     $importados++;

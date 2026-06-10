@@ -97,7 +97,7 @@ class ReporteControlador
             $sql = 'SELECT i.id, u.nombre, u.apellido, u.dni, et.nombre AS estado_nombre, i.fecha_inscripcion
                     FROM inscripciones i
                     JOIN usuarios u ON u.id = i.usuario_id
-                    LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id
+                    LEFT JOIN estados_tramite et ON et.id = i.estado_tramite_id
                     ORDER BY i.fecha_inscripcion DESC
                     LIMIT :limite';
             $stmt = $this->pdo()->prepare($sql);
@@ -391,7 +391,11 @@ class ReporteControlador
 
             switch ($tipo) {
                 case 'inscripciones':
-                    $sql = 'SELECT i.id, i.usuario_id, u.nombre, u.apellido, i.curso_id, i.fecha_inscripcion, et.nombre AS estado FROM inscripciones i LEFT JOIN usuarios u ON u.id = i.usuario_id LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id';
+                    $sql = 'SELECT i.id, i.usuario_id, u.nombre, u.apellido, i.curso_id, i.fecha_inscripcion, et.nombre 
+                                AS estado 
+                                FROM inscripciones i 
+                                LEFT JOIN usuarios u ON u.id = i.usuario_id 
+                                LEFT JOIN estados_tramite et ON et.id = i.estado_tramite_id';
                     if (!empty($where)) $sql .= ' WHERE ' . implode(' AND ', $where);
                     $sql .= ' ORDER BY i.fecha_inscripcion DESC LIMIT 5000';
                     $stmt = $this->pdo()->prepare($sql);
@@ -402,7 +406,10 @@ class ReporteControlador
                     $periodo = ($fechaDesde ?? 'inicio') . ' - ' . ($fechaHasta ?? 'hoy');
                     break;
                 case 'usuarios':
-                    $sql = 'SELECT id, nombre, apellido, email, dni, creado_en AS fecha_creacion FROM usuarios ORDER BY id DESC LIMIT 5000';
+                    $sql = 'SELECT id, nombre, apellido, email, dni, creado_en 
+                                AS fecha_creacion 
+                                FROM usuarios 
+                                ORDER BY id DESC LIMIT 5000';
                     $stmt = $this->pdo()->query($sql);
                     $datos = $stmt->fetchAll(\PDO::FETCH_ASSOC);
                     break;
@@ -569,7 +576,11 @@ class ReporteControlador
             }
 
             // Inscripciones activas (no aprobadas ni rechazadas)
-            $stmt = $pdo->query('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id NOT IN (6,7)');
+            $stmt = $pdo->query('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id NOT IN (:estado,:estado2)');
+            $stmt->execute([
+                ':estado' => EstadoTramite::INSCRIPTO_EXAMEN,
+                ':estado2' => EstadoTramite::EXAMEN_APROBADO
+            ]);
             $inscripciones_activas = (int)$stmt->fetchColumn();
 
             // Exámenes pendientes: inscripciones con examen sin resultado
@@ -603,7 +614,15 @@ class ReporteControlador
 
             // Promedio tiempo trámite (días) para inscripciones cerradas
             try {
-                $stmt = $pdo->query("SELECT AVG(DATEDIFF(IFNULL(fecha_ultima_modificacion, NOW()), fecha_inscripcion)) FROM inscripciones WHERE estado_tramite_id IN (6,7)");
+                $stmt = $pdo->query("SELECT AVG(DATEDIFF(IFNULL(fecha_ultima_modificacion, 
+                                                        NOW()), fecha_inscripcion)) 
+                                                        FROM inscripciones 
+                                                        WHERE estado_tramite_id 
+                                                        IN (:estado, :estado2)");
+                $stmt->execute([
+                    ':estado' => EstadoTramite::INSCRIPTO_EXAMEN,
+                    ':estado2' => EstadoTramite::EXAMEN_APROBADO
+                ]);
                 $promedio_tiempo = (float)($stmt->fetchColumn() ?: 0.0);
             } catch (\Throwable $t) {
                 $promedio_tiempo = 0.0;
@@ -696,7 +715,10 @@ class ReporteControlador
     {
         try {
             $pdo = $this->pdo();
-            $sql = 'SELECT et.nombre AS estado, COUNT(i.id) as cantidad FROM estado_tramite et LEFT JOIN inscripciones i ON i.estado_tramite_id = et.id GROUP BY et.id, et.nombre';
+            $sql = 'SELECT et.nombre AS estado, COUNT(i.id) as cantidad 
+                        FROM estados_tramite et 
+                        LEFT JOIN inscripciones i ON i.estados_tramite_id = et.id 
+                        GROUP BY et.id, et.nombre';
             $stmt = $pdo->query($sql);
             $map = [];
             $total = 0;
@@ -887,9 +909,16 @@ class ReporteControlador
     {
         try {
             $pdo = $this->pdo();
-            $stmt = $pdo->query('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id NOT IN (6,7)');
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE estados_tramite_id NOT IN (:estado1, :estado2)');
+            $stmt->execute([':estado1' => EstadoTramite::CANCELADO, ':estado2' => EstadoTramite::RECHAZADO]);
             $count = (int)$stmt->fetchColumn();
-            $stmt = $pdo->query('SELECT et.nombre AS estado, COUNT(i.id) as cantidad FROM inscripciones i LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id WHERE i.estado_tramite_id NOT IN (6,7) GROUP BY i.estado_tramite_id');
+            $stmt = $pdo->prepare('SELECT et.nombre AS estado, 
+                                COUNT(i.id) as cantidad 
+                                FROM inscripciones i 
+                                LEFT JOIN estados_tramite et ON et.id = i.estados_tramite_id 
+                                WHERE i.estados_tramite_id NOT IN (:cancelado, :rechazado) 
+                                GROUP BY i.estados_tramite_id');
+            $stmt->execute([':cancelado' => EstadoTramite::CANCELADO, ':rechazado' => EstadoTramite::RECHAZADO]);
             $detalles = [];
             while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                 $detalles[] = ['estado' => $r['estado'] ?? 'Desconocido', 'cantidad' => (int)$r['cantidad']];
@@ -1040,10 +1069,15 @@ class ReporteControlador
     public function generarDocumentacionParaDIPA(): array
     {
         try {
-            $pdo = $this->pdo();
-            // Obtener inscripciones aprobadas (estado 6 = aprobado) sin carnet asignado
-            $sql = 'SELECT i.id, u.dni, u.nombre, u.apellido, u.email, i.fecha_inscripcion FROM inscripciones i JOIN usuarios u ON u.id = i.usuario_id LEFT JOIN carnets c ON c.inscripcion_id = i.id WHERE i.estado_tramite_id = 6 AND c.id IS NULL';
-            $stmt = $pdo->query($sql);
+            $pdo = $this->$pdo();
+            // Obtener inscripciones aprobadas (estado 7 = aprobado) sin carnet asignado
+            $sql = 'SELECT i.id, u.dni, u.nombre, u.apellido, u.email, i.fecha_inscripcion 
+                    FROM inscripciones i JOIN usuarios u ON u.id = i.usuario_id 
+                    LEFT JOIN carnets c ON c.inscripcion_id = i.id 
+                    WHERE i.estado_tramite_id = :aprobado 
+                    AND c.id IS NULL';
+            $stmt = $pdo->prepare($sql);
+            $stmt->execute([':aprobado' => EstadoTramite::EXAMEN_APROBADO]);
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
 
             if (empty($rows)) {

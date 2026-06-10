@@ -73,7 +73,7 @@ class InscripcionModelo
         $id_tipo = (int)($data['tipo_inscripcion_id'] ?? $data['id_tipo_inscripcion'] ?? 0);
         
 
-        $estado_tramite = (int)($data['estado_tramite_id'] ?? 1);
+        $estado_tramite = (int)($data['estado_tramite_id'] ?? EstadoTramite::PENDIENTE);
 
         if (
             $id_usuario <= 0 ||
@@ -93,12 +93,13 @@ class InscripcionModelo
                 FROM inscripciones
                 WHERE usuario_id = :uid
                 AND examen_id = :eid
-                AND estado_tramite_id != 3'
+                AND estado_tramite_id != :estado_rechazado'
             );
 
             $stmt->execute([
                 ':uid' => $id_usuario,
-                ':eid' => $id_examen
+                ':eid' => $id_examen,
+                ':estado_rechazado' => EstadoTramite::RECHAZADO
             ]);
         } else {
             $stmt = $this->conexion->prepare(
@@ -106,12 +107,13 @@ class InscripcionModelo
                 FROM inscripciones
                 WHERE usuario_id = :uid
                 AND curso_id = :cid
-                AND estado_tramite_id != 3'
+                AND estado_tramite_id != :estado_rechazado'
             );
 
             $stmt->execute([
                 ':uid' => $id_usuario,
-                ':cid' => $id_curso
+                ':cid' => $id_curso,
+                ':estado_rechazado' => EstadoTramite::RECHAZADO
             ]);
         }
 
@@ -290,8 +292,15 @@ class InscripcionModelo
     {
         if (!$this->conexion) return [];
 
-        // Suponemos estados 1=pendiente,2=en_proceso,4=aprobado, etc. Ajustar según esquema.
-        $stmt = $this->conexion->query('SELECT * FROM inscripciones WHERE estado_tramite_id IN (1,2) ORDER BY fecha_inscripcion DESC');
+        $stmt = $this->conexion->prepare('SELECT * FROM inscripciones  
+                                            WHERE estado_tramite_id IN (:estado1, :estado2, :estado3, :estado4) 
+                                            ORDER BY fecha_inscripcion DESC');
+        $stmt->execute([
+            ':estado1' => EstadoTramite::PENDIENTE,
+            ':estado2' => EstadoTramite::HABILITADO_EXAMEN,
+            ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN,
+            ':estado4' => EstadoTramite::EXAMEN_APROBADO
+        ]);
         return $stmt->fetchAll();
     }
 
@@ -306,8 +315,8 @@ class InscripcionModelo
         if (!$this->conexion) return false;
 
         // suponer estado 'cancelado' = 3
-        $stmt = $this->conexion->prepare('UPDATE inscripciones SET estado_tramite_id = 3, observaciones = :motivo WHERE id = :id');
-        return (bool)$stmt->execute([':motivo' => $motivo, ':id' => $id]);
+        $stmt = $this->conexion->prepare('UPDATE inscripciones SET estado_tramite_id = :estado, observaciones = :motivo WHERE id = :id');
+        return (bool)$stmt->execute([':estado' => EstadoTramite::CANCELADO, ':motivo' => $motivo, ':id' => $id]);
     }
 
     /**
@@ -320,8 +329,8 @@ class InscripcionModelo
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('SELECT COUNT(*) as total FROM inscripciones WHERE usuario_id = :uid AND curso_id = :cid AND estado_tramite_id != 3');
-        $stmt->execute([':uid' => $id_usuario, ':cid' => $id_curso]);
+        $stmt = $this->conexion->prepare('SELECT COUNT(*) as total FROM inscripciones WHERE usuario_id = :uid AND curso_id = :cid AND estado_tramite_id != :estado');
+        $stmt->execute([':uid' => $id_usuario, ':cid' => $id_curso, ':estado' => EstadoTramite::CANCELADO]);
         $row = $stmt->fetch();
         return ((int)$row['total']) > 0;
     }

@@ -214,8 +214,12 @@ class AdminControlador
             if (file_exists($pdoFile)) {
                 require_once $pdoFile;
                 $pdo = Connection::getPDO();
-                $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE curso_id = :cid AND estado_tramite_id IN (1,2)');
-                $stmt->execute([':cid' => $id]);
+                $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE curso_id = :cid AND estados_tramite_id IN (:estado1, :estado2)');
+                $stmt->execute([
+                    ':cid' => $id,
+                    ':estado1' => EstadoTramite::PENDIENTE,
+                    ':estado2' => EstadoTramite::EXAMEN_APROBADO
+                ]);
                 $row = $stmt->fetch();
                 if ($row && (int)$row['c'] > 0) return ['success' => false, 'message' => 'No se puede eliminar: existen inscripciones activas'];
             }
@@ -513,7 +517,14 @@ class AdminControlador
             $pagina = max(1, (int)($filtros['pagina'] ?? 1));
             $offset = ($pagina - 1) * $limit;
 
-            $sql = 'SELECT i.*, u.nombre as usuario_nombre, u.apellido as usuario_apellido, c.nombre as curso_nombre, et.nombre as estado_nombre FROM inscripciones i LEFT JOIN usuarios u ON i.usuario_id = u.id LEFT JOIN cursos c ON i.curso_id = c.id LEFT JOIN estado_tramite et ON i.estado_tramite_id = et.id';
+            $sql = 'SELECT i.*, u.nombre as usuario_nombre, 
+                                u.apellido as usuario_apellido, 
+                                c.nombre as curso_nombre, 
+                                et.nombre as estado_nombre 
+                                FROM inscripciones i 
+                                LEFT JOIN usuarios u ON i.usuario_id = u.id 
+                                LEFT JOIN cursos c ON i.curso_id = c.id 
+                                LEFT JOIN estados_tramite et ON i.estado_tramite_id = et.id';
             if (!empty($where)) $sql .= ' WHERE ' . implode(' AND ', $where);
             $countSql = 'SELECT COUNT(*) as total FROM (' . $sql . ') t';
             $stmt = $pdo->prepare($countSql);
@@ -611,7 +622,9 @@ class AdminControlador
             }
             // marcar estado de inscripcion a documentacion completa (id 2 asumido)
             $pdoFile = __DIR__ . '/../db/Connection.php';
-            if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 2 WHERE id = :id'); $upd->execute([':id' => $id_inscripcion]); }
+            if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); 
+            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id'); 
+            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::EXAMEN_APROBADO]); }
             $this->log('Documentación validada', 'INFO', ['id_inscripcion' => $id_inscripcion]);
             return ['success' => true, 'message' => 'Documentación validada correctamente', 'inscripcion' => $docs];
         } catch (Exception $e) {
@@ -645,9 +658,9 @@ class AdminControlador
             if (file_exists($pdoFile)) {
                 require_once $pdoFile;
                 $pdo = Connection::getPDO();
-                $sql = "UPDATE inscripciones SET estado_tramite_id = 7, observaciones = CONCAT(IFNULL(observaciones, ''), :mot) WHERE id = :id";
+                $sql = "UPDATE inscripciones SET estado_tramite_id = :estado, observaciones = CONCAT(IFNULL(observaciones, ''), :mot) WHERE id = :id";
                 $upd = $pdo->prepare($sql);
-                $upd->execute([':mot' => "\nRechazo: " . $motivo, ':id' => $id]);
+                $upd->execute([':estado' => EstadoTramite::RECHAZADO, ':mot' => "\nRechazo: " . $motivo, ':id' => $id]);
             }
             $this->log('Documentación rechazada', 'INFO', ['id_inscripcion' => $id, 'motivo' => $motivo]);
             // notificar si existe controlador de notificaciones
@@ -921,7 +934,12 @@ class AdminControlador
             $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE id = :id'); $stmt->execute([':id' => $id]); if (!$stmt->fetch()) return ['success' => false, 'message' => 'Usuario no encontrado'];
             $upd = $pdo->prepare('UPDATE usuarios SET activo = 0 WHERE id = :id'); $upd->execute([':id' => $id]);
             // cancelar inscripciones activas
-            $cancel = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 3 WHERE usuario_id = :id AND estado_tramite_id IN (1,2)'); $cancel->execute([':id' => $id]);
+            $cancel = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
+                                        WHERE usuario_id = :id AND estado_tramite_id IN (:pendiente, :aprobado)'); 
+            $cancel->execute([':estado' => EstadoTramite::RECHAZADO, 
+                                ':id' => $id, 
+                                ':pendiente' => EstadoTramite::PENDIENTE, 
+                                ':aprobado' => EstadoTramite::EXAMEN_APROBADO    ]);
             $this->log('Usuario desactivado', 'INFO', ['id_usuario' => $id]);
             return ['success' => true, 'message' => 'Usuario desactivado correctamente'];
         } catch (Exception $e) {
@@ -956,7 +974,9 @@ class AdminControlador
             $pdo = Connection::getPDO();
 
             // por ahora exportamos usuarios e inscripciones básicas
-            $stmt = $pdo->prepare('SELECT u.id as usuario_id, u.nombre, u.apellido, u.email, u.dni, i.id as inscripcion_id, i.curso_id, i.estado_tramite_id, i.fecha_inscripcion FROM usuarios u LEFT JOIN inscripciones i ON i.usuario_id = u.id');
+            $stmt = $pdo->prepare('SELECT u.id as usuario_id, u.nombre, u.apellido, u.email, u.dni, i.id as 
+                                    inscripcion_id, i.curso_id, i.estado_tramite_id, i.fecha_inscripcion 
+                                    FROM usuarios u LEFT JOIN inscripciones i ON i.usuario_id = u.id');
             $stmt->execute();
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
@@ -1014,8 +1034,22 @@ class AdminControlador
             $totalUsuarios = (int)$pdo->query('SELECT COUNT(*) FROM usuarios')->fetchColumn();
             $usuariosActivos = (int)$pdo->query('SELECT COUNT(*) FROM usuarios WHERE activo = 1')->fetchColumn();
             $totalIns = (int)$pdo->query('SELECT COUNT(*) FROM inscripciones')->fetchColumn();
-            $insPend = (int)$pdo->query("SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id IN (1)")->fetchColumn();
-            $insAprob = (int)$pdo->query("SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id IN (2)")->fetchColumn();
+            $insPend = (int)$pdo->query(
+                                            "SELECT COUNT(*) FROM inscripciones
+                                            WHERE estado_tramite_id IN (
+                                                " . EstadoTramite::PENDIENTE . ",
+                                                " . EstadoTramite::CURSANDO . ",
+                                                " . EstadoTramite::HABILITADO_EXAMEN . ",
+                                                " . EstadoTramite::INSCRIPTO_EXAMEN . "
+                                            )"
+                                        )->fetchColumn();
+            $insAprob = (int)$pdo->query(
+                                            "SELECT COUNT(*) FROM inscripciones
+                                            WHERE estado_tramite_id IN (
+                                                " . EstadoTramite::EXAMEN_APROBADO . ",
+                                                " . EstadoTramite::CARNET_EMITIDO . "
+                                            )"
+                                        )->fetchColumn();
             $totalEx = (int)$pdo->query('SELECT COUNT(*) FROM examenes')->fetchColumn();
             $aprobados = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 1")->fetchColumn();
             $reprobados = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 0")->fetchColumn();
@@ -1065,17 +1099,41 @@ class AdminControlador
             require_once $pdoFile;
             $pdo = Connection::getPDO();
 
-            $nuevas = (int)$pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN :d1 AND :d2')->execute([':d1' => $d1, ':d2' => $d2]) ? $pdo->query("SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN '$d1' AND '$d2'")->fetchColumn() : 0;
+            $stmt = $pdo->prepare(
+                                    'SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE fecha_inscripcion BETWEEN :d1 AND :d2'
+                                );
+
+            $stmt->execute([
+                ':d1' => $d1,
+                ':d2' => $d2
+            ]);
+
+            $nuevas = (int)$stmt->fetchColumn();
+
+
             // documentacion validada: asumimos que existe updated fecha o estado 2
-            $docVal = (int)$pdo->query("SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id = 2 AND fecha_inscripcion BETWEEN '$d1' AND '$d2'")->fetchColumn();
-            $exReal = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE fecha BETWEEN '$d1' AND '$d2'")->fetchColumn();
-            $ap = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 1 AND fecha BETWEEN '$d1' AND '$d2'")->fetchColumn();
-            $rep = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 0 AND fecha BETWEEN '$d1' AND '$d2'")->fetchColumn();
+            $docVal = (int)$pdo->query(
+                                            "SELECT COUNT(*)
+                                            FROM documentos
+                                            WHERE validado = 1
+                                            AND fecha_subida BETWEEN '$d1' AND '$d2'"
+                                        )->fetchColumn();
+            $exReal = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE fecha_resultado BETWEEN '$d1' AND '$d2'")->fetchColumn();
+            $ap = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 1 AND fecha_resultado BETWEEN '$d1' AND '$d2'")->fetchColumn();
+            $rep = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 0 AND fecha_resultado BETWEEN '$d1' AND '$d2'")->fetchColumn();
             $carn = (int)$pdo->query("SELECT COUNT(*) FROM carnets WHERE fecha_emision BETWEEN '$d1' AND '$d2'")->fetchColumn();
 
             $detalles = ['inscripciones' => [], 'resultados' => []];
             $rows = $pdo->query("SELECT * FROM inscripciones WHERE fecha_inscripcion BETWEEN '$d1' AND '$d2' ORDER BY fecha_inscripcion DESC")->fetchAll(\PDO::FETCH_ASSOC);
             $detalles['inscripciones'] = $rows;
+            $detalles['resultados'] = $pdo->query(
+                                                    "SELECT *
+                                                    FROM resultado_examen
+                                                    WHERE fecha_resultado BETWEEN '$d1' AND '$d2'
+                                                    ORDER BY fecha_resultado DESC"
+                                                )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->log('Reporte generado', 'INFO', ['fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin]);
             return ['success' => true, 'reporte' => ['periodo' => "{$fecha_inicio} a {$fecha_fin}", 'nuevas_inscripciones' => (int)$nuevas, 'documentacion_validada' => (int)$docVal, 'exámenes_realizados' => (int)$exReal, 'aprobados' => (int)$ap, 'reprobados' => (int)$rep, 'carnets_emitidos' => (int)$carn, 'detalles' => $detalles]];

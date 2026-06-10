@@ -380,7 +380,7 @@ class ValidacionControlador
                 ");
 
                 $stmt->execute([
-                    ':estado' => 5, // habilitado_examen
+                    ':estado' => EstadoTramite::HABILITADO_EXAMEN,
                     ':id' => $id_inscripcion
                 ]);
             }
@@ -508,8 +508,8 @@ class ValidacionControlador
             $insc_id = (int)($row['inscripcion_id'] ?? $row['insc_id'] ?? 0);
             if ($insc_id > 0) {
                 // Intentar actualizar inscripcion a estado 'reprobado' = 4 (según convención del proyecto)
-                $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 4 WHERE id = :id');
-                $upd->execute([':id' => $insc_id]);
+                $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');
+                $upd->execute([':id' => $insc_id, ':estado' => EstadoTramite::RECHAZADO]);
             }
 
             // Registrar auditoría si existe tabla
@@ -552,9 +552,14 @@ class ValidacionControlador
             require_once $connFile;
             $pdo = Connection::getPDO();
 
-            $sql = 'SELECT i.*, u.nombre as usuario_nombre, u.apellido as usuario_apellido, c.nombre as curso_nombre, c.modalidad FROM inscripciones i JOIN usuario u ON i.usuario_id = u.id LEFT JOIN cursos c ON i.curso_id = c.id WHERE i.estado_tramite_id = 1 ORDER BY i.fecha_inscripcion ASC';
+            $sql = 'SELECT i.*, u.nombre as usuario_nombre, u.apellido as usuario_apellido, c.nombre as curso_nombre, c.modalidad 
+                    FROM inscripciones i   
+                    JOIN usuario u ON i.usuario_id = u.id 
+                    LEFT JOIN cursos c ON i.curso_id = c.id 
+                    WHERE i.estado_tramite_id = :estado 
+                    ORDER BY i.fecha_inscripcion ASC';
             $stmt = $pdo->prepare($sql);
-            $stmt->execute();
+            $stmt->execute([':estado' => EstadoTramite::PENDIENTE]);
             $rows = $stmt->fetchAll();
             return $rows ?: [];
         } catch (\Exception $e) {

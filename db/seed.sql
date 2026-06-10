@@ -19,14 +19,14 @@ DELETE FROM usuario_roles;
 DELETE FROM usuarios;
 DELETE FROM roles;
 DELETE FROM tipo_inscripcion;
-DELETE FROM estado_tramite;
+DELETE FROM estados_tramite;
 
 INSERT INTO roles (id, nombre, descripcion) VALUES
 (1, 'inscripto', 'Usuario inscripto'),
 (2, 'admin', 'Administrador del sistema'),
 (3, 'inspector', 'Inspector municipal');
 
-INSERT INTO estado_tramite (id, nombre) VALUES
+INSERT INTO estados_tramite (id, nombre) VALUES
 (1, 'pendiente'),
 (2, 'documentacion_completa'),
 (3, 'documentacion_rechazada'),

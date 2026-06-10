@@ -53,7 +53,7 @@ class TramiteControlador
             $insc = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$insc) return [];
 
-            $stmt = $pdo->prepare('SELECT id, nombre, descripcion FROM estado_tramite WHERE id = :id LIMIT 1');
+            $stmt = $pdo->prepare('SELECT id, nombre, descripcion FROM estados_tramite WHERE id = :id LIMIT 1');
             $stmt->execute([':id' => $insc['estado_tramite_id'] ?? $insc['id_estado'] ?? 0]);
             $estado = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
 
@@ -110,8 +110,8 @@ class TramiteControlador
             $sql = 'SELECT h.id, h.inscripcion_id, h.estado_anterior_id, h.estado_nuevo_id, h.fecha_cambio, h.observaciones,
                            ea.nombre AS estado_anterior, en.nombre AS estado_nuevo, u.nombre AS usuario_admin_nombre, u.apellido AS usuario_admin_apellido
                     FROM historial_tramite h
-                    LEFT JOIN estado_tramite ea ON ea.id = h.estado_anterior_id
-                    INNER JOIN estado_tramite en ON en.id = h.estado_nuevo_id
+                    LEFT JOIN estados_tramite ea ON ea.id = h.estado_anterior_id
+                    INNER JOIN estados_tramite en ON en.id = h.estado_nuevo_id
                     LEFT JOIN usuarios u ON u.id = h.usuario_admin_id
                     WHERE h.inscripcion_id = :id
                     ORDER BY h.fecha_cambio ASC';
@@ -152,7 +152,7 @@ class TramiteControlador
             if (!$row) return ['success' => false, 'mensaje' => 'Inscripcion no encontrada', 'estado_anterior' => null, 'estado_nuevo' => $id_estado_nuevo];
             $estado_anterior = (int)($row['estado_tramite_id'] ?? $row['id_estado'] ?? 0);
 
-            $stmt = $pdo->prepare('SELECT id FROM estado_tramite WHERE id = :id LIMIT 1');
+            $stmt = $pdo->prepare('SELECT id FROM estados_tramite WHERE id = :id LIMIT 1');
             $stmt->execute([':id' => $id_estado_nuevo]);
             if (!$stmt->fetch()) {
                 return ['success' => false, 'mensaje' => 'Estado destino inválido', 'estado_anterior' => $estado_anterior, 'estado_nuevo' => $id_estado_nuevo];
@@ -282,7 +282,7 @@ class TramiteControlador
             $id_estado = $mapeo_estados[strtolower($estado)] ?? null;
             if ($id_estado === null) {
                 $pdo = $this->pdo();
-                $stmt = $pdo->prepare('SELECT id FROM estado_tramite WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1');
+                $stmt = $pdo->prepare('SELECT id FROM estados_tramite WHERE LOWER(nombre) = LOWER(:nombre) LIMIT 1');
                 $stmt->execute([':nombre' => $estado]);
                 $row = $stmt->fetch(\PDO::FETCH_ASSOC);
                 if ($row) $id_estado = (int)$row['id'];
@@ -298,12 +298,24 @@ class TramiteControlador
     public function obtenerTramitesUsuario(int $id_usuario): array
     {
         try {
-            $sql = 'SELECT i.id, i.usuario_id, i.curso_id, i.examen_id, i.tipo_inscripcion_id, i.fecha_inscripcion, i.estado_tramite_id, et.nombre AS estado_nombre FROM inscripciones i LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id WHERE i.usuario_id = :id ORDER BY i.fecha_inscripcion DESC';
+            $sql = 'SELECT i.id, i.usuario_id, i.curso_id, i.examen_id, i.tipo_inscripcion_id, i.fecha_inscripcion, i.estado_tramite_id, et.nombre 
+                    AS estado_nombre 
+                    FROM inscripciones i 
+                    LEFT JOIN estados_tramite et ON et.id = i.estado_tramite_id 
+                    WHERE i.usuario_id = :id 
+                    ORDER BY i.fecha_inscripcion DESC';
             $stmt = $this->pdo()->prepare($sql);
             $stmt->execute([':id' => $id_usuario]);
             $tramites = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $tramites[] = ['id' => (int)$row['id'], 'id_usuario' => (int)$row['usuario_id'], 'id_curso' => $row['curso_id'] !== null ? (int)$row['curso_id'] : null, 'id_examen' => $row['examen_id'] !== null ? (int)$row['examen_id'] : null, 'id_tipo_inscripcion' => $row['tipo_inscripcion_id'] !== null ? (int)$row['tipo_inscripcion_id'] : null, 'fecha_inscripcion' => $row['fecha_inscripcion'], 'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente', 'estado_id' => $row['estado_tramite_id'] !== null ? (int)$row['estado_tramite_id'] : 1];
+                $tramites[] = ['id' => (int)$row['id'], 
+                                'id_usuario' => (int)$row['usuario_id'], 
+                                'id_curso' => $row['curso_id'] !== null ? (int)$row['curso_id'] : null, 
+                                'id_examen' => $row['examen_id'] !== null ? (int)$row['examen_id'] : null, 
+                                'id_tipo_inscripcion' => $row['tipo_inscripcion_id'] !== null ? (int)$row['tipo_inscripcion_id'] : null, 
+                                'fecha_inscripcion' => $row['fecha_inscripcion'],
+                                'estado_nombre' => $row['estado_nombre'] ?? 'Desconocido', 
+                                'estado_id' => $row['estado_tramite_id'] !== null ? (int)$row['estado_tramite_id'] : EstadoTramite::PENDIENTE];
             }
             $this->registrarLog('TRAMITES_USUARIO_OBTENIDOS', ['id_usuario' => $id_usuario]);
             return $tramites;
@@ -316,12 +328,26 @@ class TramiteControlador
     public function obtenerTramitesPendientes(): array
     {
         try {
-            $sql = 'SELECT i.id, i.usuario_id, i.fecha_inscripcion, i.estado_tramite_id, u.nombre, u.apellido, et.nombre AS estado_nombre FROM inscripciones i INNER JOIN usuarios u ON u.id = i.usuario_id LEFT JOIN estado_tramite et ON et.id = i.estado_tramite_id WHERE i.estado_tramite_id IN (1,2,3,4,5) ORDER BY i.fecha_inscripcion ASC';
+            $sql = 'SELECT i.id, i.usuario_id, i.fecha_inscripcion, i.estado_tramite_id, u.nombre, u.apellido, et.nombre 
+                    AS estado_nombre 
+                    FROM inscripciones i 
+                    INNER JOIN usuarios u ON u.id = i.usuario_id 
+                    LEFT JOIN estados_tramite et ON et.id = i.estado_tramite_id 
+                    WHERE i.estado_tramite_id IN (' . EstadoTramite::PENDIENTE . ',
+                                                    ' . EstadoTramite::CURSANDO . ',
+                                                    ' . EstadoTramite::HABILITADO_EXAMEN . ',
+                                                    ' . EstadoTramite::INSCRIPTO_EXAMEN . ')
+                    ORDER BY i.fecha_inscripcion ASC';
             $stmt = $this->pdo()->prepare($sql);
             $stmt->execute();
             $tramites = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $tramites[] = ['id' => (int)$row['id'], 'id_usuario' => (int)$row['usuario_id'], 'usuario_nombre' => $row['nombre'], 'usuario_apellido' => $row['apellido'], 'fecha_inscripcion' => $row['fecha_inscripcion'], 'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente', 'estado_id' => (int)$row['estado_tramite_id']];
+                $tramites[] = ['id' => (int)$row['id'], 'id_usuario' => (int)$row['usuario_id'], 
+                                'usuario_nombre' => $row['nombre'], 
+                                'usuario_apellido' => $row['apellido'], 
+                                'fecha_inscripcion' => $row['fecha_inscripcion'], 
+                                'estado_nombre' => $row['estado_nombre'] ?? 'Pendiente', 
+                                'estado_id' => (int)$row['estado_tramite_id']];
             }
             $this->registrarLog('TRAMITES_PENDIENTES_OBTENIDOS', []);
             return $tramites;
@@ -341,20 +367,71 @@ class TramiteControlador
             $por_estado_rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $por_estado = [];
             foreach ($por_estado_rows as $r) $por_estado[(string)$r['estado']] = (int)$r['cantidad'];
-            $stmt = $pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id = :id');
-            $stmt->execute([':id' => 6]); $aprobados = (int)$stmt->fetchColumn();
-            $stmt->execute([':id' => 7]); $rechazados = (int)$stmt->fetchColumn();
-            $en_tramite = max(0, $total - ($aprobados + $rechazados));
+            
+            $stmt = $pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id IN (
+                                                                                                    :aprobado,
+                                                                                                    :carnet
+                                                                                                )');
+            $stmt->execute([
+                ':aprobado' => EstadoTramite::EXAMEN_APROBADO,
+                ':carnet' => EstadoTramite::CARNET_EMITIDO
+            ]);
+            $aprobados = (int)$stmt->fetchColumn();
+
+            $stmt = $pdo->prepare(
+                                    'SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE estado_tramite_id = :id'
+                                );
+
+            $stmt->execute([
+                ':id' => EstadoTramite::RECHAZADO
+            ]);
+
+            $rechazados = (int)$stmt->fetchColumn();
+            $stmt = $pdo->prepare(
+                                    'SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE estado_tramite_id IN (
+                                        :pendiente,
+                                        :cursando,
+                                        :habilitado,
+                                        :inscripto_examen
+                                    )'
+                                );
+
+            $stmt->execute([
+                ':pendiente' => EstadoTramite::PENDIENTE,
+                ':cursando' => EstadoTramite::CURSANDO,
+                ':habilitado' => EstadoTramite::HABILITADO_EXAMEN,
+                ':inscripto_examen' => EstadoTramite::INSCRIPTO_EXAMEN
+            ]);
+
+            $en_tramite = (int)$stmt->fetchColumn();
             $tasa_aprobacion = $total > 0 ? round(($aprobados / $total) * 100.0, 2) : 0.0;
             $tasa_rechazo = $total > 0 ? round(($rechazados / $total) * 100.0, 2) : 0.0;
-            $stmt = $pdo->query("SELECT AVG(DATEDIFF(NOW(), fecha_inscripcion)) as dias_promedio FROM inscripciones WHERE estado_tramite_id IN (6,7)");
+            $stmt = $pdo->query(
+                                "SELECT AVG(DATEDIFF(NOW(), fecha_inscripcion)) as dias_promedio
+                                FROM inscripciones
+                                WHERE estado_tramite_id IN (
+                                    " . EstadoTramite::EXAMEN_APROBADO . ",
+                                    " . EstadoTramite::RECHAZADO . ",
+                                    " . EstadoTramite::CARNET_EMITIDO . "
+                                )"
+                            );
             $dias_promedio = (float)($stmt->fetchColumn() ?: 0.0);
             $estadisticas = ['total_tramites' => $total, 'por_estado' => $por_estado, 'aprobados' => $aprobados, 'rechazados' => $rechazados, 'en_tramite' => $en_tramite, 'tasa_aprobacion' => $tasa_aprobacion, 'tasa_rechazo' => $tasa_rechazo, 'dias_promedio_tramite' => round($dias_promedio, 2)];
             $this->registrarLog('ESTADISTICAS_TRAMITES_OBTENIDAS', []);
             return $estadisticas;
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_ESTADISTICAS_TRAMITES', ['error' => $e->getMessage()]);
-            return ['total_tramites' => 0, 'por_estado' => [], 'aprobados' => 0, 'rechazados' => 0, 'en_tramite' => 0, 'tasa_aprobacion' => 0.0, 'tasa_rechazo' => 0.0, 'dias_promedio_tramite' => 0.0];
+                return ['total_tramites' => 0, 'por_estado' => [], 
+                'aprobados' => 0, 
+                'rechazados' => 0, 
+                'en_tramite' => 0, 
+                'tasa_aprobacion' => 0.0, 
+                'tasa_rechazo' => 0.0, 
+                'dias_promedio_tramite' => 0.0];
         }
     }
 

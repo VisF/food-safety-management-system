@@ -81,7 +81,7 @@ CREATE TABLE `examenes` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `estado_tramite` (
+CREATE TABLE `estados_tramite` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `nombre` VARCHAR(100) NOT NULL,
   `descripcion` TEXT DEFAULT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE `inscripciones` (
   CONSTRAINT `ins_curso_fk` FOREIGN KEY (`curso_id`) REFERENCES `cursos` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `ins_examen_fk` FOREIGN KEY (`examen_id`) REFERENCES `examenes` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
   CONSTRAINT `ins_tipo_fk` FOREIGN KEY (`tipo_inscripcion_id`) REFERENCES `tipo_inscripcion` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `ins_estado_fk` FOREIGN KEY (`estado_tramite_id`) REFERENCES `estado_tramite` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
+  CONSTRAINT `ins_estado_fk` FOREIGN KEY (`estado_tramite_id`) REFERENCES `estados_tramite` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `historial_tramite` (
@@ -124,8 +124,8 @@ CREATE TABLE `historial_tramite` (
   KEY `hist_estado_nuevo_idx` (`estado_nuevo_id`),
   KEY `hist_usuario_admin_idx` (`usuario_admin_id`),
   CONSTRAINT `hist_inscripcion_fk` FOREIGN KEY (`inscripcion_id`) REFERENCES `inscripciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
-  CONSTRAINT `hist_estado_anterior_fk` FOREIGN KEY (`estado_anterior_id`) REFERENCES `estado_tramite` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
-  CONSTRAINT `hist_estado_nuevo_fk` FOREIGN KEY (`estado_nuevo_id`) REFERENCES `estado_tramite` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
+  CONSTRAINT `hist_estado_anterior_fk` FOREIGN KEY (`estado_anterior_id`) REFERENCES `estados_tramite` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  CONSTRAINT `hist_estado_nuevo_fk` FOREIGN KEY (`estado_nuevo_id`) REFERENCES `estados_tramite` (`id`) ON DELETE RESTRICT ON UPDATE CASCADE,
   CONSTRAINT `hist_usuario_admin_fk` FOREIGN KEY (`usuario_admin_id`) REFERENCES `usuarios` (`id`) ON DELETE SET NULL ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

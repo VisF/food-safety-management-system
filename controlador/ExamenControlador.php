@@ -232,9 +232,9 @@ class ExamenControlador
                 $pdo = Connection::getPDO();
             }
             if ($pdo) { //hardcode de estados, idealmente esto debería estar en un modelo o configuración centralizada
-                $nuevoEstado = $aprobado ? 7 : 3; // 7=aprobado, 3=reprobado (en trámite carnet)
-                $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :est WHERE id = :id');
-                $upd->execute([':est' => $nuevoEstado, ':id' => $id_inscripcion]);
+                $nuevoEstado = $aprobado ? EstadoTramite::EXAMEN_APROBADO : EstadoTramite::REPROBADO;
+                $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');
+                $upd->execute([':estado' => $nuevoEstado, ':id' => $id_inscripcion]);
             }
 
             $this->registrarLog('RESULTADO_EXAMEN_REGISTRADO', ['id_inscripcion' => $id_inscripcion, 'nota' => $nota, 'aprobado' => (bool)$aprobado]);
@@ -366,8 +366,14 @@ class ExamenControlador
     {
         try {
             $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) return []; require_once $conn; $pdo = Connection::getPDO();
-            $sql = 'SELECT DISTINCT e.* FROM examenes e JOIN inscripciones i ON i.examen_id = e.id WHERE i.usuario_id = :uid AND e.fecha > NOW() AND i.estado_tramite_id NOT IN (4,5) ORDER BY e.fecha ASC';
-            $stmt = $pdo->prepare($sql); $stmt->execute([':uid' => $id_usuario]); return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $sql = 'SELECT DISTINCT e.* 
+                    FROM examenes e 
+                    JOIN inscripciones i ON i.examen_id = e.id 
+                    WHERE i.usuario_id = :uid 
+                    AND e.fecha > NOW() A
+                    ND i.estado_tramite_id NOT IN (:estado1, :estado2) 
+                    ORDER BY e.fecha ASC';
+            $stmt = $pdo->prepare($sql); $stmt->execute([':uid' => $id_usuario, ':estado1' => 4, ':estado2' => 5]); return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_PROXIMOS_EXAMENES', ['id_usuario' => $id_usuario, 'error' => $e->getMessage()]);
             return [];
