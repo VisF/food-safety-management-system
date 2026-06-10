@@ -2,3 +2,12 @@
 [2026-06-03 19:06:47] [WARNING] IP: ::1 | Failed login attempt | {"email":"admin@cresta.edu.ar"}
 [2026-06-03 19:41:56] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
 [2026-06-05 21:34:25] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-08 22:33:52] [WARNING] IP: ::1 | Session expired due to inactivity | {"user_id":null,"inactive_minutes":88}
+[2026-06-08 22:33:52] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
+[2026-06-08 22:40:32] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
+[2026-06-09 19:42:30] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-09 19:48:23] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-09 19:48:43] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-09 19:52:42] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-09 19:57:26] [WARNING] IP: ::1 | Failed login attempt | {"email":"admin@cresta.com"}
+[2026-06-09 19:57:31] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}

@@ -88,7 +88,7 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             if ($method === 'POST') {
                 $result = $auth->procesarLogin($_POST);
                 if (!empty($result['success'])) {
-                    header('Location: Router.php?r=index');
+                    header('Location: /manipulacionDeAlimentos/index');
                     exit;
                 }
                 $auth->mostrarLogin([
@@ -105,14 +105,14 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             GuestMiddleware::handle();
 
             if ($method !== 'POST') {
-                header('Location: Router.php?r=login');
+                header('Location: /manipulacionDeAlimentos/login');
                 exit;
             }
 
             CsrfMiddleware::validate();
             $result = $auth->procesarLogin($_POST);
             if (!empty($result['success'])) {
-                header('Location: Router.php?r=index');
+                header('Location: /manipulacionDeAlimentos/index');
                 exit;
             }
             $auth->mostrarLogin([
@@ -126,7 +126,7 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             if ($method === 'POST') {
                 $result = $auth->procesarRegistro($_POST);
                 if (!empty($result['success'])) {
-                    header('Location: Router.php?r=login');
+                    header('Location: /manipulacionDeAlimentos/login');
                     exit;
                 }
                 $auth->mostrarRegistro([
@@ -146,13 +146,13 @@ if (in_array($route, ['login', 'login_post', 'registro', 'registro_post', 'perfi
             GuestMiddleware::handle();
             
             if ($method !== 'POST') {
-                header('Location: Router.php?r=registro');
+                header('Location: /manipulacionDeAlimentos/registro');
                 exit;
             }
             CsrfMiddleware::validate();
             $result = $auth->procesarRegistro($_POST);
             if (!empty($result['success'])) {
-                header('Location: Router.php?r=login');
+                header('Location: /manipulacionDeAlimentos/login');
                 exit;
             }
             $auth->mostrarRegistro([
@@ -247,12 +247,12 @@ if (in_array($route, ['usuarios', 'usuario_ver', 'usuario_editar', 'usuario_busc
                         ]
                     );
                     header(
-                        'Location: Router.php?r=usuario_ver&id=' . $id
+                        'Location: /manipulacionDeAlimentos/usuario_ver?id=' . $id
                     );
                     exit;
                 }
                 header(
-                    'Location: Router.php?r=usuario_editar&id=' . $id
+                    'Location: /manipulacionDeAlimentos/usuario_editar?id=' . $id
                 );
                 exit;
             }
@@ -302,7 +302,7 @@ if (in_array($route, ['usuarios', 'usuario_ver', 'usuario_editar', 'usuario_busc
                     [],
                     ['id' => $id]
                 );
-                header('Location: Router.php?r=usuarios');
+                header('Location: /manipulacionDeAlimentos/usuarios');
                 exit;
             }
 
@@ -467,7 +467,7 @@ if ($route === 'inscripcion_examen_inscribir') {
 
     if ($method !== 'POST') {
         header(
-            'Location: Router.php?r=inscripcion_examen'
+            'Location: /manipulacionDeAlimentos/inscripcion_examen'
         );
         exit;
     }
@@ -498,7 +498,7 @@ if ($route === 'inscripcion_examen_inscribir') {
         ];
 
         header(
-            'Location: Router.php?r=inscripcion_exitosa&data=' .
+            'Location: /manipulacionDeAlimentos/inscripcion_exitosa?data=' .
             rawurlencode(
                 json_encode(
                     $payload,
@@ -515,7 +515,7 @@ if ($route === 'inscripcion_examen_inscribir') {
         ?? 'No se pudo completar la inscripción';
 
     header(
-        'Location: Router.php?r=inscripcion_examen&data=' .
+        'Location: /manipulacionDeAlimentos/inscripcion_examen?data=' .
         rawurlencode(
             json_encode(
                 ['error' => $mensaje],
@@ -545,7 +545,7 @@ if ($route === 'crear_examen_guardar') {
 
     if ($method !== 'POST') {
         header(
-            'Location: Router.php?r=crear_examen'
+            'Location: /manipulacionDeAlimentos/crear_examen'
         );
         exit;
     }
@@ -592,7 +592,7 @@ if ($route === 'crear_examen_guardar') {
         );
 
         header(
-            'Location: Router.php?r=panel_admin'
+            'Location: /manipulacionDeAlimentos/panel_admin'
         );
 
         exit;
@@ -612,7 +612,7 @@ if ($route === 'crear_examen_guardar') {
     ];
 
     header(
-        'Location: Router.php?r=crear_examen&data=' .
+        'Location: /manipulacionDeAlimentos/crear_examen?data=' .
         rawurlencode(
             json_encode(
                 $payload,

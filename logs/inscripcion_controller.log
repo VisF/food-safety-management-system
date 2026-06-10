@@ -17,3 +17,6 @@
 [2026-05-26 20:48:21] Usuario: anonimo | Evento: ERROR_OBTENER_EXAMENES_DISPONIBLES | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-27 19:50:37] Usuario: anonimo | Evento: ERROR_OBTENER_EXAMENES_DISPONIBLES | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
 [2026-05-27 19:50:46] Usuario: anonimo | Evento: ERROR_OBTENER_EXAMENES_DISPONIBLES | Datos: {"error":"Database connection failed: SQLSTATE[HY000] [1049] Unknown database 'bromatologia'"}
+[2026-06-09 22:01:43] Usuario: 1 | Evento: ERROR_CREAR_INSCRIPCION | Datos: {"error":"SQLSTATE[23000]: Integrity constraint violation: 1452 Cannot add or update a child row: a foreign key constraint fails (`manipulaciondealimentos`.`inscripciones`, CONSTRAINT `fk_inscripcion_curso` FOREIGN KEY (`curso_id`) REFERENCES `cursos` (`id`))"}
+[2026-06-09 22:07:34] Usuario: 1 | Evento: INSCRIPCION_CREADA | Datos: {"id":3,"id_usuario":1,"id_curso":null,"id_examen":1,"id_tipo_inscripcion":1,"estado_tramite_id":6}
+[2026-06-09 22:08:59] Usuario: 1 | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":1,"curso_id":null,"examen_id":1,"tipo_inscripcion_id":1,"estado_tramite_id":6,"observaciones":null}}

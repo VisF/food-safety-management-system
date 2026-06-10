@@ -367,6 +367,24 @@ class ValidacionControlador
                 }
             }
 
+            /*
+            * Si todas las validaciones fueron aprobadas,
+            * la inscripción queda habilitada para examen.
+            */
+            if ($resultado_general && isset($pdo)) {
+
+                $stmt = $pdo->prepare("
+                    UPDATE inscripciones
+                    SET estado_tramite_id = :estado
+                    WHERE id = :id
+                ");
+
+                $stmt->execute([
+                    ':estado' => 5, // habilitado_examen
+                    ':id' => $id_inscripcion
+                ]);
+            }
+
             $this->registrarLog('VALIDACION_PROCESADA', [
                 'id_inscripcion' => $id_inscripcion,
                 'resultado' => $resultado_general
@@ -379,7 +397,11 @@ class ValidacionControlador
                 'contexto' => $contexto
             ];
         } catch (\Exception $e) {
-            $this->registrarLog('ERROR_PROCESAR_VALIDACION', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
+            $this->registrarLog('ERROR_PROCESAR_VALIDACION', [
+                'id_inscripcion' => $id_inscripcion,
+                'error' => $e->getMessage()
+            ]);
+
             return [
                 'resultado_general' => false,
                 'validaciones' => [],

@@ -35,8 +35,8 @@ class PreviewDocumentoVista
                 </div>
 
                 <div class="mt-4">
-                    <a href="<?= BASE_URL ?>/Router.php?r=subir_archivo" class="app-vista-button app-vista-button--secondary">Volver</a>
-                    <a href="<?= BASE_URL ?>/Router.php?r=documento_subido" class="app-vista-button app-vista-button--primary">Confirmar</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/subir_archivo" class="app-vista-button app-vista-button--secondary">Volver</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/documento_subido" class="app-vista-button app-vista-button--primary">Confirmar</a>
                 </div>
             </div>
         </main>

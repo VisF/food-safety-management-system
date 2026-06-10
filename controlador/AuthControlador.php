@@ -1,7 +1,12 @@
 <?php
 declare(strict_types=1);
 
+
+
 use App\Middleware\CsrfMiddleware;
+
+require_once __DIR__ . '/../helpers/AuthHelper.php';
+require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 
 /**
  * AuthControlador - Gestión de autenticación y registro de usuarios
@@ -404,7 +409,7 @@ class AuthControlador
     public function procesarLogout(): void
     {
         $this->logout();
-        header('Location: Router.php?r=login');
+        header('Location: /login');
         exit;
     }
 

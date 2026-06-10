@@ -231,8 +231,8 @@ class ExamenControlador
                 require_once $connFile;
                 $pdo = Connection::getPDO();
             }
-            if ($pdo) {
-                $nuevoEstado = $aprobado ? 3 : 4;
+            if ($pdo) { //hardcode de estados, idealmente esto debería estar en un modelo o configuración centralizada
+                $nuevoEstado = $aprobado ? 7 : 3; // 7=aprobado, 3=reprobado (en trámite carnet)
                 $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :est WHERE id = :id');
                 $upd->execute([':est' => $nuevoEstado, ':id' => $id_inscripcion]);
             }

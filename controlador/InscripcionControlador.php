@@ -163,25 +163,79 @@ class InscripcionControlador
     {
         try {
             $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id_inscripcion) : null;
+
             if (!$insc) return ['success' => false, 'mensaje' => 'Inscripción no encontrada', 'inscripcion' => null];
-            $validCtrl = new ValidacionControlador(); $v = $validCtrl->validarDocumentacion($id_inscripcion);
+            //require_once __DIR__ . '/ValidacionControlador.php';
+            $validCtrl = new ValidacionControlador(); 
+            $v = $validCtrl->validarDocumentacion($id_inscripcion);
+
             if (!$v['valido']) return ['success' => false, 'mensaje' => 'Documentación incompleta: ' . implode(', ', $v['documentos_faltantes']), 'inscripcion' => null];
-            $pdo = $this->pdo(); $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 2 WHERE id = :id'); $upd->execute([':id' => $id_inscripcion]);
+
+            $pdo = $this->pdo(); 
+            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = 6 WHERE id = :id');  // HARDCODEADO a estado "inscripto_examen" 
+            $upd->execute([':id' => $id_inscripcion]);                                              // para evitar que queden inscripciones en estado "pendiente" sin confirmar
+
             $examen_id = (int)($insc['examen_id'] ?? 0);
+
             if ($examen_id > 0) { $dec = $pdo->prepare('UPDATE examenes SET cupos = GREATEST(cupos - 1, 0) WHERE id = :id'); $dec->execute([':id' => $examen_id]); }
+
             $this->registrarLog('INSCRIPCION_EXAMEN_CONFIRMADA', ['id_inscripcion' => $id_inscripcion]);
+
             return ['success' => true, 'mensaje' => 'Inscripción a examen confirmada', 'inscripcion' => $this->obtenerInscripcion($id_inscripcion)];
-        } catch (\Exception $e) { $this->registrarLog('ERROR_CONFIRMAR_INSCRIPCION_EXAMEN', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]); return ['success' => false, 'mensaje' => 'Error al confirmar inscripción: ' . $e->getMessage(), 'inscripcion' => null]; }
+
+        } catch (\Exception $e) 
+            { 
+                $this->registrarLog('ERROR_CONFIRMAR_INSCRIPCION_EXAMEN', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]); 
+                return ['success' => false, 'mensaje' => 'Error al confirmar inscripción: ' . $e->getMessage(), 'inscripcion' => null]; 
+            }
     }
 
     public function procesarInscripcionExamen(array $datos): array
     {
+        $idUsuario =
+            (int)($datos['id_usuario']
+            ?? $_SESSION['user_id']
+            ?? 0);
+
+        if (
+            !$this->usuarioPuedeInscribirseExamen(
+                $idUsuario
+            )
+        ) {
+
+            return [
+                'success' => false,
+                'mensaje' =>
+                    'Debe aprobar el curso o validar Moodle antes de rendir examen'
+            ];
+        }
+
         $idUsuario = (int)($datos['id_usuario'] ?? $_SESSION['user_id'] ?? 0);
         $idExamen = (int)($datos['id_examen'] ?? 0);
-        if ($idUsuario <= 0 || $idExamen <= 0) return ['success' => false, 'mensaje' => 'Faltan datos para completar la inscripción', 'inscripcion' => null];
-        $payload = ['usuario_id' => $idUsuario, 'curso_id' => null, 'examen_id' => $idExamen, 'tipo_inscripcion_id' => (int)($datos['id_tipo_inscripcion'] ?? 1), 'observaciones' => $datos['observaciones'] ?? null];
+
+        if ($idUsuario <= 0 || $idExamen <= 0) {
+            return [
+                'success' => false,
+                'mensaje' => 'Faltan datos para completar la inscripción',
+                'inscripcion' => null
+            ];
+        }
+
+        $payload = [
+            'usuario_id' => $idUsuario,
+            'curso_id' => null,
+            'examen_id' => $idExamen,
+            'tipo_inscripcion_id' => (int)($datos['id_tipo_inscripcion'] ?? 1),
+            'estado_tramite_id' => 6, // inscripto_examen
+            'observaciones' => $datos['observaciones'] ?? null
+        ];
+
         $res = $this->crearInscripcion($payload);
-        if ($res['success'] && $res['id']) return $this->confirmarInscripcionExamen((int)$res['id']);
+
+        if ($res['success'] && $res['id']) {
+            return $this->confirmarInscripcionExamen((int)$res['id']);
+        }
+
         return $res;
     }
 
@@ -202,5 +256,27 @@ class InscripcionControlador
             return ['inscripcion' => $ins, 'usuario' => ['nombre' => $ins['usuario_nombre'] ?? '', 'apellido' => $ins['usuario_apellido'] ?? '', 'email' => $ins['usuario_email'] ?? ''], 'curso' => ['nombre' => $ins['curso_nombre'] ?? ''], 'examen' => ['fecha' => $ins['examen_fecha'] ?? null], 'documentos' => $docs, 'asistencia' => $asis, 'resultado_examen' => $resEx, 'estado_actual' => $estado];
         } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_DETALLE_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]); return []; }
     }
+
+    private function usuarioPuedeInscribirseExamen(int $idUsuario): bool
+    {
+        $pdo = $this->pdo();
+
+        $sql = "
+            SELECT COUNT(*)
+            FROM inscripciones i
+            WHERE i.usuario_id = :usuario
+            AND i.estado_tramite_id = 5
+        ";
+
+        $stmt = $pdo->prepare($sql);
+
+        $stmt->execute([
+            ':usuario' => $idUsuario
+        ]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+
 
 }

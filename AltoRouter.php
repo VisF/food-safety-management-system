@@ -189,7 +189,6 @@ class AltoRouter
      */
     public function match($requestUrl = null, $requestMethod = null)
     {
-
         $params = [];
 
         // set Request Url if it isn't passed as parameter
@@ -197,12 +196,12 @@ class AltoRouter
             $requestUrl = isset($_SERVER['REQUEST_URI']) ? $_SERVER['REQUEST_URI'] : '/';
         }
 
+
         // strip base path from request url
         $requestUrl = substr($requestUrl, strlen($this->basePath));
 
-        // Strip query string (?a=b) from Request Url
-        if (($strpos = strpos($requestUrl, '?')) !== false) {
-            $requestUrl = substr($requestUrl, 0, $strpos);
+        if ($requestUrl === '/index.php') {
+            $requestUrl = '/';
         }
 
         $lastRequestUrlChar = $requestUrl ? $requestUrl[strlen($requestUrl)-1] : '';
@@ -242,7 +241,6 @@ class AltoRouter
                 $regex = $this->compileRoute($route);
                 $match = preg_match($regex, $requestUrl, $params) === 1;
             }
-
             if ($match) {
                 if ($params) {
                     foreach ($params as $key => $value) {
@@ -259,7 +257,6 @@ class AltoRouter
                 ];
             }
         }
-
         return false;
     }
 

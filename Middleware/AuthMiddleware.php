@@ -10,7 +10,7 @@ class AuthMiddleware
             !isset($_SESSION['usuario_id']) ||
             empty($_SESSION['usuario_id'])
         ) {
-            header('Location: Router.php?r=login');
+            header('Location: /manipulacionDeAlimentos/login');
             exit;
         }
     }

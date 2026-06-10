@@ -11,7 +11,7 @@ class GuestMiddleware
             !empty($_SESSION['usuario_id'])
         ) {
             header(
-                'Location: Router.php?r=index'
+                'Location: /manipulacionDeAlimentos/index'
             );
 
             exit;

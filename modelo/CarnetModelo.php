@@ -10,8 +10,7 @@ declare(strict_types=1);
  * - numero_carnet: número único del carnet
  * - fecha_emision: fecha de emisión del carnet
  * - fecha_vencimiento: fecha de vencimiento del carnet
- * - ruta_pdf: ruta del archivo PDF del carnet
- * - vigente: estado de vigencia (1=vigente, 0=vencido)
+ * - activo: estado de activación (1=activo, 0=inactivo)
  */
 
 class CarnetModelo
@@ -21,8 +20,7 @@ class CarnetModelo
     private string $numero_carnet;
     private string $fecha_emision;
     private string $fecha_vencimiento;
-    private string $ruta_pdf;
-    private int $vigente;
+    private int $activo;
 
     // Conexión a BD (PDO)
     private ?\PDO $conexion = null;
@@ -43,7 +41,7 @@ class CarnetModelo
 
     /**
      * Crear nuevo carnet
-     * @param array $data Datos: id_inscripcion, numero_carnet, fecha_emision, fecha_vencimiento, ruta_pdf
+     * @param array $data Datos: id_inscripcion, numero_carnet, fecha_emision, fecha_vencimiento
      * @return array|false Retorna array con id y datos, false si falla
      */
     public function crear(array $data)
@@ -54,18 +52,17 @@ class CarnetModelo
         $numero = $data['numero_carnet'] ?? '';
         $fecha_emision = $data['fecha_emision'] ?? date('Y-m-d');
         $fecha_venc = $data['fecha_vencimiento'] ?? null;
-        $ruta = $data['ruta_pdf'] ?? '';
 
-        if ($id_inscripcion <= 0 || !$numero || !$fecha_venc || !$ruta) return false;
+        if ($id_inscripcion <= 0 || !$numero || !$fecha_venc) return false;
 
         // verificar numero único
         $stmt = $this->conexion->prepare('SELECT id FROM carnets WHERE numero_carnet = :num');
         $stmt->execute([':num' => $numero]);
         if ($stmt->fetch()) return false;
 
-        $sql = 'INSERT INTO carnets (inscripcion_id, numero_carnet, fecha_emision, fecha_vencimiento, ruta_pdf, vigente) VALUES (:iid, :num, :femi, :fven, :ruta, 1)';
+        $sql = 'INSERT INTO carnets (inscripcion_id, numero_carnet, fecha_emision, fecha_vencimiento, activo) VALUES (:iid, :num, :femi, :fven, 1)';
         $stmt = $this->conexion->prepare($sql);
-        $params = [':iid' => $id_inscripcion, ':num' => $numero, ':femi' => $fecha_emision, ':fven' => $fecha_venc, ':ruta' => $ruta];
+        $params = [':iid' => $id_inscripcion, ':num' => $numero, ':femi' => $fecha_emision, ':fven' => $fecha_venc];
         if ($stmt->execute($params)) {
             $id = (int)$this->conexion->lastInsertId();
             return ['id' => $id, 'numero_carnet' => $numero, 'id_inscripcion' => $id_inscripcion];
@@ -105,19 +102,19 @@ class CarnetModelo
     }
 
     /**
-     * Verificar si el carnet está vigente
+     * Verificar si el carnet está activo
      * @param int $id ID del carnet
-     * @return bool true si está vigente, false si no
+     * @return bool true si está activo, false si no
      */
     public function verificarVigencia(int $id): bool
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('SELECT fecha_vencimiento, vigente FROM carnets WHERE id = :id');
+        $stmt = $this->conexion->prepare('SELECT fecha_vencimiento, activo FROM carnets WHERE id = :id');
         $stmt->execute([':id' => $id]);
         $row = $stmt->fetch();
         if (!$row) return false;
-        if ((int)$row['vigente'] === 0) return false;
+        if ((int)$row['activo'] === 0) return false;
         return strtotime($row['fecha_vencimiento']) > time();
     }
 
@@ -131,7 +128,7 @@ class CarnetModelo
     {
         if (!$this->conexion) return false;
 
-        $allowed = ['fecha_emision','fecha_vencimiento','ruta_pdf','vigente','numero_carnet'];
+        $allowed = ['fecha_emision','fecha_vencimiento','activo','numero_carnet'];
         $sets = [];
         $params = [':id' => $id];
         foreach ($allowed as $f) {
@@ -155,7 +152,7 @@ class CarnetModelo
     {
         if (!$this->conexion) return [];
 
-        $stmt = $this->conexion->query('SELECT * FROM carnets WHERE fecha_vencimiento < NOW() AND vigente = 1 ORDER BY fecha_vencimiento ASC');
+        $stmt = $this->conexion->query('SELECT * FROM carnets WHERE fecha_vencimiento < NOW() AND activo = 1 ORDER BY fecha_vencimiento ASC');
         return $stmt->fetchAll();
     }
 
@@ -163,15 +160,14 @@ class CarnetModelo
      * Renovar carnet
      * @param int $id ID del carnet
      * @param string $nuevaFechaVencimiento Nueva fecha de vencimiento
-     * @param string $nuevaRutaPdf Nueva ruta del PDF
      * @return bool true si fue exitoso, false si falla
      */
-    public function renovar(int $id, string $nuevaFechaVencimiento, string $nuevaRutaPdf): bool
+    public function renovar(int $id, string $nuevaFechaVencimiento): bool
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('UPDATE carnets SET fecha_emision = NOW(), fecha_vencimiento = :fv, ruta_pdf = :ruta, vigente = 1 WHERE id = :id');
-        return (bool)$stmt->execute([':fv' => $nuevaFechaVencimiento, ':ruta' => $nuevaRutaPdf, ':id' => $id]);
+        $stmt = $this->conexion->prepare('UPDATE carnets SET fecha_emision = NOW(), fecha_vencimiento = :fv, activo = 1 WHERE id = :id');
+        return (bool)$stmt->execute([':fv' => $nuevaFechaVencimiento, ':id' => $id]);
     }
 
     // Getters
@@ -220,22 +216,14 @@ class CarnetModelo
         return $this->fecha_vencimiento;
     }
 
-    /**
-     * Obtener ruta del PDF
-     * @return string
-     */
-    public function getRutaPdf(): string
-    {
-        return $this->ruta_pdf;
-    }
+
 
     /**
-     * Obtener estado vigente
-     * @return int
+     * Obtener estado activo     * @return int
      */
-    public function getVigente(): int
+    public function getActivo(): int
     {
-        return $this->vigente;
+        return $this->activo;
     }
 
     // Setters
@@ -289,24 +277,16 @@ class CarnetModelo
         $this->fecha_vencimiento = $fecha_vencimiento;
     }
 
-    /**
-     * Establecer ruta del PDF
-     * @param string $ruta_pdf
-     * @return void
-     */
-    public function setRutaPdf(string $ruta_pdf): void
-    {
-        $this->ruta_pdf = $ruta_pdf;
-    }
+
 
     /**
-     * Establecer estado vigente
-     * @param int $vigente
+     * Establecer estado activo     
+     * @param int $activo    
      * @return void
      */
-    public function setVigente(int $vigente): void
+    public function setActivo(int $activo): void
     {
-        $this->vigente = $vigente;
+        $this->activo = $activo === 1 ? 1 : 0 ;
     }
 }
 ?>

@@ -137,12 +137,14 @@ class PanelAdminVista
 
     private function getRoute(string $route): string
     {
+        echo $this->getRoute('login');
+        die();
         $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
         if (preg_match('#/vistas$#', $basePath) === 1) {
             $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
         }
 
-        return $basePath . '/Router.php?r=' . rawurlencode($route);
+        return $basePath . '/' . rawurlencode($route);
     }
 
     public function mostrar(): void

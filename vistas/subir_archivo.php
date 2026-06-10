@@ -32,12 +32,12 @@ class SubirArchivoVista
                 <h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
                 <p class="mt-2 text-sm text-gray-600"><?php echo htmlspecialchars($data['description']); ?></p>
 
-                <form action="<?= BASE_URL ?>/Router.php?r=documento_subido" method="post" enctype="multipart/form-data" class="mt-4">
+                <form action="<?= BASE_URL ?>/manipulacionDeAlimentos/documento_subido" method="post" enctype="multipart/form-data" class="mt-4">
                     <label class="block text-sm font-medium text-gray-700">Archivo</label>
                     <input type="file" name="archivo" class="mt-1 block w-full" required />
 
                     <button type="submit" class="app-vista-button app-vista-button--primary mt-4">Subir archivo</button>
-                    <a href="<?= BASE_URL ?>/Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary mt-4 inline-block">Cancelar</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/subida_documentacion" class="app-vista-button app-vista-button--secondary mt-4 inline-block">Cancelar</a>
                 </form>
             </div>
         </main>

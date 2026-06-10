@@ -1,0 +1,10 @@
+[2026-06-09 21:43:36] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:48:42] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:48:44] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:49:28] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:54:15] Usuario: anonimo | Evento: ERROR_VALIDAR_ASISTENCIA | Datos: {"id_inscripcion":1,"error":"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'manipulaciondealimentos.asistencias' doesn't exist"}
+[2026-06-09 21:54:15] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:56:34] Usuario: anonimo | Evento: ERROR_VALIDAR_ASISTENCIA | Datos: {"id_inscripcion":1,"error":"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'manipulaciondealimentos.asistencias' doesn't exist"}
+[2026-06-09 21:56:34] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":false}
+[2026-06-09 21:58:44] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":true}
+[2026-06-09 21:58:46] Usuario: anonimo | Evento: VALIDACION_PROCESADA | Datos: {"id_inscripcion":1,"resultado":true}

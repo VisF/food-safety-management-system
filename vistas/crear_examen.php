@@ -22,7 +22,7 @@ class CrearExamenVista
             $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
         }
 
-        return $basePath . '/Router.php?r=' . rawurlencode($route);
+        return $basePath . '/' . rawurlencode($route);
     }
 
     private function getIncomingData(): array

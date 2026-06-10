@@ -70,7 +70,7 @@ nombre VARCHAR(100) NOT NULL UNIQUE,
 descripcion TEXT
 );
 
-CREATE TABLE tipos_inscripcion (
+CREATE TABLE tipo_inscripcion (
 id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 nombre VARCHAR(100) NOT NULL,
 descripcion TEXT
@@ -86,7 +86,7 @@ fecha_inscripcion DATETIME DEFAULT CURRENT_TIMESTAMP,
 observaciones TEXT,
 FOREIGN KEY (usuario_id) REFERENCES usuarios(id),
 FOREIGN KEY (fecha_curso_id) REFERENCES fechas_curso(id),
-FOREIGN KEY (tipo_inscripcion_id) REFERENCES tipos_inscripcion(id),
+FOREIGN KEY (tipo_inscripcion_id) REFERENCES tipo_inscripcion(id),
 FOREIGN KEY (estado_tramite_id) REFERENCES estados_tramite(id)
 );
 

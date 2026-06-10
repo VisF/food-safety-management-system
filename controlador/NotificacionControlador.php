@@ -751,7 +751,7 @@ class NotificacionControlador
                 'fecha_emision' => $fecha_emision,
                 'fecha_vencimiento' => $fecha_vencimiento,
                 'ruta_descarga' => $ruta_descarga,
-                'link_descarga' => 'Router.php?r=carnet_emitido&id_carnet=' . $id_carnet,
+                'link_descarga' => '/manipulacionDeAlimentos/carnet_emitido&id_carnet=' . $id_carnet,
                 'asunto' => $asunto
             ];
 

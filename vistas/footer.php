@@ -5,7 +5,7 @@
  * Implementación técnica:
  *  - Determina `currentRoute` a partir de `basename($_SERVER['SCRIPT_NAME'])` y un `match` para mapear vistas a secciones.
  *  - Calcula `$basePath` similar a header.php para resolver rutas cuando las vistas están en `/vistas`.
- *  - `routeUrl($route)` devuelve `$basePath . '/Router.php?r=' . rawurlencode($route)` (usar `rawurlencode` para seguridad en URLs).
+ *  - `routeUrl($route)` devuelve `$basePath . '/manipulacionDeAlimentos/' . rawurlencode($route)` (usar `rawurlencode` para seguridad en URLs).
  * Notas de despliegue:
  *  - Si se cambia la estrategia de routing (front controller distinto), actualizar la resolución de `$basePath`.
  */
@@ -27,7 +27,7 @@ if (preg_match('#/vistas$#', $basePath) === 1) {
 }
 
 $routeUrl = static function (string $route) use ($basePath): string {
-   return $basePath . '/Router.php?r=' . rawurlencode($route);
+   return $basePath . '/' . rawurlencode($route);
 };
 
 $linkClass = static function (string $route) use ($currentRoute): string {

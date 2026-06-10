@@ -27,7 +27,7 @@ class DetalleActividadVista
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['actividad']['titulo'] ?? $data['title']); ?></h1>
 				<p class="mt-2"><?php echo htmlspecialchars($data['actividad']['descripcion'] ?? ''); ?></p>
 				<div class="mt-4">
-				<a href="<?= BASE_URL ?>/Router.php?r=actividad_reciente" class="app-vista-button app-vista-button--secondary">Volver</a>
+				<a href="<?= BASE_URL ?>/manipulacionDeAlimentos/actividad_reciente" class="app-vista-button app-vista-button--secondary">Volver</a>
 				</div>
 			</div>
 		</main>

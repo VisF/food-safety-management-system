@@ -43,43 +43,127 @@ class InscripcionModelo
         }
     }
 
-    /**
-     * Crear nueva inscripción
-     * @param array $data Datos: id_usuario, id_curso, id_tipo_inscripcion, id_examen (opcional)
-     * @return array|false Retorna array con id y datos, false si falla
-     */
+   /**
+ * Crear nueva inscripción
+ * @param array $data Datos: id_usuario, id_curso, id_tipo_inscripcion, id_examen (opcional)
+ * @return array|false Retorna array con id y datos, false si falla
+ */
     public function crear(array $data)
     {
         if (!$this->conexion) return false;
 
         $id_usuario = (int)($data['usuario_id'] ?? $data['id_usuario'] ?? 0);
-        $id_curso = isset($data['curso_id']) ? (int)$data['curso_id'] : (isset($data['id_curso']) ? (int)$data['id_curso'] : 0);
-        $id_tipo = (int)($data['tipo_inscripcion_id'] ?? $data['id_tipo_inscripcion'] ?? 0);
-        $id_examen = isset($data['examen_id']) ? (int)$data['examen_id'] : (isset($data['id_examen']) ? (int)$data['id_examen'] : 0);
 
-        if ($id_usuario <= 0 || $id_tipo <= 0 || ($id_curso <= 0 && $id_examen <= 0)) return false;
+        $id_curso = $data['curso_id']
+            ?? $data['id_curso']
+            ?? null;
+
+        $id_examen = $data['examen_id']
+            ?? $data['id_examen']
+            ?? null;
+
+        $id_curso = $id_curso !== null
+            ? (int)$id_curso
+            : null;
+
+        $id_examen = $id_examen !== null
+            ? (int)$id_examen
+            : null;
+
+        $id_tipo = (int)($data['tipo_inscripcion_id'] ?? $data['id_tipo_inscripcion'] ?? 0);
+        
+
+        $estado_tramite = (int)($data['estado_tramite_id'] ?? 1);
+
+        if (
+            $id_usuario <= 0 ||
+            $id_tipo <= 0 ||
+            (
+                ($id_curso === null || $id_curso <= 0) &&
+                ($id_examen === null || $id_examen <= 0)
+            )
+        ) {
+            return false;
+        }
 
         // verificar duplicado según el tipo de inscripción solicitado
         if ($id_examen > 0) {
-            $stmt = $this->conexion->prepare('SELECT id FROM inscripciones WHERE usuario_id = :uid AND examen_id = :eid AND estado_tramite_id != 3');
-            $stmt->execute([':uid' => $id_usuario, ':eid' => $id_examen]);
-        } else {
-            $stmt = $this->conexion->prepare('SELECT id FROM inscripciones WHERE usuario_id = :uid AND curso_id = :cid AND estado_tramite_id != 3');
-            $stmt->execute([':uid' => $id_usuario, ':cid' => $id_curso]);
-        }
-        if ($stmt->fetch()) return false;
+            $stmt = $this->conexion->prepare(
+                'SELECT id
+                FROM inscripciones
+                WHERE usuario_id = :uid
+                AND examen_id = :eid
+                AND estado_tramite_id != 3'
+            );
 
-        $sql = 'INSERT INTO inscripciones (usuario_id, curso_id, examen_id, tipo_inscripcion_id, fecha_inscripcion, estado_tramite_id) VALUES (:uid, :cid, :eid, :tid, NOW(), 1)';
+            $stmt->execute([
+                ':uid' => $id_usuario,
+                ':eid' => $id_examen
+            ]);
+        } else {
+            $stmt = $this->conexion->prepare(
+                'SELECT id
+                FROM inscripciones
+                WHERE usuario_id = :uid
+                AND curso_id = :cid
+                AND estado_tramite_id != 3'
+            );
+
+            $stmt->execute([
+                ':uid' => $id_usuario,
+                ':cid' => $id_curso
+            ]);
+        }
+
+        if ($stmt->fetch()) {
+            return false;
+        }
+
+        $sql = '
+            INSERT INTO inscripciones (
+                usuario_id,
+                curso_id,
+                examen_id,
+                tipo_inscripcion_id,
+                fecha_inscripcion,
+                estado_tramite_id
+            )
+            VALUES (
+                :uid,
+                :cid,
+                :eid,
+                :tid,
+                NOW(),
+                :estado
+            )
+        ';
+
         $stmt = $this->conexion->prepare($sql);
-        $params = [':uid' => $id_usuario, ':cid' => $id_curso, ':eid' => $id_examen, ':tid' => $id_tipo];
+
+        $params = [
+            ':uid' => $id_usuario,
+            ':cid' => $id_curso,
+            ':eid' => $id_examen,
+            ':tid' => $id_tipo,
+            ':estado' => $estado_tramite
+        ];
+
         if ($stmt->execute($params)) {
+
             $id = (int)$this->conexion->lastInsertId();
-            return ['id' => $id, 'id_usuario' => $id_usuario, 'id_curso' => $id_curso, 'id_examen' => $id_examen, 'id_tipo_inscripcion' => $id_tipo];
+
+            return [
+                'id' => $id,
+                'id_usuario' => $id_usuario,
+                'id_curso' => $id_curso,
+                'id_examen' => $id_examen,
+                'id_tipo_inscripcion' => $id_tipo,
+                'estado_tramite_id' => $estado_tramite
+            ];
         }
 
         return false;
     }
-
 
     /// Obtener última inscripción de un usuario
 
@@ -97,7 +181,7 @@ class InscripcionModelo
 
                 et.id AS estado_id,
                 et.nombre AS estado_nombre,
-                et.descripcion AS estado_descripcion,
+
 
                 ti.nombre AS tipo_inscripcion
 
@@ -106,7 +190,7 @@ class InscripcionModelo
             INNER JOIN estados_tramite et
                 ON i.estado_tramite_id = et.id
 
-            INNER JOIN tipos_inscripcion ti
+            INNER JOIN tipo_inscripcion ti
                 ON i.tipo_inscripcion_id = ti.id
 
             WHERE i.usuario_id = :usuario_id

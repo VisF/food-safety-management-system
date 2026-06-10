@@ -26,15 +26,15 @@ INSERT INTO roles (id, nombre, descripcion) VALUES
 (2, 'admin', 'Administrador del sistema'),
 (3, 'inspector', 'Inspector municipal');
 
-INSERT INTO estado_tramite (id, nombre, descripcion) VALUES
-(1, 'pendiente', 'Pendiente de validacion'),
-(2, 'documentacion_completa', 'Documentacion completa'),
-(3, 'documentacion_rechazada', 'Documentacion rechazada'),
-(4, 'apto_examen', 'Apto para examen'),
-(5, 'examen_rendido', 'Examen rendido'),
-(6, 'aprobado', 'Aprobado'),
-(7, 'rechazado', 'Rechazado'),
-(8, 'carnet_emitido', 'Carnet emitido');
+INSERT INTO estado_tramite (id, nombre) VALUES
+(1, 'pendiente'),
+(2, 'documentacion_completa'),
+(3, 'documentacion_rechazada'),
+(4, 'apto_examen'),
+(5, 'examen_rendido'),
+(6, 'aprobado'),
+(7, 'rechazado'),
+(8, 'carnet_emitido');
 
 INSERT INTO tipo_inscripcion (id, nombre, descripcion) VALUES
 (1, 'curso_presencial', 'Inscripcion a curso presencial'),

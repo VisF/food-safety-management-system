@@ -6,7 +6,7 @@ declare(strict_types=1);
  * Estructura esperada para `exam`:
  *  - nombre:string, fecha:string, lugar:string, id:int
  * Flujo técnico:
- *  - El enlace de inscripción apunta a `Router.php?r=confirmar_inscripcion_examen&data=`; el controlador debe validar cupos y permisos.
+ *  - El enlace de inscripción apunta a `/manipulacionDeAlimentos/confirmar_inscripcion_examen&data=`; el controlador debe validar cupos y permisos.
  * Seguridad:
  *  - No confiar en datos de disponibilidad enviados por el cliente; siempre validar en servidor.
  */
@@ -34,8 +34,8 @@ class DetalleExamenVista
                 <p>Lugar: <?php echo htmlspecialchars($data['exam']['lugar']); ?></p>
 
                 <div class="mt-4">
-                    <a href="<?= BASE_URL ?>/Router.php?r=confirmar_inscripcion_examen&data=" class="app-vista-button app-vista-button--primary">Inscribirme</a>
-                    <a href="<?= BASE_URL ?>/Router.php?r=index"class="app-vista-button app-vista-button--secondary">Volver</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/confirmar_inscripcion_examen&data=" class="app-vista-button app-vista-button--primary">Inscribirme</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/index"class="app-vista-button app-vista-button--secondary">Volver</a>
                 </div>
             </div>
         </main>

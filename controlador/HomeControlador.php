@@ -11,6 +11,7 @@ declare(strict_types=1);
  *   - vistas/consulta_publica.php   (búsqueda pública por DNI)
  */
 require_once __DIR__ . '/../helpers/AuthHelper.php';
+require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
 require_once __DIR__ . '/../modelo/InscripcionModelo.php';

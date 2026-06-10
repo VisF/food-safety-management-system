@@ -27,7 +27,7 @@ class MotivoRechazoVista
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
 				<p class="mt-2 text-sm text-gray-600"><?php echo htmlspecialchars($data['reason']); ?></p>
 				<div class="mt-4">
-					<a href="<?= BASE_URL ?>/Router.php?r=subida_documentacion" class="app-vista-button app-vista-button--secondary">Reintentar</a>
+					<a href="<?= BASE_URL ?>/manipulacionDeAlimentos/subida_documentacion" class="app-vista-button app-vista-button--secondary">Reintentar</a>
 				</div>
 			</div>
 		</main>

@@ -32,7 +32,7 @@ class InscripcionExitosaVista
                 </p>
 
                 <div style="margin-top:1.25rem;display:flex;justify-content:center;">
-                    <a href="<?= BASE_URL ?>/Router.php?r=index"class="btn" role="button">Ir al inicio</a>
+                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/index"class="btn" role="button">Ir al inicio</a>
                 </div>
             </section>
         </main>

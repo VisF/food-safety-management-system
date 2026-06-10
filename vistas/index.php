@@ -13,10 +13,12 @@
  *  - Use `e()` o `htmlspecialchars` para escapar toda salida; `getRoute()` genera enlaces a `Router.php` con `rawurlencode`.
  *  - No confiar en estados enviados por cliente; validar la disponibilidad de exámenes y permisos en backend.
  */
+
+
 class InicioVista
 {
     private string $baseURL = '/ManipulacionDeAlimentosAPI/';
-
+    
 
 
     private function getHeader(array $inicioData): void
@@ -101,7 +103,7 @@ class InicioVista
             $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
         }
 
-        return $basePath . '/Router.php?r=' . rawurlencode($route);
+        return $basePath . '/' . rawurlencode($route);
     }
 
     public function mostrar(array $inicioData): void

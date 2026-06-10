@@ -27,7 +27,7 @@ class DetalleValidacionVista
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
 				<p class="mt-2">Estado: <?php echo htmlspecialchars($data['validation']['status'] ?? ''); ?></p>
 				<div class="mt-4">
-					<a href="<?= BASE_URL ?>/Router.php?r=panel_inspector" class="app-vista-button app-vista-button--secondary">Volver</a>
+					<a href="<?= BASE_URL ?>/manipulacionDeAlimentos/panel_inspector" class="app-vista-button app-vista-button--secondary">Volver</a>
 				</div>
 			</div>
 		</main>

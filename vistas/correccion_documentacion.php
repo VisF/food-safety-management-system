@@ -27,7 +27,7 @@ class CorreccionDocumentacionVista
 				<h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
 				<p class="mt-2"><?php echo htmlspecialchars($data['instructions']); ?></p>
 
-			<form action="<?= BASE_URL ?>/Router.php?r=documento_subido" method="post" enctype="multipart/form-data" class="mt-4">
+			<form action="<?= BASE_URL ?>/manipulacionDeAlimentos/documento_subido" method="post" enctype="multipart/form-data" class="mt-4">
 					<label class="block text-sm font-medium">Archivo corregido</label>
 					<input type="file" name="archivo" class="mt-1 block w-full" required />
 					<button class="app-vista-button app-vista-button--primary mt-4" type="submit">Enviar corrección</button>

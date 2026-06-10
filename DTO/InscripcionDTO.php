@@ -32,8 +32,7 @@ class InscripcionDTO
             $data['observaciones'] ?? null,
 
             $data['tipo_inscripcion'] ?? null,
-            $data['estado_nombre'] ?? null,
-            $data['estado_descripcion'] ?? null
+            $data['estado_nombre'] ?? null
         );
     }
 
@@ -49,8 +48,7 @@ class InscripcionDTO
             'fecha_inscripcion' => $this->fechaInscripcion,
             'observaciones' => $this->observaciones,
             'tipo_inscripcion' => $this->tipoInscripcion,
-            'estado_nombre' => $this->estadoNombre,
-            'estado_descripcion' => $this->estadoDescripcion
+            'estado_nombre' => $this->estadoNombre
         ];
     }
 

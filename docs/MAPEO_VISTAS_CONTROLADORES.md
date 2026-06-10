@@ -116,7 +116,7 @@ $datos = $controlador->metodo();
 
 // Validar sesión
 if (!isset($_SESSION['usuario'])) {
-    header('Location: ?r=login');
+    header('Location: /manipulacionDeAlimentos/login');
     exit;
 }
 ?>
