@@ -370,8 +370,8 @@ class ExamenControlador
                     FROM examenes e 
                     JOIN inscripciones i ON i.examen_id = e.id 
                     WHERE i.usuario_id = :uid 
-                    AND e.fecha > NOW() A
-                    ND i.estado_tramite_id NOT IN (:estado1, :estado2) 
+                    AND e.fecha > NOW() 
+                    AND i.estado_tramite_id NOT IN (:estado1, :estado2) 
                     ORDER BY e.fecha ASC';
             $stmt = $pdo->prepare($sql); $stmt->execute([':uid' => $id_usuario, ':estado1' => 4, ':estado2' => 5]); return $stmt->fetchAll(\PDO::FETCH_ASSOC);
         } catch (\Exception $e) {

@@ -7,8 +7,12 @@
  */
 class PanelAdminVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
-
+    private string $baseURL = '/ManipulacionDeAlimentos/';
+    /*TODO:
+        Datos temporales para desarrollo
+        Eliminar cuando panel_admin reciba datos
+        Desde adminControlador::obtenerEstadisticas()
+    */
     private function getDefaultData(): array
     {
         return [
@@ -137,14 +141,9 @@ class PanelAdminVista
 
     private function getRoute(string $route): string
     {
-        echo $this->getRoute('login');
-        die();
-        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-        if (preg_match('#/vistas$#', $basePath) === 1) {
-            $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
-        }
+        $basePath = '/ManipulacionDeAlimentos';
 
-        return $basePath . '/' . rawurlencode($route);
+        return $basePath . '/' . ltrim($route, '/');
     }
 
     public function mostrar(): void
@@ -295,4 +294,4 @@ class PanelAdminVista
     }
 }
 
-(new PanelAdminVista())->mostrar();
+

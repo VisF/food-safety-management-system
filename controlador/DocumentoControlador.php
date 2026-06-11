@@ -146,6 +146,50 @@ class DocumentoControlador
             ];
         }
     }
+        public function obtenerDocumentosUsuario(int $idUsuario): array
+        {
+            try {
+                $pdoFile = __DIR__ . '/../db/Connection.php';
+
+                if (!file_exists($pdoFile)) {
+                    return [];
+                }
+
+                require_once $pdoFile;
+
+                $pdo = Connection::getPDO();
+
+                $sql = "
+                    SELECT d.*
+                    FROM documento d
+                    INNER JOIN inscripciones i
+                        ON d.id_inscripcion = i.id
+                    WHERE i.usuario_id = :id_usuario
+                    ORDER BY d.fecha_subida DESC
+                ";
+
+                $stmt = $pdo->prepare($sql);
+
+                $stmt->execute([
+                    ':id_usuario' => $idUsuario
+                ]);
+
+                return $stmt->fetchAll(PDO::FETCH_ASSOC);
+
+            } catch (Exception $e) {
+
+                $this->registrarLog(
+                    'ERROR_OBTENER_DOCUMENTOS_USUARIO',
+                    ['error' => $e->getMessage()]
+                );
+
+                return [];
+            }
+        }
+
+
+
+
 
     /**
      * Obtener todos los documentos de una inscripción
@@ -311,7 +355,21 @@ class DocumentoControlador
             if (!file_exists($serverPath)) return ['success' => false, 'ruta' => null, 'nombre' => null];
             // registrar auditoria
             $pdoFile = __DIR__ . '/../db/Connection.php';
-            if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); if ($pdo->query("SHOW TABLES LIKE 'auditoria_acciones'")->rowCount() > 0) { $insA = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, accion, detalle, fecha) VALUES (:u, :a, :d, NOW())'); $insA->execute([':u' => $_SESSION['user_id'] ?? null, ':a' => 'descargar_documento', ':d' => json_encode(['id' => $id])]); } }
+            if (file_exists($pdoFile)) 
+                { 
+                    require_once $pdoFile; 
+                    
+                    $pdo = Connection::getPDO(); 
+                    if ($pdo->query("SHOW TABLES LIKE 'auditoria_acciones'")->rowCount() > 0) 
+                        {   
+                            $insA = $pdo->prepare
+                            ('INSERT INTO auditoria_acciones (usuario_id, accion, detalle, fecha) 
+                                VALUES (:u, :a, :d, NOW())'); 
+                            $insA->execute([':u' => $_SESSION['user_id'] ?? null, 
+                                        ':a' => 'descargar_documento', 
+                                        ':d' => json_encode(['id' => $id])]); 
+                         } 
+            }
             $this->registrarLog('DOCUMENTO_DESCARGADO', ['id' => $id]);
             return ['success' => true, 'ruta' => $ruta, 'nombre' => basename($ruta)];
         } catch (\Exception $e) {

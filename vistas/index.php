@@ -17,7 +17,7 @@
 
 class InicioVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentos/';
     
 
 
@@ -151,7 +151,7 @@ class InicioVista
                          <?php echo $this->e($inicioData['tramite']['progreso']); ?>
                         </p>
 
-                        <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('inscripcion_examen'); ?>" role="button">
+                        <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('detalle_examen'); ?>" role="button">
                          <span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
                          Inscribirse a examen
                         </a>

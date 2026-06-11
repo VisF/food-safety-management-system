@@ -22,15 +22,70 @@ class ConfirmarInscripcionExamenVista
         }
         include __DIR__ . '/header.php';
         ?>
-        <main class="app-container">
-            <div class="app-vista-card">
-                <h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
-                <p class="mt-2">Desea inscribirse al examen: <?php echo htmlspecialchars($data['examName']); ?>?</p>
-
-                <form action="<?= BASE_URL ?>/manipulacionDeAlimentos/inscripcion_exitosa" method="post" class="mt-4">
-                    <button type="submit" class="app-vista-button app-vista-button--primary">Confirmar inscripción</button>
-                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/detalle_examen" class="app-vista-button app-vista-button--secondary">Cancelar</a>
-                </form>
+        <main class="contenido-principal contenido-principal--ancho">
+            <div class="w-full max-w-2xl mx-auto">
+                <section class="app-vista-card text-center">
+                    <div
+                        style="
+                            width:72px;
+                            height:72px;
+                            margin:0 auto 1.5rem auto;
+                            border-radius:50%;
+                            background:linear-gradient(
+                                135deg,
+                                #005596 0%,
+                                #3a5f94 100%
+                            );
+                            display:flex;
+                            align-items:center;
+                            justify-content:center;
+                            color:white;
+                            font-size:2rem;
+                            font-weight:bold;
+                        "
+                    >
+                        !
+                    </div>
+                    <h1 class="font-headline-lg text-primary">
+                        Confirmar inscripción
+                    </h1>
+                    <p
+                        style="
+                            margin-top:1rem;
+                            margin-bottom:2rem;
+                        "
+                    >
+                        Está a punto de inscribirse al examen
+                        <strong>
+                            <?php echo htmlspecialchars($data['examName'] ?: 'seleccionado'); ?>
+                        </strong>
+                    </p>
+                    <div
+                        style="
+                            display:flex;
+                            flex-direction:column;
+                            gap:12px;
+                        "
+                    >
+                        <form
+                            action="/manipulacionDeAlimentos/inscripcion/confirmar"
+                            method="post"
+                        >
+                            <button
+                                type="submit"
+                                class="app-vista-button app-vista-button--primary w-full"
+                            >
+                                Confirmar inscripción
+                            </button>
+                        </form>
+                        <a
+                            href="/manipulacionDeAlimentos/detalle_examen"
+                            class="app-vista-button app-vista-button--secondary w-full text-center"
+                        >
+                            Volver
+                        </a>
+                    </div>
+                </section>
             </div>
         </main>
         <?php
@@ -38,4 +93,4 @@ class ConfirmarInscripcionExamenVista
     }
 }
 
-ConfirmarInscripcionExamenVista::mostrar();
+

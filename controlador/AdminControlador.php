@@ -214,7 +214,7 @@ class AdminControlador
             if (file_exists($pdoFile)) {
                 require_once $pdoFile;
                 $pdo = Connection::getPDO();
-                $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE curso_id = :cid AND estados_tramite_id IN (:estado1, :estado2)');
+                $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE curso_id = :cid AND estado_tramite_id IN (:estado1, :estado2)');
                 $stmt->execute([
                     ':cid' => $id,
                     ':estado1' => EstadoTramite::PENDIENTE,
@@ -623,10 +623,15 @@ class AdminControlador
             // marcar estado de inscripcion a documentacion completa (id 2 asumido)
             $pdoFile = __DIR__ . '/../db/Connection.php';
             if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); 
+
             $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id'); 
-            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::EXAMEN_APROBADO]); }
+
+            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::HABILITADO_EXAMEN]); }
+
             $this->log('Documentación validada', 'INFO', ['id_inscripcion' => $id_inscripcion]);
+
             return ['success' => true, 'message' => 'Documentación validada correctamente', 'inscripcion' => $docs];
+
         } catch (Exception $e) {
             $this->log('Error al validar documentación', 'ERROR', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
             return [
@@ -721,7 +726,14 @@ class AdminControlador
 
             // Notificar usuario si aplica
             if (!empty($sol['usuario_id']) && class_exists('NotificacionControlador')) {
-                try { $nc = new NotificacionControlador(); if (method_exists($nc, 'enviarNotificacion')) $nc->enviarNotificacion((int)$sol['usuario_id'], 'solicitud_respondida', ['mensaje' => $respuesta['contenido'] ?? '']); } catch (Exception $e) {}
+                try { 
+                    $nc = new NotificacionControlador();
+                    if (method_exists($nc, 'enviarNotificacion')) 
+                        $nc->enviarNotificacion((int)$sol['usuario_id'], 
+                    'solicitud_respondida', ['mensaje' => $respuesta['contenido'] ?? '']); 
+                    } 
+                catch (Exception $e) 
+                    {}
             }
 
             $this->log('Solicitud respondida', 'INFO', ['id_solicitud' => $id_solicitud, 'id_respuesta' => $id_resp]);
@@ -842,7 +854,15 @@ class AdminControlador
                 if ($ex) return ['success' => false, 'message' => 'Email ya registrado', 'id_usuario' => null];
             } else {
                 $pdoFile = __DIR__ . '/../db/Connection.php';
-                if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :e'); $stmt->execute([':e' => $email]); if ($stmt->fetch()) return ['success' => false, 'message' => 'Email ya registrado', 'id_usuario' => null]; }
+                if (file_exists($pdoFile)) 
+                    { 
+                        require_once $pdoFile; 
+                        $pdo = Connection::getPDO(); 
+                        $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :e'); 
+                        $stmt->execute([':e' => $email]); 
+                        if ($stmt->fetch()) 
+                            return ['success' => false, 'message' => 'Email ya registrado', 'id_usuario' => null]; 
+                        }
             }
 
             $hashed = password_hash($password, PASSWORD_DEFAULT);
@@ -855,7 +875,17 @@ class AdminControlador
             } else {
                 $id = null;
                 $pdoFile = __DIR__ . '/../db/Connection.php';
-                if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $ins = $pdo->prepare('INSERT INTO usuarios (nombre, apellido, email, dni, password, activo, creado_en) VALUES (:n, :a, :e, :d, :p, 1, NOW())'); $ins->execute([':n' => $datos['nombre'] ?? '', ':a' => $datos['apellido'] ?? '', ':e' => $email, ':d' => $dni, ':p' => $hashed]); $id = (int)$pdo->lastInsertId(); }
+                if (file_exists($pdoFile)) 
+                    { 
+                        require_once $pdoFile; 
+                        $pdo = Connection::getPDO(); 
+                        $ins = $pdo->prepare('INSERT INTO usuarios (nombre, apellido, email, dni, password, activo, creado_en) 
+                                                VALUES (:n, :a, :e, :d, :p, 1, NOW())'); 
+                        $ins->execute([':n' => $datos['nombre'] ?? '', 
+                                        ':a' => $datos['apellido'] ?? '', 
+                                        ':e' => $email, ':d' => $dni, 
+                                        ':p' => $hashed]); 
+                        $id = (int)$pdo->lastInsertId(); }
             }
 
             $this->log('Usuario creado', 'INFO', ['email' => $email, 'dni' => $dni, 'id' => $id]);
@@ -900,7 +930,23 @@ class AdminControlador
                 $ok = $this->usuarioModelo->actualizar($id, $datos);
             } else {
                 $pdoFile = __DIR__ . '/../db/Connection.php';
-                if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $sets = []; $params = [':id' => $id]; foreach ($datos as $k => $v) { $sets[] = "$k = :$k"; $params[":$k"] = $v; } $sql = 'UPDATE usuarios SET ' . implode(', ', $sets) . ' WHERE id = :id'; $stmt = $pdo->prepare($sql); $ok = $stmt->execute($params); } else { $ok = false; }
+                if (file_exists($pdoFile)) 
+                    { 
+                        require_once $pdoFile; 
+                        $pdo = Connection::getPDO(); 
+                        $sets = []; $params = [':id' => $id]; 
+                        foreach ($datos as $k => $v) 
+                            { 
+                                $sets[] = "$k = :$k"; 
+                                $params[":$k"] = $v; 
+                            } 
+                        $sql = 'UPDATE usuarios SET ' . implode(', ', $sets) . ' WHERE id = :id'; 
+                        $stmt = $pdo->prepare($sql); 
+                        $ok = $stmt->execute($params); 
+                        } else 
+                            { 
+                            $ok = false; 
+                            }
             }
 
             $this->log('Usuario actualizado', 'INFO', ['id_usuario' => $id]);
@@ -967,7 +1013,7 @@ class AdminControlador
     {
         try {
             $format = strtolower(trim($formato));
-            if (!in_array($format, ['csv', 'json'])) return ['success' => false, 'message' => 'Formato no soportado', 'archivo' => null];
+            if (!in_array($format, ['csv', 'json','excel'])) return ['success' => false, 'message' => 'Formato no soportado', 'archivo' => null];
             $pdoFile = __DIR__ . '/../db/Connection.php';
             if (!file_exists($pdoFile)) return ['success' => false, 'message' => 'DB no disponible', 'archivo' => null];
             require_once $pdoFile;
@@ -1056,7 +1102,15 @@ class AdminControlador
             $tasa = $aprobados + $reprobados > 0 ? round(($aprobados / max(1, $aprobados + $reprobados)) * 100, 2) : 0.0;
             $carnets = (int)$pdo->query('SELECT COUNT(*) FROM carnets')->fetchColumn();
 
-            return ['success' => true, 'estadisticas' => ['total_usuarios' => $totalUsuarios, 'usuarios_activos' => $usuariosActivos, 'total_inscripciones' => $totalIns, 'inscripciones_pendientes' => $insPend, 'inscripciones_aprobadas' => $insAprob, 'total_exámenes' => $totalEx, 'tasa_aprobacion' => $tasa, 'carnets_emitidos' => $carnets]];
+            return ['success' => true, 'estadisticas' => 
+                                                    ['total_usuarios' => $totalUsuarios, 
+                                                    'usuarios_activos' => $usuariosActivos, 
+                                                    'total_inscripciones' => $totalIns, 
+                                                    'inscripciones_pendientes' => $insPend, 
+                                                    'inscripciones_aprobadas' => $insAprob, 
+                                                    'total_exámenes' => $totalEx, 
+                                                    'tasa_aprobacion' => $tasa, 
+                                                    'carnets_emitidos' => $carnets]];
         } catch (Exception $e) {
             $this->log('Error al obtener estadísticas', 'ERROR', ['error' => $e->getMessage()]);
             return [
@@ -1136,7 +1190,15 @@ class AdminControlador
                                                 )->fetchAll(\PDO::FETCH_ASSOC);
 
             $this->log('Reporte generado', 'INFO', ['fecha_inicio' => $fecha_inicio, 'fecha_fin' => $fecha_fin]);
-            return ['success' => true, 'reporte' => ['periodo' => "{$fecha_inicio} a {$fecha_fin}", 'nuevas_inscripciones' => (int)$nuevas, 'documentacion_validada' => (int)$docVal, 'exámenes_realizados' => (int)$exReal, 'aprobados' => (int)$ap, 'reprobados' => (int)$rep, 'carnets_emitidos' => (int)$carn, 'detalles' => $detalles]];
+            return ['success' => true, 'reporte' => 
+                                        ['periodo' => "{$fecha_inicio} a {$fecha_fin}",
+                                        'nuevas_inscripciones' => (int)$nuevas, 
+                                        'documentacion_validada' => (int)$docVal, 
+                                        'exámenes_realizados' => (int)$exReal, 
+                                        'aprobados' => (int)$ap, 
+                                        'reprobados' => (int)$rep, 
+                                        'carnets_emitidos' => (int)$carn, 
+                                        'detalles' => $detalles]];
         } catch (Exception $e) {
             $this->log('Error al generar reporte', 'ERROR', ['error' => $e->getMessage()]);
             return [

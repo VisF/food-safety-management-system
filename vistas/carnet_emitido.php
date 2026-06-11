@@ -9,7 +9,7 @@
  */
 class CarnetEmitidoVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentos/';
 
     private function getHeader(): void
     {
@@ -174,4 +174,4 @@ class CarnetEmitidoVista
     }
 }
 
-(new CarnetEmitidoVista())->mostrar();
+

@@ -4,6 +4,8 @@ declare(strict_types=1);
 /**
  * InscripcionControlador - Gestión de inscripciones a cursos y exámenes
  */
+require_once __DIR__ . '/../Constantes/EstadoTramite.php';
+
 
 class InscripcionControlador
 {

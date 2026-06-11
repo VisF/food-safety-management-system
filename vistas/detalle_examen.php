@@ -26,22 +26,170 @@ class DetalleExamenVista
         }
         include __DIR__ . '/header.php';
         ?>
-        <main class="app-container">
-            <div class="app-vista-card">
-                <h1 class="text-2xl font-semibold"><?php echo htmlspecialchars($data['title']); ?></h1>
-                <p class="mt-2">Nombre: <?php echo htmlspecialchars($data['exam']['nombre']); ?></p>
-                <p>Fecha: <?php echo htmlspecialchars($data['exam']['fecha']); ?></p>
-                <p>Lugar: <?php echo htmlspecialchars($data['exam']['lugar']); ?></p>
+        <main class="contenido-principal contenido-principal--ancho">
 
-                <div class="mt-4">
-                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/confirmar_inscripcion_examen&data=" class="app-vista-button app-vista-button--primary">Inscribirme</a>
-                    <a href="<?= BASE_URL ?>/manipulacionDeAlimentos/index"class="app-vista-button app-vista-button--secondary">Volver</a>
+            <div class="w-full max-w-4xl mx-auto space-y-6">
+
+                <section class="space-y-1">
+                    <p class="text-sm text-on-surface-variant">
+                        Próximo examen
+                    </p>
+
+                    <h1 class="font-headline-lg text-headline-lg text-primary">
+                        <?php echo htmlspecialchars($data['exam']['nombre'] ?? 'Examen'); ?>
+                    </h1>
+                </section>
+
+                <section
+                        class="app-vista-card overflow-hidden relative"
+                        style="
+                        background: linear-gradient(
+                                                    135deg,
+                                                    #005596 0%,
+                                                    #3a5f94 100%
+                                                );
+                           
+                            background-size: cover;
+                            background-position: center;
+                            min-height: 128px;
+                        "
+                    >
+
+                        <div
+                            style="
+                                position:relative;
+                                z-index:1;
+                                padding:1rem 1.25rem;
+                                height:130px;
+                                color:white;
+                            "
+                        >
+
+                            <div
+                                style="
+                                    display:grid;
+                                    grid-template-columns:1fr auto;
+                                    gap:20px;
+                                    align-items:center;
+                                "
+                            >
+
+                                <div>
+
+                                    <div
+                                        style="
+                                            display:inline-block;
+                                            background:rgba(255,255,255,.15);
+                                            border-radius:999px;
+                                            padding:.4rem .8rem;
+                                            font-size:.75rem;
+                                            font-weight:600;
+                                            margin-bottom:.75rem;
+                                        "
+                                    >
+                                        CUPOS DISPONIBLES
+                                    </div>
+
+                                    <h2
+                                        style="
+                                            margin:0;
+                                            font-size:2rem;
+                                            font-weight:700;
+                                            line-height:1;
+                                        "
+                                    >
+                                        CRESTA
+                                    </h2>
+
+                                    <div
+                                        style="
+                                            margin-top:.5rem;
+                                            font-size:1rem;
+                                        "
+                                    >
+                                        Centro Universitario
+                                    </div>
+
+                                </div>
+
+                                <div style="text-align:right; min-width:120px;">
+
+                                    <div
+                                        style="
+                                            font-size:2rem;
+                                            font-weight:700;
+                                            line-height:1;
+                                        "
+                                    >
+                                        OCT 24
+                                    </div>
+
+                                    <div
+                                        style="
+                                            margin-top:.75rem;
+                                            font-size:1.1rem;
+                                            font-weight:600;
+                                        "
+                                    >
+                                        09:00 hs
+                                    </div>
+
+                                    <div
+                                        style="
+                                            margin-top:.25rem;
+                                            font-size:.95rem;
+                                        "
+                                    >
+                                        Aula 3
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </section>
+
+                <section class="app-vista-card">
+
+                    <h3 class="font-semibold text-lg mb-4">
+                        Información importante
+                    </h3>
+
+                    <ul class="space-y-2 text-on-surface-variant text-sm">
+                        <li>• Presentarse 15 minutos antes del horario indicado.</li>
+                        <li>• Llevar DNI físico.</li>
+                        <li>• La inscripción será validada por el sistema.</li>
+                        <li>• Los cupos son limitados.</li>
+                    </ul>
+
+                </section>
+
+                <div class="space-y-3">
+
+                    <a
+                        href="/manipulacionDeAlimentos/confirmar_inscripcion_examen"
+                        class="app-vista-button app-vista-button--primary w-full text-center"
+                    >
+                        Inscribirme al examen
+                    </a>
+
+                    <a
+                        href="/manipulacionDeAlimentos/"
+                        class="app-vista-button app-vista-button--secondary w-full text-center"
+                    >
+                        Volver
+                    </a>
+
                 </div>
+
             </div>
+
         </main>
         <?php
         include __DIR__ . '/footer.php';
     }
 }
 
-DetalleExamenVista::mostrar();
+

@@ -10,7 +10,7 @@
  */
 class InscripcionExamenVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentosAPI/';
+    private string $baseURL = '/ManipulacionDeAlimentos/';
 
     private function getDefaultData(): array
     {

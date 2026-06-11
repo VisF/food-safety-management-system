@@ -51,7 +51,7 @@ $linkClass = static function (string $route) use ($currentRoute): string {
     Novedades
    </span>
    </a>
-   <a<?php echo $currentRoute === 'inicio' ? ' aria-current="page"' : ''; ?> class="<?php echo $linkClass('inicio'); ?>" href="<?php echo $routeUrl('inicio'); ?>">
+   <a<?php echo $currentRoute === 'inicio' ? ' aria-current="page"' : ''; ?> class="<?php echo $linkClass('inicio'); ?>" href="<?php echo $routeUrl('index.php'); ?>">
    <span class="material-symbols-outlined icono-relleno" data-icon="home">
     home
    </span>
