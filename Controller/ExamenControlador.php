@@ -26,6 +26,7 @@ class ExamenControlador
     private const LOG_FILE = __DIR__ . '/../logs/examen_controller.log';
     private const NOTA_MINIMA_APROBACION = 60;
     private const ASISTENCIA_MINIMA_PRESENCIAL = 80.0; // 80%
+    private const BASE_PATH = '/manipulacionDeAlimentos';
 
     private ?ExamenModelo $examenModelo = null;
     private ?ResultadoExamenModelo $resultadoExamenModelo = null;
@@ -37,6 +38,96 @@ class ExamenControlador
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         $this->inicializarModelos();
     }
+    public function guardar(): void
+    {
+        require_once __DIR__ . '/../modelo/ExamenModelo.php';
+
+        $fecha = trim($_POST['fecha'] ?? '');
+        $hora = trim($_POST['hora'] ?? '');
+        $cupos = (int)($_POST['cupos'] ?? 0);
+        $ubicacion = trim($_POST['ubicacion'] ?? '');
+        $aula = trim($_POST['aula'] ?? '');
+
+        $errores = [];
+
+        if ($fecha === '') {
+            $errores[] = 'Debe indicar una fecha.';
+        }
+
+        if ($hora === '') {
+            $errores[] = 'Debe indicar una hora.';
+        }
+
+        if ($cupos <= 0) {
+            $errores[] = 'Los cupos deben ser mayores a cero.';
+        }
+
+        if ($ubicacion === '') {
+            $errores[] = 'Debe indicar una ubicación.';
+        }
+
+        if ($aula === '') {
+            $errores[] = 'Debe indicar un aula.';
+        }
+
+        if (!empty($errores)) {
+
+            $data = [
+                'error' => implode(' ', $errores),
+                'fecha_display' => $_POST['fecha_display'] ?? '',
+                'hora' => $hora,
+                'cupos' => (string)$cupos,
+                'ubicacion' => $ubicacion,
+                'aula' => $aula
+            ];
+
+            header(
+                'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
+                urlencode(json_encode($data))
+            );
+            exit;
+        }
+
+        $modelo = new ExamenModelo();
+
+        $resultado = $modelo->crear([
+            'fecha' => $fecha,
+            'hora' => $hora,
+            'ubicacion' => $ubicacion,
+            'aula' => $aula,
+            'cupos' => $cupos
+        ]);
+
+        if ($resultado === false) {
+
+            $data = [
+                'error' => 'No fue posible crear el examen.',
+                'fecha_display' => $_POST['fecha_display'] ?? '',
+                'hora' => $hora,
+                'cupos' => (string)$cupos,
+                'ubicacion' => $ubicacion,
+                'aula' => $aula
+            ];
+
+            header(
+                'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
+                urlencode(json_encode($data))
+            );
+            exit;
+        }
+
+        $data = [
+            'success' => true,
+            'message' => 'Fecha de examen creada correctamente.'
+        ];
+
+        header(
+            'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
+            urlencode(json_encode($data))
+        );
+        exit;
+    }
+
 
     /**
      * Inicializar todas las dependencias de modelos
@@ -139,14 +230,28 @@ class ExamenControlador
                 $e = $this->examenModelo->obtenerPorId($id);
                 $pdoFile = __DIR__ . '/../db/Connection.php'; if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $stmt = $pdo->prepare('SELECT COUNT(*) as c FROM inscripciones WHERE examen_id = :id'); $stmt->execute([':id' => $id]); $c = (int)$stmt->fetchColumn(); } else { $c = 0; }
                 $cupos = (int)($e['cupos'] ?? $e['cupos_totales'] ?? 0);
-                return ['id' => $id, 'fecha' => $e['fecha'] ?? '', 'hora' => $e['hora'] ?? '', 'ubicacion' => $e['ubicacion'] ?? $e['lugar'] ?? '', 'cupos_totales' => $cupos, 'cupos_disponibles' => max(0, $cupos - $c), 'total_inscriptos' => $c, 'estado' => $e['estado'] ?? ''];
+                return ['id' => $id, 
+                'fecha' => $e['fecha'] ?? '', 
+                'hora' => $e['hora'] ?? '', 
+                'ubicacion' => $e['ubicacion'] ?? $e['lugar'] ?? '',
+                 'cupos_totales' => $cupos,
+                  'cupos_disponibles' => max(0, $cupos - $c), 
+                  'total_inscriptos' => $c, 
+                  'estado' => $e['estado'] ?? ''];
             }
             $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) return []; require_once $conn; $pdo = Connection::getPDO();
             $sql = 'SELECT e.*, COUNT(i.id) as total_inscriptos FROM examenes e LEFT JOIN inscripciones i ON i.examen_id = e.id WHERE e.id = :id GROUP BY e.id';
             $stmt = $pdo->prepare($sql); $stmt->execute([':id' => $id]); $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$row) return [];
             $cupos = (int)($row['cupos'] ?? $row['cupos_totales'] ?? 0);
-            return ['id' => $id, 'fecha' => $row['fecha'] ?? '', 'hora' => $row['hora'] ?? '', 'ubicacion' => $row['ubicacion'] ?? $row['lugar'] ?? '', 'cupos_totales' => $cupos, 'cupos_disponibles' => max(0, $cupos - (int)$row['total_inscriptos']), 'total_inscriptos' => (int)$row['total_inscriptos'], 'estado' => $row['estado'] ?? ''];
+            return ['id' => $id, 
+                    'fecha' => $row['fecha'] ?? '',
+                     'hora' => $row['hora'] ?? '', 
+                    'ubicacion' => $row['ubicacion'] ?? $row['lugar'] ?? '',
+                     'cupos_totales' => $cupos, 
+                     'cupos_disponibles' => max(0, $cupos - (int)$row['total_inscriptos']),
+                      'total_inscriptos' => (int)$row['total_inscriptos'],
+                       'estado' => $row['estado'] ?? ''];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_OBTENER_DETALLE_EXAMEN', ['id' => $id, 'error' => $e->getMessage()]);
             return [];

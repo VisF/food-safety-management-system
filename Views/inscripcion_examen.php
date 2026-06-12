@@ -269,4 +269,3 @@ class InscripcionExamenVista
     }
 }
 
-(new InscripcionExamenVista())->mostrar();

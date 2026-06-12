@@ -10,7 +10,7 @@ declare(strict_types=1);
  * - hora: hora del examen
  * - ubicacion: ubicación física del examen
  * - cupos: cantidad de cupos disponibles
- * - estado: estado del examen (pendiente, en progreso, finalizado)
+ * - activo: indicador de si el examen está activo
  * - id_estado_tramite: ID del estado de trámite asociado
  */
 
@@ -21,7 +21,7 @@ class ExamenModelo
     private string $hora;
     private string $ubicacion;
     private int $cupos;
-    private string $estado;
+    private int $activo;
     private int $id_estado_tramite;
 
     // Conexión a BD (PDO)
@@ -97,12 +97,12 @@ class ExamenModelo
 
         if (!$fecha || !$hora || $cupos <= 0) return false;
 
-        $sql = 'INSERT INTO examenes (fecha, hora, ubicacion, aula, cupos, estado) VALUES (:fecha, :hora, :ubicacion, :aula, :cupos, :estado)';
+        $sql = 'INSERT INTO examenes (fecha, hora, ubicacion, aula, cupos, activo) VALUES (:fecha, :hora, :ubicacion, :aula, :cupos, :activo)';
         $stmt = $this->conexion->prepare($sql);
-        $params = [':fecha' => $fecha, ':hora' => $hora, ':ubicacion' => $ubicacion, ':aula' => $aula, ':cupos' => $cupos, ':estado' => 'pendiente'];
+        $params = [':fecha' => $fecha, ':hora' => $hora, ':ubicacion' => $ubicacion, ':aula' => $aula, ':cupos' => $cupos, ':activo' => 1];
         if ($stmt->execute($params)) {
             $id = (int)$this->conexion->lastInsertId();
-            return ['id' => $id, 'fecha' => $fecha, 'hora' => $hora, 'ubicacion' => $ubicacion, 'aula' => $aula, 'cupos' => $cupos];
+            return ['id' => $id, 'fecha' => $fecha, 'hora' => $hora, 'ubicacion' => $ubicacion, 'aula' => $aula, 'cupos' => $cupos, 'activo' => 1];
         }
 
         return false;
@@ -118,7 +118,7 @@ class ExamenModelo
     {
         if (!$this->conexion) return false;
 
-        $allowed = ['fecha','hora','ubicacion','aula','cupos','estado'];
+        $allowed = ['fecha','hora','ubicacion','aula','cupos','activo'];
         $sets = [];
         $params = [':id' => $id];
         foreach ($allowed as $f) {
@@ -213,9 +213,9 @@ class ExamenModelo
      * Obtener estado
      * @return string
      */
-    public function getEstado(): string
+    public function getActivo(): int
     {
-        return $this->estado;
+        return $this->activo;
     }
 
     /**
@@ -279,13 +279,13 @@ class ExamenModelo
     }
 
     /**
-     * Establecer estado
-     * @param string $estado
+     * Establecer activo
+     * @param int $activo
      * @return void
      */
-    public function setEstado(string $estado): void
+    public function setActivo(int $activo): void
     {
-        $this->estado = $estado;
+        $this->activo = $activo;
     }
 
     /**

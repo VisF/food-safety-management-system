@@ -1,11 +1,11 @@
 <?php
-
+//---------- Rutas relacionadas con inscripciones a exámenes ---------
 $router->map(
     'GET',
     '/inscripciones',
     function () {
         
-    require_once __DIR__ . '/../controlador/InscripcionControlador.php';
+    require_once __DIR__ . '/../Controller/InscripcionControlador.php';
 
     $controller = new InscripcionControlador();
 
@@ -18,7 +18,7 @@ $router->map(
     '/inscripciones',
     function () {
         
-    require_once __DIR__ . '/../controlador/InscripcionControlador.php';
+    require_once __DIR__ . '/../Controller/InscripcionControlador.php';
 
     $controller = new InscripcionControlador();
 
@@ -29,20 +29,20 @@ $router->map(
 
 
 
-
+//---------- Rutas relacionadas con la página de inicio ---------
 
 $router->map(
     'GET',
     '/',
     function () {
 
-        require_once __DIR__ . '/../controlador/HomeControlador.php';
+        require_once __DIR__ . '/../Controller/HomeControlador.php';
 
         $controller = new HomeControlador();
 
         $datos = $controller->mostrarIndex();
 
-        require_once __DIR__ . '/../vistas/index.php';
+        require_once __DIR__ . '/../Views/index.php';
 
         $vista = new InicioVista();
 
@@ -52,10 +52,23 @@ $router->map(
 
 $router->map(
     'GET',
+    '/subida_documentacion',
+    function () {
+
+        require_once __DIR__ . '/../Views/subida_documentacion.php';
+
+        $vista = new SubidaDocumentacionVista();
+        $vista->mostrar();
+    }
+);
+
+//---------- Rutas relacionadas con la autenticación ---------
+$router->map(
+    'GET',
     '/login',
     function () {
 
-        require_once __DIR__ . '/../controlador/AuthControlador.php';
+        require_once __DIR__ . '/../Controller/AuthControlador.php';
 
         $controller = new AuthControlador();
 
@@ -68,7 +81,7 @@ $router->map(
     '/login',
     function () {
 
-        require_once __DIR__ . '/../controlador/AuthControlador.php';
+        require_once __DIR__ . '/../Controller/AuthControlador.php';
 
         $controller = new AuthControlador();
 
@@ -92,7 +105,7 @@ $router->map(
     '/logout',
     function () {
 
-        require_once __DIR__ . '/../controlador/AuthControlador.php';
+        require_once __DIR__ . '/../Controller/AuthControlador.php';
 
         $controller = new AuthControlador();
 
@@ -100,13 +113,13 @@ $router->map(
     }
 );
 
-
+//---------- Rutas relacionadas con el registro de usuarios ---------
 $router->map(
     'POST',
     '/registro',
     function () {
 
-        require_once __DIR__ . '/../controlador/AuthControlador.php';
+        require_once __DIR__ . '/../Controller/AuthControlador.php';
 
         $controller = new AuthControlador();
 
@@ -119,26 +132,26 @@ $router->map(
     '/registro',
     function () {
 
-        require_once __DIR__ . '/../controlador/AuthControlador.php';
+        require_once __DIR__ . '/../Controller/AuthControlador.php';
 
         $controller = new AuthControlador();
 
         $controller->mostrarRegistro();
     }
 );
-
+//---------- Rutas relacionadas con el panel de administración ---------
 $router->map(
     'GET',
     '/admin',
     function () {
 
-        require_once __DIR__ . '/../controlador/AdminControlador.php';
+        require_once __DIR__ . '/../Controller/AdminControlador.php';
 
         $controller = new AdminControlador();
 
         //$estadisticas = $controller->obtenerEstadisticas();
 
-        require_once __DIR__ . '/../vistas/panel_admin.php';
+        require_once __DIR__ . '/../Views/panel_admin.php';
 
         $vista = new PanelAdminVista();
 
@@ -146,12 +159,14 @@ $router->map(
     }
 );
 
+
+//---------- Rutas relacionadas con exámenes ---------
 $router->map(
     'GET',
     '/crear_examen',
     function () {
 
-        require_once __DIR__ . '/../vistas/crear_examen.php';
+        require_once __DIR__ . '/../Views/crear_examen.php';
 
         $vista = new CrearExamenVista();
 
@@ -160,35 +175,38 @@ $router->map(
 );
 
 $router->map(
+    'POST',
+    '/crear_examen_guardar',
+    function () {
+
+        require_once __DIR__ . '/../Controller/ExamenControlador.php';
+
+        $controlador = new ExamenControlador();
+
+        $controlador->guardar();
+    }
+);
+
+//---------- Rutas relacionadas con otras vistas ---------
+$router->map(
     'GET',
     '/actividad_reciente',
     function () {
 
-        require_once __DIR__ . '/../vistas/actividad_reciente.php';
+        require_once __DIR__ . '/../Views/actividad_reciente.php';
 
         $vista = new ActividadRecienteVista();
 
         $vista->mostrar();
     }
 );
-/*
-$router->map(
-    'GET',
-    '/detalle_examen',
-    function () {
 
-        require_once __DIR__ . '/../vistas/detalle_examen.php';
-
-        DetalleExamenVista::mostrar();
-    }
-);
-*/
 $router->map(
     'GET',
     '/confirmar_inscripcion_examen',
     function () {
 
-        require_once __DIR__ . '/../vistas/confirmar_inscripcion_examen.php';
+        require_once __DIR__ . '/../Views/confirmar_inscripcion_examen.php';
 
         ConfirmarInscripcionExamenVista::mostrar();
     }
@@ -201,22 +219,40 @@ $router->map(
     '/detalle_examen',
     function () {
 
+        require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+
+        $idExamen = (int)($_GET['id'] ?? 0);
+
+        $modelo = new ExamenModelo();
+
+        $examen = $modelo->obtenerPorId($idExamen);  
+
+
+        if ($examen === null) {
+            http_response_code(404);
+            echo 'Examen no encontrado';
+            return;
+        }
+
         $datos = [
             'title' => 'Detalle del examen',
             'exam' => [
-                'id' => 1,
-                'nombre' => 'CRESTA',
-                'fecha' => '24/10/2026',
-                'hora' => '09:00',
-                'lugar' => 'Aula 3',
-                'cupos' => 30,
-                'estado' => 'CUPOS DISPONIBLES'
+                'id' => $examen['id'],
+                'nombre' => 'Examen de Manipulación de Alimentos',
+                'fecha' => date('d/m/Y', strtotime($examen['fecha'])),
+                'hora' => substr($examen['hora'], 0, 5),
+                'lugar' => $examen['ubicacion']
+                    . (!empty($examen['aula']) ? ' - ' . $examen['aula'] : ''),
+                'cupos' => $examen['cupos'],
+                'estado' => ((int)$examen['cupos'] > 0)
+                    ? 'CUPOS DISPONIBLES'
+                    : 'SIN CUPOS'
             ]
         ];
 
         $_GET['data'] = json_encode($datos);
 
-        require_once __DIR__ . '/../vistas/detalle_examen.php';
+        require_once __DIR__ . '/../Views/detalle_examen.php';
 
         DetalleExamenVista::mostrar();
     }
@@ -227,17 +263,22 @@ $router->map(
     '/inscripcion/confirmar',
     function () {
 
-        require_once __DIR__ . '/../controlador/InscripcionControlador.php';
+        require_once __DIR__ . '/../Controller/InscripcionControlador.php';
 
         $controller = new InscripcionControlador();
 
         $resultado = $controller->procesarInscripcionExamen($_POST);
+       if ($resultado['success']) {
+            header(
+                'Location: /manipulacionDeAlimentos/index.php?toast=inscripcion_exitosa'
+            );
+        } else {
+            header(
+                'Location: /manipulacionDeAlimentos/index.php?toast=curso_no_aprobado'
+            );
+        }
 
-        $_SESSION['success_message'] =
-            'Te inscribiste correctamente al examen.';
-
-        header('Location: /manipulacionDeAlimentos/');
-        exit;
+    exit;
     }
 );
 
@@ -253,8 +294,38 @@ $router->map(
         ]);
 
         console.log("Confirmar inscripción al examen CRESTA");
-        require_once __DIR__ . '/../vistas/confirmar_inscripcion_examen.php';
+        require_once __DIR__ . '/../Views/confirmar_inscripcion_examen.php';
 
         ConfirmarInscripcionExamenVista::mostrar();
+    }
+);
+
+//Para borrar despues
+$router->map(
+    'GET',
+    '/detalle_tramite',
+    function () {
+
+        $datos = [
+            'title' => 'Detalle del trámite',
+            'tramite' => [
+                'id' => 123,
+                'estado' => 'EN PROCESO',
+                'fecha' => '15/09/2026',
+                'dni' => '12345678',
+                'curso' => 'Aprobado',
+                'examen' => 'Pendiente',
+                'documentacion' => 'Completa'
+            ]
+        ];
+
+        $_GET['data'] = json_encode(
+            $datos,
+            JSON_UNESCAPED_UNICODE
+        );
+
+        require_once __DIR__ . '/../Views/detalle_tramite.php';
+
+        DetalleTramiteVista::mostrar();
     }
 );

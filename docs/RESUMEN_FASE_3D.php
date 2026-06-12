@@ -17,13 +17,13 @@ echo "║                                                                       
 echo "╚══════════════════════════════════════════════════════════════════════════════╝\n\n";
 
 echo "📦 DIPACONTROLADOR\n";
-echo "   Ubicación: /controlador/DipaControlador.php\n";
+echo "   Ubicación: ControllerDipaControlador.php\n";
 echo "   Métodos:   13 métodos públicos\n";
 echo "   Modelos:   InscripcionModelo, CarnetModelo, ResultadoExamenModelo, ExamenModelo\n";
 echo "   Funciones: Exportar/importar carnets, sincronizar con DIPA, generar reportes\n\n";
 
 echo "📮 NOTIFICACIONCONTROLADOR\n";
-echo "   Ubicación: /controlador/NotificacionControlador.php\n";
+echo "   Ubicación: ControllerNotificacionControlador.php\n";
 echo "   Métodos:   18 métodos públicos\n";
 echo "   Modelos:   NotificacionModelo, UsuarioModelo, InscripcionModelo, DocumentoModelo, ResultadoExamenModelo\n";
 echo "   Funciones: Enviar emails, gestionar notificaciones, generar plantillas, procesar cola\n\n";

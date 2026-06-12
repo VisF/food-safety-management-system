@@ -27,6 +27,7 @@
     </span>
    </button>
   </header>
+  <div id="toast-container"></div>
 <?php
 $usuarioLogueado = !empty($_SESSION['usuario_id']);
 
@@ -44,6 +45,7 @@ if (preg_match('#/vistas$#', $assetBase) === 1) {
 }
 if ($assetBase === '') { $assetBase = ''; }
 ?>
+<script src="<?= BASE_URL ?>/js/notificaciones.js"></script>
 <script src="<?php echo $assetBase; ?>/js/sample-data.js"></script>
 <script>
 (function(){

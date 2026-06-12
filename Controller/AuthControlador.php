@@ -38,9 +38,9 @@ class AuthControlador
     private const MAX_LOGIN_ATTEMPTS = 5;
     private const LOCKOUT_TIME = 900; // 15 minutos
 
-    private const VIEW_LOGIN = __DIR__ . '/../vistas/login.php';
-    private const VIEW_REGISTRO = __DIR__ . '/../vistas/registro.php';
-    private const VIEW_PERFIL = __DIR__ . '/../vistas/perfil.php';
+    private const VIEW_LOGIN = __DIR__ . '/../Views/login.php';
+    private const VIEW_REGISTRO = __DIR__ . '/../Views/registro.php';
+    private const VIEW_PERFIL = __DIR__ . '/../Views/perfil.php';
 
     private ?UsuarioModelo $usuarioModelo = null;
 

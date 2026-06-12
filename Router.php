@@ -8,13 +8,13 @@ declare(strict_types=1);
 // ----------------------------------------------------
 
 // Cargar controladores (si existen)
-$authControllerFile = __DIR__ . '/controlador/AuthControlador.php';
-$inscripcionControllerFile = __DIR__ . '/controlador/InscripcionControlador.php';
-$reporteControllerFile = __DIR__ . '/controlador/ReporteControlador.php';
-$tramiteControllerFile = __DIR__ . '/controlador/TramiteControlador.php';
-$usuarioControllerFile = __DIR__ . '/controlador/UsuarioControlador.php';
-$adminControllerFile = __DIR__ . '/controlador/AdminControlador.php';
-$homeControllerFile = __DIR__ . '/controlador/HomeControlador.php';
+$authControllerFile = __DIR__ . '/Controller/AuthControlador.php';
+$inscripcionControllerFile = __DIR__ . '/Controller/InscripcionControlador.php';
+$reporteControllerFile = __DIR__ . '/Controller/ReporteControlador.php';
+$tramiteControllerFile = __DIR__ . '/Controller/TramiteControlador.php';
+$usuarioControllerFile = __DIR__ . '/Controller/UsuarioControlador.php';
+$adminControllerFile = __DIR__ . '/Controller/AdminControlador.php';
+$homeControllerFile = __DIR__ . '/Controller/HomeControlador.php';
 
 
 // ---------- MIDDLEWARES ----------
@@ -177,7 +177,7 @@ if ($route === 'index') {
 
     $datos = $homeControlador->mostrarIndex();
 
-    require_once __DIR__ . '/vistas/index.php';
+    require_once __DIR__ . '/Views/index.php';
 
     $vista = new InicioVista();
     $vista->mostrar($datos);
@@ -703,7 +703,7 @@ $actualRoute = $routeMap[$route] ?? $route;
 
 $file =
     __DIR__ .
-    '/vistas/' .
+    '/Views/' .
     $actualRoute .
     '.php';
 

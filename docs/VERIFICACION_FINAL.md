@@ -37,7 +37,7 @@
 
 ---
 
-## ✅ Controladores Creados en `/controlador/`
+## ✅ Controladores Creados en `/Controller/`
 
 ```
 16 archivos, 158 métodos públicos + 17 privados

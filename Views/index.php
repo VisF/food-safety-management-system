@@ -110,6 +110,28 @@ class InicioVista
     {
         $this->getHeader($inicioData);
         ?>
+        <?php if (($_GET['toast'] ?? '') === 'inscripcion_exitosa'): ?>
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                mostrarToast(
+                    'Inscripción realizada correctamente',
+                    'success'
+                );
+            });
+            console.log("Toast de inscripción exitosa mostrado");
+            </script>
+        <?php endif; ?>
+        <?php if (($_GET['toast'] ?? '') === 'curso_no_aprobado'): ?>
+            <script>
+            document.addEventListener('DOMContentLoaded', () => {
+                mostrarToast(
+                    'Debe aprobar el curso antes de rendir examen',
+                    'error'
+                );
+            });
+            console.log("Toast de curso no aprobado mostrado");
+            </script>
+        <?php endif; ?>
 
                     <main class="contenido-principal">
                        <section style="margin-bottom: 22px; padding-inline: 2px;">
@@ -153,7 +175,7 @@ class InicioVista
 
                         <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('detalle_examen'); ?>" role="button">
                          <span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
-                         Inscribirse a examen
+                         Cargar documentos
                         </a>
                      </article>
 
@@ -206,9 +228,14 @@ class InicioVista
                                  <?php endif; ?>
                                  <?php echo $this->e($this->getExamBadgeText((int) $exam['available'])); ?>
                                 </span>
-                                <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute((string) $exam['route']); ?>" role="button" style="margin-top: 10px;">
-                                 Inscribirse
-                                </a>
+                                    <a
+                                        class="app-vista-button app-vista-button--primary"
+                                        href="/manipulacionDeAlimentos/detalle_examen?id=<?php echo (int)$exam['id']; ?>"
+                                        role="button"
+                                        style="margin-top: 10px;"
+                                    >
+                                        Inscribirse
+                                    </a>
                              </div>
                             </div>
                          </article>

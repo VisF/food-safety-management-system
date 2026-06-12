@@ -46,7 +46,7 @@ manipulaciondealimentos/
 │   ├── CarnetModelo.php
 │   └── ... (10 más)
 │
-├── controlador/                        🎮 16 Controladores
+├── Controller/                        🎮 16 Controladores
 │   ├── AuthControlador.php
 │   ├── InscripcionControlador.php
 │   ├── ExamenControlador.php
@@ -54,7 +54,7 @@ manipulaciondealimentos/
 │   ├── InspectorControlador.php
 │   └── ... (11 más)
 │
-├── vistas/                             👁️ 26 Vistas HTML
+├── Views/                             👁️ 26 Vistas HTML
 │   ├── index.php (dashboard)
 │   ├── inscripcion_examen.php
 │   ├── panel_admin.php

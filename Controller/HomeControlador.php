@@ -19,6 +19,7 @@ require_once __DIR__ . '/../modelo/InscripcionModelo.php';
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../modelo/DocumentoModelo.php';
 
+require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 
 class HomeControlador
 {
@@ -124,7 +125,29 @@ class HomeControlador
                 'route' => 'subida_documentacion',
                 'state' => $doc->getValidado()
             ];
-    }
+        }
+        $modeloExamen = new ExamenModelo();
+
+        $examenesBD = $modeloExamen->obtenerProximos(5);
+
+        $examenesVista = [];
+
+        foreach ($examenesBD as $examen) {
+
+            $fecha = new DateTime($examen['fecha']);
+
+            $examenesVista[] = [
+                'month' => strtoupper($fecha->format('M')),
+                'day' => $fecha->format('d'),
+                'title' => 'Examen de Manipulación de Alimentos',
+                'time' => substr($examen['hora'], 0, 5),
+                'place' => $examen['ubicacion']
+                    . (!empty($examen['aula']) ? ' - ' . $examen['aula'] : ''),
+                'available' => ((int)$examen['cupos'] > 0) ? 1 : 0,
+                'route' => 'inscripcion_examen?id=' . $examen['id'],
+                'id' => (int)$examen['id']
+            ];
+        }
 
     return [
         'page_title' => 'App Ciudadana - Inicio',
@@ -153,17 +176,7 @@ class HomeControlador
 
         'documentos' => $documentosVista,
 
-        'examenes' => [
-            [
-                'month' => 'OCT',
-                'day' => '24',
-                'title' => 'CRESTA',
-                'time' => '09:00 AM',
-                'place' => 'Aula 3',
-                'available' => 1,
-                'route' => 'inscripcion_examen',
-            ],
-        ],
+        'examenes' => $examenesVista,
 
         'carnet' => [
             'descarga_habilitada' => false,

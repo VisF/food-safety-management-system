@@ -280,7 +280,7 @@ InspectorControlador.buscarPorDNI()
 - **Contexto del Proyecto**: Ver `contexto.txt`
 - **Diagrama BD**: Ver `img_examples/diagrama bbdd.drawio.png`
 - **Custom Agent**: Ver `.github/agents/tudai-developer.agent.md`
-- **Vistas Existentes**: Ver `/vistas/` (26 archivos)
+- **Vistas Existentes**: Ver `/Views/` (26 archivos)
 
 ---
 
