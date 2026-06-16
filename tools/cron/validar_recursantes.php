@@ -1,7 +1,7 @@
 <?php
 // Script CLI: validar recursantes (ejecutar desde cron cada noche)
 
-require_once __DIR__ . '/../../modelo/PlazoRecursanteModelo.php';
+require_once __DIR__ . '/../../Modelo/PlazoRecursanteModelo.php';
 
 $model = new PlazoRecursanteModelo();
 $recursantes = $model->listarRecursantesVigentes();

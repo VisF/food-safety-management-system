@@ -9,8 +9,8 @@
  *
  * Dependencias: MoodleModelo, DocumentoModelo
  */
-require_once __DIR__ . '/../modelo/MoodleModelo.php';
-require_once __DIR__ . '/../modelo/DocumentoModelo.php';
+require_once __DIR__ . '/../Modelo/MoodleModelo.php';
+require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
 class MoodleControlador {
     protected $moodleModel;

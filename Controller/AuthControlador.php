@@ -12,7 +12,7 @@ require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
  * AuthControlador - Gestión de autenticación y registro de usuarios
  *
  * Dependencias esperadas:
- * - Modelo: modelo/UsuarioModelo.php (clase UsuarioModelo)
+ * - Modelo: Modelo/UsuarioModelo.php (clase UsuarioModelo)
  *
  * - Vistas:
  *   - vistas/login.php              (mostrar formulario login)
@@ -62,7 +62,7 @@ class AuthControlador
     private function inicializarModeloSiExiste(): void
     {
         // Si existe archivo de modelo, intentar cargarlo.
-        $modelFile = __DIR__ . '/../modelo/UsuarioModelo.php';
+        $modelFile = __DIR__ . '/../Modelo/UsuarioModelo.php';
         if (file_exists($modelFile)) {
             require_once $modelFile;
         }

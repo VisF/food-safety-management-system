@@ -5,7 +5,7 @@ declare(strict_types=1);
  * InscripcionControlador - Gestión de inscripciones a cursos y exámenes
  */
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
-
+require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
 class InscripcionControlador
 {
@@ -16,6 +16,7 @@ class InscripcionControlador
     private ?ExamenModelo $examenModelo = null;
     private ?FechaCursoModelo $fechaCursoModelo = null;
     private ?TipoInscripcionModelo $tipoInscripcionModelo = null;
+    private ?DocumentoModelo $documentoModelo = null;
 
     private function pdo(): \PDO
     {
@@ -36,6 +37,7 @@ class InscripcionControlador
         if (class_exists('ExamenModelo')) $this->examenModelo = new ExamenModelo();
         if (class_exists('FechaCursoModelo')) $this->fechaCursoModelo = new FechaCursoModelo();
         if (class_exists('TipoInscripcionModelo')) $this->tipoInscripcionModelo = new TipoInscripcionModelo();
+        if (class_exists('DocumentoModelo')) $this->documentoModelo = new DocumentoModelo();
     }
 
     private function registrarLog(string $evento, array $datos = []): void
@@ -261,30 +263,36 @@ class InscripcionControlador
     public function procesarInscripcionExamen(array $datos): array
     {
         $idUsuario =
-            (int)($datos['id_usuario']
-            ?? $_SESSION['user_id']
-            ?? 0);
+                (int)($datos['id_usuario']
+                ?? $_SESSION['usuario_id']
+                ?? 0);
 
-        if (
-            !$this->usuarioPuedeInscribirseExamen(
+        $validacion =
+            $this->usuarioPuedeInscribirseExamen(
                 $idUsuario
-            )
-        ) {
+            );
+
+
+        if (!$validacion['puede']) {
 
             return [
                 'success' => false,
                 'mensaje' =>
-                    'Debe aprobar el curso o validar Moodle antes de rendir examen'
+                    'Debe completar la documentación requerida',
+                'faltantes' =>
+                    $validacion['faltantes'] ?? []
             ];
         }
 
-        $idUsuario = (int)($datos['id_usuario'] ?? $_SESSION['user_id'] ?? 0);
-        $idExamen = (int)($datos['id_examen'] ?? 0);
+        $idExamen =
+            (int)($datos['id_examen'] ?? 0);
 
         if ($idUsuario <= 0 || $idExamen <= 0) {
+
             return [
                 'success' => false,
-                'mensaje' => 'Faltan datos para completar la inscripción',
+                'mensaje' =>
+                    'Faltan datos para completar la inscripción',
                 'inscripcion' => null
             ];
         }
@@ -293,19 +301,35 @@ class InscripcionControlador
             'usuario_id' => $idUsuario,
             'curso_id' => null,
             'examen_id' => $idExamen,
-            'tipo_inscripcion_id' => (int)($datos['id_tipo_inscripcion'] ?? 1),
-            'estado_tramite_id' => EstadoTramite::INSCRIPTO_EXAMEN, // inscripto_examen
-            'observaciones' => $datos['observaciones'] ?? null
+            'tipo_inscripcion_id' =>
+                (int)($datos['id_tipo_inscripcion'] ?? 2),
+            'estado_tramite_id' =>
+                EstadoTramite::INSCRIPTO_EXAMEN,
+            'observaciones' =>
+                $datos['observaciones'] ?? null
         ];
 
-        $res = $this->crearInscripcion($payload);
+        $res =
+            $this->crearInscripcion(
+                $payload
+            );
 
-        if ($res['success'] && $res['id']) {
-            return $this->confirmarInscripcionExamen((int)$res['id']);
+        if (
+            $res['success']
+            && !empty($res['id'])
+        ) {
+
+            return
+                $this->confirmarInscripcionExamen(
+                    (int)$res['id']
+                );
         }
 
         return $res;
     }
+
+
+
 
     public function obtenerDetalleInscripcion(int $id): array
     {
@@ -354,25 +378,76 @@ class InscripcionControlador
         } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_DETALLE_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]); return []; }
     }
 
-    private function usuarioPuedeInscribirseExamen(int $idUsuario): bool
+    private function usuarioPuedeInscribirseExamen(int $idUsuario): array
     {
-        $pdo = $this->pdo();
+        $documentos =
+            $this->documentoModelo
+                ->obtenerPorUsuario(
+                    $idUsuario
+                );
 
-        $sql = "
-            SELECT COUNT(*)
-            FROM inscripciones i
-            WHERE i.usuario_id = :usuario
-            AND i.estado_tramite_id = :estado
-        ";
 
-        $stmt = $pdo->prepare($sql);
+        
+        $tieneDni = false;
+        $tieneFoto = false;
+        $tieneAsistencia = false;
+        $tieneMoodle = false;
 
-        $stmt->execute([
-            ':usuario' => $idUsuario,
-            ':estado' => EstadoTramite::INSCRIPTO_EXAMEN
-        ]);
+        foreach ($documentos as $documento) {
 
-        return (int)$stmt->fetchColumn() > 0;
+            if (
+                ($documento['estado'] ?? '')
+                !== 'aprobado'
+            ) {
+                continue;
+            }
+
+            switch (
+                strtolower(
+                    $documento['tipo_documento']
+                )
+            ) {
+
+                case 'dni':
+                    $tieneDni = true;
+                    break;
+
+                case 'foto_carnet':
+                    $tieneFoto = true;
+                    break;
+
+                case 'asistencia':
+                    $tieneAsistencia = true;
+                    break;
+
+                case 'moodle':
+                    $tieneMoodle = true;
+                    break;
+            }
+        }
+
+        $faltantes = [];
+
+        if (!$tieneDni) {
+            $faltantes[] = 'DNI';
+        }
+
+        if (!$tieneFoto) {
+            $faltantes[] = 'Foto Carnet';
+        }
+
+        if (
+            !$tieneAsistencia
+            && !$tieneMoodle
+        ) {
+            $faltantes[] =
+                'Constancia de asistencia o certificado Moodle';
+        }
+
+        return [
+            'puede' => empty($faltantes),
+            'faltantes' => $faltantes
+        ];
     }
 
 

@@ -263,22 +263,32 @@ $router->map(
     '/inscripcion/confirmar',
     function () {
 
-        require_once __DIR__ . '/../Controller/InscripcionControlador.php';
+         require_once __DIR__ . '/../Controller/InscripcionControlador.php';
 
         $controller = new InscripcionControlador();
 
         $resultado = $controller->procesarInscripcionExamen($_POST);
-       if ($resultado['success']) {
+
+        if ($resultado['success']) {
+
             header(
                 'Location: /manipulacionDeAlimentos/index.php?toast=inscripcion_exitosa'
             );
+
         } else {
+
+            $toast =
+                urlencode(
+                    $resultado['mensaje']
+                    ?? 'No fue posible completar la inscripción'
+                );
+
             header(
-                'Location: /manipulacionDeAlimentos/index.php?toast=curso_no_aprobado'
+                "Location: /manipulacionDeAlimentos/index.php?toast_error={$toast}"
             );
         }
 
-    exit;
+        exit;
     }
 );
 

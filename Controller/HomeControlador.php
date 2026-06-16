@@ -14,12 +14,14 @@ require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
-require_once __DIR__ . '/../modelo/InscripcionModelo.php';
+require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
-require_once __DIR__ . '/../modelo/DocumentoModelo.php';
+require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
 require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+
+require_once __DIR__ . '/../Servicios/HomeService.php';
 
 class HomeControlador
 {
@@ -33,6 +35,9 @@ class HomeControlador
             new InscripcionService(
                 new InscripcionModelo()
             );
+
+        $this->homeService =
+            new HomeService();
 
         $this->documentoService =
             new DocumentoService(
@@ -84,14 +89,14 @@ class HomeControlador
         }
         $documentos = [];
 
-        if ($inscripcion !== null &&
+        if ($usuario !== null &&
             class_exists('DocumentoService') &&
-            class_exists('DocumentoModelo')) 
+            class_exists('DocumentoModelo'))
         {
             $documentos =
                 $this->documentoService
-                    ->obtenerPorInscripcion(
-                        $inscripcion->getId()
+                    ->obtenerPorUsuario(
+                        $usuario['id']
                     );
         }
         $this->log(
@@ -101,6 +106,7 @@ class HomeControlador
                 'usuario_id' => $usuario['id'] ?? null
             ]
         );
+
         $documentosVista = [];
 
         foreach ($documentos as $doc) {
@@ -149,6 +155,15 @@ class HomeControlador
             ];
         }
 
+
+        $accionPrincipal =
+            $this->homeService
+                ->obtenerAccionPrincipal(
+                    $documentos,
+                    $inscripcion
+                );
+        
+
     return [
         'page_title' => 'App Ciudadana - Inicio',
 
@@ -171,12 +186,22 @@ class HomeControlador
 
             'fecha_vencimiento' => null,
 
-            'progreso' => null
+            'progreso' => $accionPrincipal['porcentaje'] . '%',
+
+            'porcentaje' => $accionPrincipal['porcentaje'],
+
+            'accion_principal' => [
+                'texto' => $accionPrincipal['texto'],
+                'ruta' => $accionPrincipal['ruta']
+            ],
+            
         ],
 
         'documentos' => $documentosVista,
 
         'examenes' => $examenesVista,
+        
+        'documentos_faltantes' => $accionPrincipal['faltantes'],
 
         'carnet' => [
             'descarga_habilitada' => false,

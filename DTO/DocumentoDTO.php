@@ -24,7 +24,11 @@ class DocumentoDTO
             (int)($data['id_inscripcion'] ?? 0),
             (string)($data['tipo_documento'] ?? ''),
             (string)($data['ruta_archivo'] ?? ''),
-            (int)($data['validado'] ?? 0),
+            match ($data['estado'] ?? 'pendiente') {
+                        'aprobado' => 1,
+                        'rechazado' => -1,
+                        default => 0
+                    },
             (string)($data['fecha_subida'] ?? ''),
             $data['observaciones'] ?? null
         );

@@ -5,7 +5,7 @@
 
 ---
 
-## ✅ Modelos OOP Creados en `/modelo/`
+## ✅ Modelos OOP Creados en `/Modelo/`
 
 ```
 15 archivos, 87 métodos públicos

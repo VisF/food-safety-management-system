@@ -16,3 +16,22 @@
 [2026-06-11 22:45:38] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
 [2026-06-11 22:45:46] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
 [2026-06-12 19:21:27] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"admin@cresta.com"}
+[2026-06-16 19:36:03] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":1,"email":"alumno1@test.com"}
+[2026-06-16 19:59:48] [INFO] IP: ::1 | User logged out | {"usuario_id":1,"email":"alumno1@test.com"}
+[2026-06-16 20:00:10] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno3@test.com"}
+[2026-06-16 20:00:39] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":5,"email":"alumno5@test.com"}
+[2026-06-16 20:02:28] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno2@test.com"}
+[2026-06-16 20:04:01] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":5,"email":"alumno5@test.com"}
+[2026-06-16 20:04:15] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno3@test.com"}
+[2026-06-16 20:20:16] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":1,"email":"alumno1@test.com"}
+[2026-06-16 20:20:32] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno2@test.com"}
+[2026-06-16 20:20:45] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":5,"email":"alumno5@test.com"}
+[2026-06-16 20:21:46] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno2@test.com"}
+[2026-06-16 21:03:17] [WARNING] IP: ::1 | Failed login attempt | {"email":"alum5@test.com"}
+[2026-06-16 21:03:20] [WARNING] IP: ::1 | Failed login attempt | {"email":"alum5@test.com"}
+[2026-06-16 21:03:27] [WARNING] IP: ::1 | Failed login attempt | {"email":"alum5@test.com"}
+[2026-06-16 21:03:41] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-16 22:08:04] [WARNING] IP: ::1 | Session expired due to inactivity | {"user_id":6,"inactive_minutes":64}
+[2026-06-16 22:08:04] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-16 22:08:14] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-16 22:38:09] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}

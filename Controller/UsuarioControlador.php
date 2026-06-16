@@ -5,8 +5,8 @@ declare(strict_types=1);
  * UsuarioControlador - Gestión de usuarios del sistema
  * 
  * Dependencias esperadas:
- * - Modelo: modelo/UsuarioModelo.php (clase UsuarioModelo)
- * - Modelo: modelo/UsuarioRolModelo.php (clase UsuarioRolModelo)
+ * - Modelo: Modelo/UsuarioModelo.php (clase UsuarioModelo)
+ * - Modelo: Modelo/UsuarioRolModelo.php (clase UsuarioRolModelo)
  *
  * Vistas esperadas:
  * - vistas/usuarios_listado.php    (mostrar listado de usuarios)

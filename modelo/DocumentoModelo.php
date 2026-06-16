@@ -66,6 +66,25 @@ class DocumentoModelo
         return false;
     }
 
+    public function obtenerPorUsuario(int $usuarioId): array
+    {
+        if (!$this->conexion) {
+            return [];
+        }
+
+        $stmt = $this->conexion->prepare(
+            'SELECT * 
+            FROM documentos
+            WHERE usuario_id = :usuario_id'
+        );
+
+        $stmt->execute([
+            ':usuario_id' => $usuarioId
+        ]);
+
+        return $stmt->fetchAll();
+    }
+
     /**
      * Obtener documentos de una inscripción
      * @param int $id_inscripcion ID de la inscripción

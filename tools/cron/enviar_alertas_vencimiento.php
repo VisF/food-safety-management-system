@@ -1,6 +1,6 @@
 <?php
 // Script CLI: enviar alertas de vencimiento (ejecutar por cron)
-require_once __DIR__ . '/../../modelo/AlertaModelo.php';
+require_once __DIR__ . '/../../Modelo/AlertaModelo.php';
 require_once __DIR__ . '/../../Controller/NotificacionControlador.php';
 
 $alertModel = new AlertaModelo();

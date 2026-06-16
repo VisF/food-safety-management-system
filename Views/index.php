@@ -121,17 +121,16 @@ class InicioVista
             console.log("Toast de inscripción exitosa mostrado");
             </script>
         <?php endif; ?>
-        <?php if (($_GET['toast'] ?? '') === 'curso_no_aprobado'): ?>
+        <?php if (!empty($_GET['toast_error'])): ?>
             <script>
             document.addEventListener('DOMContentLoaded', () => {
                 mostrarToast(
-                    'Debe aprobar el curso antes de rendir examen',
+                    <?= json_encode($_GET['toast_error']) ?>,
                     'error'
                 );
             });
-            console.log("Toast de curso no aprobado mostrado");
             </script>
-        <?php endif; ?>
+         <?php endif; ?>
 
                     <main class="contenido-principal">
                        <section style="margin-bottom: 22px; padding-inline: 2px;">
@@ -167,15 +166,36 @@ class InicioVista
                         </p>
 
                         <div style="height: 10px; border-radius: 999px; background: #e3ebf5; overflow: hidden;">
-                         <div style="width: 67%; height: 100%; border-radius: 999px; background: linear-gradient(90deg, #1462b5, #0a4e93);"></div>
+                            <div
+                                style="
+                                    width: <?= (int)($inicioData['tramite']['porcentaje'] ?? 0) ?>%;
+                                    height: 100%;
+                                    border-radius: 999px;
+                                    background: linear-gradient(90deg, #1462b5, #0a4e93);
+                                "
+                            ></div>
                         </div>
                         <p style="margin: 10px 0 16px; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
                          <?php echo $this->e($inicioData['tramite']['progreso']); ?>
                         </p>
+                        <?php
+                        $documentacionCompleta =
+                            ($inicioData['tramite']['porcentaje'] ?? 0) == 100;
 
-                        <a class="app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('detalle_examen'); ?>" role="button">
-                         <span class="material-symbols-outlined" data-icon="task_alt">task_alt</span>
-                         Cargar documentos
+                        $href = $documentacionCompleta
+                            ? '#proximos-examenes'
+                            : $this->getRoute('subida_documentacion');
+                            ?>
+                        <a
+                            class="app-vista-button app-vista-button--primary"
+                            href="<?= $href ?>"
+                            role="button"
+                        >
+                            <span class="material-symbols-outlined">
+                                task_alt
+                            </span>
+
+                            <?= $inicioData['tramite']['accion_principal']['texto'] ?>
                         </a>
                      </article>
 
@@ -184,6 +204,29 @@ class InicioVista
                          Documentación Requerida
                         </h4>
                         <div class="grid grid-cols-2" style="gap: 12px;">
+                            <?php if (!empty($inicioData['documentos_faltantes'])): ?>
+                                <div
+                                    style="
+                                        margin-top:12px;
+                                        padding:12px;
+                                        border-radius:12px;
+                                        background:#fff4e5;
+                                        border:1px solid #ffd59a;
+                                    "
+                                >
+                                    <strong>Documentos pendientes:</strong>
+                                    <ul style="margin-top:8px; padding-left:20px;">
+                                        <?php foreach (
+                                            $inicioData['documentos_faltantes']
+                                            as $faltante
+                                        ): ?>
+                                            <li>
+                                                <?= $this->e($faltante) ?>
+                                            </li>
+                                        <?php endforeach; ?>
+                                    </ul>
+                                </div>
+                                <?php endif; ?>
                     <?php // Itera tarjetas de documentos; el array debe ser limitado y sanitizado por el backend.
                     foreach ($inicioData['documentos'] as $document): ?>
                         <a class="<?php echo $this->getDocumentCardClass((int) $document['state']); ?>" href="<?php echo $this->getRoute((string) $document['route']); ?>" role="button" style="text-decoration: none;">
@@ -198,7 +241,7 @@ class InicioVista
                         </div>
                      </section>
 
-                     <section style="margin-bottom: 20px;">
+                     <section id="proximos-examenes" style="margin-bottom: 20px;">
                         <h4 style="margin: 0 0 10px; color: #1f2f46; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
                          Próximos Exámenes
                         </h4>

@@ -40,7 +40,7 @@ class ExamenControlador
     }
     public function guardar(): void
     {
-        require_once __DIR__ . '/../modelo/ExamenModelo.php';
+        require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 
         $fecha = trim($_POST['fecha'] ?? '');
         $hora = trim($_POST['hora'] ?? '');

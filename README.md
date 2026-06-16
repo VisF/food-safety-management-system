@@ -38,7 +38,7 @@ manipulaciondealimentos/
 ├── .github/agents/
 │   └── tudai-developer.agent.md       🤖 Custom Agent para desarrollo
 │
-├── modelo/                             📦 15 Modelos OOP
+├── Modelo/                             📦 15 Modelos OOP
 │   ├── UsuarioModelo.php
 │   ├── InscripcionModelo.php
 │   ├── ExamenModelo.php

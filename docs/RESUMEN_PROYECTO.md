@@ -34,7 +34,7 @@ manipulaciondealimentos/
 │   └── agents/
 │       └── tudai-developer.agent.md          ✅ Custom Agent
 │
-├── modelo/                                    ✅ 15 Modelos OOP
+├── Modelo/                                    ✅ 15 Modelos OOP
 │   ├── UsuarioModelo.php
 │   ├── RolModelo.php
 │   ├── TipoInscripcionModelo.php

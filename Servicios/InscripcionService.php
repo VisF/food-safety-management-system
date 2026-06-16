@@ -1,7 +1,7 @@
 <?php
 
 require_once __DIR__ . '/../dto/InscripcionDTO.php';
-require_once __DIR__ . '/../modelo/InscripcionModelo.php';
+require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
 
 class InscripcionService
 {

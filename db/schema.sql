@@ -1,6 +1,14 @@
 -- Schema SQL for Sistema TUDAI - Manipulacion de Alimentos
 -- Generated May 2026
 -- Engine: InnoDB, Charset: utf8mb4
+CREATE DATABASE IF NOT EXISTS manipulacion_alimentos
+CHARACTER SET utf8mb4
+COLLATE utf8mb4_unicode_ci;
+
+USE manipulacion_alimentos;
+
+
+
 
 SET FOREIGN_KEY_CHECKS = 0;
 
@@ -71,15 +79,25 @@ CREATE TABLE `fecha_cursos` (
 
 CREATE TABLE `examenes` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
+
   `fecha` DATE NOT NULL,
+
   `hora` TIME DEFAULT NULL,
+
   `ubicacion` VARCHAR(255) DEFAULT NULL,
+
   `aula` VARCHAR(120) DEFAULT NULL,
+
   `cupos` INT NOT NULL DEFAULT 0,
+
   `activo` TINYINT(1) NOT NULL DEFAULT 1,
+
   `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `estados_tramite` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -157,16 +175,44 @@ CREATE TABLE `asistencias` (
 
 CREATE TABLE `documentos` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `inscripcion_id` INT UNSIGNED NOT NULL,
-  `tipo_documento` VARCHAR(100) NOT NULL,
+  `usuario_id` INT UNSIGNED NOT NULL,
+
+  `tipo_documento` ENUM(
+    'dni',
+    'foto_carnet',
+    'asistencia',
+    'moodle'
+  ) NOT NULL,
+
+  `nombre_original` VARCHAR(255) NOT NULL,
+
   `ruta_archivo` VARCHAR(512) NOT NULL,
-  `validado` TINYINT(1) NOT NULL DEFAULT 0,
-  `fecha_subida` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  `estado` ENUM(
+    'pendiente',
+    'aprobado',
+    'rechazado'
+  ) NOT NULL DEFAULT 'pendiente',
+
   `observaciones` TEXT DEFAULT NULL,
+
+  `fecha_subida` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+  `fecha_revision` DATETIME DEFAULT NULL,
+
   PRIMARY KEY (`id`),
-  KEY `doc_insc_idx` (`inscripcion_id`),
-  CONSTRAINT `doc_insc_fk` FOREIGN KEY (`inscripcion_id`) REFERENCES `inscripciones` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+  KEY `doc_usuario_idx` (`usuario_id`),
+
+  CONSTRAINT `doc_usuario_fk`
+    FOREIGN KEY (`usuario_id`)
+    REFERENCES `usuarios` (`id`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+
+) ENGINE=InnoDB
+DEFAULT CHARSET=utf8mb4
+COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `carnets` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
