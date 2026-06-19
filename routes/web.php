@@ -49,16 +49,65 @@ $router->map(
         $vista->mostrar($datos);
     }
 );
-
+//---------- Rutas relacionadas con la subida de documentación ---------
 $router->map(
     'GET',
     '/subida_documentacion',
     function () {
 
         require_once __DIR__ . '/../Views/subida_documentacion.php';
+        require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+        require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
-        $vista = new SubidaDocumentacionVista();
-        $vista->mostrar();
+        $usuarioId =
+            (int)($_SESSION['usuario_id'] ?? 0);
+
+        $documentoService =
+            new DocumentoService(
+                new DocumentoModelo()
+            );
+
+        $documentos =
+            $documentoService
+                ->obtenerPorUsuario(
+                    $usuarioId
+                );
+
+        $vista =
+            new SubidaDocumentacionVista();
+
+        $vista->mostrar(
+            $documentos
+        );
+    }
+);
+
+/*$router->map(
+    'POST',
+    '/documentos/subir',
+    function () {
+
+        require_once __DIR__ . '/../Controller/DocumentoControlador.php';
+
+        $controlador =
+            new DocumentoControlador();
+
+        $controlador->subirDocumento();
+    }
+);*/
+
+$router->map(
+    'POST',
+    '/documentos/subir',
+    function () {
+
+        require_once __DIR__ .
+            '/../Controller/DocumentoControlador.php';
+
+        $controlador =
+            new DocumentoControlador();
+
+        $controlador->procesarSubida();
     }
 );
 

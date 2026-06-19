@@ -23,32 +23,7 @@ class SubidaDocumentacionVista
       'info_title' => 'Formatos aceptados',
       'info_text' => 'Solo se permiten archivos en formato JPG, PNG y PDF. Peso máximo: 5MB.',
       'documents_title' => 'Documentación requerida',
-      'documents' => [
-        [
-          'icon' => 'badge',
-          'title' => 'DNI frente y dorso',
-          'description' => 'Ambos lados en una misma imagen o PDF.',
-          'status' => 'Cargado',
-          'status_icon' => 'check_circle',
-          'status_class' => 'bg-green-100 text-green-700',
-        ],
-        [
-          'icon' => 'account_circle',
-          'title' => 'Foto carnet',
-          'description' => 'Fondo blanco, frente despejado.',
-          'status' => 'Pendiente',
-          'status_icon' => 'pending',
-          'status_class' => 'bg-amber-100 text-amber-700',
-        ],
-        [
-          'icon' => 'school',
-          'title' => 'Certificado Moodle',
-          'description' => 'Constancia de aprobación del curso.',
-          'status' => 'Rechazado',
-          'status_icon' => 'cancel',
-          'status_class' => 'bg-red-100 text-red-700',
-        ],
-      ],
+      'documents' => [],
       'footer_button' => 'Enviar documentación',
       'footer_note' => 'Usted será notificado una vez que los documentos sean validados.',
     ];
@@ -102,85 +77,298 @@ class SubidaDocumentacionVista
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
   }
 
-  public function mostrar(): void
-  {
-    $data = array_replace_recursive($this->getDefaultData(), []);
+  public function mostrar(array $documentos = []): void
+{
+    $data = $this->getDefaultData();
+
+    $tiposRequeridos = [
+        'dni' => [
+            'icon' => 'badge',
+            'title' => 'DNI frente y dorso',
+            'description' => 'Ambos lados en una misma imagen o PDF.'
+        ],
+
+        'foto_carnet' => [
+            'icon' => 'account_circle',
+            'title' => 'Foto carnet',
+            'description' => 'Fondo blanco, frente despejado.'
+        ],
+
+        'moodle' => [
+            'icon' => 'school',
+            'title' => 'Certificado Moodle',
+            'description' => 'Constancia de aprobación del curso.'
+        ]
+    ];
+
+    $data['documents'] = [];
+
+    foreach ($tiposRequeridos as $tipo => $config) {
+
+        $documentoEncontrado = null;
+
+        foreach ($documentos as $doc) {
+
+            if (
+                strtolower(
+                    $doc->getTipoDocumento()
+                ) === $tipo
+            ) {
+                $documentoEncontrado = $doc;
+                break;
+            }
+        }
+
+        $estado = $documentoEncontrado
+            ? $documentoEncontrado->getEstado()
+            : 'pendiente';
+
+        $data['documents'][] = [
+            'tipo' => $tipo,
+            'icon' => $config['icon'],
+            'title' => $config['title'],
+            'description' => $config['description'],
+
+            'status' => match ($estado) {
+                'aprobado' => 'Aprobado',
+                'rechazado' => 'Rechazado',
+                default => 'Pendiente'
+            },
+
+            'status_icon' => match ($estado) {
+                'aprobado' => 'check_circle',
+                'rechazado' => 'cancel',
+                default => 'pending'
+            },
+
+            'status_class' => match ($estado) {
+                'aprobado' => 'bg-green-100 text-green-700',
+                'rechazado' => 'bg-red-100 text-red-700',
+                default => 'bg-amber-100 text-amber-700'
+            },
+
+            'estado' => $estado,
+            'documento' => $documentoEncontrado
+        ];
+    }
 
     $this->getHeader($data);
     ?>
+    <?php if (($_GET['toast'] ?? '') === 'documento_subido'): ?>
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          mostrarToast(
+              'Documento subido correctamente',
+              'success'
+          );
+      });
+      </script>
+      <?php endif; ?>
 
-      <main class="contenido-principal contenido-principal--estrecho" style="display: grid; gap: 18px;">
-       <section style="display: grid; gap: 8px; margin-top: 4px;">
+      <?php if (($_GET['toast'] ?? '') === 'error_subida'): ?>
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          mostrarToast(
+              'Ocurrió un error al subir el documento',
+              'error'
+          );
+      });
+      </script>
+      <?php endif; ?>
+
+      <?php if (($_GET['toast'] ?? '') === 'formato_invalido'): ?>
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          mostrarToast(
+              'Solo se permiten archivos PDF, JPG o PNG',
+              'error'
+          );
+      });
+      </script>
+      <?php endif; ?>
+
+      <?php if (($_GET['toast'] ?? '') === 'error_upload'): ?>
+      <script>
+      document.addEventListener('DOMContentLoaded', () => {
+          mostrarToast(
+              'El archivo no pudo procesarse',
+              'error'
+          );
+      });
+      </script>
+      <?php endif; ?>
+
+      <main class="contenido-principal contenido-principal--estrecho subida-documentacion">
+       <section class="subida-documentacion__hero">
         <h2 class="app-vista-section-title">
          <?php echo $this->e($data['hero_title']); ?>
         </h2>
-        <p class="app-vista-section-subtitle" style="margin: 0; max-width: 34ch;">
+        <p class="app-vista-section-subtitle subida-documentacion__hero-texto">
          <?php echo $this->e($data['hero_text']); ?>
         </p>
        </section>
 
-       <article class="app-vista-card app-vista-card--surface" style="padding: 16px; display: flex; gap: 12px; align-items: flex-start;">
-        <span class="material-symbols-outlined" data-icon="info" style="font-size: 21px; color: #0a4e93;">info</span>
-        <div style="display: grid; gap: 4px;">
-         <p style="margin: 0; color: #0a4e93; font-size: 1rem; font-weight: 700;">
-          <?php echo $this->e($data['info_title']); ?>
-         </p>
-         <p style="margin: 0; color: #4f5f75; font-size: 0.96rem; line-height: 1.45;">
-          <?php echo $this->e($data['info_text']); ?>
-         </p>
-        </div>
-       </article>
+       <article class="app-vista-card app-vista-card--surface subida-documentacion__info">
 
-       <section style="display: grid; gap: 12px;">
-        <h3 style="margin: 4px 0 0; color: #1f2f46; font-size: 1.06rem; font-weight: 700;">
+            <span
+                class="material-symbols-outlined subida-documentacion__info-icono"
+                data-icon="info"
+            >
+                info
+            </span>
+
+            <div class="subida-documentacion__info-contenido">
+
+                <p class="subida-documentacion__info-titulo">
+                    <?php echo $this->e($data['info_title']); ?>
+                </p>
+
+                <p class="subida-documentacion__info-texto">
+                    <?php echo $this->e($data['info_text']); ?>
+                </p>
+
+            </div>
+
+        </article>
+
+       <section class="subida-documentacion__documentos">
+        <h3 class="subida-documentacion__documentos-titulo">
          <?php echo $this->e($data['documents_title']); ?>
         </h3>
 
         <?php // Itera documentos requeridos; evitar pasar objetos grandes a la vista y escapar todas las propiedades.
         foreach ($data['documents'] as $document): ?>
-        <article class="app-vista-card" style="padding: 16px; display: grid; gap: 14px;">
-         <div style="display: flex; gap: 12px; align-items: flex-start;">
-          <div style="width: 42px; height: 42px; border-radius: 12px; background: #e9f2fb; color: #0a4e93; display: inline-flex; align-items: center; justify-content: center; flex: 0 0 auto;">
+        <article class="app-vista-card documento-card">
+         <div class="documento-card__header">
+          <div class="documento-card__icono">
            <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>" style="font-size: 22px;">
         <?php echo $this->e($document['icon']); ?>
            </span>
           </div>
-          <div style="display: grid; gap: 4px; min-width: 0;">
-           <h4 style="margin: 0; color: #1f2f46; font-size: 1.08rem; font-weight: 700; line-height: 1.25;">
+          <div class="documento-card__contenido">
+            <h4 class="documento-card__titulo">
         <?php echo $this->e($document['title']); ?>
            </h4>
-           <p style="margin: 0; color: #5b6b80; font-size: 0.95rem; line-height: 1.45;">
+           <p class="documento-card__descripcion">
         <?php echo $this->e($document['description']); ?>
            </p>
+           <?php if ($document['documento']): ?>
+            <p class="documento-card__archivo">
+                Archivo:
+                <?php echo $this->e(
+                    $document['documento']->getNombreOriginal()
+                ); ?>
+            </p>
+            <?php endif; ?>
+            <?php
+            $observaciones =
+                $document['documento']
+                    ? $document['documento']->getObservaciones()
+                    : null;
+            ?>
+
+            <?php if (!empty($observaciones)): ?>
+
+            <p class="documento-card__observacion" >
+                <strong>Observación:</strong>
+                <?= $this->e($observaciones) ?>
+            </p>
+
+            <?php endif; ?>
           </div>
          </div>
 
-         <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; flex-wrap: wrap;">
-          <span class="app-vista-chip <?php echo ((string) $document['status_icon'] === 'check_circle') ? 'app-vista-chip--vigente' : ''; ?>" style="font-size: 0.84rem;">
-           <span class="material-symbols-outlined <?php echo ((string) $document['status_icon'] === 'pending') ? '' : 'icono-relleno'; ?>" data-icon="<?php echo $this->e($document['status_icon']); ?>" style="font-size: 18px;">
+         <div class="documento-card__footer">
+
+          <span class="app-vista-chip 
+          <?php echo ((string) $document['status_icon'] === 'check_circle') ? 'app-vista-chip--vigente' : ''; ?>"
+           style="font-size: 0.84rem;">
+
+           <span class="material-symbols-outlined 
+           <?php echo ((string) $document['status_icon'] === 'pending') ? '' : 'icono-relleno'; ?>"
+            data-icon="
+            <?php echo $this->e($document['status_icon']); ?>" 
+            style="font-size: 18px;">
+
         <?php echo $this->e($document['status_icon']); ?>
            </span>
            <?php echo $this->e($document['status']); ?>
           </span>
-          <button class="app-vista-button app-vista-button--primary" style="width: auto; min-height: 44px; padding: 10px 16px; border-radius: 14px; font-size: 0.86rem;">
-           Subir archivo
+            <?php if ($document['estado'] !== 'aprobado'): ?>
+
+          <form
+              method="POST"
+              action="<?= BASE_URL ?>/documentos/subir"
+              enctype="multipart/form-data"
+          >
+
+              <input
+                  type="hidden"
+                  name="tipo_documento"
+                  value="<?= $this->e($document['tipo']) ?>"
+              >
+
+              <input
+                  type="file"
+                  name="archivo"
+                  id="archivo_<?= $this->e($document['tipo']) ?>"
+                  style="display:none;"
+                  accept=".pdf,.jpg,.jpeg,.png"
+              >
+
+              <button type="button" class="app-vista-button app-vista-button--primary documento-card__boton"
+                      onclick="
+                      document
+                          .getElementById(
+                              'archivo_<?= $this->e($document['tipo']) ?>'
+                          )
+                          .click();
+                  "
+              >
+                  Subir archivo
+              </button>
+
+          </form>
+
+          <?php else: ?>
+
+          <button
+              type="button"
+              class="app-vista-button app-vista-button--secondary documento-card__boton"
+              disabled
+          >
+              Documento aprobado
           </button>
+
+          <?php endif; ?>
          </div>
         </article>
         <?php endforeach; ?>
        </section>
 
-       <section style="padding-bottom: 10px; display: grid; gap: 12px;">
+       <section class="subida-documentacion__footer">
         <button class="app-vista-button app-vista-button--primary">
          <?php echo $this->e($data['footer_button']); ?>
         </button>
-        <p style="margin: 0; text-align: center; color: #6a778a; font-size: 0.84rem; line-height: 1.45;">
+        <p class="subida-documentacion__footer-nota">
          <?php echo $this->e($data['footer_note']); ?>
         </p>
        </section>
       </main>
       <!-- BottomNavBar -->
+<script>
+document.querySelectorAll('input[type="file"]').forEach(input => {
 
+    input.addEventListener('change', function () {
+
+        if (this.files.length > 0) {
+            this.form.submit();
+        }
+
+    });
+
+});
+</script>
     <?php
     $this->getFooter();
   }

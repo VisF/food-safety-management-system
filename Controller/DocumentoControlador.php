@@ -67,7 +67,9 @@ class DocumentoControlador
     {
         try {
             // Validación: comprobar que el modelo de inscripción esté disponible
-            if (!$this->inscripcionModelo || !method_exists($this->inscripcionModelo, 'obtenerPorId')) return ['success' => false, 'id' => null, 'mensaje' => 'Modelo de inscripción no disponible', 'documento' => null];
+            if (!$this->inscripcionModelo || !method_exists($this->inscripcionModelo, 'obtenerPorId')) 
+                return ['success' => false, 'id' => null, 'mensaje' => 'Modelo de inscripción no disponible', 'documento' => null];
+
             $ins = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
             // Validación: la inscripción debe existir
             if (!$ins) return ['success' => false, 'id' => null, 'mensaje' => 'Inscripción no encontrada', 'documento' => null];
@@ -80,8 +82,11 @@ class DocumentoControlador
 
             // Validación mínima del array de archivo esperado (estructura de $_FILES)
             $requiredKeys = ['name','type','size','tmp_name','error'];
-            foreach ($requiredKeys as $k) if (!array_key_exists($k, $archivo)) return ['success' => false, 'id' => null, 'mensaje' => 'Archivo inválido', 'documento' => null];
-            if ($archivo['error'] !== 0) return ['success' => false, 'id' => null, 'mensaje' => 'Error en upload: ' . $archivo['error'], 'documento' => null];
+            foreach ($requiredKeys as $k) 
+                if (!array_key_exists($k, $archivo)) 
+                    return ['success' => false, 'id' => null, 'mensaje' => 'Archivo inválido', 'documento' => null];
+                if ($archivo['error'] !== 0) 
+                    return ['success' => false, 'id' => null, 'mensaje' => 'Error en upload: ' . $archivo['error'], 'documento' => null];
 
             $tipo = $archivo['type'] ?? 'documento';
 
@@ -100,7 +105,8 @@ class DocumentoControlador
             $moved = false;
             // Intentar usar controlador dedicado para subir archivos (encapsula validaciones/movimientos)
             if (class_exists('UploadControlador')) {
-                try { $up = new UploadControlador(); if (method_exists($up, 'subirArchivo')) { $res = $up->subirArchivo($archivo, $target); $moved = $res['success'] ?? false; } }
+                try { $up = new UploadControlador(); 
+                    if (method_exists($up, 'subirArchivo')) { $res = $up->subirArchivo($archivo, $target); $moved = $res['success'] ?? false; } }
                 catch (Exception $e) { $moved = false; }
             }
             if (!$moved) {
@@ -121,14 +127,21 @@ class DocumentoControlador
             if (file_exists($pdoFile)) {
                 require_once $pdoFile;
                 $pdo = Connection::getPDO();
-                $insStmt = $pdo->prepare('INSERT INTO documento (id_inscripcion, tipo_documento, ruta_archivo, validado, fecha_subida, observaciones) VALUES (:iid, :tipo, :ruta, 0, NOW(), NULL)');
+                $insStmt = $pdo->prepare('INSERT INTO documento (id_inscripcion, tipo_documento, ruta_archivo, estado, fecha_subida, observaciones)
+                                            VALUES (:iid, :tipo, :ruta, "pendiente", NOW(), NULL)');
                 $insStmt->execute([':iid' => $id_inscripcion, ':tipo' => $tipo, ':ruta' => str_replace(__DIR__ . '/../', '/', $target)]);
                 $docId = (int)$pdo->lastInsertId();
                 // actualizar inscripcion fecha ultima modificacion
                 $upd = $pdo->prepare('UPDATE inscripciones SET fecha_ultima_modificacion = NOW() WHERE id = :id'); $upd->execute([':id' => $id_inscripcion]);
             }
 
-            $documento = ['id' => $docId, 'id_inscripcion' => $id_inscripcion, 'tipo_documento' => $tipo, 'ruta_archivo' => str_replace(__DIR__ . '/../', '/', $target), 'validado' => 0, 'fecha_subida' => date('Y-m-d H:i:s'), 'observaciones' => null];
+            $documento = ['id' => $docId, 
+                        'id_inscripcion' => $id_inscripcion, 
+                        'tipo_documento' => $tipo, 
+                        'ruta_archivo' => str_replace(__DIR__ . '/../', '/', $target), 
+                        'estado' => 'pendiente', 
+                        'fecha_subida' => date('Y-m-d H:i:s'),
+                         'observaciones' => null];
 
             $this->registrarLog('DOCUMENTO_SUBIDO', ['id_inscripcion' => $id_inscripcion, 'tipo' => $documento['tipo_documento'], 'id_documento' => $docId]);
 
@@ -254,10 +267,10 @@ class DocumentoControlador
      * Validar documento (admin)
      * 
      * @param int $id ID del documento a validar
-     * @param bool $validado true para aprobar, false para rechazar
+     * @param string $estado 'aprobado' o 'rechazado' o 'pendiente'
      * @return array ['success' => bool, 'mensaje' => string, 'documento' => array|null]
      */
-    public function validarDocumento(int $id, bool $validado): array
+    public function validarDocumento(int $id, string $estado): array
     {
         try {
             $pdoFile = __DIR__ . '/../db/Connection.php';
@@ -266,12 +279,17 @@ class DocumentoControlador
             $pdo = Connection::getPDO();
             $stmt = $pdo->prepare('SELECT * FROM documento WHERE id = :id'); $stmt->execute([':id' => $id]); $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$doc) return ['success' => false, 'mensaje' => 'Documento no encontrado', 'documento' => null];
-            $upd = $pdo->prepare('UPDATE documento SET validado = :v, fecha_validacion = NOW() WHERE id = :id');
-            $upd->execute([':v' => $validado ? 1 : 0, ':id' => $id]);
+            $upd = $pdo->prepare('UPDATE documento SET estado = :v, fecha_validacion = NOW() WHERE id = :id');
+            $upd->execute([':v' => $estado, ':id' => $id]);
 
             // si aprobado, verificar estado de todos los documentos
-            if ($validado) {
-                $count = (int)$pdo->prepare('SELECT COUNT(*) FROM documento WHERE id_inscripcion = :iid AND validado = 0')->execute([':iid' => $doc['id_inscripcion']]) ? $pdo->query("SELECT COUNT(*) FROM documento WHERE id_inscripcion = {$doc['id_inscripcion']} AND validado = 0")->fetchColumn() : 0;
+            if ($estado === 'aprobado') {
+                $count = (int)$pdo->prepare('SELECT COUNT(*) FROM documento 
+                                            WHERE id_inscripcion = :iid AND estado = "pendiente"')
+                                            ->execute([':iid' => $doc['id_inscripcion']]) ? 
+                                            $pdo->query("SELECT COUNT(*) FROM documento 
+                                                        WHERE id_inscripcion = {$doc['id_inscripcion']} 
+                                                        AND estado = 'pendiente'")->fetchColumn() : 0;
                 if ((int)$count === 0) {
                     // marcar inscripcion como documentacion completa (estado 2 asumido)
                     $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
@@ -283,11 +301,12 @@ class DocumentoControlador
             // auditoría simple si tabla existe
             if ($pdo->query("SHOW TABLES LIKE 'auditoria_acciones'")->rowCount() > 0) {
                 $insA = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, accion, detalle, fecha) VALUES (:u, :a, :d, NOW())');
-                $insA->execute([':u' => $_SESSION['user_id'] ?? null, ':a' => 'validar_documento', ':d' => json_encode(['id' => $id, 'validado' => $validado])]);
+                $insA->execute([':u' => $_SESSION['user_id'] ?? null, ':a' => 'validar_documento', ':d' => json_encode(['id' => $id, 'estado' => $estado])]);
             }
 
-            $this->registrarLog('DOCUMENTO_VALIDADO', ['id' => $id, 'validado' => $validado]);
-            return ['success' => true, 'mensaje' => $validado ? 'Documento aprobado' : 'Documento rechazado', 'documento' => ['id' => $id, 'validado' => $validado ? 1 : 0, 'fecha_validacion' => date('Y-m-d H:i:s')]];
+            $this->registrarLog('DOCUMENTO_VALIDADO', ['id' => $id, 'estado' => $estado]);
+            return ['success' => true, 'mensaje' => $estado === 'aprobado' ? 'Documento aprobado' : 'Documento rechazado', 
+                    'documento' => ['id' => $id, 'estado' => $estado, 'fecha_validacion' => date('Y-m-d H:i:s')]];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_VALIDAR_DOCUMENTO', ['error' => $e->getMessage()]);
             return [
@@ -314,7 +333,7 @@ class DocumentoControlador
             $pdo = Connection::getPDO();
             $stmt = $pdo->prepare('SELECT * FROM documento WHERE id = :id'); $stmt->execute([':id' => $id]); $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
             if (!$doc) return ['success' => false, 'mensaje' => 'Documento no encontrado', 'documento' => null];
-            $upd = $pdo->prepare('UPDATE documento SET validado = 0, motivo_rechazo = :mot, fecha_rechazo = NOW() WHERE id = :id'); $upd->execute([':mot' => $motivo, ':id' => $id]);
+            $upd = $pdo->prepare('UPDATE documento SET estado = :estado, motivo_rechazo = :mot, fecha_rechazo = NOW() WHERE id = :id'); $upd->execute([':estado' => 'rechazado', ':mot' => $motivo, ':id' => $id]);
             // marcar inscripcion como documentacion rechazada (estado 7 asumido)
             $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
                             WHERE id = :id')->execute([':id' => $doc['id_inscripcion'], ':estado' => EstadoTramite::DOCUMENTACION_RECHAZADA]);
@@ -327,7 +346,7 @@ class DocumentoControlador
                 $insA->execute([':u' => $_SESSION['user_id'] ?? null, ':a' => 'rechazar_documento', ':d' => json_encode(['id' => $id, 'motivo' => $motivo])]);
             }
             $this->registrarLog('DOCUMENTO_RECHAZADO', ['id' => $id, 'motivo' => $motivo]);
-            return ['success' => true, 'mensaje' => 'Documento rechazado', 'documento' => ['id' => $id, 'validado' => 0, 'motivo_rechazo' => $motivo, 'fecha_rechazo' => date('Y-m-d H:i:s')]];
+            return ['success' => true, 'mensaje' => 'Documento rechazado', 'documento' => ['id' => $id, 'estado' => 'rechazado', 'motivo_rechazo' => $motivo, 'fecha_rechazo' => date('Y-m-d H:i:s')]];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_RECHAZAR_DOCUMENTO', ['error' => $e->getMessage()]);
             return [
@@ -392,7 +411,12 @@ class DocumentoControlador
         try {
             $pdoFile = __DIR__ . '/../db/Connection.php'; if (!file_exists($pdoFile)) return [];
             require_once $pdoFile; $pdo = Connection::getPDO();
-            $sql = 'SELECT d.*, i.usuario_id as id_usuario, u.nombre as usuario_nombre, u.apellido as usuario_apellido FROM documento d JOIN inscripciones i ON d.id_inscripcion = i.id LEFT JOIN usuarios u ON i.usuario_id = u.id WHERE d.validado = 0 ORDER BY d.fecha_subida ASC';
+            $sql = 'SELECT d.*, i.usuario_id as id_usuario, u.nombre as usuario_nombre, u.apellido as usuario_apellido 
+                    FROM documento d 
+                    JOIN inscripciones i ON d.id_inscripcion = i.id 
+                    LEFT JOIN usuarios u ON i.usuario_id = u.id 
+                    WHERE d.estado = "pendiente"
+                    ORDER BY d.fecha_subida ASC';
             $stmt = $pdo->prepare($sql); $stmt->execute(); $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $this->registrarLog('DOCUMENTOS_PENDIENTES_OBTENIDOS', ['count' => count($rows)]);
             return $rows;
@@ -413,7 +437,9 @@ class DocumentoControlador
         try {
             $pdoFile = __DIR__ . '/../db/Connection.php'; if (!file_exists($pdoFile)) return [];
             require_once $pdoFile; $pdo = Connection::getPDO();
-            $stmt = $pdo->prepare('SELECT * FROM documento WHERE tipo_documento = :tipo ORDER BY fecha_subida DESC'); $stmt->execute([':tipo' => $tipo]); $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare('SELECT * FROM documento WHERE tipo_documento = :tipo ORDER BY fecha_subida DESC'); 
+            $stmt->execute([':tipo' => $tipo]); 
+            $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC);
             $this->registrarLog('DOCUMENTOS_POR_TIPO_OBTENIDOS', ['tipo' => $tipo, 'count' => count($rows)]);
             return $rows;
         } catch (\Exception $e) {
@@ -434,7 +460,9 @@ class DocumentoControlador
         try {
             $pdoFile = __DIR__ . '/../db/Connection.php'; if (!file_exists($pdoFile)) return [];
             require_once $pdoFile; $pdo = Connection::getPDO();
-            $stmt = $pdo->prepare('SELECT id_tipo_inscripcion, usuario_id FROM inscripciones WHERE id = :id'); $stmt->execute([':id' => $id_inscripcion]); $ins = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $stmt = $pdo->prepare('SELECT id_tipo_inscripcion, usuario_id FROM inscripciones WHERE id = :id'); 
+            $stmt->execute([':id' => $id_inscripcion]); $ins = $stmt->fetch(\PDO::FETCH_ASSOC);
+
             if (!$ins) return [];
             $tipoIns = (int)($ins['id_tipo_inscripcion'] ?? 0);
             // intentar obtener requeridos desde modelo TipoInscripcionModelo
@@ -451,7 +479,7 @@ class DocumentoControlador
                 $stmt = $pdo->prepare('SELECT * FROM documento WHERE id_inscripcion = :id AND tipo_documento = :t ORDER BY fecha_subida DESC LIMIT 1');
                 $stmt->execute([':id' => $id_inscripcion, ':t' => $r]);
                 $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
-                $result[] = ['tipo' => $r, 'requerido' => true, 'cargado' => (bool)$doc, 'validado' => (int)($doc['validado'] ?? 0) === 1, 'id_documento' => $doc['id'] ?? null];
+                $result[] = ['tipo' => $r, 'requerido' => true, 'cargado' => (bool)$doc, 'estado' => $doc['estado'] ?? 'pendiente', 'id_documento' => $doc['id'] ?? null];
             }
             $this->registrarLog('DOCUMENTOS_REQUERIDOS_OBTENIDOS', ['id_inscripcion' => $id_inscripcion]);
             return $result;
@@ -470,14 +498,35 @@ class DocumentoControlador
     public function eliminarDocumento(int $id): array
     {
         try {
-            $pdoFile = __DIR__ . '/../db/Connection.php'; if (!file_exists($pdoFile)) return ['success' => false, 'mensaje' => 'DB no disponible'];
-            require_once $pdoFile; $pdo = Connection::getPDO();
-            $stmt = $pdo->prepare('SELECT * FROM documento WHERE id = :id'); $stmt->execute([':id' => $id]); $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
+            $pdoFile = __DIR__ . '/../db/Connection.php'; 
+            if (!file_exists($pdoFile)) return ['success' => false, 'mensaje' => 'DB no disponible'];
+
+            require_once $pdoFile; 
+            $pdo = Connection::getPDO();
+            $stmt = $pdo->prepare('SELECT * FROM documento WHERE id = :id'); 
+            $stmt->execute([':id' => $id]); 
+            $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
+
             if (!$doc) return ['success' => false, 'mensaje' => 'Documento no encontrado'];
-            if ((int)($doc['validado'] ?? 0) === 1 && empty($_SESSION['is_admin'])) return ['success' => false, 'mensaje' => 'No autorizado para eliminar documento validado'];
-            $serverPath = __DIR__ . '/../' . ltrim($doc['ruta_archivo'] ?? '', '/'); if (file_exists($serverPath)) @unlink($serverPath);
-            $del = $pdo->prepare('DELETE FROM documento WHERE id = :id'); $del->execute([':id' => $id]);
-            if ($pdo->query("SHOW TABLES LIKE 'auditoria_acciones'")->rowCount() > 0) { $insA = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, accion, detalle, fecha) VALUES (:u, :a, :d, NOW())'); $insA->execute([':u' => $_SESSION['user_id'] ?? null, ':a' => 'eliminar_documento', ':d' => json_encode(['id' => $id])]); }
+
+            if (($doc['estado'] ?? 'pendiente') === 'aprobado' 
+                && empty($_SESSION['is_admin'])) 
+                return ['success' => false, 'mensaje' => 'No autorizado para eliminar documento aprobado'];
+
+            $serverPath = __DIR__ . '/../' . ltrim($doc['ruta_archivo'] ?? '', '/'); 
+            if (file_exists($serverPath)) @unlink($serverPath);
+
+            $del = $pdo->prepare('DELETE FROM documento WHERE id = :id'); 
+            $del->execute([':id' => $id]);
+
+            if ($pdo->query("SHOW TABLES LIKE 'auditoria_acciones'")->rowCount() > 0) 
+                {
+                    $insA = $pdo->prepare('INSERT INTO auditoria_acciones (usuario_id, accion, detalle, fecha) 
+                                            VALUES (:u, :a, :d, NOW())'); 
+                    $insA->execute([':u' => $_SESSION['user_id'] ?? null, 
+                                    ':a' => 'eliminar_documento', 
+                                    ':d' => json_encode(['id' => $id])]); 
+                }
             $this->registrarLog('DOCUMENTO_ELIMINADO', ['id' => $id]);
             return ['success' => true, 'mensaje' => 'Documento eliminado'];
         } catch (\Exception $e) {
@@ -493,27 +542,299 @@ class DocumentoControlador
      * Obtener estado de la documentación de una inscripción
      * 
      * @param int $id_inscripcion ID de la inscripción
-     * @return array ['documentacion_completa' => bool, 'documentos_totales' => int, 'validados' => int, 'pendientes' => int]
+     * @return array ['documentacion_completa' => bool, 'documentos_totales' => int, 'estado' => string, 'pendientes' => int]
      */
-    public function obtenerEstadoDocumentacion(int $id_inscripcion): array
+    public function obtenerEstadoDocumentacion(int $usuarioId): array
     {
         try {
-            $pdoFile = __DIR__ . '/../db/Connection.php'; if (!file_exists($pdoFile)) return ['documentacion_completa' => false, 'documentos_totales' => 0, 'validados' => 0, 'pendientes' => 0, 'id_inscripcion' => $id_inscripcion];
-            require_once $pdoFile; $pdo = Connection::getPDO();
-            $stmt = $pdo->prepare('SELECT COUNT(*) as total, SUM(CASE WHEN validado = 1 THEN 1 ELSE 0 END) as validados FROM documento WHERE id_inscripcion = :id'); $stmt->execute([':id' => $id_inscripcion]); $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-            $total = (int)($row['total'] ?? 0); $val = (int)($row['validados'] ?? 0); $pend = max(0, $total - $val);
-            $complete = ($pend === 0 && $total > 0);
-            $this->registrarLog('ESTADO_DOCUMENTACION_OBTENIDO', ['id_inscripcion' => $id_inscripcion, 'total' => $total, 'validados' => $val]);
-            return ['documentacion_completa' => $complete, 'documentos_totales' => $total, 'validados' => $val, 'pendientes' => $pend, 'id_inscripcion' => $id_inscripcion];
+
+            $pdoFile =
+                __DIR__ . '/../db/Connection.php';
+
+            if (!file_exists($pdoFile)) {
+
+                return [
+                    'documentacion_completa' => false,
+                    'documentos_totales' => 0,
+                    'aprobados' => 0,
+                    'pendientes' => 0
+                ];
+            }
+
+            require_once $pdoFile;
+
+            $pdo = Connection::getPDO();
+
+            $stmt = $pdo->prepare(
+                'SELECT
+                    COUNT(*) AS total,
+                    SUM(
+                        CASE
+                            WHEN estado = "aprobado"
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) AS aprobados
+                FROM documentos
+                WHERE usuario_id = :usuario_id'
+            );
+
+            $stmt->execute([
+                ':usuario_id' => $usuarioId
+            ]);
+
+            $row =
+                $stmt->fetch(
+                    \PDO::FETCH_ASSOC
+                );
+
+            $total =
+                (int)($row['total'] ?? 0);
+
+            $aprobados =
+                (int)($row['aprobados'] ?? 0);
+
+            $pendientes =
+                max(
+                    0,
+                    $total - $aprobados
+                );
+
+            return [
+                'documentacion_completa' =>
+                    $pendientes === 0
+                    && $total > 0,
+
+                'documentos_totales' =>
+                    $total,
+
+                'aprobados' =>
+                    $aprobados,
+
+                'pendientes' =>
+                    $pendientes
+            ];
+
         } catch (\Exception $e) {
-            $this->registrarLog('ERROR_OBTENER_ESTADO_DOCUMENTACION', ['error' => $e->getMessage()]);
+
             return [
                 'documentacion_completa' => false,
                 'documentos_totales' => 0,
-                'validados' => 0,
-                'pendientes' => 0,
-                'id_inscripcion' => $id_inscripcion
+                'aprobados' => 0,
+                'pendientes' => 0
             ];
+        }
+    }
+    public function procesarSubida(): void
+    {
+        try {
+
+            if (empty($_SESSION['usuario_id'])) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/login'
+                );
+
+                exit;
+            }
+
+            if (
+                empty($_FILES['archivo'])
+                || empty($_POST['tipo_documento'])
+            ) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/subida_documentacion?toast=error_archivo'
+                );
+
+                exit;
+            }
+
+            $usuarioId =
+                (int)$_SESSION['usuario_id'];
+
+            $tipoDocumento =
+                trim(
+                    $_POST['tipo_documento']
+                );
+
+            $archivo =
+                $_FILES['archivo'];
+
+            if (
+                $archivo['error']
+                !== UPLOAD_ERR_OK
+            ) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/subida_documentacion?toast=error_upload'
+                );
+
+                exit;
+            }
+
+            $ext =
+                strtolower(
+                    pathinfo(
+                        $archivo['name'],
+                        PATHINFO_EXTENSION
+                    )
+                );
+
+            $permitidas = [
+                'pdf',
+                'jpg',
+                'jpeg',
+                'png'
+            ];
+
+            if (
+                !in_array(
+                    $ext,
+                    $permitidas,
+                    true
+                )
+            ) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/subida_documentacion?toast=formato_invalido'
+                );
+
+                exit;
+            }
+
+            $directorio =
+                __DIR__ .
+                '/../uploads';
+
+            if (
+                !is_dir($directorio)
+            ) {
+
+                mkdir(
+                    $directorio,
+                    0775,
+                    true
+                );
+            }
+
+            $nombreArchivo =
+                $tipoDocumento .
+                '_usuario_' .
+                $usuarioId .
+                '_' .
+                time() .
+                '.' .
+                $ext;
+
+            $rutaFisica =
+                $directorio .
+                '/' .
+                $nombreArchivo;
+
+            move_uploaded_file(
+                $archivo['tmp_name'],
+                $rutaFisica
+            );
+
+            require_once __DIR__ . '/../db/Connection.php';
+
+            $pdo =
+                Connection::getPDO();
+
+            $stmt = $pdo->prepare(
+                "SELECT id
+                FROM documentos
+                WHERE usuario_id = :usuario_id
+                AND tipo_documento = :tipo_documento
+                LIMIT 1"
+            );
+
+            $stmt->execute([
+                ':usuario_id' => $usuarioId,
+                ':tipo_documento' => $tipoDocumento
+            ]);
+
+            $documentoExistente =
+                $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($documentoExistente) {
+
+                $stmt = $pdo->prepare(
+                    "UPDATE documentos
+                    SET
+                        nombre_original = :nombre_original,
+                        ruta_archivo = :ruta_archivo,
+                        estado = 'pendiente',
+                        observaciones = NULL,
+                        fecha_revision = NULL,
+                        fecha_subida = NOW()
+                    WHERE id = :id"
+                );
+
+                $stmt->execute([
+                    ':id' => $documentoExistente['id'],
+                    ':nombre_original' => $archivo['name'],
+                    ':ruta_archivo' => '/uploads/' . $nombreArchivo
+                ]);
+
+            } else {
+
+                $stmt = $pdo->prepare(
+                    "INSERT INTO documentos
+                    (
+                        usuario_id,
+                        tipo_documento,
+                        nombre_original,
+                        ruta_archivo,
+                        estado,
+                        fecha_subida
+                    )
+                    VALUES
+                    (
+                        :usuario_id,
+                        :tipo_documento,
+                        :nombre_original,
+                        :ruta_archivo,
+                        'pendiente',
+                        NOW()
+                    )"
+                );
+
+                $stmt->execute([
+                    ':usuario_id' => $usuarioId,
+                    ':tipo_documento' => $tipoDocumento,
+                    ':nombre_original' => $archivo['name'],
+                    ':ruta_archivo' => '/uploads/' . $nombreArchivo
+                ]);
+            }
+
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/subida_documentacion?toast=documento_subido'
+            );
+
+            exit;
+
+        } catch (\Exception $e) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/subida_documentacion?toast=error_subida'
+            );
+
+            exit;
         }
     }
 }

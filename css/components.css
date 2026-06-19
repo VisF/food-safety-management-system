@@ -141,6 +141,7 @@ body.tema-ciudadano {
   padding: var(--space-2);
   border-radius: var(--radius-pill);
   transition: transform 150ms ease, background-color 150ms ease;
+  margin-right: 30px;
 }
 
 .encabezado-principal__boton:hover {
@@ -622,6 +623,50 @@ a:focus-visible {
     gap: 1rem;
 }
 
+
+.encabezado-principal__accion {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 16px;
+  margin-right: 12px;
+
+  border-radius: var(--radius-pill);
+
+  color: inherit;
+  text-decoration: none;
+
+  transition:
+    background-color 150ms ease,
+    transform 150ms ease;
+}
+
+.encabezado-principal__accion:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.encabezado-principal__accion:active {
+  transform: scale(0.97);
+}
+
+.encabezado-principal__accion:focus-visible {
+  outline: 2px solid var(--color-active-fg);
+  outline-offset: 3px;
+}
+
+.encabezado-principal__accion-texto {
+  white-space: nowrap;
+  font-size: 0.95rem;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.encabezado-principal__accion .material-symbols-outlined {
+  flex-shrink: 0;
+  font-size: 22px;
+}
+
 #toast-container {
     position: fixed;
     top: 90px;
@@ -664,6 +709,11 @@ a:focus-visible {
 
 .toast-info {
     background: rgba(37, 99, 235, .9);
+}
+
+.logout-text,
+.login-text {
+    display: inline;
 }
 
 @keyframes toast-in {
@@ -762,4 +812,14 @@ a:focus-visible {
   .detalle-tramite-acciones {
     flex-direction: column;
   }
+
+  .encabezado-principal__accion {
+    margin-right: 4px;
+    padding: 8px;
+  }
+
+  .encabezado-principal__accion-texto {
+    display: none;
+  }
+
 }

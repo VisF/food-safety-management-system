@@ -5,6 +5,9 @@ $title ??= 'Registro';
 $error ??= null;
 $csrf_token ??= '';
 
+$ocultarAccionesHeader = true;
+
+
 include __DIR__ . '/header.php';
 ?>
 

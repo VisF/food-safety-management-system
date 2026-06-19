@@ -12,19 +12,61 @@ class MoodleModelo {
 
     // Guarda metadata sobre un certificado Moodle usando la tabla `documentos`
     // Espera: ['id_inscripcion' => int, 'ruta' => string, 'tipo' => string]
-    public function guardarCertificado(array $data) {
-        if (!$this->db) return false;
-        $id_inscripcion = (int)($data['id_inscripcion'] ?? 0);
-        $ruta = $data['ruta'] ?? '';
-        $tipo = $data['tipo'] ?? 'certificado_moodle';
-        if ($id_inscripcion <= 0 || !$ruta) return false;
-
-        $sql = 'INSERT INTO documentos (id_inscripcion, tipo_documento, ruta_archivo, validado, fecha_subida) VALUES (:iid, :tipo, :ruta, 0, NOW())';
-        $stmt = $this->db->prepare($sql);
-        $ok = $stmt->execute([':iid' => $id_inscripcion, ':tipo' => $tipo, ':ruta' => $ruta]);
-        if ($ok) {
-            return ['id' => (int)$this->db->lastInsertId(), 'id_inscripcion' => $id_inscripcion, 'ruta' => $ruta, 'tipo' => $tipo];
+    public function guardarCertificado(array $data)
+    {
+        if (!$this->db) {
+            return false;
         }
+
+        $usuarioId = (int)($data['usuario_id'] ?? 0);
+
+        $ruta = $data['ruta'] ?? '';
+
+        $nombreOriginal =
+            $data['nombre_original']
+            ?? basename($ruta);
+
+        if ($usuarioId <= 0 || !$ruta) {
+            return false;
+        }
+
+        $sql = "
+            INSERT INTO documentos (
+                usuario_id,
+                tipo_documento,
+                nombre_original,
+                ruta_archivo,
+                estado,
+                fecha_subida
+            )
+            VALUES (
+                :usuario_id,
+                'moodle',
+                :nombre_original,
+                :ruta_archivo,
+                'pendiente',
+                NOW()
+            )
+        ";
+
+        $stmt = $this->db->prepare($sql);
+
+        $ok = $stmt->execute([
+            ':usuario_id' => $usuarioId,
+            ':nombre_original' => $nombreOriginal,
+            ':ruta_archivo' => $ruta
+        ]);
+
+        if ($ok) {
+
+            return [
+                'id' => (int)$this->db->lastInsertId(),
+                'usuario_id' => $usuarioId,
+                'tipo_documento' => 'moodle',
+                'ruta' => $ruta
+            ];
+        }
+
         return false;
     }
 
@@ -57,16 +99,25 @@ class MoodleModelo {
     }
 
     // Valida que el usuario completó el curso verificando existencia de documento tipo certificado_moodle validado
-    public function validarCursoCompletado(int $idUsuario, int $idCurso): bool {
-        if (!$this->db) return false;
-
-        $sql = 'SELECT d.* FROM documentos d
-                JOIN inscripciones i ON d.id_inscripcion = i.id
-                WHERE i.usuario_id = :uid AND i.curso_id = :cid AND d.tipo_documento = :tipo AND d.validado = 1
-                LIMIT 1';
+    public function validarCursoCompletado(int $idUsuario,int $idCurso): bool {
+        if (!$this->db) {
+            return false;
+        }
+        $sql = "
+            SELECT d.*
+            FROM documentos d
+            WHERE d.usuario_id = :uid
+            AND d.tipo_documento = :tipo
+            AND d.estado = 'aprobado'
+            LIMIT 1
+        ";
         $stmt = $this->db->prepare($sql);
-        $stmt->execute([':uid' => $idUsuario, ':cid' => $idCurso, ':tipo' => 'certificado_moodle']);
-        $row = $stmt->fetch();
-        return (bool)$row;
+
+        $stmt->execute([
+            ':uid' => $idUsuario,
+            ':tipo' => 'moodle'
+        ]);
+
+        return (bool)$stmt->fetch();
     }
 }

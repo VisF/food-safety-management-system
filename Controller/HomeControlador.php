@@ -124,12 +124,45 @@ class HomeControlador
                     $icono = 'add_a_photo';
                     break;
             }
+            $tipo = strtoupper($doc->getTipoDocumento());
+
+            switch ($tipo) {
+
+                case 'DNI':
+                    $label = 'DNI';
+                    $descripcion = 'Documento de identidad';
+                    $icono = 'badge';
+                    break;
+
+                case 'FOTO_CARNET':
+                case 'FOTO':
+                    $label = 'Foto carnet';
+                    $descripcion = 'Fotografía actual';
+                    $icono = 'account_circle';
+                    break;
+
+                case 'CERTIFICADO_MOODLE':
+                case 'MOODLE':
+                    $label = 'Curso Moodle aprobado';
+                    $descripcion = 'Certificado Moodle';
+                    $icono = 'school';
+                    break;
+
+                default:
+                    $label = ucfirst(
+                        str_replace('_', ' ', $doc->getTipoDocumento())
+                    );
+
+                    $descripcion = 'Documento cargado';
+                    $icono = 'description';
+            }
 
             $documentosVista[] = [
-                'label' => $doc->getTipoDocumento(),
+                'label' => $label,
+                'descripcion' => $descripcion,
                 'icon' => $icono,
                 'route' => 'subida_documentacion',
-                'state' => $doc->getValidado()
+                'state' => $doc->getEstado()
             ];
         }
         $modeloExamen = new ExamenModelo();
@@ -201,7 +234,10 @@ class HomeControlador
 
         'examenes' => $examenesVista,
         
-        'documentos_faltantes' => $accionPrincipal['faltantes'],
+        'documentos_faltantes' =>
+                        isset($accionPrincipal['faltantes'])
+                            ? $accionPrincipal['faltantes']
+                            : [],
 
         'carnet' => [
             'descarga_habilitada' => false,

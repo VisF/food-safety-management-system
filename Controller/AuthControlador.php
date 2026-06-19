@@ -409,7 +409,7 @@ class AuthControlador
     public function procesarLogout(): void
     {
         $this->logout();
-        header('Location: /login');
+        header('Location: ' . BASE_URL . '/login');
         exit;
     }
 

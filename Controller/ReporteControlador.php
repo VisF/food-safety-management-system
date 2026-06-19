@@ -949,17 +949,54 @@ class ReporteControlador
     public function obtenerDocumentosPendientes(): array
     {
         try {
+
             $pdo = $this->pdo();
-            $stmt = $pdo->query("SELECT COUNT(*) FROM documentos WHERE (validado = 0 OR validado IS NULL)");
+
+            $stmt = $pdo->query(
+                "SELECT COUNT(*)
+                FROM documentos
+                WHERE estado = 'pendiente'"
+            );
+
             $total = (int)$stmt->fetchColumn();
-            $stmt = $pdo->query("SELECT tipo_documento, COUNT(*) as cantidad FROM documentos WHERE (validado = 0 OR validado IS NULL) GROUP BY tipo_documento");
+
+            $stmt = $pdo->query(
+                "SELECT
+                    tipo_documento,
+                    COUNT(*) AS cantidad
+                FROM documentos
+                WHERE estado = 'pendiente'
+                GROUP BY tipo_documento"
+            );
+
             $detalles = [];
+
             while ($r = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $detalles[] = ['tipo_documento' => $r['tipo_documento'] ?? 'desconocido', 'cantidad' => (int)$r['cantidad']];
+
+                $detalles[] = [
+                    'tipo_documento' =>
+                        $r['tipo_documento']
+                        ?? 'desconocido',
+
+                    'cantidad' =>
+                        (int)$r['cantidad']
+                ];
             }
-            return ['success' => true, 'documentos_pendientes' => $total, 'detalles' => $detalles];
+
+            return [
+                'success' => true,
+                'documentos_pendientes' => $total,
+                'detalles' => $detalles
+            ];
+
         } catch (Exception $e) {
-            $this->log('Error al obtener documentos pendientes', 'ERROR', ['error' => $e->getMessage()]);
+
+            $this->log(
+                'Error al obtener documentos pendientes',
+                'ERROR',
+                ['error' => $e->getMessage()]
+            );
+
             return [
                 'success' => false,
                 'documentos_pendientes' => 0,
@@ -1003,7 +1040,13 @@ class ReporteControlador
             $nuevas_inscripciones = (int)$stmt->fetchColumn();
 
             // Documentación validada
-            $stmt = $pdo->prepare("SELECT COUNT(*) FROM documentos WHERE validado = 1 AND DATE(fecha_validacion) BETWEEN :desde AND :hasta");
+            $stmt = $pdo->prepare(
+                                    "SELECT COUNT(*)
+                                    FROM documentos
+                                    WHERE estado = 'aprobado'
+                                    AND DATE(fecha_revision)
+                                    BETWEEN :desde AND :hasta"
+                                );
             $ok = $stmt->execute([':desde' => $desde, ':hasta' => $hasta]);
             $documentacion_validada = $ok ? (int)$stmt->fetchColumn() : 0;
 

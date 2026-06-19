@@ -9,7 +9,7 @@ declare(strict_types=1);
  * - id_inscripcion: ID de la inscripción
  * - tipo_documento: tipo de documento (DNI, certificado, etc.)
  * - ruta_archivo: ruta del archivo guardado
- * - validado: estado de validación (1=validado, 0=pendiente)
+ * - estado: pendiente, aprobado o rechazado
  * - fecha_subida: timestamp de subida
  * - observaciones: notas de validación
  */
@@ -17,12 +17,12 @@ declare(strict_types=1);
 class DocumentoModelo
 {
     private int $id;
-    private int $id_inscripcion;
     private string $tipo_documento;
     private string $ruta_archivo;
-    private int $validado;
     private string $fecha_subida;
     private ?string $observaciones;
+    private int $usuarioId;
+    private string $estado;
 
     // Conexión a BD (PDO)
     private ?\PDO $conexion = null;
@@ -50,18 +50,21 @@ class DocumentoModelo
     {
         if (!$this->conexion) return false;
 
-        $id_inscripcion = (int)($data['id_inscripcion'] ?? 0);
+        $usuario_id = (int)($data['usuario_id'] ?? 0);
         $tipo = $data['tipo_documento'] ?? '';
         $ruta = $data['ruta_archivo'] ?? '';
+        $nombre_original = $data['nombre_original'] ?? '';
+        $estado = 'pendiente';
+        $fecha_subida = date('d-m-Y H:i:s');
 
-        if ($id_inscripcion <= 0 || !$tipo || !$ruta) return false;
+        if ($usuario_id <= 0 || !$tipo || !$ruta) return false;
 
-        $sql = 'INSERT INTO documentos (id_inscripcion, tipo_documento, ruta_archivo, validado, fecha_subida) VALUES (:iid, :tipo, :ruta, 0, NOW())';
+        $sql = 'INSERT INTO documentos (usuario_id, tipo_documento,nombre_original, ruta_archivo, estado, fecha_subida) VALUES (:uid, :tipo, :nombre_original, :ruta, "pendiente", NOW())';
         $stmt = $this->conexion->prepare($sql);
-        $params = [':iid' => $id_inscripcion, ':tipo' => $tipo, ':ruta' => $ruta];
+        $params = [':uid' => $usuario_id, ':tipo' => $tipo, ':nombre_original' => $nombre_original, ':ruta' => $ruta];
         if ($stmt->execute($params)) {
             $id = (int)$this->conexion->lastInsertId();
-            return ['id' => $id, 'id_inscripcion' => $id_inscripcion, 'tipo_documento' => $tipo, 'ruta_archivo' => $ruta];
+            return ['id' => $id, 'usuario_id' => $usuario_id, 'tipo_documento' => $tipo, 'nombre_original' => $nombre_original, 'ruta_archivo' => $ruta, 'estado' => 'pendiente', 'fecha_subida' => date('Y-m-d H:i:s')];
         }
         return false;
     }
@@ -94,7 +97,7 @@ class DocumentoModelo
     {
         if (!$this->conexion) return [];
 
-        $stmt = $this->conexion->prepare('SELECT * FROM documentos WHERE id_inscripcion = :iid ORDER BY fecha_subida DESC');
+        $stmt = $this->conexion->prepare('SELECT * FROM documentos WHERE usuario_id = :iid ORDER BY fecha_subida DESC');
         $stmt->execute([':iid' => $id_inscripcion]);
         return $stmt->fetchAll();
     }
@@ -107,7 +110,7 @@ class DocumentoModelo
     {
         if (!$this->conexion) return [];
 
-        $stmt = $this->conexion->query('SELECT * FROM documentos WHERE validado = 0 ORDER BY fecha_subida ASC');
+        $stmt = $this->conexion->query('SELECT * FROM documentos WHERE estado = "pendiente" ORDER BY fecha_subida ASC');
         return $stmt->fetchAll();
     }
 
@@ -121,7 +124,7 @@ class DocumentoModelo
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('UPDATE documentos SET validado = 1, observaciones = :obs WHERE id = :id');
+        $stmt = $this->conexion->prepare('UPDATE documentos SET estado = "aprobado", observaciones = :obs, fecha_revision = NOW() WHERE id = :id');
         return (bool)$stmt->execute([':obs' => $observaciones, ':id' => $id]);
     }
 
@@ -135,7 +138,7 @@ class DocumentoModelo
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('UPDATE documentos SET validado = -1, observaciones = :motivo WHERE id = :id');
+        $stmt = $this->conexion->prepare('UPDATE documentos SET estado = "rechazado", observaciones = :motivo, fecha_revision = NOW() WHERE id = :id');
         return (bool)$stmt->execute([':motivo' => $motivo, ':id' => $id]);
     }
 
@@ -242,9 +245,9 @@ class DocumentoModelo
      * Obtener estado validado
      * @return int
      */
-    public function getValidado(): int
+    public function getEstado(): int
     {
-        return $this->validado;
+        return $this->estado;
     }
 
     /**
@@ -307,13 +310,13 @@ class DocumentoModelo
     }
 
     /**
-     * Establecer estado validado
-     * @param int $validado
+     * Establecer estado estado de validación
+     * @param string $estado
      * @return void
      */
-    public function setValidado(int $validado): void
+    public function setEstado(string $estado): void
     {
-        $this->validado = $validado;
+        $this->estado = $estado;
     }
 
     /**

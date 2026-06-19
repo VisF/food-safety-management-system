@@ -45,11 +45,19 @@ class MoodleControlador {
         return $res ? ['success' => true, 'documento' => $res] : ['success' => false, 'message' => 'Error al guardar certificado'];
     }
 
-    public function listarCertificadosPendientes(): array {
-        // Reutilizar DocumentoModelo para obtener documentos tipo 'certificado_moodle' pendientes
-        $docs = $this->documentoModel->obtenerPorTipo('certificado_moodle');
-        $pendientes = array_filter($docs, function($d){ return (int)($d['validado'] ?? 0) === 0; });
-        return array_values($pendientes);
-    }
+    public function listarCertificadosPendientes(): array
+{
+    $docs =
+        $this->documentoModel
+            ->obtenerPorTipo('moodle');
+
+    $pendientes = array_filter(
+        $docs,
+        fn($d) =>
+            ($d['estado'] ?? '') === 'pendiente'
+    );
+
+    return array_values($pendientes);
+}
 }
 

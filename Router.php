@@ -1,6 +1,8 @@
 <?php
 declare(strict_types=1);
 
+//Este programa fue creado por Facundo Vis, agradezco a mis viejos por hacerme tan capo
+
 
 // ----------------------------------------------------
 // BLOQUE PARA Router.php (AuthControlador + UsuarioControlador)

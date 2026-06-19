@@ -70,18 +70,34 @@ class InicioVista
         return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
     }
 
-    private function getDocumentCardClass(int $state): string
+    private function getDocumentCardClass(string $state): string
     {
-        return $state === 1
-            ? 'app-vista-card app-vista-card--surface flex flex-col items-center justify-center p-6 border border-[#b8e2c4] bg-[#ebf8ef] transition-all'
-            : 'app-vista-card app-vista-card--surface flex flex-col items-center justify-center p-6 transition-all';
+        return match ($state) {
+
+            'aprobado' =>
+                'app-vista-card documento-home documento-home--aprobado',
+
+            'rechazado' =>
+                'app-vista-card documento-home documento-home--rechazado',
+
+            default =>
+                'app-vista-card documento-home documento-home--pendiente'
+        };
     }
 
-    private function getDocumentButtonClass(int $state): string
+    private function getDocumentButtonClass(string $state): string
     {
-        return $state === 1
-            ? 'text-sm font-semibold text-[#2d6e43]'
-            : 'text-sm font-semibold text-[#1f2f46]';
+        return match ($state) {
+
+            'aprobado' =>
+                'documento-home__texto documento-home__texto--aprobado',
+
+            'rechazado' =>
+                'documento-home__texto documento-home__texto--rechazado',
+
+            default =>
+                'documento-home__texto documento-home__texto--pendiente'
+        };
     }
 
     private function getExamBadgeClass(int $available): string
@@ -229,13 +245,25 @@ class InicioVista
                                 <?php endif; ?>
                     <?php // Itera tarjetas de documentos; el array debe ser limitado y sanitizado por el backend.
                     foreach ($inicioData['documentos'] as $document): ?>
-                        <a class="<?php echo $this->getDocumentCardClass((int) $document['state']); ?>" href="<?php echo $this->getRoute((string) $document['route']); ?>" role="button" style="text-decoration: none;">
-                            <div style="width: 48px; height: 48px; border-radius: 16px; background: #e9f2fb; color: #0a4e93; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                        <a
+                            class="<?php echo $this->getDocumentCardClass($document['state']); ?>"
+                            href="<?php echo $this->getRoute((string) $document['route']); ?>"
+                            role="button"
+                        >
+                            <div class="documento-home__icono">
                              <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>"><?php echo $this->e($document['icon']); ?></span>
                             </div>
-                            <span class="<?php echo $this->getDocumentButtonClass((int) $document['state']); ?>">
-                             <?php echo $this->e($document['label']); ?>
-                            </span>
+                            <div class="inicio-documento__contenido">
+
+                                <span class="inicio-documento__titulo">
+                                    <?php echo $this->e($document['label']); ?>
+                                </span>
+
+                                <span class="inicio-documento__descripcion">
+                                    <?php echo $this->e($document['descripcion']); ?>
+                                </span>
+
+                            </div>
                         </a>
                     <?php endforeach; ?>
                         </div>

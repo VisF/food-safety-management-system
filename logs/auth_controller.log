@@ -35,3 +35,55 @@
 [2026-06-16 22:08:04] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-06-16 22:08:14] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
 [2026-06-16 22:38:09] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 19:53:35] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 19:53:39] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 19:53:51] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-17 19:56:30] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-17 19:56:51] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:02:36] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:09:55] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:11:24] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:11:35] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:29] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:36] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:37] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:44] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:46] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:15:52] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-17 20:15:54] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-17 20:39:50] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 20:51:35] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 21:09:04] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 21:09:05] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 21:09:34] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 21:13:43] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-17 21:43:21] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-17 22:06:47] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-17 22:38:13] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 19:14:39] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 19:14:41] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 19:14:47] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-18 19:43:51] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-18 19:43:57] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 20:08:24] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 20:08:29] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 20:10:25] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 20:10:30] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-18 21:25:46] [WARNING] IP: ::1 | Session expired due to inactivity | {"user_id":4,"inactive_minutes":75}
+[2026-06-18 21:25:46] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-18 21:25:46] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
+[2026-06-18 21:25:53] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:26:15] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:26:22] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 21:42:03] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 21:42:10] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:42:30] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:42:36] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 21:43:52] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 21:44:01] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:56:32] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 21:56:38] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 22:02:24] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-18 22:02:31] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 22:05:37] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-18 22:05:48] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno2@test.com"}

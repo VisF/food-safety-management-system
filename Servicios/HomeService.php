@@ -14,7 +14,7 @@ class HomeService
 
         foreach ($documentos as $doc) {
 
-            if (!$doc->getValidado()) {
+            if ($doc->getEstado() !== 'aprobado') {
                 continue;
             }
 
@@ -37,6 +37,7 @@ class HomeService
                     break;
 
                 case 'MOODLE':
+                case 'CERTIFICADO_MOODLE':
                     $tieneMoodle = true;
                     break;
             }
@@ -69,11 +70,12 @@ class HomeService
         }
 
         return [
-            'texto' => 'Inscribirme a examen',
-            'ruta' => 'inscripciones',
-            'completa' => true,
-            'porcentaje' => 100
-        ];
+                'faltantes' => [],
+                'texto' => 'Inscribirme a examen',
+                'ruta' => 'inscripciones',
+                'completa' => true,
+                'porcentaje' => 100
+            ];
     }
 
     private function calcularPorcentaje(

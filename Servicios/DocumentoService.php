@@ -156,30 +156,31 @@ class DocumentoService
 
         return $resultado;
     }
-    public function obtenerValidados(int $idInscripcion): array 
+    public function obtenerValidados(int $usuarioId): array
     {
         $documentos =
-            $this->obtenerPorInscripcion(
-                $idInscripcion
+            $this->obtenerPorUsuario(
+                $usuarioId
             );
 
         return array_filter(
             $documentos,
             fn (DocumentoDTO $doc)
-                => $doc->estaValidado()
+                => $doc->estaAprobado()
         );
     }
-    public function obtenerNoValidados(int $idInscripcion): array 
+
+    public function obtenerNoValidados(int $usuarioId): array
     {
         $documentos =
-            $this->obtenerPorInscripcion(
-                $idInscripcion
+            $this->obtenerPorUsuario(
+                $usuarioId
             );
 
         return array_filter(
             $documentos,
             fn (DocumentoDTO $doc)
-                => !$doc->estaValidado()
+                => !$doc->estaAprobado()
         );
     }
 

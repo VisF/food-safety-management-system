@@ -5,22 +5,20 @@ $title ??= 'Iniciar Sesión';
 $email ??= '';
 $error ??= null;
 $csrf_token ??= '';
+$title ??= 'Iniciar Sesión';
+
+$ocultarAccionesHeader = true;
 
 include __DIR__ . '/header.php';
+
+
 ?>
 
-<main class="contenido-principal">
+<main class="contenido-principal contenido-principal-login">
 
     <section style="text-align:center; margin-bottom:24px;">
         <span
-            class="material-symbols-outlined"
-            style="
-                font-size:72px;
-                color:#0a4e93;
-                margin-bottom:12px;
-                display:block;
-            "
-        >
+            class="material-symbols-outlined"        >
             account_circle
         </span>
 

@@ -57,11 +57,40 @@ class TramiteControlador
             $stmt->execute([':id' => $insc['estado_tramite_id'] ?? $insc['id_estado'] ?? 0]);
             $estado = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
 
-            $stmt = $pdo->prepare('SELECT COUNT(*) as total, SUM(CASE WHEN validado = 1 THEN 1 ELSE 0 END) as validados FROM documentos WHERE id_inscripcion = :id');
-            $stmt->execute([':id' => $id_inscripcion]);
-            $docStats = $stmt->fetch(\PDO::FETCH_ASSOC) ?: ['total' => 0, 'validados' => 0];
-            $totalDocs = (int)($docStats['total'] ?? 0);
-            $validados = (int)($docStats['validados'] ?? 0);
+            $usuarioId = (int)($insc['usuario_id'] ?? 0);
+
+            $stmt = $pdo->prepare(
+                "SELECT
+                    COUNT(*) as total,
+                    SUM(
+                        CASE
+                            WHEN estado = 'aprobado'
+                            THEN 1
+                            ELSE 0
+                        END
+                    ) as validados
+                FROM documentos
+                WHERE usuario_id = :usuario_id"
+            );
+
+            $stmt->execute([
+                ':usuario_id' => $usuarioId
+            ]);
+
+            $docStats =
+                $stmt->fetch(\PDO::FETCH_ASSOC)
+                ?: [
+                    'total' => 0,
+                    'validados' => 0
+                ];
+
+            $totalDocs =
+                (int)($docStats['total'] ?? 0);
+
+            $validados =
+                (int)($docStats['validados'] ?? 0);
+
+
 
             $stmt = $pdo->prepare('SELECT * FROM resultado_examen WHERE inscripcion_id = :id ORDER BY fecha_resultado DESC LIMIT 1');
             $stmt->execute([':id' => $id_inscripcion]);

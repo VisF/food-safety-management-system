@@ -615,7 +615,7 @@ class AdminControlador
             $docs = $this->documentoModelo->obtenerPorInscripcion($id_inscripcion);
             $faltantes = [];
             foreach ($docs as $d) {
-                if (((int)($d['validado'] ?? 0)) !== 1) $faltantes[] = $d['tipo_documento'] ?? 'desconocido';
+                if (((int)($d['estado'] ?? '')) !== 'aprobado') $faltantes[] = $d['tipo_documento'] ?? 'desconocido';
             }
             if (!empty($faltantes)) {
                 return ['success' => false, 'message' => 'Documentación incompleta: ' . implode(', ', $faltantes), 'inscripcion' => $docs];
@@ -1171,7 +1171,7 @@ class AdminControlador
             $docVal = (int)$pdo->query(
                                             "SELECT COUNT(*)
                                             FROM documentos
-                                            WHERE validado = 1
+                                            WHERE estado = 'aprobado'
                                             AND fecha_subida BETWEEN '$d1' AND '$d2'"
                                         )->fetchColumn();
             $exReal = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE fecha_resultado BETWEEN '$d1' AND '$d2'")->fetchColumn();

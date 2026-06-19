@@ -11,22 +11,72 @@
   - Evitar CDN en producción sin políticas CSP; preferir assets versionados y servidos desde el servidor.
 -->
 <header class="encabezado-principal app-shell-header encabezado-principal--alto encabezado-principal--fijo encabezado-principal--realzado encabezado-principal--primario text-on-primary topbar">
-   <div class="encabezado-principal__grupo encabezado-principal__grupo--espaciado">
-    <button aria-label="Abrir menú" class="encabezado-principal__boton" type="button">
-     <span class="encabezado-principal__icono material-symbols-outlined" data-icon="menu">
-      menu
-     </span>
-    </button>
-    <h1 class="encabezado-principal__titulo">
-     <?php echo isset($page_title) ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8') : 'App Ciudadana'; ?>
-    </h1>
-   </div>
-   <button aria-label="Cambiar tema" class="encabezado-principal__boton" type="button">
-    <span class="encabezado-principal__icono material-symbols-outlined" data-icon="light_mode">
-     light_mode
-    </span>
-   </button>
-  </header>
+
+    <div class="encabezado-principal__grupo encabezado-principal__grupo--espaciado">
+
+        <button
+            aria-label="Abrir menú"
+            class="encabezado-principal__boton"
+            type="button"
+        >
+            <span
+                class="encabezado-principal__icono material-symbols-outlined"
+                data-icon="menu"
+            >
+                menu
+            </span>
+        </button>
+
+        <h1 class="encabezado-principal__titulo">
+            <?= isset($page_title)
+                ? htmlspecialchars($page_title, ENT_QUOTES, 'UTF-8')
+                : 'App Ciudadana'; ?>
+        </h1>
+
+    </div>
+
+    <?php if (empty($ocultarAccionesHeader)): ?>
+
+        <?php if (!empty($_SESSION['usuario_id'])): ?>
+
+            <a
+                href="<?= BASE_URL ?>/logout"
+                class="encabezado-principal__accion"
+                aria-label="Cerrar sesión"
+                title="Cerrar sesión"
+            >
+                <span class="encabezado-principal__accion-texto">
+                    Cerrar sesión
+                </span>
+
+                <span class="encabezado-principal__icono material-symbols-outlined">
+                    logout
+                </span>
+            </a>
+
+        <?php else: ?>
+
+            <a
+                href="<?= BASE_URL ?>/login"
+                class="encabezado-principal__accion"
+                aria-label="Iniciar sesión"
+                title="Iniciar sesión"
+            >
+                <span class="encabezado-principal__accion-texto">
+                    Iniciar sesión
+                </span>
+
+                <span class="encabezado-principal__icono material-symbols-outlined">
+                    login
+                </span>
+            </a>
+
+        <?php endif; ?>
+
+    <?php endif; ?>
+
+</header>
+
   <div id="toast-container"></div>
 <?php
 $usuarioLogueado = !empty($_SESSION['usuario_id']);

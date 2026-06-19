@@ -155,8 +155,9 @@ class ValidacionControlador
             $presentes = [];
             // Recorrer documentos cargados y acumular los validados
             foreach ($docs as $d) {
-                if ((int)($d['validado'] ?? 0) === 1) {
-                    $presentes[] = $d['tipo_documento'];
+                if (($d['estado'] ?? '') === 'aprobado') {
+                    $presentes[] =
+                        $d['tipo_documento'];
                 }
             }
 
@@ -183,7 +184,9 @@ class ValidacionControlador
     {
         try {
             if (!$this->inscripcionModelo) return ['valido' => false, 'certificado_presente' => false, 'fecha_certificado' => null];
+
             $insc = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
+
             if (!$insc) return ['valido' => false, 'certificado_presente' => false, 'fecha_certificado' => null];
 
             $curso_id = (int)($insc['curso_id'] ?? 0);
@@ -204,10 +207,14 @@ class ValidacionControlador
             }
 
             $docModel = new DocumentoModelo();
-            $docs = $docModel->obtenerPorInscripcion($id_inscripcion);
+
+            $docs = $docModel->obtenerPorUsuario(
+                                                (int)$insc['usuario_id']
+                                            );
+
             foreach ($docs as $d) {
                 $tipo = $d['tipo_documento'] ?? '';
-                if (((int)($d['validado'] ?? 0) === 1) && (strtolower($tipo) === 'certificado_moodle' || strtolower($tipo) === 'certificado moodle')) {
+                if ((int)($d['estado']  === 'aprobado') && (strtolower($tipo) === 'moodle')) {
                     return ['valido' => true, 'certificado_presente' => true, 'fecha_certificado' => $d['fecha_subida'] ?? null];
                 }
             }
