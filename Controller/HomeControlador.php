@@ -21,6 +21,8 @@ require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
 require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 
+require_once __DIR__ . '/../Modelo/CursoModelo.php';
+
 require_once __DIR__ . '/../Servicios/HomeService.php';
 
 class HomeControlador
@@ -29,11 +31,16 @@ class HomeControlador
     private InscripcionService $inscripcionService;
     private DocumentoService $documentoService;
 
+    private InscripcionModelo $inscripcionModelo;
+
     public function __construct()
     {
+        $this->inscripcionModelo =
+            new InscripcionModelo();
+
         $this->inscripcionService =
             new InscripcionService(
-                new InscripcionModelo()
+                $this->inscripcionModelo
             );
 
         $this->homeService =
@@ -43,6 +50,7 @@ class HomeControlador
             new DocumentoService(
                 new DocumentoModelo()
             );
+
         @mkdir(dirname(self::LOG_FILE), 0755, true);
     }
 
@@ -109,6 +117,79 @@ class HomeControlador
 
         $documentosVista = [];
 
+        $modeloCurso = new CursoModelo();
+
+        $cursosBD =
+            $modeloCurso->obtenerActivos();
+
+        $cursosVista = [];
+        $modeloInscripcion = new InscripcionModelo();
+        foreach ($cursosBD as $curso) {
+
+            $yaInscripto = false;
+
+            if ($inscripcion !== null) {
+
+                $yaInscripto =
+                    $inscripcion->getCursoId() === (int)$curso['id']
+                    &&
+                    $inscripcion->getTipoInscripcionId() === 1;
+            }
+            $inscriptos =
+                        $modeloInscripcion
+                            ->contarInscriptosCurso(
+                                (int)$curso['id']
+                            );
+
+            $cupos =
+                (int)$curso['cupos'];
+
+            $cuposDisponibles =
+                max(
+                    0,
+                    $cupos - $inscriptos
+            );
+            $cursosVista[] = [
+
+                            'id' => (int)$curso['id'],
+
+                            'nombre' => $curso['nombre'],
+
+                            'descripcion' => $curso['descripcion'],
+
+                            'modalidad' => ucfirst(
+                                $curso['modalidad']
+                            ),
+
+                            'fecha_inicio' =>
+                                $curso['fecha_inicio'],
+
+                            'hora_inicio' =>
+                                substr(
+                                    (string)$curso['hora_inicio'],
+                                    0,
+                                    5
+                                ),
+
+                            'ubicacion' =>
+                                $curso['ubicacion'],
+
+                            'cupos' =>
+                                (int)$curso['cupos'],
+
+                            'inscripto' =>
+                                $yaInscripto,
+
+                            'cupos_totales' =>
+                                $cupos,
+
+                            'inscriptos' =>
+                                $inscriptos,
+
+                            'cupos_disponibles' =>
+                                $cuposDisponibles,
+                        ];
+        }
         foreach ($documentos as $doc) {
             $icono = 'description';
             switch (
@@ -142,9 +223,15 @@ class HomeControlador
                     break;
 
                 case 'CERTIFICADO_MOODLE':
-                case 'MOODLE':
-                    $label = 'Curso Moodle aprobado';
-                    $descripcion = 'Certificado Moodle';
+                case 'MOODLE':                   
+                    $label = 'Certificado Moodle';
+                    if ($doc->getEstado() === 'aprobado') {
+                        $descripcion = 'Curso aprobado';
+                    } elseif ($doc->getEstado() === 'rechazado') {
+                        $descripcion = 'Requiere corrección';
+                    } else {
+                        $descripcion = 'Pendiente de revisión';
+                    }
                     $icono = 'school';
                     break;
 
@@ -195,7 +282,6 @@ class HomeControlador
                     $documentos,
                     $inscripcion
                 );
-        
 
     return [
         'page_title' => 'App Ciudadana - Inicio',
@@ -231,7 +317,7 @@ class HomeControlador
         ],
 
         'documentos' => $documentosVista,
-
+        'cursos' => $cursosVista,
         'examenes' => $examenesVista,
         
         'documentos_faltantes' =>

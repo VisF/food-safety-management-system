@@ -55,15 +55,30 @@ CREATE TABLE `tipo_inscripcion` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
-CREATE TABLE `cursos` (
-  `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `nombre` VARCHAR(150) NOT NULL,
-  `modalidad` ENUM('presencial','virtual') NOT NULL DEFAULT 'presencial',
-  `descripcion` TEXT DEFAULT NULL,
-  `activo` TINYINT(1) NOT NULL DEFAULT 1,
-  `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+CREATE TABLE cursos (
+    id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+
+    nombre VARCHAR(150) NOT NULL,
+
+    modalidad ENUM(
+        'presencial',
+        'virtual'
+    ) NOT NULL,
+
+    descripcion TEXT NULL,
+
+    fecha_inicio DATE NULL,
+
+    hora_inicio TIME NULL,
+
+    ubicacion VARCHAR(255) NULL,
+
+    cupos INT UNSIGNED DEFAULT 30,
+
+    activo TINYINT(1) NOT NULL DEFAULT 1,
+
+    fecha_creacion TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+); ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE `fecha_cursos` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -116,6 +131,7 @@ CREATE TABLE `inscripciones` (
   `fecha_inscripcion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `estado_tramite_id` INT UNSIGNED DEFAULT NULL,
   `observaciones` TEXT DEFAULT NULL,
+  `fecha_fin_curso` DATE NULL,
   PRIMARY KEY (`id`),
   KEY `ins_usuario_idx` (`usuario_id`),
   KEY `ins_curso_idx` (`curso_id`),

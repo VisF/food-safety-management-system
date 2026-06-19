@@ -269,6 +269,129 @@ class InicioVista
                         </div>
                      </section>
 
+                    <section class="home-cursos">
+
+                        <h4 class="home-cursos__titulo">
+                            Cursos Disponibles
+                        </h4>
+
+                        <div class="home-cursos__grid">
+
+                            <?php foreach ($inicioData['cursos'] as $curso): ?>
+
+                            <article class="app-vista-card app-vista-card--surface home-curso-card">
+
+                                <div class="home-curso-card__contenido">
+
+                                    <h5 class="home-curso-card__nombre">
+                                        <?= $this->e($curso['nombre']) ?>
+                                    </h5>
+
+                                    <p class="home-curso-card__descripcion">
+                                        <?= $this->e($curso['descripcion']) ?>
+                                    </p>
+                                    <div class="home-curso-card__datos">
+
+                                        <?php if (!empty($curso['fecha_inicio'])): ?>
+                                        <p class="home-curso-card__dato">
+                                            <?= date(
+                                                'd/m/Y',
+                                                strtotime($curso['fecha_inicio'])
+                                            ) ?>
+                                        </p>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($curso['hora_inicio'])): ?>
+                                        <p class="home-curso-card__dato">
+                                             <?= $this->e(
+                                                $curso['hora_inicio']
+                                            ) ?> hs
+                                        </p>
+                                        <?php endif; ?>
+
+                                        <?php if (!empty($curso['ubicacion'])): ?>
+                                        <p class="home-curso-card__dato">
+                                            <?= $this->e(
+                                                $curso['ubicacion']
+                                            ) ?>
+                                        </p>
+                                        <?php endif; ?>
+
+                                        <p class="home-curso-card__dato">
+
+                                            👥
+
+                                            <?= (int)$curso['cupos_disponibles'] ?>
+
+                                            cupos disponibles
+
+                                            de
+
+                                            <?= (int)$curso['cupos_totales'] ?>
+
+                                        </p>
+
+                                    </div>
+                                    <span class="app-vista-chip">
+
+                                        <?php if (
+                                            strtolower($curso['modalidad']) === 'presencial'
+                                        ): ?>
+
+                                            📍 Presencial
+
+                                        <?php else: ?>
+
+                                            💻 Virtual
+
+                                        <?php endif; ?>
+
+                                    </span>
+
+                                </div>
+
+                               <?php if (!$curso['inscripto']): ?>
+
+                                    <form
+                                        method="POST"
+                                        action="<?= BASE_URL ?>/curso/inscribirse"
+                                    >
+
+                                        <input
+                                            type="hidden"
+                                            name="curso_id"
+                                            value="<?= (int)$curso['id'] ?>"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="app-vista-button app-vista-button--primary"
+                                        >
+                                            Inscribirme
+                                        </button>
+
+                                    </form>
+
+                                    <?php else: ?>
+
+                                    <button
+                                        type="button"
+                                        class="app-vista-button app-vista-button--secondary"
+                                        disabled
+                                    >
+                                        Ya inscripto
+                                    </button>
+
+                                    <?php endif; ?>
+
+                            </article>
+
+                            <?php endforeach; ?>
+
+                        </div>
+
+                    </section>
+
                      <section id="proximos-examenes" style="margin-bottom: 20px;">
                         <h4 style="margin: 0 0 10px; color: #1f2f46; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
                          Próximos Exámenes

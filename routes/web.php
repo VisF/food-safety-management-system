@@ -25,6 +25,21 @@ $router->map(
     $controller->procesarInscripcionExamen($_POST);
     }
 );
+//---------- Ruta para inscribirse a un curso (sin examen) ---------
+
+$router->map(
+    'POST',
+    '/curso/inscribirse',
+    function () {
+
+        require_once __DIR__ . '/../Controller/InscripcionControlador.php';
+
+        $controlador =
+            new InscripcionControlador();
+
+        $controlador->inscribirseCurso();
+    }
+);
 
 
 

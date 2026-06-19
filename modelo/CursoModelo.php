@@ -12,6 +12,8 @@ declare(strict_types=1);
  * - activo: estado del curso (1=activo, 0=inactivo)
  * - fecha_creacion: timestamp de creación del registro
  */
+require_once __DIR__ . '/../db/Connection.php';
+
 
 class CursoModelo
 {
@@ -36,12 +38,16 @@ class CursoModelo
      */
     public function obtenerTodos(): array
     {
-        // TODO: SELECT * FROM cursos ORDER BY nombre ASC
-        // TODO: Retornar array de resultados
-        
-        return [];
-    }
+        $pdo = Connection::getPDO();
 
+        $stmt = $pdo->query(
+            "SELECT *
+            FROM cursos
+            ORDER BY nombre ASC"
+        );
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
     /**
      * Obtener curso por ID
      * @param int $id ID del curso
@@ -49,10 +55,22 @@ class CursoModelo
      */
     public function obtenerPorId(int $id): ?array
     {
-        // TODO: SELECT * FROM cursos WHERE id = $id
-        // TODO: Retornar array de datos o null
-        
-        return null;
+        $pdo = Connection::getPDO();
+
+        $stmt = $pdo->prepare(
+            "SELECT *
+            FROM cursos
+            WHERE id = :id
+            LIMIT 1"
+        );
+
+        $stmt->execute([
+            ':id' => $id
+        ]);
+
+        $curso = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $curso ?: null;
     }
 
     /**
@@ -61,10 +79,16 @@ class CursoModelo
      */
     public function obtenerActivos(): array
     {
-        // TODO: SELECT * FROM cursos WHERE activo = 1 ORDER BY nombre ASC
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = Connection::getPDO();
+
+        $stmt = $pdo->query(
+            "SELECT *
+            FROM cursos
+            WHERE activo = 1
+            ORDER BY nombre ASC"
+        );
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /**
@@ -74,12 +98,41 @@ class CursoModelo
      */
     public function crear(array $data)
     {
-        // TODO: Validar que nombre sea único
-        // TODO: Validar que modalidad sea presencial, virtual o híbrida
-        // TODO: INSERT en tabla cursos
-        // TODO: Retornar ['id' => $id, 'nombre' => $nombre, ...]
-        
-        return false;
+        $pdo = Connection::getPDO();
+
+        $stmt = $pdo->prepare(
+            "INSERT INTO cursos
+            (
+                nombre,
+                modalidad,
+                descripcion,
+                activo,
+                fecha_creacion
+            )
+            VALUES
+            (
+                :nombre,
+                :modalidad,
+                :descripcion,
+                1,
+                NOW()
+            )"
+        );
+
+        $stmt->execute([
+            ':nombre' => trim($data['nombre']),
+            ':modalidad' => trim($data['modalidad']),
+            ':descripcion' => trim($data['descripcion'])
+        ]);
+
+        $id = (int)$pdo->lastInsertId();
+
+        return [
+            'id' => $id,
+            'nombre' => $data['nombre'],
+            'modalidad' => $data['modalidad'],
+            'descripcion' => $data['descripcion']
+        ];
     }
 
     /**
@@ -90,11 +143,25 @@ class CursoModelo
      */
     public function actualizar(int $id, array $data): bool
     {
-        // TODO: Validar que el curso exista
-        // TODO: UPDATE cursos SET ... WHERE id = $id
-        // TODO: Retornar true/false según resultado
-        
-        return false;
+        $pdo = Connection::getPDO();
+
+        $stmt = $pdo->prepare(
+            "UPDATE cursos
+            SET
+                nombre = :nombre,
+                modalidad = :modalidad,
+                descripcion = :descripcion,
+                activo = :activo
+            WHERE id = :id"
+        );
+
+        return $stmt->execute([
+            ':id' => $id,
+            ':nombre' => trim($data['nombre']),
+            ':modalidad' => trim($data['modalidad']),
+            ':descripcion' => trim($data['descripcion']),
+            ':activo' => (int)$data['activo']
+        ]);
     }
 
     /**
@@ -102,12 +169,23 @@ class CursoModelo
      * @param string $modalidad presencial, virtual, híbrida
      * @return array Array de cursos de la modalidad especificada
      */
-    public function obtenerCursosPorModalidad(string $modalidad): array
+    public function obtenerCursosPorModalidad(string $modalidad ): array
     {
-        // TODO: SELECT * FROM cursos WHERE modalidad = $modalidad AND activo = 1
-        // TODO: Retornar array de resultados
-        
-        return [];
+        $pdo = Connection::getPDO();
+
+        $stmt = $pdo->prepare(
+            "SELECT *
+            FROM cursos
+            WHERE modalidad = :modalidad
+            AND activo = 1
+            ORDER BY nombre ASC"
+        );
+
+        $stmt->execute([
+            ':modalidad' => $modalidad
+        ]);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Getters

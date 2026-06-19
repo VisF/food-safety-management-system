@@ -21,6 +21,8 @@ declare(strict_types=1);
  * - Renovación: documentación + examen
  */
 
+require_once __DIR__ . '/../Modelo/AsistenciaModelo.php';
+
 class ValidacionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/validacion_controller.log';

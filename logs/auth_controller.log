@@ -87,3 +87,4 @@
 [2026-06-18 22:02:31] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-06-18 22:05:37] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-06-18 22:05:48] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno2@test.com"}
+[2026-06-19 19:02:02] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}

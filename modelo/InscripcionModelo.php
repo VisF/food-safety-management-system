@@ -488,5 +488,60 @@ class InscripcionModelo
     {
         $this->observaciones = $observaciones;
     }
+    public function contarInscriptosCurso(int $cursoId): int
+    {
+        try {
+
+            $sql = "
+                SELECT COUNT(*) total
+                FROM inscripciones
+                WHERE curso_id = :curso_id
+                AND tipo_inscripcion_id = 1
+            ";
+
+            $stmt =
+                $this->conexion->prepare(
+                    $sql
+                );
+
+            $stmt->execute([
+                ':curso_id' => $cursoId
+            ]);
+
+            return (int)$stmt->fetchColumn();
+
+        } catch (\Exception $e) {
+
+            return 0;
+        }
+    }
+    public function tieneCursoActivo(int $usuarioId): bool
+    {
+        try {
+
+            $sql = "
+                SELECT COUNT(*)
+                FROM inscripciones
+                WHERE usuario_id = :usuario_id
+                AND tipo_inscripcion_id = 1
+                AND fecha_fin_curso >= CURDATE()
+            ";
+
+            $stmt =
+                $this->conexion->prepare(
+                    $sql
+                );
+
+            $stmt->execute([
+                ':usuario_id' => $usuarioId,
+            ]);
+
+            return ((int)$stmt->fetchColumn()) > 0;
+
+        } catch (\Exception $e) {
+
+            return false;
+        }
+    }
 }
 ?>

@@ -7,6 +7,11 @@ declare(strict_types=1);
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
+require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
+require_once __DIR__ . '/../Modelo/CursoModelo.php';
+require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+
 class InscripcionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/inscripcion_controller.log';
@@ -85,8 +90,10 @@ class InscripcionControlador
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
             if ($row && isset($row['modalidad'])) $modalidad = $row['modalidad'];
             // Reglas por modalidad: presencial requiere asistencia, virtual requiere certificado Moodle
-            if ($modalidad === 'presencial') { $asis = $validCtrl->validarAsistencia($id); if (!$asis['valido']) { $puede = false; $motivos[] = 'Asistencia insuficiente'; } }
-            if ($modalidad === 'virtual') { $m = $validCtrl->validarCursoMoodle($id); if (!$m['valido']) { $puede = false; $motivos[] = 'Falta certificado Moodle'; } }
+            if ($modalidad === 'presencial') { $asis = $validCtrl->validarAsistencia($id); 
+            if (!$asis['valido']) { $puede = false; $motivos[] = 'Asistencia insuficiente'; } }
+            if ($modalidad === 'virtual') { $m = $validCtrl->validarCursoMoodle($id); 
+            if (!$m['valido']) { $puede = false; $motivos[] = 'Falta certificado Moodle'; } }
             $usuario_id = (int)($insc['usuario_id'] ?? 0);
             $rec = $validCtrl->validarPlazoRecursante($usuario_id);
             // Validación de plazo para recursantes
@@ -117,7 +124,17 @@ class InscripcionControlador
 
     public function obtenerInscripcion(int $id): ?array
     {
-        try { $pdo = $this->pdo(); $stmt = $pdo->prepare('SELECT * FROM inscripciones WHERE id = :id'); $stmt->execute([':id' => $id]); $row = $stmt->fetch(\PDO::FETCH_ASSOC); return $row ?: null; } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]); return null; }
+        try { $pdo = $this->pdo(); $stmt = $pdo->prepare('SELECT * 
+                                                            FROM inscripciones 
+                                                            WHERE id = :id'); 
+            $stmt->execute([':id' => $id]); 
+            $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+             return $row ?: null; 
+             } catch (\Exception $e) 
+             { 
+                $this->registrarLog('ERROR_OBTENER_INSCRIPCION', 
+                    ['id' => $id, 'error' => $e->getMessage()]); 
+                return null; }
     }
 
     public function obtenerInscripcionesActivas(int $id_usuario): array
@@ -132,7 +149,10 @@ class InscripcionControlador
             AND i.estado_tramite_id IN (:estado1, :estado2, :estado3) 
             ORDER BY i.fecha_inscripcion DESC'; 
             $stmt = $pdo->prepare($sql); 
-            $stmt->execute([':uid' => $id_usuario, ':estado1' => EstadoTramite::PENDIENTE, ':estado2' => EstadoTramite::CURSANDO, ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN]); 
+            $stmt->execute([':uid' => $id_usuario,
+                            ':estado1' => EstadoTramite::PENDIENTE, 
+                            ':estado2' => EstadoTramite::CURSANDO, 
+                            ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN]); 
             return $stmt->fetchAll(\PDO::FETCH_ASSOC); } 
         catch (\Exception $e) { 
             $this->registrarLog('ERROR_OBTENER_INSCRIPCIONES_ACTIVAS', 
@@ -211,19 +231,41 @@ class InscripcionControlador
 
     public function obtenerCursosDisponibles(): array
     {
-        try { $pdo = $this->pdo(); $sql = 'SELECT DISTINCT c.* FROM cursos c JOIN fecha_curso fc ON c.id = fc.curso_id WHERE c.activo = 1 AND fc.cupos > 0 AND fc.activo = 1 AND fc.fecha_inicio > NOW() ORDER BY c.nombre ASC'; $stmt = $pdo->prepare($sql); $stmt->execute(); return $stmt->fetchAll(\PDO::FETCH_ASSOC); } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_CURSOS_DISPONIBLES', ['error' => $e->getMessage()]); return []; }
+        try { $pdo = $this->pdo(); $sql = 'SELECT DISTINCT c.* 
+                                            FROM cursos c 
+                                            JOIN fecha_curso fc ON c.id = fc.curso_id 
+                                            WHERE c.activo = 1 AND fc.cupos > 0 AND fc.activo = 1 AND fc.fecha_inicio > NOW() 
+                                            ORDER BY c.nombre ASC'; 
+            $stmt = $pdo->prepare($sql); 
+            $stmt->execute(); 
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC); } 
+        catch (\Exception $e) 
+            { 
+                $this->registrarLog('ERROR_OBTENER_CURSOS_DISPONIBLES', ['error' => $e->getMessage()]); 
+                return []; }
     }
 
     public function obtenerExamenesDisponibles(): array
     {
         try {
-            $stmt = $this->pdo()->prepare('SELECT id, fecha, hora, ubicacion, cupos FROM examenes WHERE activo = 1 AND cupos >= 0 AND fecha >= CURDATE() ORDER BY fecha ASC, hora ASC');
+            $stmt = $this->pdo()->prepare('SELECT id, fecha, hora, ubicacion, cupos 
+                                            FROM examenes
+                                             WHERE activo = 1 AND cupos >= 0 AND fecha >= CURDATE() 
+                                             ORDER BY fecha ASC, hora ASC');
             $stmt->execute();
             $examenes = [];
             while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
                 $fecha = new \DateTimeImmutable($row['fecha']);
                 $hora = $row['hora'] ? substr((string)$row['hora'], 0, 5) : '';
-                $examenes[] = ['id' => (int)$row['id'], 'month' => strtoupper($fecha->format('M')), 'day' => $fecha->format('d'), 'title' => $row['ubicacion'] ?: 'Examen', 'capacity' => ((int)$row['cupos'] > 0) ? 1 : 0, 'capacity_label' => ((int)$row['cupos'] > 0) ? 'CUPOS DISPONIBLES' : 'SIN CUPOS', 'time' => $hora !== '' ? date('h:i A', strtotime($hora)) : '', 'room' => $row['ubicacion'] ?: '', 'route' => 'inscripcion_examen'];
+                $examenes[] = ['id' => (int)$row['id'], 
+                                'month' => strtoupper($fecha->format('M')), 
+                                'day' => $fecha->format('d'), 
+                                'title' => $row['ubicacion'] ?: 'Examen', 
+                                'capacity' => ((int)$row['cupos'] > 0) ? 1 : 0, 
+                                'capacity_label' => ((int)$row['cupos'] > 0) ? 'CUPOS DISPONIBLES' : 'SIN CUPOS', 
+                                'time' => $hora !== '' ? date('h:i A', strtotime($hora)) : '', 
+                                'room' => $row['ubicacion'] ?: '', 
+                                'route' => 'inscripcion_examen'];
             }
             return $examenes;
         } catch (\Exception $e) { $this->registrarLog('ERROR_OBTENER_EXAMENES_DISPONIBLES', ['error' => $e->getMessage()]); return []; }
@@ -450,6 +492,87 @@ class InscripcionControlador
         ];
     }
 
+
+    public function inscribirseCurso(): void
+    {
+        try {
+
+            if (empty($_SESSION['usuario_id'])) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/login'
+                );
+
+                exit;
+            }
+
+            $cursoId =
+                (int)(
+                    $_POST['curso_id']
+                    ?? 0
+                );
+
+            if ($cursoId <= 0) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/?toast=curso_invalido'
+                );
+
+                exit;
+            }
+            $documentos = $this->documentoModelo
+                            ->obtenerPorUsuario(
+                                (int)$_SESSION['usuario_id']
+                            );
+            $resultado =
+                $this->inscripcionModelo->crear([
+                    'usuario_id' =>
+                        (int)$_SESSION['usuario_id'],
+
+                    'curso_id' =>
+                        $cursoId,
+
+                    'tipo_inscripcion_id' =>
+                        1,
+
+                    'estado_tramite_id' =>
+                        1
+                ]);
+
+            if (!$resultado) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/?toast=ya_inscripto'
+                );
+
+                exit;
+            }
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/?toast=curso_inscripto'
+            );
+
+            exit;
+
+        } catch (\Exception $e) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/?toast=error_inscripcion'
+            );
+
+            exit;
+        }
+    }
 
 
 }

@@ -1,4 +1,6 @@
 <?php
+require_once __DIR__ . '/../Controller/ValidacionControlador.php';
+
 
 class HomeService
 {
@@ -11,6 +13,7 @@ class HomeService
         $tieneFoto = false;
         $tieneAsistencia = false;
         $tieneMoodle = false;
+        $asistenciaValida = false;
 
         foreach ($documentos as $doc) {
 
@@ -32,10 +35,6 @@ class HomeService
                     $tieneFoto = true;
                     break;
 
-                case 'ASISTENCIA':
-                    $tieneAsistencia = true;
-                    break;
-
                 case 'MOODLE':
                 case 'CERTIFICADO_MOODLE':
                     $tieneMoodle = true;
@@ -43,10 +42,29 @@ class HomeService
             }
         }
 
-        $documentacionCompleta =
-            $tieneDni
-            && $tieneFoto
-            && ($tieneAsistencia || $tieneMoodle);
+
+
+
+
+        if ($inscripcion !== null) {
+
+            $validacion = new ValidacionControlador();
+
+            $resultadoAsistencia =
+                $validacion->validarAsistencia(
+                    $inscripcion->getId()
+                );
+
+            $asistenciaValida =
+                $resultadoAsistencia['valido'];
+        }
+
+        $documentacionCompleta = $tieneDni
+                                && $tieneFoto
+                                && (
+                                    $tieneAsistencia
+                                    || $tieneMoodle
+                                );
 
         if (!$documentacionCompleta) {
 
@@ -95,7 +113,7 @@ class HomeService
             $completos++;
         }
 
-        if ($asistencia || $moodle) {
+        if ($moodle || $asistencia) {
             $completos++;
         }
 
@@ -119,9 +137,8 @@ class HomeService
             $faltantes[] = 'Foto Carnet';
         }
 
-        if (!$asistencia && !$moodle) {
-            $faltantes[] =
-                'Constancia de asistencia o certificado Moodle';
+        if (!$moodle && !$asistencia) {
+            $faltantes[] = 'Certificado Moodle o Constancia de asistencia';
         }
 
         return $faltantes;

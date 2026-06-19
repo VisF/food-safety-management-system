@@ -55,9 +55,28 @@ INSERT INTO usuario_roles (id, usuario_id, rol_id, fecha_asignacion) VALUES
 (4, 4, 2, '2026-05-01 07:35:00'),
 (5, 4, 3, '2026-05-01 07:36:00');
 
-INSERT INTO cursos (id, nombre, modalidad, descripcion, activo, fecha_creacion) VALUES
-(1, 'Manipulacion de Alimentos Basica', 'presencial', 'Curso base para manipuladores', 1, '2026-05-01 08:30:00'),
-(2, 'Buenas Practicas de Higiene', 'virtual', 'Capacitacion virtual complementaria', 1, '2026-05-01 08:35:00');
+INSERT INTO cursos
+(
+    nombre,
+    modalidad,
+    descripcion,
+    fecha_inicio,
+    hora_inicio,
+    ubicacion,
+    cupos,
+    activo
+)
+VALUES
+(
+    'Manipulación Segura de Alimentos',
+    'presencial',
+    'Curso oficial de manipulación de alimentos',
+    '2026-07-15',
+    '18:00:00',
+    'Centro Cultural Municipal',
+    30,
+    1
+);
 
 INSERT INTO fecha_cursos (id, curso_id, fecha_inicio, fecha_fin, cupos, activo) VALUES
 (1, 1, '2026-06-05', '2026-06-20', 12, 1),
