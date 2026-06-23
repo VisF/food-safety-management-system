@@ -154,49 +154,7 @@ class SubidaDocumentacionVista
 
     $this->getHeader($data);
     ?>
-    <?php if (($_GET['toast'] ?? '') === 'documento_subido'): ?>
-      <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          mostrarToast(
-              'Documento subido correctamente',
-              'success'
-          );
-      });
-      </script>
-      <?php endif; ?>
 
-      <?php if (($_GET['toast'] ?? '') === 'error_subida'): ?>
-      <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          mostrarToast(
-              'Ocurrió un error al subir el documento',
-              'error'
-          );
-      });
-      </script>
-      <?php endif; ?>
-
-      <?php if (($_GET['toast'] ?? '') === 'formato_invalido'): ?>
-      <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          mostrarToast(
-              'Solo se permiten archivos PDF, JPG o PNG',
-              'error'
-          );
-      });
-      </script>
-      <?php endif; ?>
-
-      <?php if (($_GET['toast'] ?? '') === 'error_upload'): ?>
-      <script>
-      document.addEventListener('DOMContentLoaded', () => {
-          mostrarToast(
-              'El archivo no pudo procesarse',
-              'error'
-          );
-      });
-      </script>
-      <?php endif; ?>
 
       <main class="contenido-principal contenido-principal--estrecho subida-documentacion">
        <section class="subida-documentacion__hero">

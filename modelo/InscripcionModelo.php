@@ -122,33 +122,44 @@ class InscripcionModelo
         }
 
         $sql = '
-            INSERT INTO inscripciones (
-                usuario_id,
-                curso_id,
-                examen_id,
-                tipo_inscripcion_id,
-                fecha_inscripcion,
-                estado_tramite_id
-            )
-            VALUES (
-                :uid,
-                :cid,
-                :eid,
-                :tid,
-                NOW(),
-                :estado
-            )
-        ';
+                INSERT INTO inscripciones (
+                    usuario_id,
+                    curso_id,
+                    examen_id,
+                    tipo_inscripcion_id,
+                    fecha_inscripcion,
+                    fecha_fin_curso,
+                    estado_tramite_id
+                )
+                VALUES (
+                    :uid,
+                    :cid,
+                    :eid,
+                    :tid,
+                    NOW(),
+                    :fecha_fin_curso,
+                    :estado
+                )
+            ';
 
         $stmt = $this->conexion->prepare($sql);
 
         $params = [
-            ':uid' => $id_usuario,
-            ':cid' => $id_curso,
-            ':eid' => $id_examen,
-            ':tid' => $id_tipo,
-            ':estado' => $estado_tramite
-        ];
+                    ':uid' => $id_usuario,
+                    ':cid' => $id_curso,
+                    ':eid' => $id_examen,
+                    ':tid' => $id_tipo,
+
+                    ':fecha_fin_curso' =>
+                        $id_tipo === 1
+                            ? date(
+                                'Y-m-d',
+                                strtotime('+7 days')
+                            )
+                            : null,
+
+                    ':estado' => $estado_tramite
+                ];
 
         if ($stmt->execute($params)) {
 
@@ -178,12 +189,16 @@ class InscripcionModelo
         $sql = "
             SELECT
                 i.id,
+                i.usuario_id,
+                i.curso_id,
+                i.examen_id,
+                i.tipo_inscripcion_id,
+                i.estado_tramite_id,
                 i.fecha_inscripcion,
                 i.observaciones,
 
                 et.id AS estado_id,
                 et.nombre AS estado_nombre,
-
 
                 ti.nombre AS tipo_inscripcion
 
@@ -297,9 +312,9 @@ class InscripcionModelo
                                             ORDER BY fecha_inscripcion DESC');
         $stmt->execute([
             ':estado1' => EstadoTramite::PENDIENTE,
-            ':estado2' => EstadoTramite::HABILITADO_EXAMEN,
+            ':estado2' => EstadoTramite::DOCUMENTACION_APROBADA,
             ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN,
-            ':estado4' => EstadoTramite::EXAMEN_APROBADO
+            ':estado4' => EstadoTramite::APROBADO
         ]);
         return $stmt->fetchAll();
     }
@@ -533,10 +548,10 @@ class InscripcionModelo
                 );
 
             $stmt->execute([
-                ':usuario_id' => $usuarioId,
+                ':usuario_id' => $usuarioId
             ]);
 
-            return ((int)$stmt->fetchColumn()) > 0;
+            return (int)$stmt->fetchColumn() > 0;
 
         } catch (\Exception $e) {
 

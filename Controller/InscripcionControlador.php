@@ -12,6 +12,8 @@ require_once __DIR__ . '/../Modelo/CursoModelo.php';
 require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
+require_once __DIR__ . '/ValidacionControlador.php';
+
 class InscripcionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/inscripcion_controller.log';
@@ -57,15 +59,38 @@ class InscripcionControlador
     {
         try {
             // Comprobar disponibilidad del modelo para crear la inscripción
-            if (!$this->inscripcionModelo) return ['success' => false, 'id' => null, 'mensaje' => 'Modelo de inscripción no disponible', 'inscripcion' => null];
+            if (!$this->inscripcionModelo) 
+                return ['success' => false, 
+                        'id' => null, 
+                        'mensaje' => 'Modelo de inscripción no disponible', 
+                        'inscripcion' => null];
+
             $creada = $this->inscripcionModelo->crear($datos);
-            if ($creada === false) { $this->registrarLog('INSCRIPCION_NO_CREADA', ['datos' => $datos]); return ['success' => false, 'id' => null, 'mensaje' => 'No se pudo crear la inscripción', 'inscripcion' => null]; }
+            if ($creada === false)
+                { 
+                    $this->registrarLog('INSCRIPCION_NO_CREADA', 
+                                        ['datos' => $datos]); 
+                    return ['success' => false, 
+                            'id' => null, 
+                            'mensaje' => 'No se pudo crear la inscripción', 
+                            'inscripcion' => null]; 
+                            }
+
             $inscripcion = is_array($creada) ? $creada : $datos;
+
             $this->registrarLog('INSCRIPCION_CREADA', $inscripcion);
-            return ['success' => true, 'id' => (int)($inscripcion['id'] ?? 0), 'mensaje' => 'Inscripción creada exitosamente', 'inscripcion' => $inscripcion];
+
+            return ['success' => true, 
+                    'id' => (int)($inscripcion['id'] ?? 0), 
+                    'mensaje' => 'Inscripción creada exitosamente', 
+                    'inscripcion' => $inscripcion];
         } catch (\Exception $e) {
+            die($e->getMessage());
             $this->registrarLog('ERROR_CREAR_INSCRIPCION', ['error' => $e->getMessage()]);
-            return ['success' => false, 'id' => null, 'mensaje' => 'Error al crear inscripción: ' . $e->getMessage(), 'inscripcion' => null];
+            return ['success' => false, 
+                    'id' => null, 
+                    'mensaje' => 'Error al crear inscripción: ' . $e->getMessage(), 
+                    'inscripcion' => null];
         }
     }
 
@@ -141,18 +166,40 @@ class InscripcionControlador
     {
         try { 
             $pdo = $this->pdo(); 
-            $sql = 'SELECT i.*, c.nombre as curso_nombre, e.fecha as examen_fecha 
-            FROM inscripciones i 
-            LEFT JOIN cursos c ON i.curso_id = c.id 
-            LEFT JOIN examenes e ON i.examen_id = e.id 
-            WHERE i.usuario_id = :uid 
-            AND i.estado_tramite_id IN (:estado1, :estado2, :estado3) 
-            ORDER BY i.fecha_inscripcion DESC'; 
-            $stmt = $pdo->prepare($sql); 
-            $stmt->execute([':uid' => $id_usuario,
-                            ':estado1' => EstadoTramite::PENDIENTE, 
-                            ':estado2' => EstadoTramite::CURSANDO, 
-                            ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN]); 
+            $sql = '
+                    SELECT
+                        i.*,
+                        c.nombre AS curso_nombre,
+                        e.fecha AS examen_fecha
+                    FROM inscripciones i
+                    LEFT JOIN cursos c
+                        ON i.curso_id = c.id
+                    LEFT JOIN examenes e
+                        ON i.examen_id = e.id
+                    WHERE i.usuario_id = :uid
+                    AND
+                    (
+                        (
+                            i.tipo_inscripcion_id = 1
+                            AND i.fecha_fin_curso >= CURDATE()
+                        )
+                        OR
+                        (
+                            i.tipo_inscripcion_id = 2
+                            AND i.estado_tramite_id IN (
+                                ' . EstadoTramite::DOCUMENTACION_APROBADA . ',
+                                ' . EstadoTramite::INSCRIPTO_EXAMEN . '
+                            )
+                        )
+                    )
+                    ORDER BY i.fecha_inscripcion DESC
+                ';
+
+            $stmt = $pdo->prepare($sql);
+
+            $stmt->execute([
+                ':uid' => $id_usuario
+            ]);
             return $stmt->fetchAll(\PDO::FETCH_ASSOC); } 
         catch (\Exception $e) { 
             $this->registrarLog('ERROR_OBTENER_INSCRIPCIONES_ACTIVAS', 
@@ -180,7 +227,7 @@ class InscripcionControlador
 
             if (in_array(
                         $estado,
-                        [EstadoTramite::EXAMEN_APROBADO,EstadoTramite::CARNET_EMITIDO],
+                        [EstadoTramite::APROBADO,EstadoTramite::CARNET_EMITIDO],
                         true
                     )
                 )
@@ -274,22 +321,37 @@ class InscripcionControlador
     public function confirmarInscripcionExamen(int $id_inscripcion): array
     {
         try {
+
             $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id_inscripcion) : null;
 
-            if (!$insc) return ['success' => false, 'mensaje' => 'Inscripción no encontrada', 'inscripcion' => null];
-            //require_once __DIR__ . '/ValidacionControlador.php';
+            if (!$insc) return ['success' => false, 
+                                'mensaje' => 'Inscripción no encontrada', 
+                                'inscripcion' => null];
+            //
             $validCtrl = new ValidacionControlador(); 
             $v = $validCtrl->validarDocumentacion($id_inscripcion);
 
-            if (!$v['valido']) return ['success' => false, 'mensaje' => 'Documentación incompleta: ' . implode(', ', $v['documentos_faltantes']), 'inscripcion' => null];
+            if (!$v['valido']) 
+                return ['success' => false, 
+                        'mensaje' => 'Documentación incompleta: ' . implode(', ', $v['documentos_faltantes']), 
+                        'inscripcion' => null];
 
             $pdo = $this->pdo(); 
-            $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');  
+            $upd = $pdo->prepare('UPDATE inscripciones
+                                 SET estado_tramite_id = :estado 
+                                 WHERE id = :id');  
+
             $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::INSCRIPTO_EXAMEN]); 
 
             $examen_id = (int)($insc['examen_id'] ?? 0);
 
-            if ($examen_id > 0) { $dec = $pdo->prepare('UPDATE examenes SET cupos = GREATEST(cupos - 1, 0) WHERE id = :id'); $dec->execute([':id' => $examen_id]); }
+            if ($examen_id > 0) 
+                { 
+                    $dec = $pdo->prepare('UPDATE examenes 
+                                        SET cupos = GREATEST(cupos - 1, 0) 
+                                        WHERE id = :id'); 
+                    $dec->execute([':id' => $examen_id]); 
+                }
 
             $this->registrarLog('INSCRIPCION_EXAMEN_CONFIRMADA', ['id_inscripcion' => $id_inscripcion]);
 
@@ -298,12 +360,15 @@ class InscripcionControlador
         } catch (\Exception $e) 
             { 
                 $this->registrarLog('ERROR_CONFIRMAR_INSCRIPCION_EXAMEN', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]); 
-                return ['success' => false, 'mensaje' => 'Error al confirmar inscripción: ' . $e->getMessage(), 'inscripcion' => null]; 
+                return ['success' => false, 
+                        'mensaje' => 'Error al confirmar inscripción: ' . $e->getMessage(), 
+                        'inscripcion' => null]; 
             }
     }
 
     public function procesarInscripcionExamen(array $datos): array
     {
+
         $idUsuario =
                 (int)($datos['id_usuario']
                 ?? $_SESSION['usuario_id']
@@ -435,6 +500,7 @@ class InscripcionControlador
         $tieneAsistencia = false;
         $tieneMoodle = false;
 
+
         foreach ($documentos as $documento) {
 
             if (
@@ -463,6 +529,7 @@ class InscripcionControlador
                     break;
 
                 case 'moodle':
+                case 'certificado_moodle':
                     $tieneMoodle = true;
                     break;
             }
@@ -524,10 +591,59 @@ class InscripcionControlador
 
                 exit;
             }
+            if (
+                $this->inscripcionModelo
+                    ->tieneCursoActivo(
+                        (int)$_SESSION['usuario_id']
+                    )
+            ) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/?toast=curso_activo'
+                );
+
+                exit;
+            }
             $documentos = $this->documentoModelo
                             ->obtenerPorUsuario(
                                 (int)$_SESSION['usuario_id']
                             );
+            $tieneDni = false;
+            $tieneFoto = false;
+
+            foreach ($documentos as $doc) {
+
+                if (($doc['estado'] ?? '') !== 'aprobado') {
+                    continue;
+                }
+
+                switch (
+                    strtoupper($doc['tipo_documento'] ?? '')
+                ) {
+
+                    case 'DNI':
+                        $tieneDni = true;
+                        break;
+
+                    case 'FOTO':
+                    case 'FOTO_CARNET':
+                        $tieneFoto = true;
+                        break;
+                }
+            }
+
+            if (!$tieneDni || !$tieneFoto) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/?toast=documentacion_incompleta'
+                );
+
+                exit;
+            }
             $resultado =
                 $this->inscripcionModelo->crear([
                     'usuario_id' =>

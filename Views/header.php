@@ -10,6 +10,9 @@
   - Recomienda validar `SCRIPT_NAME` en entornos con front-controllers personalizados.
   - Evitar CDN en producción sin políticas CSP; preferir assets versionados y servidos desde el servidor.
 -->
+<?php
+require_once __DIR__ . '/../Helpers/ToastHelper.php';
+?>
 <header class="encabezado-principal app-shell-header encabezado-principal--alto encabezado-principal--fijo encabezado-principal--realzado encabezado-principal--primario text-on-primary topbar">
 
     <div class="encabezado-principal__grupo encabezado-principal__grupo--espaciado">
@@ -78,6 +81,40 @@
 </header>
 
   <div id="toast-container"></div>
+
+
+<?php
+
+  $toast =
+      ToastHelper::obtenerToast(
+          $_GET['toast'] ?? null
+      );
+
+  if ($toast !== null):
+
+  ?>
+
+  <script>
+
+  document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+
+          mostrarToast(
+              <?= json_encode(
+                  $toast['mensaje']
+              ) ?>,
+
+              <?= json_encode(
+                  $toast['tipo']
+              ) ?>
+          );
+      }
+  );
+
+  </script>
+
+<?php endif; ?>
 <?php
 $usuarioLogueado = !empty($_SESSION['usuario_id']);
 

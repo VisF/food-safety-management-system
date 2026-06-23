@@ -126,27 +126,6 @@ class InicioVista
     {
         $this->getHeader($inicioData);
         ?>
-        <?php if (($_GET['toast'] ?? '') === 'inscripcion_exitosa'): ?>
-            <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                mostrarToast(
-                    'Inscripción realizada correctamente',
-                    'success'
-                );
-            });
-            console.log("Toast de inscripción exitosa mostrado");
-            </script>
-        <?php endif; ?>
-        <?php if (!empty($_GET['toast_error'])): ?>
-            <script>
-            document.addEventListener('DOMContentLoaded', () => {
-                mostrarToast(
-                    <?= json_encode($_GET['toast_error']) ?>,
-                    'error'
-                );
-            });
-            </script>
-         <?php endif; ?>
 
                     <main class="contenido-principal">
                        <section style="margin-bottom: 22px; padding-inline: 2px;">
@@ -191,8 +170,13 @@ class InicioVista
                                 "
                             ></div>
                         </div>
-                        <p style="margin: 10px 0 16px; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
-                         <?php echo $this->e($inicioData['tramite']['progreso']); ?>
+                        <p style="margin: 10px 0 4px; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
+                            <?= $this->e($inicioData['tramite']['progreso']); ?>
+                        </p>
+
+                        <p style="margin: 0 0 16px; color: #0a4e93; font-size: 0.9rem; font-weight: 600;">
+                            Siguiente paso:
+                            <?= $this->e($inicioData['tramite']['accion_principal']['texto']); ?>
                         </p>
                         <?php
                         $documentacionCompleta =

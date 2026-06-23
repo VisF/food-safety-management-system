@@ -12,7 +12,8 @@ class ConfirmarInscripcionExamenVista
     {
         $defaults = [
             'title' => 'Confirmar inscripción',
-            'examName' => ''
+            'examName' => '',
+            'examId' => 0
         ];
         $data = $defaults;
         // Decodifica `data` JSON pasado por GET para mostrar contextualización; el backend debe autorizar la acción.
@@ -70,6 +71,11 @@ class ConfirmarInscripcionExamenVista
                         <form
                             action="/manipulacionDeAlimentos/inscripcion/confirmar"
                             method="post"
+                        >
+                        <input
+                            type="hidden"
+                            name="id_examen"
+                            value="<?= (int)$data['examId'] ?>"
                         >
                             <button
                                 type="submit"

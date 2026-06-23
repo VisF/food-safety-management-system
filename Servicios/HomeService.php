@@ -4,16 +4,15 @@ require_once __DIR__ . '/../Controller/ValidacionControlador.php';
 
 class HomeService
 {
-    public function obtenerAccionPrincipal(
-        array $documentos,
-        ?object $inscripcion
-    ): array {
+    public function obtenerAccionPrincipal(array $documentos,?object $inscripcion ): array 
+    {
 
         $tieneDni = false;
         $tieneFoto = false;
         $tieneAsistencia = false;
         $tieneMoodle = false;
         $asistenciaValida = false;
+        $tituloTramite = 'Carnet de Manipulador';
 
         foreach ($documentos as $doc) {
 
@@ -43,7 +42,12 @@ class HomeService
         }
 
 
+        if ($inscripcion !== null && $inscripcion->getTipoInscripcionId() === 1) 
+            {
 
+            $tituloTramite =
+                'Curso de Manipulación de Alimentos';
+        }
 
 
         if ($inscripcion !== null) {
@@ -58,7 +62,30 @@ class HomeService
             $asistenciaValida =
                 $resultadoAsistencia['valido'];
         }
+        if ($inscripcion !== null
+                &&
+                $inscripcion->getTipoInscripcionId() === 1
+                &&
+                $inscripcion->getEstadoNombre() === 'PENDIENTE') 
+                {
 
+                return [
+
+                    'titulo' =>
+                        'Curso de Manipulación de Alimentos',
+
+                    'faltantes' => [],
+
+                    'texto' =>
+                        'Esperando finalización del curso',
+
+                    'ruta' => '#',
+
+                    'completa' => false,
+
+                    'porcentaje' => 100
+                ];
+            }
         $documentacionCompleta = $tieneDni
                                 && $tieneFoto
                                 && (
@@ -69,6 +96,7 @@ class HomeService
         if (!$documentacionCompleta) {
 
             return [
+                'titulo' => $tituloTramite,
                 'faltantes' => $this->obtenerFaltantes(
                                     $tieneDni,
                                     $tieneFoto,
@@ -88,6 +116,7 @@ class HomeService
         }
 
         return [
+                'titulo' => $tituloTramite,
                 'faltantes' => [],
                 'texto' => 'Inscribirme a examen',
                 'ruta' => 'inscripciones',

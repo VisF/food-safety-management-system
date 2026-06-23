@@ -337,7 +337,7 @@ class ExamenControlador
                 $pdo = Connection::getPDO();
             }
             if ($pdo) { //hardcode de estados, idealmente esto debería estar en un modelo o configuración centralizada
-                $nuevoEstado = $aprobado ? EstadoTramite::EXAMEN_APROBADO : EstadoTramite::REPROBADO;
+                $nuevoEstado = $aprobado ? EstadoTramite::APROBADO : EstadoTramite::REPROBADO;
                 $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id');
                 $upd->execute([':estado' => $nuevoEstado, ':id' => $id_inscripcion]);
             }

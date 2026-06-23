@@ -270,6 +270,24 @@ $router->map(
     '/confirmar_inscripcion_examen',
     function () {
 
+        require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+
+        $idExamen =
+            (int)($_GET['id'] ?? 0);
+
+        $modelo =
+            new ExamenModelo();
+
+        $examen =
+            $modelo->obtenerPorId(
+                $idExamen
+            );
+
+        $_GET['data'] = json_encode([
+            'examId' => $examen['id'],
+            'examName' => 'Examen de Manipulación de Alimentos'
+        ]);
+
         require_once __DIR__ . '/../Views/confirmar_inscripcion_examen.php';
 
         ConfirmarInscripcionExamenVista::mostrar();

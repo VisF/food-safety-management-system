@@ -294,7 +294,7 @@ class DocumentoControlador
                     // marcar inscripcion como documentacion completa (estado 2 asumido)
                     $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado 
                                     WHERE id = :id')
-                                    ->execute([':id' => $doc['id_inscripcion'], ':estado' => EstadoTramite::EXAMEN_APROBADO]);
+                                    ->execute([':id' => $doc['id_inscripcion'], ':estado' => EstadoTramite::APROBADO]);
                 }
             }
 

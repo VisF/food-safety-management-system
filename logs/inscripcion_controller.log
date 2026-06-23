@@ -23,3 +23,18 @@
 [2026-06-11 19:58:29] Usuario: anonimo | Evento: ERROR_OBTENER_CURSOS_DISPONIBLES | Datos: {"error":"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'manipulaciondealimentos.fecha_curso' doesn't exist"}
 [2026-06-16 20:21:26] Usuario: anonimo | Evento: ERROR_OBTENER_CURSOS_DISPONIBLES | Datos: {"error":"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'manipulacion_alimentos.fecha_curso' doesn't exist"}
 [2026-06-16 21:31:25] Usuario: anonimo | Evento: ERROR_OBTENER_CURSOS_DISPONIBLES | Datos: {"error":"SQLSTATE[42S02]: Base table or view not found: 1146 Table 'manipulacion_alimentos.fecha_curso' doesn't exist"}
+[2026-06-23 20:48:42] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":16,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":6}
+[2026-06-23 20:49:13] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 20:52:36] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 20:55:11] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 20:55:50] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 20:55:55] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 21:00:32] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":17,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":6}
+[2026-06-23 21:02:30] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 21:02:34] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":6,"observaciones":null}}
+[2026-06-23 21:03:03] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":18,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":6}
+[2026-06-23 21:20:22] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":19,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":4}
+[2026-06-23 21:20:51] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":4,"observaciones":null}}
+[2026-06-23 21:21:05] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":4,"observaciones":null}}
+[2026-06-23 21:31:14] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":20,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":4}
+[2026-06-23 21:31:14] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":20}

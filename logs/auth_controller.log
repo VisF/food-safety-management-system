@@ -88,3 +88,10 @@
 [2026-06-18 22:05:37] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-06-18 22:05:48] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno2@test.com"}
 [2026-06-19 19:02:02] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-19 21:16:49] [WARNING] IP: ::1 | Session expired due to inactivity | {"user_id":4,"inactive_minutes":134}
+[2026-06-19 21:16:49] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-06-19 21:16:57] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
+[2026-06-19 21:17:02] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-06-23 19:05:46] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-23 19:44:06] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-06-23 19:44:12] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}

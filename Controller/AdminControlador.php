@@ -218,7 +218,7 @@ class AdminControlador
                 $stmt->execute([
                     ':cid' => $id,
                     ':estado1' => EstadoTramite::PENDIENTE,
-                    ':estado2' => EstadoTramite::EXAMEN_APROBADO
+                    ':estado2' => EstadoTramite::APROBADO
                 ]);
                 $row = $stmt->fetch();
                 if ($row && (int)$row['c'] > 0) return ['success' => false, 'message' => 'No se puede eliminar: existen inscripciones activas'];
@@ -626,7 +626,7 @@ class AdminControlador
 
             $upd = $pdo->prepare('UPDATE inscripciones SET estado_tramite_id = :estado WHERE id = :id'); 
 
-            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::HABILITADO_EXAMEN]); }
+            $upd->execute([':id' => $id_inscripcion, ':estado' => EstadoTramite::DOCUMENTACION_APROBADA]); }
 
             $this->log('Documentación validada', 'INFO', ['id_inscripcion' => $id_inscripcion]);
 
@@ -985,7 +985,7 @@ class AdminControlador
             $cancel->execute([':estado' => EstadoTramite::RECHAZADO, 
                                 ':id' => $id, 
                                 ':pendiente' => EstadoTramite::PENDIENTE, 
-                                ':aprobado' => EstadoTramite::EXAMEN_APROBADO    ]);
+                                ':aprobado' => EstadoTramite::APROBADO    ]);
             $this->log('Usuario desactivado', 'INFO', ['id_usuario' => $id]);
             return ['success' => true, 'message' => 'Usuario desactivado correctamente'];
         } catch (Exception $e) {
@@ -1081,21 +1081,27 @@ class AdminControlador
             $usuariosActivos = (int)$pdo->query('SELECT COUNT(*) FROM usuarios WHERE activo = 1')->fetchColumn();
             $totalIns = (int)$pdo->query('SELECT COUNT(*) FROM inscripciones')->fetchColumn();
             $insPend = (int)$pdo->query(
-                                            "SELECT COUNT(*) FROM inscripciones
-                                            WHERE estado_tramite_id IN (
-                                                " . EstadoTramite::PENDIENTE . ",
-                                                " . EstadoTramite::CURSANDO . ",
-                                                " . EstadoTramite::HABILITADO_EXAMEN . ",
-                                                " . EstadoTramite::INSCRIPTO_EXAMEN . "
-                                            )"
-                                        )->fetchColumn();
+                                    "SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE estado_tramite_id IN (
+                                        " . EstadoTramite::PENDIENTE . ",
+                                        " . EstadoTramite::DOCUMENTACION_APROBADA . ",
+                                        " . EstadoTramite::INSCRIPTO_EXAMEN . "
+                                    )"
+                                )->fetchColumn();
+
+            $cursosActivos = (int)$pdo->query(
+                                    "SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE tipo_inscripcion_id = 1
+                                    AND fecha_fin_curso >= CURDATE()"
+                                )->fetchColumn(); 
+                               
             $insAprob = (int)$pdo->query(
-                                            "SELECT COUNT(*) FROM inscripciones
-                                            WHERE estado_tramite_id IN (
-                                                " . EstadoTramite::EXAMEN_APROBADO . ",
-                                                " . EstadoTramite::CARNET_EMITIDO . "
-                                            )"
-                                        )->fetchColumn();
+                                    "SELECT COUNT(*)
+                                    FROM inscripciones
+                                    WHERE estado_tramite_id = " . EstadoTramite::APROBADO
+                                )->fetchColumn();
             $totalEx = (int)$pdo->query('SELECT COUNT(*) FROM examenes')->fetchColumn();
             $aprobados = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 1")->fetchColumn();
             $reprobados = (int)$pdo->query("SELECT COUNT(*) FROM resultado_examen WHERE aprobado = 0")->fetchColumn();

@@ -91,7 +91,7 @@ procesarValidacion() devuelve:
 
 La inscripción pasa a:
 
-* estado_tramite_id = HABILITADO_EXAMEN
+* estado_tramite_id = DOCUMENTACION_APROBADA
 
 ---
 
@@ -99,7 +99,7 @@ La inscripción pasa a:
 
 ## Precondiciones
 
-* Estado HABILITADO_EXAMEN.
+* Estado DOCUMENTACION_APROBADA.
 * Existe examen activo.
 
 ## Pasos
@@ -135,7 +135,7 @@ En `resultado_examen`:
 
 La inscripción cambia a:
 
-* estado_tramite_id = EXAMEN_APROBADO
+* estado_tramite_id = APROBADO
 
 ---
 
@@ -245,13 +245,13 @@ Sólo aparecen estados:
 
 * PENDIENTE
 * CURSANDO
-* HABILITADO_EXAMEN
+* DOCUMENTACION_APROBADA
 * INSCRIPTO_EXAMEN
 
 No deben aparecer:
 
 * RECHAZADO
-* EXAMEN_APROBADO
+* APROBADO
 * CARNET_EMITIDO
 
 ---
@@ -301,9 +301,9 @@ Solo para usuarios aprobados sin carnet emitido.
 El flujo completo debe ser:
 
 CURSANDO
-→ HABILITADO_EXAMEN
+→ DOCUMENTACION_APROBADA
 → INSCRIPTO_EXAMEN
-→ EXAMEN_APROBADO
+→ APROBADO
 → CARNET_EMITIDO
 
 sin errores de PHP, PDO ni restricciones de base de datos.

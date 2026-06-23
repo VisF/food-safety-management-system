@@ -579,7 +579,7 @@ class ReporteControlador
             $stmt = $pdo->query('SELECT COUNT(*) FROM inscripciones WHERE estado_tramite_id NOT IN (:estado,:estado2)');
             $stmt->execute([
                 ':estado' => EstadoTramite::INSCRIPTO_EXAMEN,
-                ':estado2' => EstadoTramite::EXAMEN_APROBADO
+                ':estado2' => EstadoTramite::APROBADO
             ]);
             $inscripciones_activas = (int)$stmt->fetchColumn();
 
@@ -621,7 +621,7 @@ class ReporteControlador
                                                         IN (:estado, :estado2)");
                 $stmt->execute([
                     ':estado' => EstadoTramite::INSCRIPTO_EXAMEN,
-                    ':estado2' => EstadoTramite::EXAMEN_APROBADO
+                    ':estado2' => EstadoTramite::APROBADO
                 ]);
                 $promedio_tiempo = (float)($stmt->fetchColumn() ?: 0.0);
             } catch (\Throwable $t) {
@@ -1120,7 +1120,7 @@ class ReporteControlador
                     WHERE i.estado_tramite_id = :aprobado 
                     AND c.id IS NULL';
             $stmt = $pdo->prepare($sql);
-            $stmt->execute([':aprobado' => EstadoTramite::EXAMEN_APROBADO]);
+            $stmt->execute([':aprobado' => EstadoTramite::APROBADO]);
             $rows = $stmt->fetchAll(\PDO::FETCH_ASSOC) ?: [];
 
             if (empty($rows)) {

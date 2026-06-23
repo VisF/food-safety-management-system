@@ -95,6 +95,7 @@ class HomeControlador
                         $usuario['id']
                     );
         }
+
         $documentos = [];
 
         if ($usuario !== null &&
@@ -114,8 +115,28 @@ class HomeControlador
                 'usuario_id' => $usuario['id'] ?? null
             ]
         );
-
         $documentosVista = [];
+
+        $tieneMoodleAprobado = false;
+
+        foreach ($documentos as $doc) {
+
+            $tipoDocumento =
+                strtoupper($doc->getTipoDocumento());
+
+            if (
+                (
+                    $tipoDocumento === 'MOODLE'
+                    ||
+                    $tipoDocumento === 'CERTIFICADO_MOODLE'
+                )
+                &&
+                $doc->getEstado() === 'aprobado'
+            ) {
+                $tieneMoodleAprobado = true;
+                break;
+            }
+        }
 
         $modeloCurso = new CursoModelo();
 
@@ -124,6 +145,9 @@ class HomeControlador
 
         $cursosVista = [];
         $modeloInscripcion = new InscripcionModelo();
+
+        if (!$tieneMoodleAprobado) {
+
         foreach ($cursosBD as $curso) {
 
             $yaInscripto = false;
@@ -189,6 +213,7 @@ class HomeControlador
                             'cupos_disponibles' =>
                                 $cuposDisponibles,
                         ];
+            }
         }
         foreach ($documentos as $doc) {
             $icono = 'description';
@@ -293,10 +318,8 @@ class HomeControlador
         'tramite' => [
             'label' => 'Estado del Trámite',
 
-            'titulo' =>
-                    $inscripcion !== null
-                    ? $inscripcion->getTipoInscripcion()
-                    : 'Carnet de Manipulador',
+        'titulo' =>
+                    $accionPrincipal['titulo'],
 
             'estado' =>
                     $inscripcion !== null
@@ -370,8 +393,7 @@ class HomeControlador
         { 
             if (in_array((int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0), 
                 [EstadoTramite::PENDIENTE,
-                EstadoTramite::CURSANDO,
-                EstadoTramite::HABILITADO_EXAMEN,
+                EstadoTramite::DOCUMENTACION_APROBADA,
                 EstadoTramite::INSCRIPTO_EXAMEN], 
                 true)) $tramitesPendientes[] = $ins; 
         }
@@ -496,17 +518,44 @@ class HomeControlador
         try {
             $totalUsuarios = (int)$pdo->query('SELECT COUNT(*) FROM usuarios WHERE activo = 1')->fetchColumn();
             $carnets = (int)$pdo->query('SELECT COUNT(*) FROM carnets WHERE vigente = 1')->fetchColumn();
-            $tramites = (int)$pdo->query("SELECT COUNT(*) 
-                                        FROM inscripciones 
-                                        WHERE estado_tramite_id IN (:estado1, :estado2)")
-                                        ->execute([':estado1' => EstadoTramite::PENDIENTE,
-                                         ':estado2' => EstadoTramite::CURSANDO]) ? 
-                                         $pdo->query("SELECT COUNT(*) 
-                                                        FROM inscripciones 
-                                                        WHERE estado_tramite_id IN (:estado1, :estado2)")->fetchColumn() : 0;
+            $stmtTramites = $pdo->prepare(
+                "SELECT COUNT(*)
+                FROM inscripciones
+                WHERE estado_tramite_id IN (
+                    :estado1,
+                    :estado2,
+                    :estado3
+                )"
+            );
+
+            $stmtTramites->execute([
+                ':estado1' => EstadoTramite::PENDIENTE,
+                ':estado2' => EstadoTramite::DOCUMENTACION_APROBADA,
+                ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN
+            ]);
+
+            $tramites =
+                (int)$stmtTramites->fetchColumn();
             $inicioMes = date('Y-m-01 00:00:00'); $ahora = date('Y-m-d H:i:s');
-            $insMes = (int)$pdo->prepare('SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN :inicio AND :fin')->execute([':inicio' => $inicioMes, ':fin' => $ahora]) ? $pdo->query("SELECT COUNT(*) FROM inscripciones WHERE fecha_inscripcion BETWEEN '$inicioMes' AND '$ahora'")->fetchColumn() : 0;
-            return ['total_usuarios' => $totalUsuarios, 'carnets_vigentes' => $carnets, 'tramites_en_proceso' => $tramites, 'inscripciones_este_mes' => (int)$insMes];
+            $stmtInicioMes = $pdo->prepare(
+                'SELECT COUNT(*)
+                FROM inscripciones
+                WHERE fecha_inscripcion
+                BETWEEN :inicio AND :fin'
+            );
+
+            $stmtInicioMes->execute([
+                ':inicio' => $inicioMes,
+                ':fin' => $ahora
+            ]);
+
+            $insMes =
+                (int)$stmtInicioMes->fetchColumn();
+            return 
+            ['total_usuarios' => $totalUsuarios, 
+            'carnets_vigentes' => $carnets, 
+            'tramites_en_proceso' => $tramites, 
+            'inscripciones_este_mes' => (int)$insMes];
         } catch (\Exception $e) {
             $this->log('Error obtener estadisticas', 'ERROR', ['error' => $e->getMessage()]);
             return ['total_usuarios' => 0, 'carnets_vigentes' => 0, 'tramites_en_proceso' => 0, 'inscripciones_este_mes' => 0];

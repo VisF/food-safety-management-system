@@ -149,23 +149,87 @@ class ValidacionControlador
                 if ($row && isset($row['modalidad'])) $modalidad = $row['modalidad'];
             }
 
-            $requeridos = ['DNI', 'Foto carnet'];
-            if ($modalidad === 'virtual') $requeridos[] = 'certificado_moodle';
+            $requeridos = [
+                'dni',
+                'foto_carnet'
+            ];
+
 
             $docModel = new DocumentoModelo();
-            $docs = $docModel->obtenerPorInscripcion($id_inscripcion);
+            $insc =
+                $this->inscripcionModelo
+                    ->obtenerPorId(
+                        $id_inscripcion
+                    );
+
+            $usuarioId =
+                (int)$insc['usuario_id'];
+
+            $docs =
+                $docModel->obtenerPorUsuario(
+                    $usuarioId
+                );
             $presentes = [];
-            // Recorrer documentos cargados y acumular los validados
+
             foreach ($docs as $d) {
+
                 if (($d['estado'] ?? '') === 'aprobado') {
+
                     $presentes[] =
-                        $d['tipo_documento'];
+                        strtolower(
+                            $d['tipo_documento']
+                        );
                 }
             }
 
-            $faltantes = array_values(array_diff($requeridos, $presentes));
-            $valido = empty($faltantes);
-            return ['valido' => $valido, 'documentos_requeridos' => $requeridos, 'documentos_faltantes' => $faltantes];
+            $faltantes = [];
+
+            if (!in_array('dni', $presentes)) {
+
+                $faltantes[] = 'DNI';
+            }
+
+            if (!in_array('foto_carnet', $presentes)) {
+
+                $faltantes[] = 'Foto Carnet';
+            }
+
+            $tieneMoodle =
+                in_array(
+                    'moodle',
+                    $presentes
+                );
+
+            $tieneAsistencia =
+                in_array(
+                    'asistencia',
+                    $presentes
+                );
+
+            if (
+                !$tieneMoodle
+                &&
+                !$tieneAsistencia
+            ) {
+
+                $faltantes[] =
+                    'Certificado Moodle o Constancia de asistencia';
+            }
+
+            $valido =
+                empty(
+                    $faltantes
+                );
+
+            return [
+                'valido' => $valido,
+                'documentos_requeridos' => [
+                    'DNI',
+                    'Foto Carnet',
+                    'Moodle o Asistencia'
+                ],
+                'documentos_faltantes' => $faltantes
+            ];
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_VALIDAR_DOCUMENTACION', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
             return [
@@ -389,7 +453,7 @@ class ValidacionControlador
                 ");
 
                 $stmt->execute([
-                    ':estado' => EstadoTramite::HABILITADO_EXAMEN,
+                    ':estado' => EstadoTramite::DOCUMENTACION_APROBADA,
                     ':id' => $id_inscripcion
                 ]);
             }

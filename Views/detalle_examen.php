@@ -168,7 +168,7 @@ class DetalleExamenVista
                 <div class="space-y-3">
 
                     <a
-                        href="/manipulacionDeAlimentos/confirmar_inscripcion_examen"
+                        href="/manipulacionDeAlimentos/confirmar_inscripcion_examen?id=<?= (int)$data['exam']['id'] ?>"
                         class="app-vista-button app-vista-button--primary w-full text-center"
                     >
                         Inscribirme al examen

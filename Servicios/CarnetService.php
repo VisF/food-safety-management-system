@@ -56,11 +56,11 @@ class CarnetService
                 ];
             }
 
-            // La inscripción debe estar en estado examen_aprobado
-            if ((int)$inscripcion['estado_tramite_id'] !== EstadoTramite::EXAMEN_APROBADO) {
+            // La inscripción debe estar en estado aprobado
+            if ((int)$inscripcion['estado_tramite_id'] !== EstadoTramite::APROBADO) {
                 return [
                     'success' => false,
-                    'mensaje' => 'La inscripción no se encuentra en estado examen_aprobado'
+                    'mensaje' => 'La inscripción no se encuentra en estado aprobado'
                 ];
             }
 
