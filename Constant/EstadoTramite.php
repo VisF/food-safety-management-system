@@ -15,6 +15,10 @@ final class EstadoTramite
 
     public const RECHAZADO = 6;
 
+    public const CANCELADO = 7;
+
+    public const CARNET_EMITIDO = 8;
+
     private function __construct()
     {
     }

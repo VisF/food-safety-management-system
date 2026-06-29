@@ -97,6 +97,42 @@ class ToastHelper
                 'tipo' =>
                     'error'
             ],
+            'dni_existente' =>
+            [
+                'mensaje' => 'Ya existe un usuario con ese DNI.',
+                'tipo' => 'error'
+            ],
+            'email_invalido' =>
+            [
+                'mensaje' => 'El correo electrónico ingresado no es válido.',
+                'tipo' => 'warning'
+            ],
+
+            'email_existente' =>
+            [
+                'mensaje' => 'Ese correo ya está registrado.',
+                'tipo' => 'error'
+            ],
+
+            'password_distinta' =>
+            [
+                'mensaje' => 'Las contraseñas no coinciden.',
+                'tipo' => 'warning'
+            ],
+
+            'registro_exitoso' =>
+            [
+                'mensaje' => 'Usuario registrado correctamente.',
+                'tipo' => 'success'
+            ],'nombre_invalido' => [
+                'mensaje' => 'El nombre debe tener entre 3 y 100 caracteres.',
+                'tipo' => 'warning'
+            ],
+
+            'apellido_invalido' => [
+                'mensaje' => 'El apellido ingresado no es válido.',
+                'tipo' => 'warning'
+            ],
 
             default => null
         };

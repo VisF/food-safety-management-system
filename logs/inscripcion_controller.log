@@ -38,3 +38,10 @@
 [2026-06-23 21:21:05] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":2,"curso_id":null,"examen_id":2,"tipo_inscripcion_id":2,"estado_tramite_id":4,"observaciones":null}}
 [2026-06-23 21:31:14] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":20,"id_usuario":2,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":4}
 [2026-06-23 21:31:14] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":20}
+[2026-06-24 19:23:18] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":21,"id_usuario":4,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":4}
+[2026-06-24 19:23:18] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":21}
+[2026-06-24 20:43:25] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":25,"id_usuario":7,"id_curso":null,"id_examen":2,"id_tipo_inscripcion":2,"estado_tramite_id":4}
+[2026-06-24 20:43:25] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":25}
+[2026-06-25 20:52:04] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":27,"id_usuario":12,"id_curso":null,"id_examen":3,"id_tipo_inscripcion":2,"estado_tramite_id":4}
+[2026-06-25 20:52:04] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":27}
+[2026-06-25 21:08:36] Usuario: anonimo | Evento: INSCRIPCION_NO_CREADA | Datos: {"datos":{"usuario_id":12,"curso_id":null,"examen_id":3,"tipo_inscripcion_id":2,"estado_tramite_id":4,"observaciones":null}}

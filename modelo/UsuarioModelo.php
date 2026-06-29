@@ -143,6 +143,7 @@ class UsuarioModelo
             ':dni' => $data['dni'],
             ':nombre' => $data['nombre'],
             ':apellido' => $data['apellido'],
+            ':domicilio' => $data['domicilio'] ?? null,
             ':email' => $data['email'],
             ':telefono' => $data['telefono'] ?? null,
             ':password' => password_hash(

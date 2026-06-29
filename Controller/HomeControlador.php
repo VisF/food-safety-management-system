@@ -25,6 +25,8 @@ require_once __DIR__ . '/../Modelo/CursoModelo.php';
 
 require_once __DIR__ . '/../Servicios/HomeService.php';
 
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
+
 class HomeControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/home_controller.log';
@@ -321,18 +323,20 @@ class HomeControlador
         'titulo' =>
                     $accionPrincipal['titulo'],
 
-            'estado' =>
-                    $inscripcion !== null
-                    ? $inscripcion->getEstadoNombre()
-                    : 'SIN INSCRIPCIÓN',
+        'estado' =>
+                $inscripcion !== null
+                ? $this->obtenerTextoEstado(
+                    $inscripcion->getEstadoId()
+                )
+                : 'Sin inscripción',
+            
+        'fecha_vencimiento' => null,
 
-            'fecha_vencimiento' => null,
+        'progreso' => $accionPrincipal['porcentaje'] . '%',
+        
+        'porcentaje' => $accionPrincipal['porcentaje'],
 
-            'progreso' => $accionPrincipal['porcentaje'] . '%',
-
-            'porcentaje' => $accionPrincipal['porcentaje'],
-
-            'accion_principal' => [
+        'accion_principal' => [
                 'texto' => $accionPrincipal['texto'],
                 'ruta' => $accionPrincipal['ruta']
             ],
@@ -627,5 +631,38 @@ class HomeControlador
         if (file_exists($path)) $contenido = file_get_contents($path);
         $this->log('Terms page accessed', 'INFO');
         return ['title' => 'Términos y Condiciones', 'contenido' => $contenido];
+    }
+
+    private function obtenerTextoEstado(int $estado): string
+    {
+        return match ($estado) {
+
+            EstadoTramite::PENDIENTE =>
+                'Pendiente',
+
+            EstadoTramite::DOCUMENTACION_PENDIENTE =>
+                'Documentación pendiente',
+
+            EstadoTramite::DOCUMENTACION_APROBADA =>
+                'Documentación aprobada',
+
+            EstadoTramite::INSCRIPTO_EXAMEN =>
+                'Inscripto a examen',
+
+            EstadoTramite::APROBADO =>
+                'Examen aprobado',
+
+            EstadoTramite::CARNET_EMITIDO =>
+                'Carnet emitido',
+
+            EstadoTramite::RECHAZADO =>
+                'Rechazado',
+
+            EstadoTramite::CANCELADO =>
+                'Cancelado',
+
+            default =>
+                'Estado desconocido'
+        };
     }
 }

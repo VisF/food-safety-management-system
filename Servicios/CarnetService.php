@@ -5,6 +5,7 @@ declare(strict_types=1);
  * CarnetService
  * Lógica de negocio relacionada con carnets.
  */
+require_once __DIR__ . '/../Config/Configuracion.php';
 
 class CarnetService
 {
@@ -106,9 +107,13 @@ class CarnetService
             $fechaEmision = date('Y-m-d');
 
             $fechaVencimiento = date(
-                'Y-m-d',
-                strtotime('+3 years')
-            );
+                                'Y-m-d',
+                                strtotime(
+                                    '+' .
+                                    Configuracion::VIGENCIA_CARNET_ANIOS .
+                                    ' years'
+                                )
+                            );
 
             $carnet = $this->carnetModelo->crear([
                 'id_inscripcion' => $idInscripcion,

@@ -9,8 +9,7 @@ class HomeService
 
         $tieneDni = false;
         $tieneFoto = false;
-        $tieneAsistencia = false;
-        $tieneMoodle = false;
+        $tieneHabilitacion = false;
         $asistenciaValida = false;
         $tituloTramite = 'Carnet de Manipulador';
 
@@ -34,10 +33,6 @@ class HomeService
                     $tieneFoto = true;
                     break;
 
-                case 'MOODLE':
-                case 'CERTIFICADO_MOODLE':
-                    $tieneMoodle = true;
-                    break;
             }
         }
 
@@ -52,21 +47,23 @@ class HomeService
 
         if ($inscripcion !== null) {
 
-            $validacion = new ValidacionControlador();
+            require_once __DIR__ .
+                '/../Modelo/HabilitacionExamenModelo.php';
 
-            $resultadoAsistencia =
-                $validacion->validarAsistencia(
-                    $inscripcion->getId()
-                );
+            $habilitacionModelo =
+                new HabilitacionExamenModelo();
 
-            $asistenciaValida =
-                $resultadoAsistencia['valido'];
+            $tieneHabilitacion =
+                $habilitacionModelo
+                    ->tieneHabilitacionVigente(
+                        $inscripcion->getUsuarioId()
+                    );
         }
         if ($inscripcion !== null
                 &&
                 $inscripcion->getTipoInscripcionId() === 1
                 &&
-                $inscripcion->getEstadoNombre() === 'PENDIENTE') 
+                $inscripcion->getEstadoId() === EstadoTramite::PENDIENTE) 
                 {
 
                 return [
@@ -86,12 +83,32 @@ class HomeService
                     'porcentaje' => 100
                 ];
             }
-        $documentacionCompleta = $tieneDni
-                                && $tieneFoto
-                                && (
-                                    $tieneAsistencia
-                                    || $tieneMoodle
-                                );
+        $estado = $inscripcion !== null
+                ? $inscripcion->getEstadoId()
+                : null;
+
+        if ($estado === EstadoTramite::INSCRIPTO_EXAMEN) {
+
+            return [
+
+                'titulo' => $tituloTramite,
+
+                'faltantes' => [],
+
+                'texto' => 'Rendir el examen',
+
+                'ruta' => 'detalle_examen',
+
+                'completa' => true,
+
+                'porcentaje' => 100
+            ];
+        }
+
+        $documentacionCompleta =
+                $tieneDni
+                && $tieneFoto
+                && $tieneHabilitacion;
 
         if (!$documentacionCompleta) {
 
@@ -100,8 +117,7 @@ class HomeService
                 'faltantes' => $this->obtenerFaltantes(
                                     $tieneDni,
                                     $tieneFoto,
-                                    $tieneAsistencia,
-                                    $tieneMoodle
+                                    $tieneHabilitacion,
                                 ),
                 'texto' => 'Completar documentación',
                 'ruta' => 'subida_documentacion',
@@ -109,8 +125,7 @@ class HomeService
                 'porcentaje' => $this->calcularPorcentaje(
                     $tieneDni,
                     $tieneFoto,
-                    $tieneAsistencia,
-                    $tieneMoodle
+                    $tieneHabilitacion,
                 )
             ];
         }
@@ -128,8 +143,7 @@ class HomeService
     private function calcularPorcentaje(
         bool $dni,
         bool $foto,
-        bool $asistencia,
-        bool $moodle
+        bool $habilitacion
     ): int {
 
         $completos = 0;
@@ -142,7 +156,7 @@ class HomeService
             $completos++;
         }
 
-        if ($moodle || $asistencia) {
+        if ($habilitacion) {
             $completos++;
         }
 
@@ -152,8 +166,7 @@ class HomeService
     private function obtenerFaltantes(
         bool $dni,
         bool $foto,
-        bool $asistencia,
-        bool $moodle
+        bool $habilitacion
     ): array {
 
         $faltantes = [];
@@ -166,8 +179,8 @@ class HomeService
             $faltantes[] = 'Foto Carnet';
         }
 
-        if (!$moodle && !$asistencia) {
-            $faltantes[] = 'Certificado Moodle o Constancia de asistencia';
+        if (!$habilitacion) {
+            $faltantes[] = 'Falta una habilitación vigente para rendir el examen';
         }
 
         return $faltantes;

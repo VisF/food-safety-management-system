@@ -178,10 +178,20 @@ class AuthControlador
             'error' => $datos['error'] ?? null,
             'errors' => $datos['errors'] ?? [],
             'nombre' => $datos['nombre'] ?? '',
+            'apellido' => $datos['apellido'] ?? '',
             'email' => $datos['email'] ?? '',
             'dni' => $datos['dni'] ?? '',
         ];
+        $old =
+            $_SESSION['registro_old']
+            ?? [];
 
+        unset($_SESSION['registro_old']);
+
+        $datosVista = array_merge(
+            $datosVista,
+            $old
+        );
         $this->renderView(self::VIEW_REGISTRO, $datosVista);
     }
 
@@ -308,14 +318,75 @@ class AuthControlador
         }
 
         if (!empty($errors)) {
-            return ['success' => false, 'errors' => $errors];
-        }
+                if (isset($errors['email'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'email_invalido'
+                    ];
+                }
 
-        if ($this->usuarioModelo !== null && method_exists($this->usuarioModelo, 'obtenerPorEmail')) {
+                if (isset($errors['dni'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'dni_invalido'
+                    ];
+                }
+
+                if (isset($errors['password'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'password_invalida'
+                    ];
+                }
+
+                if (isset($errors['password_confirm'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'password_distinta'
+                    ];
+                }
+                if (isset($errors['nombre'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'nombre_invalido'
+                    ];
+                }
+
+                if (isset($errors['apellido'])) {
+                    return [
+                        'success' => false,
+                        'toast' => 'apellido_invalido'
+                    ];
+                }
+
+                return [
+                    'success' => false,
+                    'toast' => 'error_registro'
+                ];
+            }
+
+       if ($this->usuarioModelo !== null 
+            && method_exists( $this->usuarioModelo,'obtenerPorEmail')
+            && method_exists($this->usuarioModelo,'obtenerPorDni')) 
+            {
             $usuarioExistente = $this->usuarioModelo->obtenerPorEmail($email);
             if ($usuarioExistente) {
-                return ['success' => false, 'error' => 'El email ya está registrado'];
+                return [
+                        'success' => false,
+                        'toast' => 'email_existente'
+                    ];
             }
+            $usuarioExistente =
+                    $this->usuarioModelo
+                        ->obtenerPorDni($dni);
+
+                if ($usuarioExistente) {
+
+                    return [
+                        'success' => false,
+                        'toast' => 'dni_existente'
+                    ];
+                }
 
             if (method_exists($this->usuarioModelo, 'crear')) {
                 $usuarioNuevo = $this->usuarioModelo->crear([
@@ -328,25 +399,19 @@ class AuthControlador
                 ]);
 
                 if (!$usuarioNuevo) {
-                    return ['success' => false, 'error' => 'Error al registrar usuario'];
+                    return [
+                            'success' => false,
+                            'toast' => 'error_registro'
+                        ];
                 }
             }
             return [
-                'success' => true
+                'success' => true,
+                'toast' => 'registro_exitoso'
             ];
         }
 
-        $this->log('User registered successfully', 'INFO', ['email' => $email]);
-
-        return [
-            'success' => true,
-            'message' => 'Usuario registrado exitosamente. Por favor, inicia sesión.',
-            'usuario' => [
-                'nombre' => $nombre,
-                'email' => $email,
-                'dni' => $dni,
-            ]
-        ];
+        
     }
 
     public function actualizarPerfil(array $datos): array

@@ -11,6 +11,7 @@ require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
 require_once __DIR__ . '/../Modelo/CursoModelo.php';
 require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+require_once __DIR__ . '/../Modelo/HabilitacionExamenModelo.php';
 
 require_once __DIR__ . '/ValidacionControlador.php';
 
@@ -24,6 +25,7 @@ class InscripcionControlador
     private ?FechaCursoModelo $fechaCursoModelo = null;
     private ?TipoInscripcionModelo $tipoInscripcionModelo = null;
     private ?DocumentoModelo $documentoModelo = null;
+    private ?HabilitacionExamenModelo $habilitacionExamenModelo = null;
 
     private function pdo(): \PDO
     {
@@ -45,6 +47,7 @@ class InscripcionControlador
         if (class_exists('FechaCursoModelo')) $this->fechaCursoModelo = new FechaCursoModelo();
         if (class_exists('TipoInscripcionModelo')) $this->tipoInscripcionModelo = new TipoInscripcionModelo();
         if (class_exists('DocumentoModelo')) $this->documentoModelo = new DocumentoModelo();
+        if (class_exists('HabilitacionExamenModelo')) $this->habilitacionExamenModelo = new HabilitacionExamenModelo();
     }
 
     private function registrarLog(string $evento, array $datos = []): void
@@ -100,12 +103,19 @@ class InscripcionControlador
             // Obtener inscripción y validar existencia
             $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id) : null;
             if (!$insc) return ['valido' => false, 'motivos_rechazo' => ['Inscripción inexistente'], 'puede_inscribirse' => false];
+
             $validCtrl = new ValidacionControlador();
             $motivos = [];
             $puede = true;
+
             // Validación documental (delegada a ValidacionControlador)
             $docRes = $validCtrl->validarDocumentacion($id);
-            if (!$docRes['valido']) { $puede = false; $motivos[] = 'Documentación incompleta: ' . implode(', ', $docRes['documentos_faltantes']); }
+            if (!$docRes['valido']) 
+                { 
+                    $puede = false; 
+                    $motivos[] = 'Documentación incompleta: ' . implode(', ', $docRes['documentos_faltantes']); 
+                    }
+            
             $cursoId = (int)($insc['curso_id'] ?? 0);
             $modalidad = 'presencial';
             $pdo = $this->pdo();
@@ -113,19 +123,40 @@ class InscripcionControlador
             $stmt = $pdo->prepare('SELECT modalidad FROM cursos WHERE id = :id');
             $stmt->execute([':id' => $cursoId]);
             $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+            
             if ($row && isset($row['modalidad'])) $modalidad = $row['modalidad'];
-            // Reglas por modalidad: presencial requiere asistencia, virtual requiere certificado Moodle
-            if ($modalidad === 'presencial') { $asis = $validCtrl->validarAsistencia($id); 
-            if (!$asis['valido']) { $puede = false; $motivos[] = 'Asistencia insuficiente'; } }
-            if ($modalidad === 'virtual') { $m = $validCtrl->validarCursoMoodle($id); 
-            if (!$m['valido']) { $puede = false; $motivos[] = 'Falta certificado Moodle'; } }
+
+           require_once __DIR__ . '/../Modelo/HabilitacionExamenModelo.php';
+
+            $habilitacionModelo = new HabilitacionExamenModelo();
+
+            if (
+                !$habilitacionModelo->tieneHabilitacionVigente(
+                    (int)$insc['usuario_id']
+                )
+            ) {
+                $puede = false;
+                $motivos[] = 'No posee una habilitación vigente para rendir el examen';
+            }
             $usuario_id = (int)($insc['usuario_id'] ?? 0);
+
             $rec = $validCtrl->validarPlazoRecursante($usuario_id);
+            
             // Validación de plazo para recursantes
-            if (!$rec['puede_recursar']) { $puede = false; $motivos[] = 'Plazo recursante no cumplido, faltan ' . ($rec['dias_restantes'] ?? 0) . ' días'; }
+            if (!$rec['puede_recursar']) 
+                { 
+                    $puede = false; $motivos[] = 'Plazo recursante no cumplido, faltan ' . ($rec['dias_restantes'] ?? 0) . ' días'; 
+                }
             $ren = $validCtrl->validarRenovacion($id);
-            if (($ren['carnet_vencido'] ?? null) === false && (($insc['tipo_inscripcion_id'] ?? 0) == 4)) { $puede = false; $motivos[] = 'No existe carnet anterior vencido para renovar'; }
+
+            if (($ren['carnet_vencido'] ?? null) === false 
+                && (($insc['tipo_inscripcion_id'] ?? 0) == 4)) 
+                { 
+                    $puede = false; 
+                    $motivos[] = 'No existe carnet anterior vencido para renovar'; 
+                }
             return ['valido' => $puede, 'motivos_rechazo' => $motivos, 'puede_inscribirse' => $puede];
+
         } catch (\Exception $e) {
             $this->registrarLog('ERROR_VALIDAR_INSCRIPCION', ['id' => $id, 'error' => $e->getMessage()]);
             return ['valido' => false, 'motivos_rechazo' => ['Error: ' . $e->getMessage()], 'puede_inscribirse' => false];
@@ -225,12 +256,14 @@ class InscripcionControlador
 
             $estado = (int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0);
 
-            if (in_array(
-                        $estado,
-                        [EstadoTramite::APROBADO,EstadoTramite::CARNET_EMITIDO],
-                        true
-                    )
-                )
+            if (in_array($estado,[EstadoTramite::APROBADO],true))
+                { $pdo->rollBack();
+
+                    return [
+                        'success' => false,
+                        'mensaje' => 'No puede cancelarse una inscripción finalizada'
+                    ];
+                }
 
             $upd = $pdo->prepare('UPDATE inscripciones 
                                     SET estado_tramite_id = :estado WHERE id = :id'); 
@@ -534,6 +567,10 @@ class InscripcionControlador
                     break;
             }
         }
+        $tieneHabilitacion = $habilitacionExamenModelo
+                                        ->tieneHabilitacionVigente(
+                                            $idUsuario
+                                        );
 
         $faltantes = [];
 
@@ -545,12 +582,9 @@ class InscripcionControlador
             $faltantes[] = 'Foto Carnet';
         }
 
-        if (
-            !$tieneAsistencia
-            && !$tieneMoodle
-        ) {
+        if (!$tieneHabilitacion) {
             $faltantes[] =
-                'Constancia de asistencia o certificado Moodle';
+                    'No posee una habilitación vigente para rendir el examen';
         }
 
         return [

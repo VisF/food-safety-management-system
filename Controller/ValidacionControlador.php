@@ -23,6 +23,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../Modelo/AsistenciaModelo.php';
 
+
 class ValidacionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/validacion_controller.log';
@@ -35,6 +36,7 @@ class ValidacionControlador
     private ?AsistenciaModelo $asistenciaModelo = null;
     private ?ResultadoExamenModelo $resultadoExamenModelo = null;
     private ?EstadoTramiteModelo $estadoTramiteModelo = null;
+    private ?HabilitacionExamenModelo $habilitacionExamenModelo = null;
 
     public function __construct()
     {
@@ -64,6 +66,9 @@ class ValidacionControlador
         if (class_exists('EstadoTramiteModelo')) {
             $this->estadoTramiteModelo = new EstadoTramiteModelo();
         }
+        if (class_exists('HabilitacionExamenModelo')) {
+            $this->habilitacionExamenModelo = new HabilitacionExamenModelo();
+        }
     }
 
     /**
@@ -80,48 +85,7 @@ class ValidacionControlador
         @file_put_contents(self::LOG_FILE, $mensaje, FILE_APPEND);
     }
 
-    /**
-     * Validar asistencia (solo para curso presencial)
-     *
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array ['valido' => bool, 'porcentaje_asistencia' => float, 'sesiones_presentes' => int, 'total_sesiones' => int]
-     */
-    public function validarAsistencia(int $id_inscripcion): array
-    {
-        try {
-            if (!$this->inscripcionModelo) return ['valido' => false, 'porcentaje_asistencia' => 0.0, 'sesiones_presentes' => 0, 'total_sesiones' => 0];
-            $insc = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
-            if (!$insc) return ['valido' => false, 'porcentaje_asistencia' => 0.0, 'sesiones_presentes' => 0, 'total_sesiones' => 0];
-
-            $curso_id = (int)($insc['curso_id'] ?? 0);
-            $modalidad = 'presencial';
-            $connFile = __DIR__ . '/../db/Connection.php';
-            if (file_exists($connFile)) {
-                require_once $connFile;
-                $pdo = Connection::getPDO();
-                $stmt = $pdo->prepare('SELECT modalidad FROM cursos WHERE id = :id');
-                $stmt->execute([':id' => $curso_id]);
-                $row = $stmt->fetch();
-                if ($row && isset($row['modalidad'])) $modalidad = $row['modalidad'];
-            }
-
-            if ($modalidad !== 'presencial') {
-                return ['valido' => true, 'porcentaje_asistencia' => 100.0, 'sesiones_presentes' => 0, 'total_sesiones' => 0];
-            }
-
-            $asistencia = new AsistenciaModelo();
-            $tot = $asistencia->obtenerTotalAsistencias($id_inscripcion);
-            $presentes = (int)($tot['presentes'] ?? 0);
-            $total = (int)($tot['total'] ?? 0);
-            $porcentaje = $total > 0 ? ($presentes / $total) * 100.0 : 0.0;
-
-            $valido = $porcentaje >= self::ASISTENCIA_MINIMA_PRESENCIAL;
-            return ['valido' => $valido, 'porcentaje_asistencia' => round($porcentaje, 2), 'sesiones_presentes' => $presentes, 'total_sesiones' => $total];
-        } catch (\Exception $e) {
-            $this->registrarLog('ERROR_VALIDAR_ASISTENCIA', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
-            return ['valido' => false, 'porcentaje_asistencia' => 0.0, 'sesiones_presentes' => 0, 'total_sesiones' => 0];
-        }
-    }
+    
 
     /**
      * Validar documentación completa
@@ -240,65 +204,7 @@ class ValidacionControlador
         }
     }
 
-    /**
-     * Validar certificado de curso virtual (Moodle)
-     *
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array ['valido' => bool, 'certificado_presente' => bool, 'fecha_certificado' => string|null]
-     */
-    public function validarCursoMoodle(int $id_inscripcion): array
-    {
-        try {
-            if (!$this->inscripcionModelo) return ['valido' => false, 'certificado_presente' => false, 'fecha_certificado' => null];
-
-            $insc = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
-
-            if (!$insc) return ['valido' => false, 'certificado_presente' => false, 'fecha_certificado' => null];
-
-            $curso_id = (int)($insc['curso_id'] ?? 0);
-            $modalidad = 'presencial';
-            // Intentar resolución de modalidad vía conexión a BD si existe el archivo de conexión
-            $connFile = __DIR__ . '/../db/Connection.php';
-            if (file_exists($connFile)) {
-                require_once $connFile;
-                $pdo = Connection::getPDO();
-                $stmt = $pdo->prepare('SELECT modalidad FROM cursos WHERE id = :id');
-                $stmt->execute([':id' => $curso_id]);
-                $row = $stmt->fetch();
-                if ($row && isset($row['modalidad'])) $modalidad = $row['modalidad'];
-            }
-
-            if ($modalidad !== 'virtual') {
-                return ['valido' => true, 'certificado_presente' => true, 'fecha_certificado' => null];
-            }
-
-            $docModel = new DocumentoModelo();
-
-            $docs = $docModel->obtenerPorUsuario(
-                                                (int)$insc['usuario_id']
-                                            );
-
-            foreach ($docs as $d) {
-                $tipo = $d['tipo_documento'] ?? '';
-                if ((int)($d['estado']  === 'aprobado') && (strtolower($tipo) === 'moodle')) {
-                    return ['valido' => true, 'certificado_presente' => true, 'fecha_certificado' => $d['fecha_subida'] ?? null];
-                }
-            }
-
-            // fallback: preguntar a MoodleModelo si hay certificado validado por usuario/curso
-            $moodle = new MoodleModelo();
-            $puede = $moodle->validarCursoCompletado((int)$insc['usuario_id'], $curso_id);
-            return ['valido' => (bool)$puede, 'certificado_presente' => (bool)$puede, 'fecha_certificado' => null];
-        } catch (\Exception $e) {
-            $this->registrarLog('ERROR_VALIDAR_CURSO_MOODLE', ['id_inscripcion' => $id_inscripcion, 'error' => $e->getMessage()]);
-            return [
-                'valido' => false,
-                'certificado_presente' => false,
-                'fecha_certificado' => null
-            ];
-        }
-    }
-
+   
     /**
      * Validar plazo de recursante (3 meses desde último examen fallido)
      *
@@ -416,21 +322,32 @@ class ValidacionControlador
                     require_once $connFile;
                     $pdo = Connection::getPDO();
                     // curso
-                    $stmt = $pdo->prepare('SELECT id, nombre, modalidad FROM cursos WHERE id = :id');
+                    $stmt = $pdo->prepare('SELECT id, nombre, modalidad 
+                                            FROM cursos 
+                                            WHERE id = :id');
+
                     $stmt->execute([':id' => (int)($insc['curso_id'] ?? $insc['id_curso'] ?? 0)]);
+
                     $contexto['curso'] = $stmt->fetch() ?: [];
                     // tipo inscripcion
-                    $stmt = $pdo->prepare('SELECT id, nombre FROM tipo_inscripcion WHERE id = :id');
+                    $stmt = $pdo->prepare('SELECT id, nombre 
+                                            FROM tipo_inscripcion 
+                                            WHERE id = :id');
+
                     $stmt->execute([':id' => (int)($insc['tipo_inscripcion_id'] ?? $insc['id_tipo_inscripcion'] ?? 0)]);
+
                     $contexto['tipo_inscripcion'] = $stmt->fetch() ?: [];
                 }
             }
 
             $validaciones = [
                 'documentacion' => $this->validarDocumentacion($id_inscripcion),
-                'asistencia' => $this->validarAsistencia($id_inscripcion),
-                'curso_moodle' => $this->validarCursoMoodle($id_inscripcion)
-                // Agregar validaciones según flujo (recursante, renovación) si aplica
+                'habilitacion' => [
+                    'valido' => $this->habilitacionExamenModelo
+                        ->tieneHabilitacionVigente(
+                            (int)$insc['usuario_id']
+                        )
+                ]
             ];
 
             $resultado_general = true;

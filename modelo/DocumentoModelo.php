@@ -13,6 +13,7 @@ declare(strict_types=1);
  * - fecha_subida: timestamp de subida
  * - observaciones: notas de validación
  */
+require_once __DIR__ . '/../Config/Configuracion.php';
 
 class DocumentoModelo
 {
@@ -124,8 +125,52 @@ class DocumentoModelo
     {
         if (!$this->conexion) return false;
 
-        $stmt = $this->conexion->prepare('UPDATE documentos SET estado = "aprobado", observaciones = :obs, fecha_revision = NOW() WHERE id = :id');
-        return (bool)$stmt->execute([':obs' => $observaciones, ':id' => $id]);
+        $stmt = $this->conexion->prepare('UPDATE documentos 
+                                        SET estado = "aprobado", 
+                                        observaciones = :obs, 
+                                        fecha_revision = NOW() 
+                                        WHERE id = :id');
+        
+
+        if (!$stmt->execute([':obs' => $observaciones,':id' => $id])) 
+            {
+            return false;
+        }
+
+        $stmt = $this->conexion->prepare(
+                            'SELECT usuario_id, tipo_documento
+                            FROM documentos
+                            WHERE id = :id'
+        );
+
+        $stmt->execute([
+            ':id' => $id
+        ]);
+
+        $doc = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        if (
+            $doc
+            && strtolower($doc['tipo_documento']) === 'moodle'
+        ) {
+
+            require_once __DIR__ . '/HabilitacionExamenModelo.php';
+
+            $habilitacionModelo = new HabilitacionExamenModelo();
+
+            $habilitacionModelo->crear([
+                'usuario_id' => $doc['usuario_id'],
+                'curso_id' => null,
+                'fecha_habilitacion' => date('Y-m-d'),
+                'fecha_vencimiento' => date(
+                    'Y-m-d',
+                    strtotime(
+                        '+' . TramitesConfig::VIGENCIA_HABILITACION_DIAS . ' days'
+                    )
+                )
+            ]);
+        }
+        return true;
     }
 
     /**

@@ -392,13 +392,26 @@ class ExamenControlador
             if ($insc) {
                 $curso_id = (int)($insc['curso_id'] ?? 0);
                 $pdoFile = __DIR__ . '/../db/Connection.php';
-                if (file_exists($pdoFile)) { require_once $pdoFile; $pdo = Connection::getPDO(); $stmt = $pdo->prepare('SELECT modalidad FROM cursos WHERE id = :id'); $stmt->execute([':id' => $curso_id]); $r = $stmt->fetch(); $modalidad = $r['modalidad'] ?? 'presencial'; }
-                if (($modalidad ?? 'presencial') === 'presencial') {
-                    $asis = $validCtrl->validarAsistencia($id_inscripcion);
-                    if (!$asis['valido']) { $habilitado = false; $motivos[] = 'Asistencia insuficiente'; }
-                } else {
-                    $m = $validCtrl->validarCursoMoodle($id_inscripcion);
-                    if (!$m['valido']) { $habilitado = false; $motivos[] = 'Falta certificado Moodle'; }
+                if (file_exists($pdoFile)) { 
+                    require_once $pdoFile; $pdo = Connection::getPDO(); 
+                    $stmt = $pdo->prepare('SELECT modalidad 
+                                            FROM cursos 
+                                            WHERE id = :id'); 
+                    $stmt->execute([':id' => $curso_id]); 
+                    $r = $stmt->fetch(); 
+                    $modalidad = $r['modalidad'] ?? 'presencial'; 
+                }
+                require_once __DIR__ . '/../Modelo/HabilitacionExamenModelo.php';
+
+                $habilitacionModelo = new HabilitacionExamenModelo();
+
+                if (
+                    !$habilitacionModelo->tieneHabilitacionVigente(
+                        (int)$insc['usuario_id']
+                    )
+                ) {
+                    $habilitado = false;
+                    $motivos[] = 'No posee una habilitación vigente para rendir el examen';
                 }
 
                 // recursante

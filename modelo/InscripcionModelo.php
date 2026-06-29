@@ -15,6 +15,8 @@ declare(strict_types=1);
  * - observaciones: notas adicionales
  */
 
+require_once __DIR__ . '/../Config/Configuracion.php';
+
 class InscripcionModelo
 {
     private int $id;
@@ -154,7 +156,11 @@ class InscripcionModelo
                         $id_tipo === 1
                             ? date(
                                 'Y-m-d',
-                                strtotime('+7 days')
+                                strtotime(
+                                            '+' .
+                                            Configuracion::DURACION_CURSO_DIAS .
+                                            ' days'
+                                        )
                             )
                             : null,
 

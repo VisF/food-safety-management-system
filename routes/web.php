@@ -185,9 +185,44 @@ $router->map(
 
         require_once __DIR__ . '/../Controller/AuthControlador.php';
 
-        $controller = new AuthControlador();
+        $controller =
+            new AuthControlador();
 
-        $controller->procesarRegistro($_POST);
+        $resultado =
+            $controller->procesarRegistro($_POST);
+
+        if ($resultado['success']) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/login?toast=' .
+                urlencode(
+                    $resultado['toast']
+                    ?? 'registro_exitoso'
+                )
+            );
+
+            exit;
+        }
+        $_SESSION['registro_old'] = [
+                'nombre' => $_POST['nombre'] ?? '',
+                'apellido' => $_POST['apellido'] ?? '',
+                'dni' => $_POST['dni'] ?? '',
+                'email' => $_POST['email'] ?? ''
+            ];
+
+        header(
+            'Location: ' .
+            BASE_URL .
+            '/registro?toast=' .
+            urlencode(
+                $resultado['toast']
+                ?? 'error_registro'
+            )
+        );
+
+        exit;
     }
 );
 

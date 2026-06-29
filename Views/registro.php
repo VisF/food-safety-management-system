@@ -72,7 +72,7 @@ include __DIR__ . '/header.php';
 
         <form
             method="POST"
-            action="<?= BASE_URL ?>/manipulacionDeAlimentos/registro"
+            action="<?= BASE_URL ?>/registro"
             style="
                 display:flex;
                 flex-direction:column;
@@ -92,6 +92,7 @@ include __DIR__ . '/header.php';
                     id="nombre"
                     name="nombre"
                     type="text"
+                    value="<?= htmlspecialchars($nombre) ?>"
                     required
                     style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
@@ -103,6 +104,7 @@ include __DIR__ . '/header.php';
                     id="apellido"
                     name="apellido"
                     type="text"
+                    value="<?= htmlspecialchars($apellido) ?>"
                     required
                     style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
@@ -114,6 +116,7 @@ include __DIR__ . '/header.php';
                     id="dni"
                     name="dni"
                     type="number"
+                    value="<?= htmlspecialchars($dni) ?>"
                     required
                     min="1"
                     style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
@@ -126,6 +129,7 @@ include __DIR__ . '/header.php';
                     id="email"
                     name="email"
                     type="email"
+                    value="<?= htmlspecialchars($email) ?>"
                     required
                     style="width:100%; padding:12px; border:1px solid #d8e1ea; border-radius:12px;"
                 >
