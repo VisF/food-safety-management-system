@@ -1,19 +1,25 @@
 <?php
 
 require_once __DIR__ . '/../dto/InscripcionDTO.php';
-require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
+require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 
 class InscripcionService
 {
-    public function __construct(
-        private InscripcionModelo $inscripcionModelo
-    ) {
-    }
+    private InscripcionRepository $inscripcionRepository;
+    
 
+    public function __construct(){
+        $this->inscripcionRepository = new InscripcionRepository();
+    }
+    public function tieneCursoActivo(int $usuarioId): bool
+    {
+        return $this->inscripcionRepository
+            ->tieneCursoActivo($usuarioId);
+    }
     public function obtenerPorId(int $id): ?InscripcionDTO 
     {
         $inscripcion =
-            $this->inscripcionModelo
+            $this->inscripcionRepository
                 ->obtenerPorId($id);
 
         if (!$inscripcion) {
@@ -27,7 +33,7 @@ class InscripcionService
     public function obtenerPorUsuario(int $usuarioId    ): array 
     {
         $inscripciones =
-            $this->inscripcionModelo
+            $this->inscripcionRepository
                 ->obtenerPorUsuario(
                     $usuarioId
                 );
@@ -47,7 +53,7 @@ class InscripcionService
     public function obtenerUltimaPorUsuario(int $usuarioId): ?InscripcionDTO 
     {
         $inscripcion =
-            $this->inscripcionModelo
+            $this->inscripcionRepository
                 ->obtenerUltimaInscripcionPorUsuario(
                     $usuarioId
                 );
@@ -60,24 +66,28 @@ class InscripcionService
             $inscripcion
         );
     }
-    public function crear(array $datos): ?InscripcionDTO 
+    public function crear(array $datos): ?InscripcionDTO
     {
-        $creada =
-            $this->inscripcionModelo
-                ->crear($datos);
+        $id = $this->inscripcionRepository->crear($datos);
 
-        if (!$creada) {
+        if (!$id) {
             return null;
         }
 
-        return InscripcionDTO::fromArray(
-            $creada
-        );
+        $inscripcion =
+            $this->inscripcionRepository
+                ->obtenerPorId($id);
+
+        if (!$inscripcion) {
+            return null;
+        }
+
+        return InscripcionDTO::fromArray($inscripcion);
     }
     public function cancelar(int $id, string $motivo = ''): bool 
     {
         return
-            $this->inscripcionModelo
+            $this->inscripcionRepository
                 ->cancelar(
                     $id,
                     $motivo
@@ -86,7 +96,7 @@ class InscripcionService
     public function obtenerActivas(): array
     {
         $rows =
-            $this->inscripcionModelo
+            $this->inscripcionRepository
                 ->obtenerInscripcionesActivas();
 
         $resultado = [];

@@ -16,6 +16,8 @@ require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
 require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
 
+require_once __DIR__ . '/../Repository/InscripcionRepository.php';
+
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
@@ -34,6 +36,7 @@ class HomeControlador
     private DocumentoService $documentoService;
 
     private InscripcionModelo $inscripcionModelo;
+    private InscripcionRepository $inscripcionRepository;
 
     public function __construct()
     {
@@ -52,6 +55,8 @@ class HomeControlador
             new DocumentoService(
                 new DocumentoModelo()
             );
+        $this->inscripcionRepository =
+            new InscripcionRepository();
 
         @mkdir(dirname(self::LOG_FILE), 0755, true);
     }
@@ -146,7 +151,7 @@ class HomeControlador
             $modeloCurso->obtenerActivos();
 
         $cursosVista = [];
-        $modeloInscripcion = new InscripcionModelo();
+        $inscripcionRepository = new InscripcionRepository();
 
         if (!$tieneMoodleAprobado) {
 
@@ -161,11 +166,11 @@ class HomeControlador
                     &&
                     $inscripcion->getTipoInscripcionId() === 1;
             }
-            $inscriptos =
-                        $modeloInscripcion
-                            ->contarInscriptosCurso(
-                                (int)$curso['id']
-                            );
+           $inscriptos =
+                    $inscripcionRepository
+                        ->contarInscriptosCurso(
+                            (int)$curso['id']
+                        );
 
             $cupos =
                 (int)$curso['cupos'];

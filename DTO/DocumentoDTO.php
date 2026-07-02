@@ -52,18 +52,13 @@ class DocumentoDTO
     {
         return $this->nombreOriginal;
     }
-
-
-
-    public function validar(int $id, string $observaciones = ''): bool 
+    public function getFechaRevision(): ?string
     {
-        return
-            $this->documentoModelo
-                ->cambiarEstado(
-                    $id,
-                    $observaciones
-                );
+        return $this->fechaRevision;
     }
+
+
+
     public function estaAprobado(): bool
     {
         return $this->estado === 'aprobado';

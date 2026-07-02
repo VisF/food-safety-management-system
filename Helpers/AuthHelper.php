@@ -12,7 +12,7 @@ class AuthHelper
             'id' => $_SESSION['usuario_id'],
             'nombre' => $_SESSION['usuario_nombre'] ?? '',
             'email' => $_SESSION['usuario_email'] ?? '',
-            'rol' => $_SESSION['usuario_rol'] ?? 'usuario'
+            'rol' => $_SESSION['usuario_roles'] ?? 'usuario'
         ];
     }
 

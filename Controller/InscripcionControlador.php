@@ -7,7 +7,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
-require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
+
 require_once __DIR__ . '/../Modelo/CursoModelo.php';
 require_once __DIR__ . '/../Modelo/ExamenModelo.php';
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
@@ -19,7 +20,7 @@ class InscripcionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/inscripcion_controller.log';
 
-    private ?InscripcionModelo $inscripcionModelo = null;
+    private ?inscripcionService $inscripcionService = null;
     private ?CursoModelo $cursoModelo = null;
     private ?ExamenModelo $examenModelo = null;
     private ?FechaCursoModelo $fechaCursoModelo = null;
@@ -41,7 +42,7 @@ class InscripcionControlador
 
     private function inicializarModelos(): void
     {
-        if (class_exists('InscripcionModelo')) $this->inscripcionModelo = new InscripcionModelo();
+        if (class_exists('inscripcionService')) $this->inscripcionService = new inscripcionService();
         if (class_exists('CursoModelo')) $this->cursoModelo = new CursoModelo();
         if (class_exists('ExamenModelo')) $this->examenModelo = new ExamenModelo();
         if (class_exists('FechaCursoModelo')) $this->fechaCursoModelo = new FechaCursoModelo();
@@ -62,13 +63,13 @@ class InscripcionControlador
     {
         try {
             // Comprobar disponibilidad del modelo para crear la inscripción
-            if (!$this->inscripcionModelo) 
+            if (!$this->inscripcionService) 
                 return ['success' => false, 
                         'id' => null, 
                         'mensaje' => 'Modelo de inscripción no disponible', 
                         'inscripcion' => null];
 
-            $creada = $this->inscripcionModelo->crear($datos);
+            $creada = $this->inscripcionService->crear($datos);
             if ($creada === false)
                 { 
                     $this->registrarLog('INSCRIPCION_NO_CREADA', 
@@ -101,7 +102,7 @@ class InscripcionControlador
     {
         try {
             // Obtener inscripción y validar existencia
-            $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id) : null;
+            $insc = $this->inscripcionService ? $this->inscripcionService->obtenerPorId($id) : null;
             if (!$insc) return ['valido' => false, 'motivos_rechazo' => ['Inscripción inexistente'], 'puede_inscribirse' => false];
 
             $validCtrl = new ValidacionControlador();
@@ -355,7 +356,7 @@ class InscripcionControlador
     {
         try {
 
-            $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id_inscripcion) : null;
+            $insc = $this->inscripcionService ? $this->inscripcionService->obtenerPorId($id_inscripcion) : null;
 
             if (!$insc) return ['success' => false, 
                                 'mensaje' => 'Inscripción no encontrada', 
@@ -626,7 +627,7 @@ class InscripcionControlador
                 exit;
             }
             if (
-                $this->inscripcionModelo
+                $this->inscripcionService
                     ->tieneCursoActivo(
                         (int)$_SESSION['usuario_id']
                     )
@@ -679,7 +680,7 @@ class InscripcionControlador
                 exit;
             }
             $resultado =
-                $this->inscripcionModelo->crear([
+                $this->inscripcionService->crear([
                     'usuario_id' =>
                         (int)$_SESSION['usuario_id'],
 

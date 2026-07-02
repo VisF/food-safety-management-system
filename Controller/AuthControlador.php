@@ -263,7 +263,7 @@ class AuthControlador
         $_SESSION['usuario_nombre'] = $usuario['nombre'];
         $_SESSION['usuario_email'] = $usuario['email'];
         
-        $_SESSION['usuario_rol'] = 'usuario';
+        $_SESSION['usuario_roles'] = 'usuario';
         //Parche hasta armar los roles en la base de datos
         $_SESSION['roles'] = [
             'usuario'
@@ -493,7 +493,7 @@ class AuthControlador
             'id' => $_SESSION['usuario_id'],
             'nombre' => $_SESSION['usuario_nombre'],
             'email' => $_SESSION['usuario_email'],
-            'rol' => $_SESSION['usuario_rol'],
+            'rol' => $_SESSION['usuario_roles'],
         ];
     }
 
@@ -541,7 +541,7 @@ class AuthControlador
             return false;
         }
 
-        $rolActual = (string) ($_SESSION['usuario_rol'] ?? '');
+        $rolActual = (string) ($_SESSION['usuario_roles'] ?? '');
 
         $rolesValidos = match ($rolRequerido) {
             'admin' => ['admin'],

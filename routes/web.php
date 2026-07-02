@@ -244,17 +244,20 @@ $router->map(
     '/admin',
     function () {
 
-        require_once __DIR__ . '/../Controller/AdminControlador.php';
-
-        $controller = new AdminControlador();
-
-        //$estadisticas = $controller->obtenerEstadisticas();
-
+        require_once __DIR__ . '/../Controller/AdminDashboardControlador.php';
         require_once __DIR__ . '/../Views/panel_admin.php';
+
+        $controller = new AdminDashboardControlador();
+
+        $estadisticas = $controller->obtenerEstadisticas();
+        $actividad = $controller->obtenerActividadReciente();
 
         $vista = new PanelAdminVista();
 
-        $vista->mostrar();
+        $vista->mostrar(
+            $estadisticas,
+            $actividad
+        );
     }
 );
 

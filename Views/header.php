@@ -120,7 +120,7 @@ $usuarioLogueado = !empty($_SESSION['usuario_id']);
 
 $nombreUsuario = $_SESSION['usuario_nombre'] ?? '';
 $emailUsuario = $_SESSION['usuario_email'] ?? '';
-$rolUsuario = $_SESSION['usuario_rol'] ?? '';
+$rolUsuario = $_SESSION['usuario_roles'] ?? '';
 
 
 

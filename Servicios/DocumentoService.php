@@ -3,17 +3,38 @@
 require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 require_once __DIR__ . '/../dto/DocumentoDTO.php';
 
+
+/*
+obtenerEstadoDocumentacion()
+
+obtenerValidados()
+
+obtenerNoValidados()
+
+subirDocumento()
+
+validarDocumento()
+
+rechazarDocumento()
+
+
+*/
+
+require_once __DIR__ . '/../Repository/DocumentoRepository.php';
+
+
 class DocumentoService
 {
-    public function __construct(
-        private DocumentoModelo $documentoModelo
-    ) {
+    private DocumentoRepository $documentoRepository;
+    public function __construct()
+    {
+        $this->documentoRepository = new DocumentoRepository();
     }
 
     public function obtenerPorUsuario(int $usuarioId): array
     {
         $documentos =
-            $this->documentoModelo
+            $this->documentoRepository
                 ->obtenerPorUsuario($usuarioId);
 
         $resultado = [];
@@ -86,38 +107,21 @@ class DocumentoService
     public function rechazarDocumento(int $id, string $observaciones = ''): bool 
     {
         return
-            $this->documentoModelo
-                ->rechazar(
+            $this->documentoRepository
+                ->rechazarDocumento(
                     $id,
                     $observaciones
                 );
     }
-    public function subirDocumento(int $idInscripcion, string $tipoDocumento, string $rutaArchivo): ?DocumentoDTO
-    {
-        $documento =
-        $this->documentoModelo
-            ->subirDocumento(
-                $idInscripcion,
-                $tipoDocumento,
-                $rutaArchivo
-            );
 
-        if (!$documento) {
-            return null;
-        }
-
-        return DocumentoDTO::fromArray(
-            $documento
-        );      
-    }
 
 
 
     public function validarDocumento(int $id, string $observaciones = ''): bool 
     {
         return
-            $this->documentoModelo
-                ->validar(
+            $this->documentoRepository
+                ->validarDocumento(
                     $id,
                     $observaciones
                 );
@@ -125,7 +129,7 @@ class DocumentoService
     public function obtenerPorId(int $id): ?DocumentoDTO 
     {
         $documento =
-            $this->documentoModelo
+            $this->documentoRepository
                 ->obtenerPorId($id);
 
         if (!$documento) {
@@ -136,26 +140,7 @@ class DocumentoService
             $documento
         );
     }
-    public function obtenerPorInscripcion(int $idInscripcion): array 
-    {
-        $documentos =
-            $this->documentoModelo
-                ->obtenerPorInscripcion(
-                    $idInscripcion
-                );
-
-        $resultado = [];
-
-        foreach ($documentos as $documento) {
-
-            $resultado[] =
-                DocumentoDTO::fromArray(
-                    $documento
-                );
-        }
-
-        return $resultado;
-    }
+   
     public function obtenerValidados(int $usuarioId): array
     {
         $documentos =
@@ -186,24 +171,4 @@ class DocumentoService
 
 
 
-    public function obtenerDocumentos(int $idInscripcion): array 
-    {
-        $documentos =
-            $this->documentoModelo
-                ->obtenerPorInscripcion(
-                    $idInscripcion
-                );
-
-        $resultado = [];
-
-        foreach ($documentos as $documento) {
-
-            $resultado[] =
-                DocumentoDTO::fromArray(
-                    $documento
-                );
-        }
-
-        return $resultado;
-    }
 }

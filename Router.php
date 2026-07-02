@@ -340,14 +340,14 @@ if (
         );
     }
 
-    if ($route === 'actividad_reciente' && class_exists('ReporteControlador')) {
+    if ($route === 'actividad_reciente' && class_exists('AdminControlador')) {
 
         RoleMiddleware::handle([
             'admin',
             'inspector'
         ]);
 
-        $controller = new ReporteControlador();
+        $controller = new AdminControlador();
 
         $resultado =
             $controller->obtenerActividadReciente(20);

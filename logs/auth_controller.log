@@ -108,3 +108,8 @@
 [2026-06-25 20:51:01] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":12,"email":"pruebaintegral@test.com"}
 [2026-06-25 21:08:43] [INFO] IP: ::1 | User logged out | {"usuario_id":12,"email":"pruebaintegral@test.com"}
 [2026-06-25 21:09:36] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":13,"email":"pruebaintegral2@test.com"}
+[2026-07-02 19:56:20] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-02 22:05:00] [WARNING] IP: ::1 | Session expired due to inactivity | {"user_id":2,"inactive_minutes":128}
+[2026-07-02 22:05:00] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-02 22:05:00] [INFO] IP: ::1 | User logged out | {"usuario_id":null,"email":"unknown"}
+[2026-07-02 22:05:08] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}

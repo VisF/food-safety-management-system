@@ -90,46 +90,7 @@ class ReporteControlador
      *   'total' => int
      * ]
      */
-    public function obtenerActividadReciente(int $limite = 20): array
-    {
-        try {
-            $limite = max(1, min(100, $limite));
-            $sql = 'SELECT i.id, u.nombre, u.apellido, u.dni, et.nombre AS estado_nombre, i.fecha_inscripcion
-                    FROM inscripciones i
-                    JOIN usuarios u ON u.id = i.usuario_id
-                    LEFT JOIN estados_tramite et ON et.id = i.estado_tramite_id
-                    ORDER BY i.fecha_inscripcion DESC
-                    LIMIT :limite';
-            $stmt = $this->pdo()->prepare($sql);
-            $stmt->bindValue(':limite', $limite, \PDO::PARAM_INT);
-            $stmt->execute();
 
-            $actividades = [];
-            // Recorrer resultados y normalizar para la vista de actividad
-            while ($row = $stmt->fetch(\PDO::FETCH_ASSOC)) {
-                $estadoNombre = strtolower((string)($row['estado_nombre'] ?? 'pendiente'));
-                $actividades[] = [
-                    'nombre' => trim(($row['nombre'] ?? '') . ' ' . ($row['apellido'] ?? '')),
-                    'dni' => $row['dni'] ?? '',
-                    'estado' => strtoupper(str_replace('_', ' ', $estadoNombre)),
-                    'estado_class' => $estadoNombre,
-                ];
-            }
-
-            return [
-                'success' => true,
-                'actividades' => $actividades,
-                'total' => count($actividades)
-            ];
-        } catch (Exception $e) {
-            $this->log('Error al obtener actividad reciente', 'ERROR', ['error' => $e->getMessage()]);
-            return [
-                'success' => false,
-                'actividades' => [],
-                'total' => 0
-            ];
-        }
-    }
 
     /**
      * Obtener detalle de una actividad específica

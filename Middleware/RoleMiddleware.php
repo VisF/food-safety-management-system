@@ -7,7 +7,7 @@ class RoleMiddleware
     public static function handle(array $rolesPermitidos): void
     {
         $rolActual =
-            $_SESSION['usuario_rol'] ?? null;
+            $_SESSION['usuario_roles'] ?? null;
 
         if ($rolActual === null) {
             http_response_code(403);

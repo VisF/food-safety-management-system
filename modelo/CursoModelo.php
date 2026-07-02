@@ -23,6 +23,10 @@ class CursoModelo
     private string $descripcion;
     private int $activo;
     private string $fecha_creacion;
+    private ?string $fecha_inicio = null;
+    private ?string $hora_inicio = null;
+    private ?string $ubicacion = null;
+    private int $cupos;
 
     // Conexión a BD (placeholder)
     private ?object $conexion = null;
@@ -107,7 +111,11 @@ class CursoModelo
                 modalidad,
                 descripcion,
                 activo,
-                fecha_creacion
+                fecha_creacion,
+                fecha_inicio
+                hora_inicio
+                ubicacion
+                cupos
             )
             VALUES
             (
@@ -115,14 +123,21 @@ class CursoModelo
                 :modalidad,
                 :descripcion,
                 1,
-                NOW()
+                :fecha_inicio,
+                :hora_inicio,
+                :ubicacion,
+                :cupos
             )"
         );
 
         $stmt->execute([
             ':nombre' => trim($data['nombre']),
             ':modalidad' => trim($data['modalidad']),
-            ':descripcion' => trim($data['descripcion'])
+            ':descripcion' => trim($data['descripcion']),
+            ':fecha_inicio' => trim($data['fecha_inicio']),
+            ':hora_inicio' => trim($data['hora_inicio']),
+            ':ubicacion' => trim($data['ubicacion']),
+            ':cupos' => (int)$data['cupos']
         ]);
 
         $id = (int)$pdo->lastInsertId();
@@ -131,7 +146,11 @@ class CursoModelo
             'id' => $id,
             'nombre' => $data['nombre'],
             'modalidad' => $data['modalidad'],
-            'descripcion' => $data['descripcion']
+            'descripcion' => $data['descripcion'],
+            'fecha_inicio' => $data['fecha_inicio'],
+            'hora_inicio' => $data['hora_inicio'],
+            'ubicacion' => $data['ubicacion'],
+            'cupos' => $data['cupos']
         ];
     }
 
@@ -148,10 +167,14 @@ class CursoModelo
         $stmt = $pdo->prepare(
             "UPDATE cursos
             SET
-                nombre = :nombre,
-                modalidad = :modalidad,
-                descripcion = :descripcion,
-                activo = :activo
+                nombre=:nombre,
+                modalidad=:modalidad,
+                descripcion=:descripcion,
+                fecha_inicio=:fecha_inicio,
+                hora_inicio=:hora_inicio,
+                ubicacion=:ubicacion,
+                cupos=:cupos,
+                activo=:activo
             WHERE id = :id"
         );
 
@@ -160,7 +183,11 @@ class CursoModelo
             ':nombre' => trim($data['nombre']),
             ':modalidad' => trim($data['modalidad']),
             ':descripcion' => trim($data['descripcion']),
-            ':activo' => (int)$data['activo']
+            ':activo' => (int)$data['activo'],
+            ':fecha_inicio' => trim($data['fecha_inicio']),
+            ':hora_inicio' => trim($data['hora_inicio']),
+            ':ubicacion' => trim($data['ubicacion']),
+            ':cupos' => (int)$data['cupos']
         ]);
     }
 
@@ -187,8 +214,24 @@ class CursoModelo
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
-
     // Getters
+    public function getFechaInicio(): ?string
+    {
+        return $this->fecha_inicio;
+    }
+    public function getHoraInicio(): ?string
+    {
+        return $this->hora_inicio;
+    }
+    public function getUbicacion(): ?string
+    {
+        return $this->ubicacion;
+    }
+    public function getCupos(): int
+    {
+        return $this->cupos;
+    }
+    
     /**
      * Obtener ID
      * @return int
@@ -244,6 +287,24 @@ class CursoModelo
     }
 
     // Setters
+    public function setFechaInicio(?string $fecha_inicio): void
+    {
+        $this->fecha_inicio = $fecha_inicio;
+    }
+    public function setHoraInicio(?string $hora_inicio): void
+    {
+        $this->hora_inicio = $hora_inicio;
+    }
+    public function setUbicacion(?string $ubicacion): void
+    {
+        $this->ubicacion = $ubicacion;
+    }
+    public function setCupos(int $cupos): void
+    {
+        $this->cupos = $cupos;
+    }
+
+
     /**
      * Establecer ID
      * @param int $id

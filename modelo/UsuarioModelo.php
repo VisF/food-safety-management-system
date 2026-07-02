@@ -253,7 +253,7 @@ class UsuarioModelo
         }
 
         $stmt = $this->conexion->prepare(
-            'INSERT INTO usuario_rol
+            'INSERT INTO usuario_roles
             (
                 usuario_id,
                 rol_id
@@ -277,7 +277,7 @@ class UsuarioModelo
         }
 
         $stmt = $this->conexion->prepare(
-            'DELETE FROM usuario_rol
+            'DELETE FROM usuario_roles
             WHERE usuario_id = :usuario
             AND rol_id = :rol'
         );
@@ -299,7 +299,7 @@ class UsuarioModelo
         $stmt = $this->conexion->prepare(
             'SELECT r.nombre
             FROM roles r
-            INNER JOIN usuario_rol ur
+            INNER JOIN usuario_roles ur
                 ON r.id = ur.rol_id
             WHERE ur.usuario_id = :usuarioId'
         );
@@ -385,7 +385,9 @@ class UsuarioModelo
         $allowed = ['email','dni','nombre','apellido'];
         if (!in_array($criterio, $allowed, true)) return [];
 
-        $sql = "SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE {$criterio} LIKE :valor AND activo = 1 ORDER BY nombre ASC";
+        $sql = "SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo 
+                FROM usuarios WHERE {$criterio} LIKE :valor AND activo = 1 
+                ORDER BY nombre ASC";
         $stmt = $this->conexion->prepare($sql);
         $stmt->execute([':valor' => "%{$valor}%"]);
         return $stmt->fetchAll();
