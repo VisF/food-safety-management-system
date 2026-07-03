@@ -1,0 +1,190 @@
+/*
+|--------------------------------------------------------------------------
+| VARIABLES GLOBALES
+|--------------------------------------------------------------------------
+| Sistema visual institucional
+| Todas las variables del proyecto.
+| NO escribir estilos en este archivo.
+|--------------------------------------------------------------------------
+*/
+
+:root {
+
+    /* ==========================================================
+       PALETA ORIGINAL (COMPATIBILIDAD)
+    ========================================================== */
+
+    --color-background: #f8f9ff;
+
+    --color-surface: #f8f9ff;
+
+    --color-surface-variant: #ededf4;
+
+    --color-surface-container-lowest: #ffffff;
+
+    --color-surface-container-low: #f2f3f9;
+
+    --color-surface-container: #ededf4;
+
+    --color-surface-container-high: #e7e8ee;
+
+    --color-on-surface: #191c20;
+
+    --color-on-surface-variant: #414750;
+
+    --color-primary-00: #005596;
+
+    --color-primary-01: #003e6f;
+
+    --color-primary-02: #3a5f94;
+
+    --color-accent-00: #003366;
+
+    --color-active-bg: #005596;
+
+    --color-active-fg: #a4caff;
+
+    --color-link-hover: #e7e8ee;
+
+    /* ==========================================================
+       SISTEMA GOV (NUEVO)
+    ========================================================== */
+
+    --gov-primary-900: #083b72;
+
+    --gov-primary-800: #0a4e93;
+
+    --gov-primary-700: #1462b5;
+
+    --gov-primary-500: #3b7fc6;
+
+    --gov-bg: #f2f4f7;
+
+    --gov-surface: #ffffff;
+
+    --gov-surface-soft: #f8fafc;
+
+    --gov-border: #d9e1ea;
+
+    --gov-text: #1f2f46;
+
+    --gov-text-soft: #5b6b80;
+
+    --gov-positive-bg: #ebf8ef;
+
+    --gov-positive-border: #b8e2c4;
+
+    --gov-positive-text: #2d6e43;
+
+    --gov-warning-bg: #fff8e8;
+
+    --gov-warning-border: #f2d79d;
+
+    --gov-warning-text: #8b5f00;
+
+    --gov-danger-bg: #fff1f2;
+
+    --gov-danger-border: #f6c2cd;
+
+    --gov-danger-text: #8b3144;
+
+    /* ==========================================================
+       TIPOGRAFÍA
+    ========================================================== */
+
+    --font-family-base:
+        "Inter",
+        "Poppins",
+        "Segoe UI",
+        sans-serif;
+
+    --font-size-base: 16px;
+
+    /* ==========================================================
+       ESPACIADOS
+    ========================================================== */
+
+    --space-1: 4px;
+
+    --space-2: 8px;
+
+    --space-3: 12px;
+
+    --space-4: 16px;
+
+    --space-5: 20px;
+
+    --space-6: 24px;
+
+    --space-8: 32px;
+
+    --space-10: 40px;
+
+    /* Alias para compatibilidad */
+
+    --gov-space-1: var(--space-1);
+
+    --gov-space-2: var(--space-2);
+
+    --gov-space-3: var(--space-3);
+
+    --gov-space-4: var(--space-4);
+
+    --gov-space-5: var(--space-5);
+
+    --gov-space-6: var(--space-6);
+
+    --gov-space-8: var(--space-8);
+
+    --gov-space-10: var(--space-10);
+
+    /* ==========================================================
+       RADIOS
+    ========================================================== */
+
+    --radius-pill: 9999px;
+
+    --radius-card: 24px;
+
+    --radius-button: 18px;
+
+    --radius-input: 14px;
+
+    /* Alias */
+
+    --gov-radius-pill: var(--radius-pill);
+
+    --gov-radius-card: var(--radius-card);
+
+    --gov-radius-button: var(--radius-button);
+
+    --gov-radius-input: var(--radius-input);
+
+    /* ==========================================================
+       SOMBRAS
+    ========================================================== */
+
+    --shadow-soft:
+        0 10px 28px rgba(10,47,84,.08);
+
+    --shadow-float:
+        0 16px 40px rgba(8,34,60,.12);
+
+    --shadow-elevated:
+        0 4px 20px rgba(0,0,0,.08);
+
+    /* Alias */
+
+    --gov-shadow-soft: var(--shadow-soft);
+
+    --gov-shadow-float: var(--shadow-float);
+
+    /* ==========================================================
+       TRANSICIONES
+    ========================================================== */
+
+    --transition-fast: 160ms ease;
+
+    --transition: 220ms ease;
+
+}

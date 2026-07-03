@@ -141,17 +141,44 @@ class PanelAdminVista
 
     private function getRoute(string $route): string
     {
-        $basePath = '/ManipulacionDeAlimentos';
+        return match ($route) {
 
-        return $basePath . '/' . ltrim($route, '/');
+            'admin' => '/manipulacionDeAlimentos/admin',
+
+            'crear_examen' => '/manipulacionDeAlimentos/admin/crear_examen',
+
+            'admin_examenes' => '/manipulacionDeAlimentos/admin/examenes',
+
+            'admin_documentos' => '/manipulacionDeAlimentos/admin/documentos',
+
+            'admin_usuarios' => '/manipulacionDeAlimentos/admin/usuarios',
+
+            'admin_carnets' => '/manipulacionDeAlimentos/admin/carnets',
+
+            'admin_reportes' => '/manipulacionDeAlimentos/admin/reportes',
+
+            'actividad_reciente' => '/manipulacionDeAlimentos/admin/actividad',
+
+            default => '#'
+        };
     }
 
-    public function mostrar(): void
-    {
-        $panelAdminData = array_replace_recursive($this->getDefaultData(), $this->getIncomingData());
-        $activityLimitedRows = array_slice((array) $panelAdminData['activities'], 0, 5);
+    public function mostrar(array $panelAdminData = []): void
+        {
+            if (empty($panelAdminData)) {
+                $panelAdminData = array_replace_recursive(
+                    $this->getDefaultData(),
+                    $this->getIncomingData()
+                );
+            }
 
-        $this->getHeader($panelAdminData);
+            $activityLimitedRows = array_slice(
+                (array)$panelAdminData['activities'],
+                0,
+                5
+            );
+
+            $this->getHeader($panelAdminData);
         ?>
 
           <!-- TopAppBar Shell -->
@@ -187,56 +214,89 @@ class PanelAdminVista
              <h3 class="font-headline-md text-headline-md text-on-surface">
               Acciones Rápidas
              </h3>
-             <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
-              <a class="panel-admin-action app-vista-button app-vista-button--primary" href="<?php echo $this->getRoute('crear_examen'); ?>" role="button" style="text-decoration: none;">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="calendar_today">
-                calendar_today
-               </span>
-               <span class="panel-admin-action__texto">
-                Crear fecha de examen
-               </span>
-              </a>
-              <button class="panel-admin-action app-vista-button app-vista-button--primary">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="event_seat">
-                event_seat
-               </span>
-               <span class="panel-admin-action__texto">
-                Gestionar cupos
-               </span>
-              </button>
-              <button class="panel-admin-action app-vista-button app-vista-button--primary">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="fact_check">
-                fact_check
-               </span>
-               <span class="panel-admin-action__texto">
-                Validar documentación
-               </span>
-              </button>
-              <button class="panel-admin-action app-vista-button app-vista-button--primary">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="assignment_turned_in">
-                assignment_turned_in
-               </span>
-               <span class="panel-admin-action__texto">
-                Registrar resultados
-               </span>
-              </button>
-              <button class="panel-admin-action app-vista-button app-vista-button--primary">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="description">
-                description
-               </span>
-               <span class="panel-admin-action__texto">
-                Descargar documentación
-               </span>
-              </button>
-              <button class="panel-admin-action app-vista-button app-vista-button--primary">
-               <span class="material-symbols-outlined panel-admin-action__icono" data-icon="add_card">
-                add_card
-               </span>
-               <span class="panel-admin-action__texto">
-                Cargar Carnet
-               </span>
-              </button>
-             </div>
+             
+                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('crear_examen'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            calendar_today
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Crear fecha de examen
+                        </span>
+
+                    </a>
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('admin_examenes'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            event_note
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Gestionar exámenes
+                        </span>
+
+                    </a>
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('admin_documentos'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            fact_check
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Gestionar documentación
+                        </span>
+
+                    </a>
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('admin_usuarios'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            group
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Administrar usuarios
+                        </span>
+
+                    </a>
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('admin_carnets'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            badge
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Gestionar carnets
+                        </span>
+
+                    </a>
+
+                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
+                    href="<?php echo $this->getRoute('admin_reportes'); ?>">
+
+                        <span class="material-symbols-outlined panel-admin-action__icono">
+                            analytics
+                        </span>
+
+                        <span class="panel-admin-action__texto">
+                            Reportes
+                        </span>
+
+                    </a>
+
+                </div>
+
             </section>
             <section class="panel-admin-actividad app-vista-card">
              <div class="panel-admin-actividad__encabezado">

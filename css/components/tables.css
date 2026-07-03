@@ -1,0 +1,231 @@
+/*
+|--------------------------------------------------------------------------
+| TABLES
+|--------------------------------------------------------------------------
+| Tablas reutilizables del sistema.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   CONTENEDOR
+========================================================== */
+
+.app-table-responsive{
+
+    width:100%;
+
+    overflow-x:auto;
+
+}
+
+/* ==========================================================
+   TABLA
+========================================================== */
+
+.app-table{
+
+    width:100%;
+
+    border-collapse:collapse;
+
+    background:#ffffff;
+
+    border:1px solid var(--gov-border);
+
+    border-radius:var(--gov-radius-card);
+
+    overflow:hidden;
+
+}
+
+/* ==========================================================
+   HEADER
+========================================================== */
+
+.app-table thead{
+
+    background:var(--gov-surface-soft);
+
+}
+
+.app-table th{
+
+    padding:16px 18px;
+
+    text-align:left;
+
+    font-size:.82rem;
+
+    font-weight:700;
+
+    color:var(--gov-text);
+
+    text-transform:uppercase;
+
+    letter-spacing:.04em;
+
+    border-bottom:1px solid var(--gov-border);
+
+}
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+.app-table td{
+
+    padding:16px 18px;
+
+    border-bottom:1px solid var(--gov-border);
+
+    color:var(--gov-text);
+
+    vertical-align:middle;
+
+}
+
+.app-table tbody tr{
+
+    transition:background var(--transition);
+
+}
+
+.app-table tbody tr:hover{
+
+    background:var(--gov-surface-soft);
+
+}
+
+.app-table tbody tr:last-child td{
+
+    border-bottom:none;
+
+}
+
+/* ==========================================================
+   ACCIONES
+========================================================== */
+
+.app-table-actions{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+}
+
+/* ==========================================================
+   BOTONES
+========================================================== */
+
+.app-table-action{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:36px;
+
+    height:36px;
+
+    border-radius:12px;
+
+    border:1px solid var(--gov-border);
+
+    background:#ffffff;
+
+    color:var(--gov-primary-700);
+
+    transition:all var(--transition);
+
+}
+
+.app-table-action:hover{
+
+    background:var(--gov-surface-soft);
+
+}
+
+/* ==========================================================
+   FILA VACÍA
+========================================================== */
+
+.app-table-empty{
+
+    text-align:center;
+
+    padding:48px;
+
+    color:var(--gov-text-soft);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .app-table{
+
+        display:block;
+
+    }
+
+    .app-table thead{
+
+        display:none;
+
+    }
+
+    .app-table tbody{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:16px;
+
+    }
+
+    .app-table tr{
+
+        display:block;
+
+        border:1px solid var(--gov-border);
+
+        border-radius:18px;
+
+        background:#ffffff;
+
+        box-shadow:var(--gov-shadow-soft);
+
+    }
+
+    .app-table td{
+
+        display:flex;
+
+        justify-content:space-between;
+
+        gap:12px;
+
+        border:none;
+
+    }
+
+    .app-table td::before{
+
+        content:attr(data-label);
+
+        font-weight:700;
+
+        color:var(--gov-text-soft);
+
+    }
+
+}

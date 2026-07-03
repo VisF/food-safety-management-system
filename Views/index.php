@@ -46,9 +46,7 @@ class InicioVista
           <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
           <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
           <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/base.css" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/components.css" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/ui.css" rel="stylesheet"/>
+          <link href="<?= $assetBase ?>/css/app.css" rel="stylesheet"/>
          </head>
          <body class="bg-background min-h-screen text-on-surface pb-24 tema-ciudadano">
         <?php include __DIR__ . '/header.php'; ?>
@@ -128,314 +126,521 @@ class InicioVista
         ?>
 
                     <main class="contenido-principal">
-                       <section style="margin-bottom: 22px; padding-inline: 2px;">
-                        <p style="margin: 0; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
-                         <?php echo $this->e($inicioData['welcome_text']); ?>
-                        </p>
-                        <h2 style="margin: 4px 0 0; color: #0a4e93; font-size: clamp(1.5rem, 7vw, 1.85rem); font-weight: 800; line-height: 1.1;">
-                                <?= $this->e(
-                                    $inicioData['usuario']['nombre'] ?? 'Invitado'
-                                ) ?>
-                        </h2>
-                     </section>
 
-                     <article class="app-vista-card" style="padding: 22px; margin-bottom: 18px;">
-                        <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; margin-bottom: 14px;">
-                         <div>
-                            <p style="margin: 0; color: #5b6b80; font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">
-                             <?php echo $this->e($inicioData['tramite']['label']); ?>
-                            </p>
-                            <h3 style="margin: 6px 0 0; color: #0a4e93; font-size: 1.12rem; font-weight: 800; line-height: 1.25;">
-                             <?php echo $this->e($inicioData['tramite']['titulo']); ?>
-                            </h3>
-                         </div>
-                         <span class="app-vista-chip app-vista-chip--vigente" style="font-size: 0.72rem;">
-                            <span style="width: 7px; height: 7px; border-radius: 50%; background: #2d6e43; box-shadow: 0 0 0 4px rgba(45,110,67,0.12);"></span>
-                            <?php echo $this->e($inicioData['tramite']['estado']); ?>
-                         </span>
-                        </div>
+    <section class="home-bienvenida">
 
-                        <p style="display: flex; align-items: center; gap: 8px; margin: 0 0 14px; color: #5b6b80; font-size: 0.9rem; font-weight: 500;">
-                         <span class="material-symbols-outlined" data-icon="calendar_today" style="font-size: 17px;">calendar_today</span>
-                         <?php echo $this->e($inicioData['tramite']['fecha_vencimiento']); ?>
-                        </p>
+        <p class="home-bienvenida__texto">
+            <?= $this->e($inicioData['welcome_text']); ?>
+        </p>
 
-                        <div style="height: 10px; border-radius: 999px; background: #e3ebf5; overflow: hidden;">
-                            <div
-                                style="
-                                    width: <?= (int)($inicioData['tramite']['porcentaje'] ?? 0) ?>%;
-                                    height: 100%;
-                                    border-radius: 999px;
-                                    background: linear-gradient(90deg, #1462b5, #0a4e93);
-                                "
-                            ></div>
-                        </div>
-                        <p style="margin: 10px 0 4px; color: #5b6b80; font-size: 0.84rem; font-weight: 600;">
-                            <?= $this->e($inicioData['tramite']['progreso']); ?>
-                        </p>
+        <h2 class="home-bienvenida__nombre">
+            <?= $this->e(
+                $inicioData['usuario']['nombre'] ?? 'Invitado'
+            ) ?>
+        </h2>
 
-                        <p style="margin: 0 0 16px; color: #0a4e93; font-size: 0.9rem; font-weight: 600;">
-                            Siguiente paso:
-                            <?= $this->e($inicioData['tramite']['accion_principal']['texto']); ?>
-                        </p>
-                        <?php
-                        $documentacionCompleta =
-                            ($inicioData['tramite']['porcentaje'] ?? 0) == 100;
+    </section>
 
-                        $href = $documentacionCompleta
-                            ? '#proximos-examenes'
-                            : $this->getRoute('subida_documentacion');
-                            ?>
-                        <a
-                            class="app-vista-button app-vista-button--primary"
-                            href="<?= $href ?>"
-                            role="button"
+    <article class="app-vista-card home-tramite">
+
+        <div class="home-tramite__header">
+
+            <div>
+
+                <p class="home-tramite__label">
+                    <?= $this->e($inicioData['tramite']['label']); ?>
+                </p>
+
+                <h3 class="home-tramite__titulo">
+                    <?= $this->e($inicioData['tramite']['titulo']); ?>
+                </h3>
+
+            </div>
+
+            <span class="app-vista-chip app-vista-chip--vigente home-tramite__estado">
+
+                <span class="home-tramite__estado-indicador"></span>
+
+                <?= $this->e($inicioData['tramite']['estado']); ?>
+
+            </span>
+
+        </div>
+
+        <p class="home-tramite__fecha">
+
+            <span class="material-symbols-outlined">
+                calendar_today
+            </span>
+
+            <?= $this->e(
+                $inicioData['tramite']['fecha_vencimiento']
+            ); ?>
+
+        </p>
+
+        <div class="home-tramite__barra">
+
+            <div
+                class="home-tramite__progreso"
+                style="width: <?= (int)($inicioData['tramite']['porcentaje'] ?? 0) ?>%;"
+            ></div>
+
+        </div>
+
+        <p class="home-tramite__porcentaje">
+
+            <?= $this->e(
+                $inicioData['tramite']['progreso']
+            ); ?>
+
+        </p>
+
+        <p class="home-tramite__accion">
+
+            <strong>Siguiente paso:</strong>
+
+            <?= $this->e(
+                $inicioData['tramite']['accion_principal']['texto']
+            ); ?>
+
+        </p>
+
+        <?php
+
+            $documentacionCompleta =
+                ($inicioData['tramite']['porcentaje'] ?? 0) == 100;
+
+            $href = $documentacionCompleta
+                ? '#proximos-examenes'
+                : $this->getRoute('subida_documentacion');
+
+            ?>
+
+            <a
+                class="app-vista-button app-vista-button--primary home-tramite__boton"
+                href="<?= $href ?>"
+                role="button"
+            >
+
+                <span class="material-symbols-outlined">
+                    task_alt
+                </span>
+
+                <?= $inicioData['tramite']['accion_principal']['texto'] ?>
+
+            </a>
+
+        </article>
+                        <section class="home-documentos">
+
+        <h4 class="home-documentos__titulo">
+
+            Documentación Requerida
+
+        </h4>
+
+        <div class="home-documentos__grid">
+
+            <?php if (!empty($inicioData['documentos_faltantes'])): ?>
+
+                <div class="home-documentos__alerta">
+
+                    <strong>
+
+                        Documentos pendientes:
+
+                    </strong>
+
+                    <ul class="home-documentos__lista">
+
+                        <?php foreach (
+                            $inicioData['documentos_faltantes']
+                            as $faltante
+                        ): ?>
+
+                            <li>
+
+                                <?= $this->e($faltante) ?>
+
+                            </li>
+
+                        <?php endforeach; ?>
+
+                    </ul>
+
+                </div>
+
+            <?php endif; ?>
+
+            <?php foreach ($inicioData['documentos'] as $document): ?>
+
+                <a
+                    class="<?= $this->getDocumentCardClass($document['state']); ?>"
+                    href="<?= $this->getRoute((string)$document['route']); ?>"
+                    role="button"
+                >
+
+                    <div class="documento-home__icono">
+
+                        <span
+                            class="material-symbols-outlined"
+                            data-icon="<?= $this->e($document['icon']); ?>"
                         >
-                            <span class="material-symbols-outlined">
-                                task_alt
-                            </span>
+                            <?= $this->e($document['icon']); ?>
+                        </span>
 
-                            <?= $inicioData['tramite']['accion_principal']['texto'] ?>
-                        </a>
-                     </article>
+                    </div>
 
-                     <section style="margin-bottom: 18px;">
-                        <h4 style="margin: 0 0 10px; color: #1f2f46; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
-                         Documentación Requerida
-                        </h4>
-                        <div class="grid grid-cols-2" style="gap: 12px;">
-                            <?php if (!empty($inicioData['documentos_faltantes'])): ?>
-                                <div
-                                    style="
-                                        margin-top:12px;
-                                        padding:12px;
-                                        border-radius:12px;
-                                        background:#fff4e5;
-                                        border:1px solid #ffd59a;
-                                    "
-                                >
-                                    <strong>Documentos pendientes:</strong>
-                                    <ul style="margin-top:8px; padding-left:20px;">
-                                        <?php foreach (
-                                            $inicioData['documentos_faltantes']
-                                            as $faltante
-                                        ): ?>
-                                            <li>
-                                                <?= $this->e($faltante) ?>
-                                            </li>
-                                        <?php endforeach; ?>
-                                    </ul>
-                                </div>
-                                <?php endif; ?>
-                    <?php // Itera tarjetas de documentos; el array debe ser limitado y sanitizado por el backend.
-                    foreach ($inicioData['documentos'] as $document): ?>
-                        <a
-                            class="<?php echo $this->getDocumentCardClass($document['state']); ?>"
-                            href="<?php echo $this->getRoute((string) $document['route']); ?>"
-                            role="button"
+                    <div class="home-documento__contenido">
+
+                        <span class="home-documento__titulo">
+
+                            <?= $this->e($document['label']); ?>
+
+                        </span>
+
+                        <span class="home-documento__descripcion">
+
+                            <?= $this->e($document['descripcion']); ?>
+
+                        </span>
+
+                        <span
+                            class="<?= $this->getDocumentButtonClass(
+                                $document['state']
+                            ); ?>"
                         >
-                            <div class="documento-home__icono">
-                             <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>"><?php echo $this->e($document['icon']); ?></span>
-                            </div>
-                            <div class="inicio-documento__contenido">
 
-                                <span class="inicio-documento__titulo">
-                                    <?php echo $this->e($document['label']); ?>
-                                </span>
+                            <?= ucfirst(
+                                $this->e($document['state'])
+                            ); ?>
 
-                                <span class="inicio-documento__descripcion">
-                                    <?php echo $this->e($document['descripcion']); ?>
-                                </span>
+                        </span>
 
-                            </div>
-                        </a>
-                    <?php endforeach; ?>
-                        </div>
-                     </section>
+                    </div>
 
+                </a>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    </section>
                     <section class="home-cursos">
 
-                        <h4 class="home-cursos__titulo">
-                            Cursos Disponibles
-                        </h4>
+    <div class="home-cursos__header">
 
-                        <div class="home-cursos__grid">
+        <h4 class="home-cursos__titulo">
 
-                            <?php foreach ($inicioData['cursos'] as $curso): ?>
+            Cursos Disponibles
 
-                            <article class="app-vista-card app-vista-card--surface home-curso-card">
+        </h4>
 
-                                <div class="home-curso-card__contenido">
+    </div>
 
-                                    <h5 class="home-curso-card__nombre">
-                                        <?= $this->e($curso['nombre']) ?>
-                                    </h5>
+    <div class="home-cursos__grid">
 
-                                    <p class="home-curso-card__descripcion">
-                                        <?= $this->e($curso['descripcion']) ?>
-                                    </p>
-                                    <div class="home-curso-card__datos">
+            <?php foreach ($inicioData['cursos'] as $curso): ?>
 
-                                        <?php if (!empty($curso['fecha_inicio'])): ?>
-                                        <p class="home-curso-card__dato">
-                                            <?= date(
-                                                'd/m/Y',
-                                                strtotime($curso['fecha_inicio'])
-                                            ) ?>
-                                        </p>
-                                        <?php endif; ?>
+                <article class="app-vista-card home-curso-card">
 
-                                        <?php if (!empty($curso['hora_inicio'])): ?>
-                                        <p class="home-curso-card__dato">
-                                             <?= $this->e(
-                                                $curso['hora_inicio']
-                                            ) ?> hs
-                                        </p>
-                                        <?php endif; ?>
+                    <div class="home-curso-card__contenido">
 
-                                        <?php if (!empty($curso['ubicacion'])): ?>
-                                        <p class="home-curso-card__dato">
-                                            <?= $this->e(
-                                                $curso['ubicacion']
-                                            ) ?>
-                                        </p>
-                                        <?php endif; ?>
+                        <h5 class="home-curso-card__nombre">
 
-                                        <p class="home-curso-card__dato">
+                            <?= $this->e($curso['nombre']) ?>
 
-                                            👥
+                        </h5>
 
-                                            <?= (int)$curso['cupos_disponibles'] ?>
+                        <p class="home-curso-card__descripcion">
 
-                                            cupos disponibles
+                            <?= $this->e($curso['descripcion']) ?>
 
-                                            de
+                        </p>
 
-                                            <?= (int)$curso['cupos_totales'] ?>
+                        <div class="home-curso-card__datos">
 
-                                        </p>
+                            <?php if (!empty($curso['fecha_inicio'])): ?>
 
-                                    </div>
-                                    <span class="app-vista-chip">
+                                <p class="home-curso-card__dato">
 
-                                        <?php if (
-                                            strtolower($curso['modalidad']) === 'presencial'
-                                        ): ?>
+                                    <span class="material-symbols-outlined">
 
-                                            📍 Presencial
-
-                                        <?php else: ?>
-
-                                            💻 Virtual
-
-                                        <?php endif; ?>
+                                        calendar_today
 
                                     </span>
 
-                                </div>
+                                    <?= date(
+                                        'd/m/Y',
+                                        strtotime($curso['fecha_inicio'])
+                                    ) ?>
 
-                               <?php if (!$curso['inscripto']): ?>
+                                </p>
 
-                                    <form
-                                        method="POST"
-                                        action="<?= BASE_URL ?>/curso/inscribirse"
+                            <?php endif; ?>
+
+                            <?php if (!empty($curso['hora_inicio'])): ?>
+
+                                <p class="home-curso-card__dato">
+
+                                    <span class="material-symbols-outlined">
+
+                                        schedule
+
+                                    </span>
+
+                                    <?= $this->e($curso['hora_inicio']) ?> hs
+
+                                </p>
+
+                            <?php endif; ?>
+
+                            <?php if (!empty($curso['ubicacion'])): ?>
+
+                                <p class="home-curso-card__dato">
+
+                                    <span class="material-symbols-outlined">
+
+                                        location_on
+
+                                    </span>
+
+                                    <?= $this->e($curso['ubicacion']) ?>
+
+                                </p>
+
+                            <?php endif; ?>
+
+                            <p class="home-curso-card__dato">
+
+                                <span class="material-symbols-outlined">
+
+                                    groups
+
+                                </span>
+
+                                <?= (int)$curso['cupos_disponibles'] ?>
+
+                                /
+
+                                <?= (int)$curso['cupos_totales'] ?>
+
+                                cupos
+
+                            </p>
+
+                        </div>
+
+                        <div class="home-curso-card__footer">
+
+                            <span class="app-chip app-chip--info">
+
+                                <?php if (
+                                    strtolower($curso['modalidad']) === 'presencial'
+                                ): ?>
+
+                                    📍 Presencial
+
+                                <?php else: ?>
+
+                                    💻 Virtual
+
+                                <?php endif; ?>
+
+                            </span>
+
+                            <?php if (!$curso['inscripto']): ?>
+
+                                <form
+                                    method="POST"
+                                    action="<?= BASE_URL ?>/curso/inscribirse"
+                                    class="home-curso-card__form"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="curso_id"
+                                        value="<?= (int)$curso['id'] ?>"
                                     >
-
-                                        <input
-                                            type="hidden"
-                                            name="curso_id"
-                                            value="<?= (int)$curso['id'] ?>"
-                                        >
-
-                                        <button
-                                            type="submit"
-                                            class="app-vista-button app-vista-button--primary"
-                                        >
-                                            Inscribirme
-                                        </button>
-
-                                    </form>
-
-                                    <?php else: ?>
 
                                     <button
-                                        type="button"
-                                        class="app-vista-button app-vista-button--secondary"
-                                        disabled
+                                        type="submit"
+                                        class="app-vista-button app-vista-button--primary"
                                     >
-                                        Ya inscripto
+
+                                        Inscribirme
+
                                     </button>
 
-                                    <?php endif; ?>
+                                </form>
 
-                            </article>
+                            <?php else: ?>
 
-                            <?php endforeach; ?>
+                                <button
+                                    class="app-vista-button app-vista-button--secondary"
+                                    disabled
+                                >
+
+                                    Ya inscripto
+
+                                </button>
+
+                            <?php endif; ?>
 
                         </div>
 
-                    </section>
+                    </div>
 
-                     <section id="proximos-examenes" style="margin-bottom: 20px;">
-                        <h4 style="margin: 0 0 10px; color: #1f2f46; font-size: 0.88rem; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase;">
-                         Próximos Exámenes
-                        </h4>
-                        <div style="display: grid; gap: 12px;">
-                    <?php // Itera exámenes próximos; validar cupos en servidor antes de mostrar acciones habilitadas.
-                    foreach ($inicioData['examenes'] as $exam): ?>
-                         <article class="app-vista-card" style="padding: 0;">
-                            <div style="display: grid; grid-template-columns: 82px 1fr; align-items: stretch;">
-                             <div style="background: linear-gradient(160deg, #1462b5, #0a4e93); color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;">
-                                <span style="font-size: 0.7rem; font-weight: 700; opacity: 0.9;">
-                                 <?php echo $this->e($exam['month']); ?>
-                                </span>
-                                <span style="font-size: 1.55rem; font-weight: 800; line-height: 1;">
-                                 <?php echo $this->e($exam['day']); ?>
-                                </span>
-                             </div>
-                             <div style="padding: 14px;">
-                                <h5 style="margin: 0 0 4px; color: #1f2f46; font-size: 0.98rem; font-weight: 700; line-height: 1.25;">
-                                 <?php echo $this->e($exam['title']); ?>
-                                </h5>
-                                <p style="margin: 0 0 10px; color: #5b6b80; font-size: 0.84rem; font-weight: 500;">
-                                 <?php echo $this->e($exam['time']); ?> • <?php echo $this->e($exam['place']); ?>
-                                </p>
-                                <span class="<?php echo $this->getExamBadgeClass((int) $exam['available']); ?>" style="margin-bottom: 10px;">
-                                 <?php if ((int) $exam['available'] === 1): ?>
-                                 <span style="width: 7px; height: 7px; border-radius: 50%; background: #2d6e43;"></span>
-                                 <?php endif; ?>
-                                 <?php echo $this->e($this->getExamBadgeText((int) $exam['available'])); ?>
-                                </span>
-                                    <a
-                                        class="app-vista-button app-vista-button--primary"
-                                        href="/manipulacionDeAlimentos/detalle_examen?id=<?php echo (int)$exam['id']; ?>"
-                                        role="button"
-                                        style="margin-top: 10px;"
-                                    >
-                                        Inscribirse
-                                    </a>
-                             </div>
-                            </div>
-                         </article>
-                    <?php endforeach; ?>
-                        </div>
-                     </section>
+                </article>
 
-                     <section style="padding-bottom: 6px;">
-                        <a class="app-vista-button app-vista-button--secondary" href="<?php echo $this->getRoute((string) $inicioData['carnet']['ruta_descarga']); ?>" role="button">
-                         <span class="material-symbols-outlined" data-icon="download">download</span>
-                         <?php echo $this->e($inicioData['carnet']['etiqueta_descarga']); ?>
-                        </a>
-                        <p style="margin: 10px 0 0; text-align: center; color: #7a8798; font-size: 0.82rem; font-style: italic;">
-                         Disponible una vez aprobado el examen.
+            <?php endforeach; ?>
+
+        </div>
+
+    </section>
+    <section id="proximos-examenes" class="home-examenes">
+
+    <h4 class="home-examenes__titulo">
+
+        Próximos Exámenes
+
+    </h4>
+
+    <div class="home-examenes__grid">
+
+            <?php foreach ($inicioData['examenes'] as $exam): ?>
+
+                <article class="app-vista-card home-examen-card">
+
+                    <div class="home-examen-card__fecha">
+
+                        <span class="home-examen-card__mes">
+
+                            <?= $this->e($exam['month']); ?>
+
+                        </span>
+
+                        <span class="home-examen-card__dia">
+
+                            <?= $this->e($exam['day']); ?>
+
+                        </span>
+
+                    </div>
+
+                    <div class="home-examen-card__contenido">
+
+                        <h5 class="home-examen-card__titulo">
+
+                            <?= $this->e($exam['title']); ?>
+
+                        </h5>
+
+                        <p class="home-examen-card__detalle">
+
+                            <span class="material-symbols-outlined">
+
+                                schedule
+
+                            </span>
+
+                            <?= $this->e($exam['time']); ?>
+
                         </p>
-                     </section>
-                    </main>
-          <!-- Bottom Navigation -->
 
-        <?php
+                        <p class="home-examen-card__detalle">
+
+                            <span class="material-symbols-outlined">
+
+                                location_on
+
+                            </span>
+
+                            <?= $this->e($exam['place']); ?>
+
+                        </p>
+
+                        <div class="home-examen-card__footer">
+
+                            <span
+                                class="<?= $this->getExamBadgeClass(
+                                    (int)$exam['available']
+                                ); ?>"
+                            >
+
+                                <?php if ((int)$exam['available'] === 1): ?>
+
+                                    <span
+                                        class="home-examen-card__indicador"
+                                    ></span>
+
+                                <?php endif; ?>
+
+                                <?= $this->e(
+                                    $this->getExamBadgeText(
+                                        (int)$exam['available']
+                                    )
+                                ); ?>
+
+                            </span>
+
+                            <a
+                                href="/manipulacionDeAlimentos/detalle_examen?id=<?= (int)$exam['id']; ?>"
+                                class="app-vista-button app-vista-button--primary"
+                            >
+
+                                Inscribirse
+
+                            </a>
+
+                        </div>
+
+                    </div>
+
+                </article>
+
+            <?php endforeach; ?>
+
+        </div>
+
+    </section>
+    <section class="home-carnet">
+
+        <a
+            class="app-vista-button app-vista-button--secondary home-carnet__boton"
+            href="<?= $this->getRoute(
+                (string)$inicioData['carnet']['ruta_descarga']
+            ); ?>"
+            role="button"
+        >
+
+            <span class="material-symbols-outlined">
+
+                download
+
+            </span>
+
+            <?= $this->e(
+                $inicioData['carnet']['etiqueta_descarga']
+            ); ?>
+
+        </a>
+
+        <p class="home-carnet__descripcion">
+
+            Disponible una vez aprobado el examen.
+
+        </p>
+
+    </section>
+
+    </main>
+
+    <?php
+
         $this->getFooter();
+
     }
+
 }
-
-

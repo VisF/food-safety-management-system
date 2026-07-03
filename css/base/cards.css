@@ -1,0 +1,363 @@
+/*
+|--------------------------------------------------------------------------
+| CARDS
+|--------------------------------------------------------------------------
+| Tarjetas reutilizables de toda la aplicación.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   CARD BASE
+========================================================== */
+
+.app-vista-card,
+.panel-admin-card,
+.panel-admin-action,
+.panel-admin-actividad{
+
+    position:relative;
+
+    background:var(--gov-surface);
+
+    border:1px solid var(--gov-border);
+
+    border-radius:var(--gov-radius-card);
+
+    box-shadow:var(--gov-shadow-soft);
+
+}
+
+/* ==========================================================
+   CARD GENERAL
+========================================================== */
+
+.app-vista-card{
+
+    padding:24px;
+
+}
+
+/* ==========================================================
+   PANEL ADMIN - TARJETAS
+========================================================== */
+
+.panel-admin-card{
+
+    min-height:94px;
+
+    padding:20px;
+
+    overflow:hidden;
+
+}
+
+.panel-admin-card::before{
+
+    content:"";
+
+    position:absolute;
+
+    left:0;
+
+    top:0;
+
+    width:100%;
+
+    height:5px;
+
+    background:linear-gradient(
+        90deg,
+        var(--gov-primary-700),
+        var(--gov-primary-500)
+    );
+
+}
+
+/* ==========================================================
+   TÍTULOS
+========================================================== */
+
+.panel-admin-card__titulo{
+
+    margin-bottom:8px;
+
+    font-size:.82rem;
+
+    font-weight:700;
+
+    letter-spacing:.04em;
+
+    text-transform:uppercase;
+
+    color:var(--gov-text-soft);
+
+}
+
+.panel-admin-card__valor{
+
+    font-size:2rem;
+
+    font-weight:800;
+
+    color:var(--gov-text);
+
+}
+
+.panel-admin-card__descripcion{
+
+    margin-top:6px;
+
+    font-size:.85rem;
+
+    color:var(--gov-text-soft);
+
+}
+
+/* ==========================================================
+   ACTIVIDAD
+========================================================== */
+
+.panel-admin-actividad{
+
+    padding:20px;
+
+}
+
+.panel-admin-actividad__encabezado{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    margin-bottom:18px;
+
+}
+
+.panel-admin-actividad__titulo{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+}
+
+.panel-admin-actividad__enlace{
+
+    font-size:.85rem;
+
+    font-weight:700;
+
+    color:var(--gov-primary-800);
+
+}
+
+.panel-admin-actividad__enlace:hover{
+
+    text-decoration:underline;
+
+}
+
+/* ==========================================================
+   FILAS
+========================================================== */
+
+.panel-admin-fila{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:16px;
+
+    padding:16px 0;
+
+}
+
+.panel-admin-fila + .panel-admin-fila{
+
+    border-top:1px solid var(--gov-border);
+
+}
+
+.panel-admin-fila__izquierda,
+.panel-admin-fila__derecha{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+/* ==========================================================
+   AVATAR
+========================================================== */
+
+.panel-admin-fila__avatar{
+
+    width:44px;
+
+    height:44px;
+
+    border-radius:50%;
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    background:#ecf3fb;
+
+    color:var(--gov-primary-700);
+
+}
+
+.panel-admin-fila__avatar .material-symbols-outlined{
+
+    font-size:22px;
+
+}
+
+/* ==========================================================
+   TEXTO
+========================================================== */
+
+.panel-admin-fila__nombre{
+
+    font-weight:700;
+
+    color:var(--gov-text);
+
+}
+
+.panel-admin-fila__dni,
+.panel-admin-fila__estado-label{
+
+    margin-top:3px;
+
+    font-size:.78rem;
+
+    color:var(--gov-text-soft);
+
+}
+
+/* ==========================================================
+   CHIPS
+========================================================== */
+
+.panel-admin-fila__estado,
+.app-vista-chip{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    padding:6px 12px;
+
+    border-radius:var(--gov-radius-pill);
+
+    border:1px solid var(--gov-border);
+
+    font-size:.74rem;
+
+    font-weight:700;
+
+}
+
+.panel-admin-fila__estado--aprobado,
+.app-vista-chip--vigente,
+.exam-pill{
+
+    background:var(--gov-positive-bg);
+
+    border-color:var(--gov-positive-border);
+
+    color:var(--gov-positive-text);
+
+}
+
+.panel-admin-fila__estado--pendiente{
+
+    background:var(--gov-warning-bg);
+
+    border-color:var(--gov-warning-border);
+
+    color:var(--gov-warning-text);
+
+}
+
+.panel-admin-fila__estado--rechazado{
+
+    background:var(--gov-danger-bg);
+
+    border-color:var(--gov-danger-border);
+
+    color:var(--gov-danger-text);
+
+}
+
+/* ==========================================================
+   BOTÓN DE ACCIÓN
+========================================================== */
+
+.panel-admin-fila__boton{
+
+    width:36px;
+
+    height:36px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:12px;
+
+    border:1px solid var(--gov-border);
+
+    background:#fff;
+
+    color:var(--gov-primary-800);
+
+    transition:all var(--transition);
+
+}
+
+.panel-admin-fila__boton:hover{
+
+    background:var(--gov-surface-soft);
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .panel-admin-fila{
+
+        flex-direction:column;
+
+        align-items:flex-start;
+
+    }
+
+    .panel-admin-fila__derecha{
+
+        width:100%;
+
+        justify-content:space-between;
+
+    }
+
+}

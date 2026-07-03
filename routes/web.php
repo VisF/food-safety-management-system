@@ -249,15 +249,71 @@ $router->map(
 
         $controller = new AdminDashboardControlador();
 
-        $estadisticas = $controller->obtenerEstadisticas();
-        $actividad = $controller->obtenerActividadReciente();
+        $datos = $controller->obtenerDashboard();
 
         $vista = new PanelAdminVista();
 
-        $vista->mostrar(
-            $estadisticas,
-            $actividad
-        );
+        $vista->mostrar($datos);
+    }
+);
+//---------- Rutas relacionadas con la gestión de documentos ---------
+
+$router->map(
+    'GET',
+    '/admin/documentos',
+    function () {
+
+        require_once __DIR__.'/../Views/admin_documentos.php';
+
+        $vista = new AdminDocumentosVista();
+
+        $vista->mostrar();
+
+    }
+);
+
+//----------Rutas relacionadas con la gestión de usuarios ---------
+$router->map(
+    'GET',
+    '/admin/usuarios',
+    function () {
+
+        require_once __DIR__.'/../Views/admin_usuarios.php';
+
+        $vista = new AdminUsuariosVista();
+
+        $vista->mostrar();
+
+    }
+);
+
+//----------- Rutas relacionadas con la gestión de carnets ---------
+$router->map(
+    'GET',
+    '/admin/carnets',
+    function () {
+
+        require_once __DIR__.'/../Views/admin_carnets.php';
+
+        $vista = new AdminCarnetsVista();
+
+        $vista->mostrar();
+
+    }
+);
+
+//----------- Rutas relacionadas con la gestión de reportes ---------
+$router->map(
+    'GET',
+    '/admin/reportes',
+    function () {
+
+        require_once __DIR__.'/../Views/admin_reportes.php';
+
+        $vista = new AdminReportesVista();
+
+        $vista->mostrar();
+
     }
 );
 
@@ -265,7 +321,7 @@ $router->map(
 //---------- Rutas relacionadas con exámenes ---------
 $router->map(
     'GET',
-    '/crear_examen',
+    '/admin/crear_examen',
     function () {
 
         require_once __DIR__ . '/../Views/crear_examen.php';
@@ -278,7 +334,7 @@ $router->map(
 
 $router->map(
     'POST',
-    '/crear_examen_guardar',
+    '/admin/crear_examen_guardar',
     function () {
 
         require_once __DIR__ . '/../Controller/ExamenControlador.php';
@@ -288,11 +344,24 @@ $router->map(
         $controlador->guardar();
     }
 );
+$router->map(
+    'GET',
+    '/admin/examenes',
+    function () {
+
+        require_once __DIR__.'/../Views/admin_examenes.php';
+
+        $vista = new AdminExamenesVista();
+
+        $vista->mostrar();
+
+    }
+);
 
 //---------- Rutas relacionadas con otras vistas ---------
 $router->map(
     'GET',
-    '/actividad_reciente',
+    '/admin/actividad',
     function () {
 
         require_once __DIR__ . '/../Views/actividad_reciente.php';

@@ -1,100 +1,136 @@
 <?php
 declare(strict_types=1);
 
-/**
- * Dashboard administrativo.
- *
- * Responsabilidades:
- * - Obtener estadísticas generales.
- * - Obtener actividad reciente.
- *
- * Dependencias:
- * - AdminRepository
- */
-require_once __DIR__ . '/../Repository/AdminRepository.php';
-
+require_once __DIR__ . '/../Servicios/AdminService.php';
 
 class AdminDashboardControlador
 {
-    private const LOG_FILE = __DIR__ . '/../logs/admin_controller.log';
-    
+    private const LOG_FILE =
+        __DIR__ . '/../logs/admin_controller.log';
 
-
-    private AdminRepository $adminRepository;
+    private AdminService $adminService;
 
     public function __construct()
     {
-        @mkdir(dirname(self::LOG_FILE), 0755, true);
+        @mkdir(
+            dirname(self::LOG_FILE),
+            0755,
+            true
+        );
 
-        $this->adminRepository = new AdminRepository();
-
+        $this->adminService =
+            new AdminService();
     }
-    /**
-     * Obtener estadísticas generales del sistema
-     * 
-     * @return array [
-     *   'success' => bool,
-     *   'estadisticas' => [
-     *     'total_usuarios' => int,
-     *     'usuarios_activos' => int,
-     *     'total_inscripciones' => int,
-     *     'inscripciones_pendientes' => int,
-     *     'inscripciones_aprobadas' => int,
-     *     'total_exámenes' => int,
-     *     'tasa_aprobacion' => float,
-     *     'carnets_emitidos' => int
-     *   ]
-     * ]
-     */
+
+    private function log(
+        string $evento,
+        string $nivel = 'INFO',
+        array $contexto = []
+    ): void
+    {
+        $fecha = date('Y-m-d H:i:s');
+
+        $mensaje =
+            sprintf(
+                "[%s] [%s] %s %s\n",
+                $fecha,
+                $nivel,
+                $evento,
+                json_encode(
+                    $contexto,
+                    JSON_UNESCAPED_UNICODE
+                )
+            );
+
+        error_log(
+            $mensaje,
+            3,
+            self::LOG_FILE
+        );
+    }
+
+    //==================================================
+    // DASHBOARD
+    //==================================================
+
+    public function obtenerDashboard(): array
+    {
+        try {
+
+            return $this
+                ->adminService
+                ->obtenerDashboardCompleto();
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error Dashboard',
+                'ERROR',
+                [
+                    'mensaje' =>
+                        $e->getMessage()
+                ]
+            );
+
+            return [
+                'page_title' => 'Panel Administrativo',
+                'stats' => [],
+                'activities' => [],
+                'indicadores' => [],
+                'resumen' => []
+            ];
+        }
+    }
+
     public function obtenerEstadisticas(): array
     {
-        try {
-            $estadisticas = $this->adminRepository->obtenerEstadisticas();
-
-            return [
-                'success' => true,
-                'estadisticas' => $estadisticas
-            ];
-        } catch (Exception $e) {
-            $this->log(
-                'Error al obtener estadísticas',
-                'ERROR',
-                ['error' => $e->getMessage()]
-            );
-
-            return [
-                'success' => false,
-                'estadisticas' => []
-            ];
-        }
+        return $this
+            ->adminService
+            ->obtenerCardsDashboard();
     }
-    public function obtenerActividadReciente(int $limite = 20): array
+
+    public function obtenerActividadReciente(
+        int $limite = 10
+    ): array
     {
-        try {
+        return $this
+            ->adminService
+            ->obtenerActividadReciente();
+    }
 
-            $actividades = $this->adminRepository
-                ->obtenerActividadReciente($limite);
+    public function obtenerIndicadores(): array
+    {
+        return $this
+            ->adminService
+            ->obtenerIndicadores();
+    }
 
-            return [
-                'success' => true,
-                'actividades' => $actividades,
-                'total' => count($actividades)
-            ];
+    public function obtenerResumenGeneral(): array
+    {
+        return $this
+            ->adminService
+            ->obtenerResumenGeneral();
+    }
 
-        } catch (Exception $e) {
+    public function obtenerUltimosUsuarios(): array
+    {
+        return $this
+            ->adminService
+            ->obtenerUltimosUsuarios();
+    }
 
-            $this->log(
-                'Error al obtener actividad reciente',
-                'ERROR',
-                ['error' => $e->getMessage()]
-            );
+    public function obtenerUltimosCarnets(): array
+    {
+        return $this
+            ->adminService
+            ->obtenerUltimosCarnets();
+    }
 
-            return [
-                'success' => false,
-                'actividades' => [],
-                'total' => 0
-            ];
-        }
+    public function obtenerUltimosExamenes(): array
+    {
+        return $this
+            ->adminService
+            ->obtenerUltimosExamenes();
     }
 
 }

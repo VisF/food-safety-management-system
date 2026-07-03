@@ -1,0 +1,269 @@
+/*
+|--------------------------------------------------------------------------
+| FORMS
+|--------------------------------------------------------------------------
+| Componentes reutilizables para formularios.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   CONTENEDOR
+========================================================== */
+
+.app-form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:20px;
+
+}
+
+.app-form-row{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,minmax(0,1fr));
+
+    gap:20px;
+
+}
+
+.app-form-column{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+}
+
+/* ==========================================================
+   LABELS
+========================================================== */
+
+.app-label{
+
+    display:block;
+
+    font-size:.92rem;
+
+    font-weight:600;
+
+    color:var(--gov-text);
+
+}
+
+.app-label--required::after{
+
+    content:" *";
+
+    color:var(--gov-danger-text);
+
+}
+
+/* ==========================================================
+   INPUTS
+========================================================== */
+
+.app-input,
+.app-select,
+.app-textarea{
+
+    width:100%;
+
+    min-height:48px;
+
+    padding:12px 16px;
+
+    border:1px solid var(--gov-border);
+
+    border-radius:var(--gov-radius-input);
+
+    background:#fff;
+
+    color:var(--gov-text);
+
+    transition:
+        border-color var(--transition),
+        box-shadow var(--transition);
+
+}
+
+.app-textarea{
+
+    min-height:140px;
+
+    resize:vertical;
+
+}
+
+.app-input::placeholder,
+.app-textarea::placeholder{
+
+    color:var(--gov-text-soft);
+
+}
+
+.app-input:hover,
+.app-select:hover,
+.app-textarea:hover{
+
+    border-color:var(--gov-primary-500);
+
+}
+
+.app-input:focus,
+.app-select:focus,
+.app-textarea:focus{
+
+    border-color:var(--gov-primary-700);
+
+    box-shadow:
+        0 0 0 3px rgba(20,98,181,.12);
+
+}
+
+/* ==========================================================
+   VALIDACIONES
+========================================================== */
+
+.app-input--success{
+
+    border-color:var(--gov-positive-border);
+
+}
+
+.app-input--error{
+
+    border-color:var(--gov-danger-border);
+
+}
+
+.app-input--warning{
+
+    border-color:var(--gov-warning-border);
+
+}
+
+.app-feedback{
+
+    margin-top:6px;
+
+    font-size:.82rem;
+
+}
+
+.app-feedback--success{
+
+    color:var(--gov-positive-text);
+
+}
+
+.app-feedback--error{
+
+    color:var(--gov-danger-text);
+
+}
+
+.app-feedback--warning{
+
+    color:var(--gov-warning-text);
+
+}
+
+/* ==========================================================
+   CHECKBOX / RADIO
+========================================================== */
+
+.app-check{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:10px;
+
+}
+
+.app-check input{
+
+    width:18px;
+
+    height:18px;
+
+}
+
+/* ==========================================================
+   BUSCADORES
+========================================================== */
+
+.app-search{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.app-search .app-input{
+
+    flex:1;
+
+}
+
+.app-search .material-symbols-outlined{
+
+    color:var(--gov-text-soft);
+
+}
+
+/* ==========================================================
+   FIELDSET
+========================================================== */
+
+fieldset{
+
+    margin:0;
+
+    padding:20px;
+
+    border:1px solid var(--gov-border);
+
+    border-radius:var(--gov-radius-card);
+
+}
+
+legend{
+
+    padding:0 8px;
+
+    font-weight:700;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .app-form-row{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .app-search{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+}

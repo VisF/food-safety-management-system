@@ -1,0 +1,25 @@
+@import url("base/variables.css");
+@import url("base/reset.css");
+@import url("base/layout.css");
+@import url("base/buttons.css");
+@import url("base/cards.css");
+@import url("base/forms.css");
+@import url("base/header.css");
+@import url("base/footer.css");
+
+@import url("components/chips.css");
+@import url("components/typography.css");
+@import url("components/utilities.css");
+@import url("components/toast.css");
+@import url("components/tables.css");
+@import url("components/entity-card.css");
+
+@import url("views/home.css");
+@import url("views/admin.css");
+@import url("views/admin-usuarios.css");
+@import url("views/admin-documentos.css");
+@import url("views/admin-examenes.css");
+@import url("views/admin-carnets.css");
+@import url("views/crear-examen.css");
+@import url("views/detalle-examen.css");
+@import url("views/inspector.css");

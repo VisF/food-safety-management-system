@@ -1,0 +1,277 @@
+/*
+|--------------------------------------------------------------------------
+| FOOTER
+|--------------------------------------------------------------------------
+| Pie de página institucional de la aplicación.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   FOOTER
+========================================================== */
+
+.app-footer{
+
+    margin-top:auto;
+
+    background:linear-gradient(
+        90deg,
+        var(--color-primary-01),
+        var(--color-primary-00)
+    );
+
+    color:#ffffff;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+}
+
+/* ==========================================================
+   CONTENEDOR
+========================================================== */
+
+.app-footer__container{
+
+    width:100%;
+
+    max-width:1280px;
+
+    margin-inline:auto;
+
+    padding:32px 24px;
+
+}
+
+/* ==========================================================
+   GRID
+========================================================== */
+
+.app-footer__grid{
+
+    display:grid;
+
+    grid-template-columns:
+        2fr
+        1fr
+        1fr;
+
+    gap:32px;
+
+}
+
+/* ==========================================================
+   MARCA
+========================================================== */
+
+.app-footer__brand{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:12px;
+
+}
+
+.app-footer__logo{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.app-footer__logo img{
+
+    width:42px;
+
+    height:42px;
+
+    object-fit:contain;
+
+}
+
+.app-footer__title{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+}
+
+.app-footer__description{
+
+    max-width:48ch;
+
+    line-height:1.6;
+
+    font-size:.92rem;
+
+    opacity:.88;
+
+}
+
+/* ==========================================================
+   COLUMNAS
+========================================================== */
+
+.app-footer__heading{
+
+    margin-bottom:14px;
+
+    font-size:.95rem;
+
+    font-weight:700;
+
+}
+
+.app-footer__list{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:10px;
+
+}
+
+.app-footer__list a{
+
+    color:inherit;
+
+    text-decoration:none;
+
+    opacity:.86;
+
+    transition:
+        opacity var(--transition);
+
+}
+
+.app-footer__list a:hover{
+
+    opacity:1;
+
+}
+
+/* ==========================================================
+   REDES
+========================================================== */
+
+.app-footer__social{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:12px;
+
+}
+
+.app-footer__social a{
+
+    width:40px;
+
+    height:40px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:50%;
+
+    background:rgba(255,255,255,.08);
+
+    color:#ffffff;
+
+    transition:
+        background var(--transition),
+        transform var(--transition);
+
+}
+
+.app-footer__social a:hover{
+
+    background:rgba(255,255,255,.18);
+
+    transform:translateY(-2px);
+
+}
+
+/* ==========================================================
+   COPYRIGHT
+========================================================== */
+
+.app-footer__bottom{
+
+    margin-top:28px;
+
+    padding-top:18px;
+
+    border-top:1px solid rgba(255,255,255,.12);
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:16px;
+
+    font-size:.82rem;
+
+    opacity:.82;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:900px){
+
+    .app-footer__grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
+
+@media (max-width:768px){
+
+    .app-footer__container{
+
+        padding:24px 16px;
+
+    }
+
+    .app-footer__bottom{
+
+        flex-direction:column;
+
+        text-align:center;
+
+    }
+
+}
+
+@media (max-width:480px){
+
+    .app-footer__container{
+
+        padding:20px 12px;
+
+    }
+
+    .app-footer__social{
+
+        justify-content:center;
+
+    }
+
+}

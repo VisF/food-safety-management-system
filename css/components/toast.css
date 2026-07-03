@@ -1,0 +1,301 @@
+/*
+|--------------------------------------------------------------------------
+| TOAST
+|--------------------------------------------------------------------------
+| Sistema de notificaciones reutilizable.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   CONTENEDOR
+========================================================== */
+
+.app-toast-container{
+
+    position:fixed;
+
+    top:24px;
+
+    right:24px;
+
+    z-index:9999;
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:16px;
+
+    max-width:420px;
+
+    width:100%;
+
+    pointer-events:none;
+
+}
+
+/* ==========================================================
+   TOAST BASE
+========================================================== */
+
+.app-toast{
+
+    display:flex;
+
+    align-items:flex-start;
+
+    gap:16px;
+
+    padding:18px 20px;
+
+    border-radius:20px;
+
+    background:#ffffff;
+
+    border:1px solid var(--gov-border);
+
+    box-shadow:var(--gov-shadow-float);
+
+    animation:toast-show .28s ease;
+
+    pointer-events:auto;
+
+}
+
+/* ==========================================================
+   ICONO
+========================================================== */
+
+.app-toast__icon{
+
+    flex-shrink:0;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    width:42px;
+
+    height:42px;
+
+    border-radius:50%;
+
+}
+
+.app-toast__icon .material-symbols-outlined{
+
+    font-size:22px;
+
+}
+
+/* ==========================================================
+   CONTENIDO
+========================================================== */
+
+.app-toast__content{
+
+    flex:1;
+
+}
+
+.app-toast__title{
+
+    margin-bottom:4px;
+
+    font-size:.94rem;
+
+    font-weight:700;
+
+    color:var(--gov-text);
+
+}
+
+.app-toast__message{
+
+    font-size:.85rem;
+
+    line-height:1.55;
+
+    color:var(--gov-text-soft);
+
+}
+
+/* ==========================================================
+   BOTÓN CERRAR
+========================================================== */
+
+.app-toast__close{
+
+    display:flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    width:34px;
+
+    height:34px;
+
+    border-radius:12px;
+
+    color:var(--gov-text-soft);
+
+    transition:all var(--transition);
+
+}
+
+.app-toast__close:hover{
+
+    background:var(--gov-surface-soft);
+
+}
+
+/* ==========================================================
+   SUCCESS
+========================================================== */
+
+.app-toast--success{
+
+    border-left:5px solid var(--gov-positive-text);
+
+}
+
+.app-toast--success .app-toast__icon{
+
+    background:var(--gov-positive-bg);
+
+    color:var(--gov-positive-text);
+
+}
+
+/* ==========================================================
+   ERROR
+========================================================== */
+
+.app-toast--danger{
+
+    border-left:5px solid var(--gov-danger-text);
+
+}
+
+.app-toast--danger .app-toast__icon{
+
+    background:var(--gov-danger-bg);
+
+    color:var(--gov-danger-text);
+
+}
+
+/* ==========================================================
+   WARNING
+========================================================== */
+
+.app-toast--warning{
+
+    border-left:5px solid var(--gov-warning-text);
+
+}
+
+.app-toast--warning .app-toast__icon{
+
+    background:var(--gov-warning-bg);
+
+    color:var(--gov-warning-text);
+
+}
+
+/* ==========================================================
+   INFO
+========================================================== */
+
+.app-toast--info{
+
+    border-left:5px solid var(--gov-primary-700);
+
+}
+
+.app-toast--info .app-toast__icon{
+
+    background:#edf5ff;
+
+    color:var(--gov-primary-700);
+
+}
+
+/* ==========================================================
+   ANIMACIONES
+========================================================== */
+
+@keyframes toast-show{
+
+    from{
+
+        opacity:0;
+
+        transform:translateX(40px);
+
+    }
+
+    to{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+}
+
+@keyframes toast-hide{
+
+    from{
+
+        opacity:1;
+
+        transform:translateX(0);
+
+    }
+
+    to{
+
+        opacity:0;
+
+        transform:translateX(40px);
+
+    }
+
+}
+
+.app-toast--hide{
+
+    animation:toast-hide .25s ease forwards;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .app-toast-container{
+
+        top:16px;
+
+        right:16px;
+
+        left:16px;
+
+        max-width:none;
+
+    }
+
+    .app-toast{
+
+        padding:16px;
+
+    }
+
+}

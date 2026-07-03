@@ -1,0 +1,254 @@
+/*
+|--------------------------------------------------------------------------
+| BUTTONS
+|--------------------------------------------------------------------------
+| Botones reutilizables de toda la aplicación.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   BOTÓN BASE
+========================================================== */
+
+.app-vista-button{
+
+    display:inline-flex;
+
+    align-items:center;
+
+    justify-content:center;
+
+    gap:10px;
+
+    min-height:48px;
+
+    padding:12px 22px;
+
+    border:none;
+
+    border-radius:var(--radius-button);
+
+    font:inherit;
+
+    font-weight:600;
+
+    text-decoration:none;
+
+    cursor:pointer;
+
+    transition:
+        background var(--transition),
+        color var(--transition),
+        border-color var(--transition),
+        transform var(--transition),
+        box-shadow var(--transition);
+
+}
+
+.app-vista-button:hover{
+
+    transform:translateY(-1px);
+
+}
+
+.app-vista-button:active{
+
+    transform:translateY(0);
+
+}
+
+.app-vista-button:disabled{
+
+    cursor:not-allowed;
+
+    opacity:.6;
+
+}
+
+/* ==========================================================
+   VARIANTES
+========================================================== */
+
+.app-vista-button--primary{
+
+    background:linear-gradient(
+        135deg,
+        var(--color-primary-00),
+        var(--color-primary-01)
+    );
+
+    color:#fff;
+
+}
+
+.app-vista-button--primary:hover{
+
+    box-shadow:var(--shadow-elevated);
+
+}
+
+.app-vista-button--secondary{
+
+    background:#fff;
+
+    border:1px solid var(--gov-border);
+
+    color:var(--gov-text);
+
+}
+
+.app-vista-button--secondary:hover{
+
+    background:var(--gov-surface-soft);
+
+}
+
+.app-vista-button--success{
+
+    background:var(--gov-positive-bg);
+
+    border:1px solid var(--gov-positive-border);
+
+    color:var(--gov-positive-text);
+
+}
+
+.app-vista-button--danger{
+
+    background:var(--gov-danger-bg);
+
+    border:1px solid var(--gov-danger-border);
+
+    color:var(--gov-danger-text);
+
+}
+
+/* ==========================================================
+   TAMAÑOS
+========================================================== */
+
+.app-vista-button--sm{
+
+    min-height:38px;
+
+    padding:8px 16px;
+
+    font-size:.90rem;
+
+}
+
+.app-vista-button--lg{
+
+    min-height:56px;
+
+    padding:16px 28px;
+
+}
+
+/* ==========================================================
+   ANCHO
+========================================================== */
+
+.app-vista-button--block{
+
+    width:100%;
+
+}
+
+/* ==========================================================
+   ICONOS
+========================================================== */
+
+.app-vista-button .material-symbols-outlined{
+
+    font-size:20px;
+
+}
+
+/* ==========================================================
+   BOTONES PANEL ADMIN
+========================================================== */
+
+.panel-admin-action{
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:10px;
+
+    min-height:118px;
+
+    text-align:center;
+
+    border-radius:22px;
+
+}
+
+.panel-admin-action__icono{
+
+    font-size:26px;
+
+}
+
+.panel-admin-action__texto{
+
+    max-width:16ch;
+
+    line-height:1.35;
+
+    font-size:.92rem;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   LINKS CON ESTILO DE BOTÓN
+========================================================== */
+
+.panel-admin-link{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+.panel-admin-link:hover{
+
+    text-decoration:none;
+
+    color:inherit;
+
+}
+
+.panel-admin-link:visited{
+
+    color:inherit;
+
+}
+
+.panel-admin-link:focus{
+
+    text-decoration:none;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .app-vista-button{
+
+        width:100%;
+
+    }
+
+}

@@ -1,0 +1,148 @@
+/*
+|--------------------------------------------------------------------------
+| ENTITY CARD
+|--------------------------------------------------------------------------
+| Tarjeta reutilizable para Home, Admin e Inspector.
+|--------------------------------------------------------------------------
+*/
+
+.entity-card{
+
+    display:flex;
+
+    flex-direction:column;
+
+    background:#fff;
+
+    border:1px solid var(--gov-border);
+
+    border-radius:var(--gov-radius-card);
+
+    box-shadow:var(--gov-shadow-soft);
+
+    overflow:hidden;
+
+    transition:
+        transform var(--transition),
+        box-shadow var(--transition);
+
+}
+
+.entity-card:hover{
+
+    transform:translateY(-3px);
+
+    box-shadow:var(--gov-shadow-float);
+
+}
+
+.entity-card__header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:16px;
+
+}
+
+.entity-card__icon{
+
+    width:54px;
+
+    height:54px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    border-radius:16px;
+
+    background:#edf5ff;
+
+    color:var(--gov-primary-700);
+
+    flex-shrink:0;
+
+}
+
+.entity-card__icon
+.material-symbols-outlined{
+
+    font-size:28px;
+
+}
+
+.entity-card__body{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:8px;
+
+    flex:1;
+
+}
+
+.entity-card__title{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    color:var(--gov-text);
+
+}
+
+.entity-card__description{
+
+    font-size:.88rem;
+
+    color:var(--gov-text-soft);
+
+    line-height:1.6;
+
+}
+
+.entity-card__meta{
+
+    display:flex;
+
+    flex-wrap:wrap;
+
+    gap:10px;
+
+    margin-top:6px;
+
+}
+
+.entity-card__footer{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:12px;
+
+    margin-top:20px;
+
+}
+
+@media (max-width:768px){
+
+    .entity-card__footer{
+
+        flex-direction:column;
+
+        align-items:stretch;
+
+    }
+
+}

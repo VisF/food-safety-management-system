@@ -1,0 +1,361 @@
+/*
+|--------------------------------------------------------------------------
+| TYPOGRAPHY
+|--------------------------------------------------------------------------
+| Sistema tipográfico reutilizable.
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   TÍTULOS
+========================================================== */
+
+.font-display-lg{
+
+    font-size:2.5rem;
+
+    font-weight:800;
+
+    line-height:1.15;
+
+}
+
+.font-display-md{
+
+    font-size:2rem;
+
+    font-weight:800;
+
+    line-height:1.2;
+
+}
+
+.font-title-lg{
+
+    font-size:1.75rem;
+
+    font-weight:700;
+
+    line-height:1.25;
+
+}
+
+.font-title-md{
+
+    font-size:1.5rem;
+
+    font-weight:700;
+
+    line-height:1.3;
+
+}
+
+.font-title-sm{
+
+    font-size:1.25rem;
+
+    font-weight:700;
+
+    line-height:1.35;
+
+}
+
+/* ==========================================================
+   HEADLINES
+========================================================== */
+
+.font-headline-lg{
+
+    font-size:1.15rem;
+
+    font-weight:700;
+
+    line-height:1.4;
+
+}
+
+.font-headline-md{
+
+    font-size:1rem;
+
+    font-weight:700;
+
+    line-height:1.45;
+
+}
+
+.font-headline-sm{
+
+    font-size:.92rem;
+
+    font-weight:700;
+
+    line-height:1.45;
+
+}
+
+/* ==========================================================
+   BODY
+========================================================== */
+
+.font-body-lg{
+
+    font-size:1rem;
+
+    line-height:1.7;
+
+}
+
+.font-body-md{
+
+    font-size:.94rem;
+
+    line-height:1.65;
+
+}
+
+.font-body-sm{
+
+    font-size:.86rem;
+
+    line-height:1.55;
+
+}
+
+/* ==========================================================
+   LABELS
+========================================================== */
+
+.font-label-lg{
+
+    font-size:.92rem;
+
+    font-weight:600;
+
+}
+
+.font-label-md{
+
+    font-size:.82rem;
+
+    font-weight:600;
+
+}
+
+.font-label-sm{
+
+    font-size:.74rem;
+
+    font-weight:600;
+
+}
+
+/* ==========================================================
+   PESOS
+========================================================== */
+
+.font-light{
+
+    font-weight:300;
+
+}
+
+.font-regular{
+
+    font-weight:400;
+
+}
+
+.font-medium{
+
+    font-weight:500;
+
+}
+
+.font-semibold{
+
+    font-weight:600;
+
+}
+
+.font-bold{
+
+    font-weight:700;
+
+}
+
+.font-black{
+
+    font-weight:800;
+
+}
+
+/* ==========================================================
+   COLORES
+========================================================== */
+
+.text-primary{
+
+    color:var(--gov-primary-700);
+
+}
+
+.text-secondary{
+
+    color:var(--gov-primary-500);
+
+}
+
+.text-on-surface{
+
+    color:var(--gov-text);
+
+}
+
+.text-muted{
+
+    color:var(--gov-text-soft);
+
+}
+
+.text-success{
+
+    color:var(--gov-positive-text);
+
+}
+
+.text-warning{
+
+    color:var(--gov-warning-text);
+
+}
+
+.text-danger{
+
+    color:var(--gov-danger-text);
+
+}
+
+.text-white{
+
+    color:#ffffff;
+
+}
+
+/* ==========================================================
+   ALINEACIÓN
+========================================================== */
+
+.text-left{
+
+    text-align:left;
+
+}
+
+.text-center{
+
+    text-align:center;
+
+}
+
+.text-right{
+
+    text-align:right;
+
+}
+
+/* ==========================================================
+   TRANSFORMACIONES
+========================================================== */
+
+.text-uppercase{
+
+    text-transform:uppercase;
+
+}
+
+.text-lowercase{
+
+    text-transform:lowercase;
+
+}
+
+.text-capitalize{
+
+    text-transform:capitalize;
+
+}
+
+/* ==========================================================
+   ESPACIADO
+========================================================== */
+
+.text-tight{
+
+    letter-spacing:-0.02em;
+
+}
+
+.text-normal{
+
+    letter-spacing:0;
+
+}
+
+.text-wide{
+
+    letter-spacing:.05em;
+
+}
+
+/* ==========================================================
+   TRUNCADO
+========================================================== */
+
+.text-truncate{
+
+    overflow:hidden;
+
+    white-space:nowrap;
+
+    text-overflow:ellipsis;
+
+}
+
+.text-balance{
+
+    text-wrap:balance;
+
+}
+
+/* ==========================================================
+   RESPONSIVE
+========================================================== */
+
+@media (max-width:768px){
+
+    .font-display-lg{
+
+        font-size:2rem;
+
+    }
+
+    .font-display-md{
+
+        font-size:1.7rem;
+
+    }
+
+    .font-title-lg{
+
+        font-size:1.45rem;
+
+    }
+
+    .font-title-md{
+
+        font-size:1.25rem;
+
+    }
+
+}

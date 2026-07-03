@@ -819,6 +819,22 @@ textarea:focus-visible {
     line-height: 1.4;
 }
 
+.panel-admin-link{
+    text-decoration:none;
+}
+
+.panel-admin-link:hover{
+    text-decoration:none;
+}
+
+.panel-admin-link:visited{
+    text-decoration:none;
+}
+
+.panel-admin-link:focus{
+    text-decoration:none;
+}
+
 @media (min-width: 640px) {
   .contenido-principal,
   .app-page-content {

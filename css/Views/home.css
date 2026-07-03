@@ -1,0 +1,302 @@
+/*
+|--------------------------------------------------------------------------
+| HOME
+|--------------------------------------------------------------------------
+*/
+
+/* ==========================================================
+   BIENVENIDA
+========================================================== */
+
+.home-bienvenida{
+
+    margin-bottom:22px;
+
+    padding-inline:2px;
+
+}
+
+.home-bienvenida__texto{
+
+    color:var(--gov-text-soft);
+
+    font-size:.84rem;
+
+    font-weight:600;
+
+}
+
+.home-bienvenida__nombre{
+
+    margin-top:4px;
+
+    color:var(--gov-primary-800);
+
+    font-size:clamp(1.5rem,7vw,1.9rem);
+
+    font-weight:800;
+
+    line-height:1.1;
+
+}
+
+/* ==========================================================
+   TRÁMITE
+========================================================== */
+
+.home-tramite{
+
+    padding:22px;
+
+    margin-bottom:22px;
+
+}
+
+.home-tramite__header{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:flex-start;
+
+    gap:16px;
+
+    margin-bottom:18px;
+
+}
+
+.home-tramite__label{
+
+    font-size:.76rem;
+
+    font-weight:700;
+
+    text-transform:uppercase;
+
+    letter-spacing:.08em;
+
+    color:var(--gov-text-soft);
+
+}
+
+.home-tramite__titulo{
+
+    margin-top:6px;
+
+    color:var(--gov-primary-800);
+
+    font-size:1.1rem;
+
+    font-weight:800;
+
+}
+
+.home-tramite__estado{
+
+    gap:8px;
+
+}
+
+.home-tramite__estado-indicador{
+
+    width:8px;
+
+    height:8px;
+
+    border-radius:50%;
+
+    background:var(--gov-positive-text);
+
+    box-shadow:0 0 0 4px rgba(45,110,67,.12);
+
+}
+
+.home-tramite__fecha{
+
+    display:flex;
+
+    align-items:center;
+
+    gap:8px;
+
+    margin-bottom:16px;
+
+    color:var(--gov-text-soft);
+
+}
+
+.home-tramite__barra{
+
+    width:100%;
+
+    height:10px;
+
+    background:#e3ebf5;
+
+    border-radius:999px;
+
+    overflow:hidden;
+
+}
+
+.home-tramite__progreso{
+
+    height:100%;
+
+    background:linear-gradient(
+        90deg,
+        var(--gov-primary-700),
+        var(--gov-primary-800)
+    );
+
+}
+
+.home-tramite__porcentaje{
+
+    margin-top:10px;
+
+    color:var(--gov-text-soft);
+
+    font-size:.84rem;
+
+    font-weight:600;
+
+}
+
+.home-tramite__accion{
+
+    margin:18px 0;
+
+    color:var(--gov-primary-800);
+
+}
+
+/* ==========================================================
+   SECCIONES
+========================================================== */
+
+.home-documentos,
+.home-cursos,
+.home-examenes,
+.home-carnet{
+
+    margin-top:28px;
+
+}
+
+.home-documentos__titulo,
+.home-cursos__titulo,
+.home-examenes__titulo{
+
+    margin-bottom:16px;
+
+    text-transform:uppercase;
+
+    letter-spacing:.06em;
+
+    font-size:.88rem;
+
+    color:var(--gov-text);
+
+}
+
+/* ==========================================================
+   GRIDS
+========================================================== */
+
+.home-documentos__grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(2,1fr);
+
+    gap:14px;
+
+}
+
+.home-cursos__grid{
+
+    display:grid;
+
+    gap:18px;
+
+}
+
+.home-examenes__grid{
+
+    display:grid;
+
+    gap:16px;
+
+}
+
+/* ==========================================================
+   ALERTA DOCUMENTOS
+========================================================== */
+
+.home-documentos__alerta{
+
+    grid-column:1/-1;
+
+    padding:16px;
+
+    border-radius:16px;
+
+    background:#fff8e8;
+
+    border:1px solid var(--gov-warning-border);
+
+}
+
+.home-documentos__lista{
+
+    margin-top:10px;
+
+    margin-left:20px;
+
+    list-style:disc;
+
+}
+
+/* ==========================================================
+   CARNET
+========================================================== */
+
+.home-carnet{
+
+    text-align:center;
+
+}
+
+.home-carnet__descripcion{
+
+    margin-top:12px;
+
+    color:var(--gov-text-soft);
+
+    font-style:italic;
+
+    font-size:.84rem;
+
+}
+
+/* ==========================================================
+   MOBILE
+========================================================== */
+
+@media (max-width:768px){
+
+    .home-documentos__grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+    .home-tramite__header{
+
+        flex-direction:column;
+
+    }
+
+}
