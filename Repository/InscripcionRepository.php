@@ -2,21 +2,35 @@
 
 declare(strict_types=1);
 /** faltan? 
- * obtenerUltimaInscripcionPorUsuario()
+ * obtenerUltimaInscripcionPorUsuario() ok
 
- * obtenerPorEstado()
+ * obtenerPorEstado() ok
 
- * actualizar()
+ * actualizar() ok
 
- * obtenerInscripcionesActivas()
+ * obtenerInscripcionesActivas() ok
 
- * verificarDuplicado()
+ * verificarDuplicado() ok
 
- * contarInscriptosCurso()
+ * contarInscriptosCurso() ok
 
- * tieneCursoActivo()
+ * tieneCursoActivo() ok
  * 
+ * listarInscripciones() ok
  * 
+*   contarInscripciones() ok
+
+*   obtenerPorId() ok
+
+*   obtenerPorUsuario() ok
+
+*   crear() ok
+
+*   actualizarEstadoInscripcion() ok
+
+*   agregarObservacion() ok
+
+*   cancelar() ok
  * 
  * 
  */
@@ -192,7 +206,6 @@ class InscripcionRepository
     }
     
    
-
     public function contarInscriptosCurso(int $cursoId): int
     {
         $stmt = $this->conexion->prepare("
@@ -200,10 +213,12 @@ class InscripcionRepository
             FROM inscripciones
             WHERE curso_id = :curso
             AND tipo_inscripcion_id = 1
+            AND estado_tramite_id != :cancelado
         ");
 
         $stmt->execute([
-            ':curso' => $cursoId
+            ':curso' => $cursoId,
+            ':cancelado' => EstadoTramite::CANCELADO
         ]);
 
         return (int)$stmt->fetchColumn();
@@ -216,11 +231,19 @@ class InscripcionRepository
             FROM inscripciones
             WHERE usuario_id = :usuario
             AND tipo_inscripcion_id = 1
-            AND fecha_fin_curso >= CURDATE()
+            AND estado_tramite_id IN
+            (
+                :pendiente,
+                :documentacion,
+                :inscripto
+            )
         ");
 
         $stmt->execute([
-            ':usuario' => $usuarioId
+            ':usuario' => $usuarioId,
+            ':pendiente' => EstadoTramite::PENDIENTE,
+            ':documentacion' => EstadoTramite::DOCUMENTACION_APROBADA,
+            ':inscripto' => EstadoTramite::INSCRIPTO_EXAMEN
         ]);
 
         return (int)$stmt->fetchColumn() > 0;
@@ -576,12 +599,12 @@ class InscripcionRepository
     /// Obtener última inscripción de un usuario
 
 
-    public function obtenerInscripcionesActivas(): array
+    public function obtenerInscripcionesActivas(int $usuarioId): array
     {
         $stmt = $this->conexion->prepare("
             SELECT *
             FROM inscripciones
-            WHERE estado_tramite_id IN
+            WHERE usuario_id = :usuario AND estado_tramite_id IN
             (
                 :pendiente,
                 :documentacion,
@@ -599,5 +622,46 @@ class InscripcionRepository
         ]);
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    /**
+     * Confirma una inscripción a examen.
+     */
+    public function confirmarInscripcionExamen(int $id): bool
+    {
+        $stmt = $this->conexion->prepare("
+            UPDATE inscripciones
+            SET estado_tramite_id = :estado
+            WHERE id = :id
+        ");
+
+        return $stmt->execute([
+            ':estado' => EstadoTramite::INSCRIPTO_EXAMEN,
+            ':id' => $id
+        ]);
+    }
+
+    /**
+     * Obtener la modalidad del curso asociado a una inscripción.
+     */
+    public function obtenerModalidadCurso(int $idInscripcion): ?string
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT c.modalidad
+            FROM inscripciones i
+            INNER JOIN cursos c
+                ON c.id = i.curso_id
+            WHERE i.id = :id
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':id' => $idInscripcion
+        ]);
+
+        $modalidad = $stmt->fetchColumn();
+
+        return $modalidad !== false
+            ? $modalidad
+            : null;
     }
 }
