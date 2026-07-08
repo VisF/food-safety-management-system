@@ -1,6 +1,6 @@
 <?php
 
-require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../dto/DocumentoDTO.php';
 
 

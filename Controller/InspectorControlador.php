@@ -5,7 +5,7 @@ declare(strict_types=1);
  * InspectorControlador - Funciones para inspectores de alimentos
  * 
  * Dependencias esperadas:
- * - Modelos: UsuarioModelo, CarnetModelo, InscripcionModelo
+ * -  UsuarioService, CarnetService, InscripcionService
  * 
  * Vistas esperadas:
  * - vistas/panel_inspector.php
@@ -17,31 +17,17 @@ class InspectorControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/inspector_controller.log';
     
-    private ?object $usuarioModelo = null;
-    private ?object $carnetModelo = null;
-    private ?object $inscripcionModelo = null;
+    private ?object $UsuarioService = null;
+    private ?object $CarnetService = null;
+    private ?object $InscripcionService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
-    }
+        $this->UsuarioService = new UsuarioService();
+        $this->CarnetService = new CarnetService();
+        $this->InscripcionService = new InscripcionService();
 
-    /**
-     * Inicializar modelos si existen
-     */
-    private function inicializarModelos(): void
-    {
-        // Instanciar modelos sólo si las clases están definidas (fallback testable)
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
-        if (class_exists('CarnetModelo')) {
-            $this->carnetModelo = new CarnetModelo();
-        }
-        if (class_exists('InscripcionModelo')) {
-            $this->inscripcionModelo = new InscripcionModelo();
-        }
     }
 
     /**
@@ -557,7 +543,7 @@ class InspectorControlador
     public function listarCarnetesVencidos(): array
     {
         try {
-            // TODO: Llamar a $this->carnetModelo->obtenerVencidos()
+            // TODO: Llamar a $this->CarnetService->obtenerVencidos()
             // TODO: Incluir datos del usuario
             
             return [

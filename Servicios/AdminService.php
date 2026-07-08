@@ -519,5 +519,45 @@ class AdminService
 
         ];
     }
+    /**
+     * Obtener solicitud.
+     */
+    public function obtenerSolicitud(int $id): ?array
+    {
+        return
+            $this->adminRepository
+                ->obtenerSolicitud($id);
+    }
+    /**
+     * Responder solicitud.
+     */
+    public function responderSolicitud(int $idSolicitud, array $respuesta): ?int
+    {
+        return
+            $this->adminRepository
+                ->responderSolicitud(
+                    $idSolicitud,
+                    $respuesta
+                );
+    }
+    /**
+     * Obtener solicitudes pendientes.
+     */
+    public function obtenerSolicitudesPendientes(): array
+    {
+        return
+            $this->adminRepository
+                ->obtenerSolicitudesPendientes();
+    }
+    /**
+     * Exportar datos.
+     */
+    public function obtenerDatosExportacion(): array
+    {
+        return
+            $this->adminRepository
+                ->obtenerDatosExportacion();
+    }
+
 
 }

@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 require_once __DIR__ . '/../db/Connection.php';
+require_once __DIR__ .'/../Constant/EstadoTramite.php';
 
 class UsuarioRepository
 {
@@ -669,5 +670,25 @@ class UsuarioRepository
         ");
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Cambiar contraseña.
+     */
+    public function cambiarPassword(
+        int $usuarioId,
+        string $password
+    ): bool
+    {
+        $stmt = $this->conexion->prepare("
+            UPDATE usuarios
+            SET password = :password
+            WHERE id = :id
+        ");
+
+        return $stmt->execute([
+            ':password' => $password,
+            ':id' => $usuarioId
+        ]);
     }
 }

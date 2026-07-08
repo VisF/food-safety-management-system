@@ -7,18 +7,18 @@
  * - Importar certificados ya subidos
  * - Listar certificados pendientes para validación
  *
- * Dependencias: MoodleModelo, DocumentoModelo
+ * Dependencias: MoodleService, DocumentoService
  */
-require_once __DIR__ . '/../Modelo/MoodleModelo.php';
-require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+require_once __DIR__ . '/../Servicios/MoodleService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
 class MoodleControlador {
     protected $moodleModel;
     protected $documentoModel;
 
     public function __construct() {
-        $this->moodleModel = new MoodleModelo();
-        $this->documentoModel = new DocumentoModelo();
+        $this->moodleModel = new MoodleService();
+        $this->documentoModel = new DocumentoService();
     }
 
     // Endpoint para recibir certificado (p.e. subida manual o webhook)
@@ -39,7 +39,7 @@ class MoodleControlador {
 
     // Importar certificado manualmente (archivo ya subido)
     public function importarCertificadoManual(int $idInscripcion, string $filePath) {
-        // Validar existencia del archivo antes de delegar a modelo
+        // Validar existencia del archivo antes de delegar a Service
         if ($idInscripcion <= 0 || !file_exists($filePath)) return ['success' => false, 'message' => 'Parámetros inválidos'];
         $res = $this->moodleModel->guardarCertificado(['id_inscripcion' => $idInscripcion, 'ruta' => $filePath, 'tipo' => 'certificado_moodle']);
         return $res ? ['success' => true, 'documento' => $res] : ['success' => false, 'message' => 'Error al guardar certificado'];

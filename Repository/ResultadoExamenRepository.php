@@ -1,29 +1,21 @@
 <?php
 declare(strict_types=1);
 
-
 /**
- * 
- *  crear()
- *  obtenerPorId()
- *  obtenerPorInscripcion()
- *  obtenerPorExamen()
- *  obtenerPorUsuario()
- *  listarResultados()
- *  actualizar()
- *  eliminar()
- *  contarAprobados()
- *  contarReprobados()
- *  obtenerPromedioExamen()
- * 
- * 
- * 
- * 
- * 
- * 
- * 
- * 
+ * Métodos:
+ * - crear()
+ * - obtenerPorId()
+ * - obtenerPorInscripcion()
+ * - obtenerPorExamen()
+ * - obtenerPorUsuario()
+ * - listarResultados()
+ * - actualizar()
+ * - eliminar()
+ * - contarAprobados()
+ * - contarReprobados()
+ * - obtenerPromedioExamen()
  */
+
 require_once __DIR__ . '/../db/Connection.php';
 
 class ResultadoExamenRepository
@@ -38,7 +30,7 @@ class ResultadoExamenRepository
     /**
      * Crear resultado.
      */
-    public function crear(array $datos): int
+    public function crear(array $datos): ?int
     {
         $sql = "
             INSERT INTO resultado_examen
@@ -63,21 +55,27 @@ class ResultadoExamenRepository
 
         $stmt = $this->conexion->prepare($sql);
 
-        $stmt->execute([
-            ':inscripcion'   => $datos['inscripcion_id'],
-            ':examen'        => $datos['examen_id'],
-            ':nota'          => $datos['nota'],
-            ':aprobado'      => $datos['aprobado'],
+        $ok = $stmt->execute([
+            ':inscripcion' => $datos['inscripcion_id'],
+            ':examen' => $datos['id_examen'],
+            ':nota' => $datos['nota'],
+            ':aprobado' => $datos['aprobado'],
             ':observaciones' => $datos['observaciones'] ?? null
         ]);
+
+        if (!$ok) {
+            return null;
+        }
 
         return (int)$this->conexion->lastInsertId();
     }
 
     /**
-     * Obtener por ID.
+     * Obtener resultado por ID.
      */
-    public function obtenerPorId(int $id): ?array
+    public function obtenerPorId(
+        int $id
+    ): ?array
     {
         $stmt = $this->conexion->prepare("
             SELECT *
@@ -95,9 +93,11 @@ class ResultadoExamenRepository
     }
 
     /**
-     * Obtener por inscripción.
+     * Obtener resultado por inscripción.
      */
-    public function obtenerPorInscripcion(int $inscripcionId): ?array
+    public function obtenerPorInscripcion(
+        int $inscripcionId
+    ): ?array
     {
         $stmt = $this->conexion->prepare("
             SELECT *
@@ -115,10 +115,12 @@ class ResultadoExamenRepository
         return $row ?: null;
     }
 
-    /**
+        /**
      * Obtener resultados de un examen.
      */
-    public function obtenerPorExamen(int $examenId): array
+    public function obtenerPorExamen(
+        int $examenId
+    ): array
     {
         $stmt = $this->conexion->prepare("
             SELECT *
@@ -137,11 +139,12 @@ class ResultadoExamenRepository
     /**
      * Obtener resultados de un usuario.
      */
-    public function obtenerPorUsuario(int $usuarioId): array
+    public function obtenerPorUsuario(
+        int $usuarioId
+    ): array
     {
         $stmt = $this->conexion->prepare("
-            SELECT
-                re.*
+            SELECT re.*
 
             FROM resultado_examen re
 
@@ -160,37 +163,16 @@ class ResultadoExamenRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-        /**
+    /**
      * Listar todos los resultados.
      */
     public function listarResultados(): array
     {
-        $stmt = $this->conexion->prepare("
-            SELECT
-                re.*,
-
-                u.nombre,
-                u.apellido,
-
-                e.fecha,
-                e.hora
-
-            FROM resultado_examen re
-
-            INNER JOIN inscripciones i
-                ON i.id = re.inscripcion_id
-
-            INNER JOIN usuarios u
-                ON u.id = i.usuario_id
-
-            INNER JOIN examenes e
-                ON e.id = re.examen_id
-
-            ORDER BY
-                re.fecha_resultado DESC
+        $stmt = $this->conexion->query("
+            SELECT *
+            FROM resultado_examen
+            ORDER BY fecha_resultado DESC
         ");
-
-        $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
@@ -201,16 +183,18 @@ class ResultadoExamenRepository
     public function actualizar(
         int $id,
         array $datos
-    ): bool {
-
-        $stmt = $this->conexion->prepare("
+    ): bool
+    {
+        $sql = "
             UPDATE resultado_examen
             SET
                 nota = :nota,
                 aprobado = :aprobado,
                 observaciones = :observaciones
             WHERE id = :id
-        ");
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
 
         return $stmt->execute([
             ':id' => $id,
@@ -220,11 +204,12 @@ class ResultadoExamenRepository
                 $datos['observaciones'] ?? null
         ]);
     }
-
-    /**
+        /**
      * Eliminar resultado.
      */
-    public function eliminar(int $id): bool
+    public function eliminar(
+        int $id
+    ): bool
     {
         $stmt = $this->conexion->prepare("
             DELETE
@@ -238,9 +223,11 @@ class ResultadoExamenRepository
     }
 
     /**
-     * Cantidad de aprobados.
+     * Contar aprobados de un examen.
      */
-    public function contarAprobados(int $examenId): int
+    public function contarAprobados(
+        int $examenId
+    ): int
     {
         $stmt = $this->conexion->prepare("
             SELECT COUNT(*)
@@ -248,7 +235,6 @@ class ResultadoExamenRepository
             FROM resultado_examen
 
             WHERE examen_id = :id
-
             AND aprobado = 1
         ");
 
@@ -260,9 +246,11 @@ class ResultadoExamenRepository
     }
 
     /**
-     * Cantidad de reprobados.
+     * Contar reprobados de un examen.
      */
-    public function contarReprobados(int $examenId): int
+    public function contarReprobados(
+        int $examenId
+    ): int
     {
         $stmt = $this->conexion->prepare("
             SELECT COUNT(*)
@@ -270,7 +258,6 @@ class ResultadoExamenRepository
             FROM resultado_examen
 
             WHERE examen_id = :id
-
             AND aprobado = 0
         ");
 
@@ -282,9 +269,11 @@ class ResultadoExamenRepository
     }
 
     /**
-     * Promedio de notas.
+     * Obtener promedio de un examen.
      */
-    public function obtenerPromedioExamen(int $examenId): float
+    public function obtenerPromedioExamen(
+        int $examenId
+    ): float
     {
         $stmt = $this->conexion->prepare("
             SELECT AVG(nota)

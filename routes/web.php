@@ -71,16 +71,13 @@ $router->map(
     function () {
 
         require_once __DIR__ . '/../Views/subida_documentacion.php';
-        require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
         require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
         $usuarioId =
             (int)($_SESSION['usuario_id'] ?? 0);
 
         $documentoService =
-            new DocumentoService(
-                new DocumentoModelo()
-            );
+            new DocumentoService();
 
         $documentos =
             $documentoService
@@ -371,27 +368,33 @@ $router->map(
         $vista->mostrar();
     }
 );
-
 $router->map(
     'GET',
     '/confirmar_inscripcion_examen',
     function () {
 
-        require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+        require_once __DIR__ . '/../Servicios/ExamenService.php';
 
         $idExamen =
             (int)($_GET['id'] ?? 0);
 
-        $modelo =
-            new ExamenModelo();
+        $examenService =
+            new ExamenService();
 
         $examen =
-            $modelo->obtenerPorId(
-                $idExamen
-            );
+            $examenService
+                ->obtenerExamen(
+                    $idExamen
+                );
+
+        if ($examen === null) {
+
+            http_response_code(404);
+            exit('Examen no encontrado.');
+        }
 
         $_GET['data'] = json_encode([
-            'examId' => $examen['id'],
+            'examId'   => $examen['id'],
             'examName' => 'Examen de Manipulación de Alimentos'
         ]);
 
@@ -408,16 +411,22 @@ $router->map(
     '/detalle_examen',
     function () {
 
-        require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+        require_once __DIR__ . '/../Servicios/ExamenService.php';
 
-        $idExamen = (int)($_GET['id'] ?? 0);
+        $idExamen =
+            (int)($_GET['id'] ?? 0);
 
-        $modelo = new ExamenModelo();
+        $examenService =
+            new ExamenService();
 
-        $examen = $modelo->obtenerPorId($idExamen);  
-
+        $examen =
+            $examenService
+                ->obtenerExamen(
+                    $idExamen
+                );
 
         if ($examen === null) {
+
             http_response_code(404);
             echo 'Examen no encontrado';
             return;
@@ -428,14 +437,27 @@ $router->map(
             'exam' => [
                 'id' => $examen['id'],
                 'nombre' => 'Examen de Manipulación de Alimentos',
-                'fecha' => date('d/m/Y', strtotime($examen['fecha'])),
-                'hora' => substr($examen['hora'], 0, 5),
-                'lugar' => $examen['ubicacion']
-                    . (!empty($examen['aula']) ? ' - ' . $examen['aula'] : ''),
+                'fecha' => date(
+                    'd/m/Y',
+                    strtotime($examen['fecha'])
+                ),
+                'hora' => substr(
+                    $examen['hora'],
+                    0,
+                    5
+                ),
+                'lugar' =>
+                    $examen['ubicacion'] .
+                    (
+                        !empty($examen['aula'])
+                        ? ' - ' . $examen['aula']
+                        : ''
+                    ),
                 'cupos' => $examen['cupos'],
-                'estado' => ((int)$examen['cupos'] > 0)
-                    ? 'CUPOS DISPONIBLES'
-                    : 'SIN CUPOS'
+                'estado' =>
+                    (int)$examen['cupos'] > 0
+                        ? 'CUPOS DISPONIBLES'
+                        : 'SIN CUPOS'
             ]
         ];
 

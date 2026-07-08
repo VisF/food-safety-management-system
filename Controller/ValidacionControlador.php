@@ -5,7 +5,7 @@ declare(strict_types=1);
  * ValidacionControlador - Gestión de validaciones de inscripciones
  *
  * Dependencias esperadas:
- * - Modelos: InscripcionModelo, DocumentoModelo, AsistenciaModelo, ResultadoExamenModelo, EstadoTramiteModelo
+ * -  inscripcionService, DocumentoService, AsistenciaService, ResultadoExamenService, EstadoTramiteService
  *
  * Responsabilidades:
  * - Validar cumplimiento de requisitos por flujo (presencial, virtual, recursante, renovación)
@@ -21,7 +21,7 @@ declare(strict_types=1);
  * - Renovación: documentación + examen
  */
 
-require_once __DIR__ . '/../Modelo/AsistenciaModelo.php';
+require_once __DIR__ . '/../Servicios/AsistenciaService.php';
 
 
 class ValidacionControlador
@@ -31,45 +31,25 @@ class ValidacionControlador
     private const PLAZO_RECURSANTE_DIAS = 90; // 3 meses
     private const PORCENTAJE_DOCUMENTACION_REQUERIDA = 100; // 100% de documentos
 
-    private ?InscripcionModelo $inscripcionModelo = null;
-    private ?DocumentoModelo $documentoModelo = null;
-    private ?AsistenciaModelo $asistenciaModelo = null;
-    private ?ResultadoExamenModelo $resultadoExamenModelo = null;
-    private ?EstadoTramiteModelo $estadoTramiteModelo = null;
-    private ?HabilitacionExamenModelo $habilitacionExamenModelo = null;
+    private ?inscripcionService $inscripcionService = null;
+    private ?DocumentoService $DocumentoService = null;
+    private ?AsistenciaService $AsistenciaService = null;
+    private ?ResultadoExamenService $ResultadoExamenService = null;
+    private ?EstadoTramiteService $EstadoTramiteService = null;
+    private ?HabilitacionExamenService $HabilitacionExamenService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
+        $this->inscripcionService = new inscripcionService();
+        $this->DocumentoService = new DocumentoService();
+        $this->AsistenciaService = new AsistenciaService();
+        $this->ResultadoExamenService = new ResultadoExamenService();
+        $this->EstadoTramiteService = new EstadoTramiteService();
+        $this->HabilitacionExamenService = new HabilitacionExamenService();
     }
 
-    /**
-     * Inicializar todas las dependencias de modelos
-     * @return void
-     */
-    private function inicializarModelos(): void
-    {
-        // Instanciar modelos sólo si la clase está definida (facilita pruebas aisladas)
-        if (class_exists('InscripcionModelo')) {
-            $this->inscripcionModelo = new InscripcionModelo();
-        }
-        if (class_exists('DocumentoModelo')) {
-            $this->documentoModelo = new DocumentoModelo();
-        }
-        if (class_exists('AsistenciaModelo')) {
-            $this->asistenciaModelo = new AsistenciaModelo();
-        }
-        if (class_exists('ResultadoExamenModelo')) {
-            $this->resultadoExamenModelo = new ResultadoExamenModelo();
-        }
-        if (class_exists('EstadoTramiteModelo')) {
-            $this->estadoTramiteModelo = new EstadoTramiteModelo();
-        }
-        if (class_exists('HabilitacionExamenModelo')) {
-            $this->habilitacionExamenModelo = new HabilitacionExamenModelo();
-        }
-    }
+   
 
     /**
      * Registrar evento en el log
@@ -97,8 +77,8 @@ class ValidacionControlador
     {
         try {
             // obtener inscripcion y modalidad
-            if (!$this->inscripcionModelo) return ['valido' => false, 'documentos_requeridos' => [], 'documentos_faltantes' => []];
-            $insc = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
+            if (!$this->inscripcionService) return ['valido' => false, 'documentos_requeridos' => [], 'documentos_faltantes' => []];
+            $insc = $this->inscripcionService->obtenerPorId($id_inscripcion);
             if (!$insc) return ['valido' => false, 'documentos_requeridos' => [], 'documentos_faltantes' => []];
 
             $curso_id = (int)($insc['curso_id'] ?? 0);
@@ -119,9 +99,9 @@ class ValidacionControlador
             ];
 
 
-            $docModel = new DocumentoModelo();
+            $docService = new DocumentoService();
             $insc =
-                $this->inscripcionModelo
+                $this->inscripcionService
                     ->obtenerPorId(
                         $id_inscripcion
                     );
@@ -130,7 +110,7 @@ class ValidacionControlador
                 (int)$insc['usuario_id'];
 
             $docs =
-                $docModel->obtenerPorUsuario(
+                $docService->obtenerPorUsuario(
                     $usuarioId
                 );
             $presentes = [];
@@ -251,8 +231,8 @@ class ValidacionControlador
     public function validarRenovacion(int $id_inscripcion): array
     {
         try {
-            if (!$this->inscripcionModelo) return ['puede_renovar' => false, 'carnet_vencido' => false, 'fecha_vencimiento' => null];
-            $insc = $this->inscripcionModelo->obtenerPorId($id_inscripcion);
+            if (!$this->inscripcionService) return ['puede_renovar' => false, 'carnet_vencido' => false, 'fecha_vencimiento' => null];
+            $insc = $this->inscripcionService->obtenerPorId($id_inscripcion);
             if (!$insc) return ['puede_renovar' => false, 'carnet_vencido' => false, 'fecha_vencimiento' => null];
 
             $usuario_id = (int)($insc['usuario_id'] ?? 0);
@@ -313,7 +293,7 @@ class ValidacionControlador
     {
         try {
             // Obtener información básica de la inscripción y contexto (curso, tipo)
-            $insc = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id_inscripcion) : null;
+            $insc = $this->inscripcionService ? $this->inscripcionService->obtenerPorId($id_inscripcion) : null;
             $contexto = [];
             if ($insc) {
                 $contexto['inscripcion'] = $insc;
@@ -343,7 +323,7 @@ class ValidacionControlador
             $validaciones = [
                 'documentacion' => $this->validarDocumentacion($id_inscripcion),
                 'habilitacion' => [
-                    'valido' => $this->habilitacionExamenModelo
+                    'valido' => $this->HabilitacionExamenService
                         ->tieneHabilitacionVigente(
                             (int)$insc['usuario_id']
                         )
@@ -409,8 +389,8 @@ class ValidacionControlador
     public function obtenerDetalleValidacion(int $id): array
     {
         try {
-            // Intentar obtener datos desde modelos y DB
-            $inscripcion = $this->inscripcionModelo ? $this->inscripcionModelo->obtenerPorId($id) : null;
+            
+            $inscripcion = $this->inscripcionService ? $this->inscripcionService->obtenerPorId($id) : null;
             $usuario = [];
             $curso = [];
             $tipo_inscripcion = [];
@@ -435,9 +415,9 @@ class ValidacionControlador
                 $tipo_inscripcion = $stmt->fetch() ?: [];
             }
 
-            $documentos = $this->documentoModelo ? $this->documentoModelo->obtenerPorInscripcion($id) : [];
+            $documentos = $this->DocumentoService ? $this->DocumentoService->obtenerPorInscripcion($id) : [];
             $asistencia = $this->obtenerAsistencia($id);
-            $resultadoExamen = $this->resultadoExamenModelo ? $this->resultadoExamenModelo->obtenerPorInscripcion($id) : null;
+            $resultadoExamen = $this->ResultadoExamenService ? $this->ResultadoExamenService->obtenerPorInscripcion($id) : null;
             $motivos = [];
             if ($resultadoExamen && isset($resultadoExamen['id'])) {
                 $motivos = $this->obtenerMotivosRechazo((int)$resultadoExamen['id']);
@@ -566,7 +546,7 @@ class ValidacionControlador
     private function obtenerAsistencia(int $id_inscripcion): array
     {
         try {
-            $asistencia = new AsistenciaModelo();
+            $asistencia = new AsistenciaService();
             $tot = $asistencia->obtenerTotalAsistencias($id_inscripcion);
             $presentes = (int)($tot['presentes'] ?? 0);
             $total = (int)($tot['total'] ?? 0);

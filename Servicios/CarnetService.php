@@ -2,221 +2,118 @@
 declare(strict_types=1);
 
 /**
- * CarnetService
- * Lógica de negocio relacionada con carnets.
+ * Métodos:
+ * - crear()
+ * - obtenerPorInscripcion()
+ * - obtenerPorDNI()
+ * - verificarVigencia()
+ * - actualizar()
+ * - obtenerCarnetsVencidos()
+ * - renovar()
  */
-require_once __DIR__ . '/../Config/Configuracion.php';
+
+require_once __DIR__ . '/../Repository/CarnetRepository.php';
 
 class CarnetService
 {
-    private CarnetModelo $carnetModelo;
-    private ?PDO $conexion = null;
+    private CarnetRepository $carnetRepository;
 
-    public function __construct(?CarnetModelo $carnetModelo = null)
+    public function __construct()
     {
-        $this->carnetModelo = $carnetModelo ?? new CarnetModelo();
-
-        $connFile = __DIR__ . '/../db/Connection.php';
-        if (file_exists($connFile)) {
-            require_once $connFile;
-            $this->conexion = Connection::getPDO();
-        }
+        $this->carnetRepository =
+            new CarnetRepository();
     }
 
     /**
-     * Emitir carnet para una inscripción aprobada
+     * Crear un carnet.
      */
-   public function emitirCarnet(int $idInscripcion, string $rutaPdf): array
+    public function crear(array $datos): ?array
     {
-        try {
-
-            if (!$this->conexion) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'No hay conexión a la base de datos'
-                ];
-            }
-
-            // Verificar que exista la inscripción
-            $stmt = $this->conexion->prepare(
-                'SELECT *
-                FROM inscripciones
-                WHERE id = :id'
-            );
-
-            $stmt->execute([
-                ':id' => $idInscripcion
-            ]);
-
-            $inscripcion = $stmt->fetch();
-
-            if (!$inscripcion) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'La inscripción no existe'
-                ];
-            }
-
-            // La inscripción debe estar en estado aprobado
-            if ((int)$inscripcion['estado_tramite_id'] !== EstadoTramite::APROBADO) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'La inscripción no se encuentra en estado aprobado'
-                ];
-            }
-
-            // Verificar que no exista carnet previo
-            $existente = $this->carnetModelo->obtenerPorInscripcion(
-                $idInscripcion
-            );
-
-            if ($existente) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'La inscripción ya posee un carnet'
-                ];
-            }
-
-            // Verificar resultado aprobado
-            $stmt = $this->conexion->prepare(
-                'SELECT *
-                FROM resultado_examen
-                WHERE inscripcion_id = :id
-                AND aprobado = 1'
-            );
-
-            $stmt->execute([
-                ':id' => $idInscripcion
-            ]);
-
-            $resultado = $stmt->fetch();
-
-            if (!$resultado) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'La inscripción no posee un examen aprobado'
-                ];
-            }
-
-            $numeroCarnet =
-                'MA-' .
-                date('Y') .
-                '-' .
-                strtoupper(substr(md5(uniqid('', true)), 0, 8));
-
-            $fechaEmision = date('Y-m-d');
-
-            $fechaVencimiento = date(
-                                'Y-m-d',
-                                strtotime(
-                                    '+' .
-                                    Configuracion::VIGENCIA_CARNET_ANIOS .
-                                    ' years'
-                                )
-                            );
-
-            $carnet = $this->carnetModelo->crear([
-                'id_inscripcion' => $idInscripcion,
-                'numero_carnet' => $numeroCarnet,
-                'fecha_emision' => $fechaEmision,
-                'fecha_vencimiento' => $fechaVencimiento,
-                'ruta_pdf' => $rutaPdf
-            ]);
-
-            if ($carnet === false) {
-                return [
-                    'success' => false,
-                    'mensaje' => 'No se pudo crear el carnet'
-                ];
-            }
-
-            // 8 = carnet_emitido
-            $stmt = $this->conexion->prepare(
-                'UPDATE inscripciones
-                SET estado_tramite_id = :estado
-                WHERE id = :id'
-            );
-
-            $stmt->execute([
-                ':estado' => EstadoTramite::CARNET_EMITIDO,
-                ':id' => $idInscripcion
-            ]);
-
-            return [
-                'success' => true,
-                'mensaje' => 'Carnet emitido correctamente',
-                'carnet' => $carnet
-            ];
-
-        } catch (\Exception $e) {
-
-            return [
-                'success' => false,
-                'mensaje' => $e->getMessage()
-            ];
-        }
+        return
+            $this->carnetRepository
+                ->crear($datos);
     }
+
     /**
-     * Obtener carnet por inscripción
+     * Obtener carnet por inscripción.
      */
     public function obtenerPorInscripcion(
         int $idInscripcion
     ): ?array
     {
-        return $this->carnetModelo
-            ->obtenerPorInscripcion(
-                $idInscripcion
-            );
+        return
+            $this->carnetRepository
+                ->obtenerPorInscripcion(
+                    $idInscripcion
+                );
     }
 
     /**
-     * Obtener carnet por DNI
+     * Obtener carnet por DNI.
      */
     public function obtenerPorDNI(
         string $dni
     ): ?array
     {
-        return $this->carnetModelo
-            ->obtenerPorDNI(
-                $dni
-            );
+        return
+            $this->carnetRepository
+                ->obtenerPorDNI(
+                    $dni
+                );
     }
 
     /**
-     * Renovar carnet
-     */
-    public function renovarCarnet(
-        int $idCarnet,
-        string $nuevaFechaVencimiento,
-        string $nuevaRutaPdf
-    ): bool
-    {
-        return $this->carnetModelo->renovar(
-            $idCarnet,
-            $nuevaFechaVencimiento,
-            $nuevaRutaPdf
-        );
-    }
-
-    /**
-     * Verificar vigencia
+     * Verificar vigencia.
      */
     public function verificarVigencia(
-        int $idCarnet
+        int $id
     ): bool
     {
-        return $this->carnetModelo
-            ->verificarVigencia(
-                $idCarnet
-            );
+        return
+            $this->carnetRepository
+                ->verificarVigencia(
+                    $id
+                );
+    }
+        /**
+     * Actualizar un carnet.
+     */
+    public function actualizar(
+        int $id,
+        array $datos
+    ): bool
+    {
+        return
+            $this->carnetRepository
+                ->actualizar(
+                    $id,
+                    $datos
+                );
     }
 
     /**
-     * Obtener carnets vencidos
+     * Obtener carnets vencidos.
      */
     public function obtenerCarnetsVencidos(): array
     {
-        return $this->carnetModelo
-            ->obtenerCarnetesVencidos();
+        return
+            $this->carnetRepository
+                ->obtenerCarnetsVencidos();
+    }
+
+    /**
+     * Renovar un carnet.
+     */
+    public function renovar(
+        int $id,
+        string $fechaVencimiento
+    ): bool
+    {
+        return
+            $this->carnetRepository
+                ->renovar(
+                    $id,
+                    $fechaVencimiento
+                );
     }
 }

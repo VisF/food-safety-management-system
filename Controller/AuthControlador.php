@@ -12,7 +12,7 @@ require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
  * AuthControlador - Gestión de autenticación y registro de usuarios
  *
  * Dependencias esperadas:
- * - Modelo: Modelo/UsuarioModelo.php (clase UsuarioModelo)
+ * - Servicios: Servicios/UsuarioService.php (clase UsuarioService)
  *
  * - Vistas:
  *   - vistas/login.php              (mostrar formulario login)
@@ -42,36 +42,18 @@ class AuthControlador
     private const VIEW_REGISTRO = __DIR__ . '/../Views/registro.php';
     private const VIEW_PERFIL = __DIR__ . '/../Views/perfil.php';
 
-    private ?UsuarioModelo $usuarioModelo = null;
+    private ?UsuarioService $UsuarioService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         $this->configurarSesion();
-        
-        // Inicializar modelo si existe
-        // Instanciar modelo de usuario si está disponible (permite testing sin DB)
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
+        $this->UsuarioService = new UsuarioService();
         // Validar estado de sesión y cargar posibles dependencias adicionales
         $this->validarSesion();
-        $this->inicializarModeloSiExiste();
     }
 
-    private function inicializarModeloSiExiste(): void
-    {
-        // Si existe archivo de modelo, intentar cargarlo.
-        $modelFile = __DIR__ . '/../Modelo/UsuarioModelo.php';
-        if (file_exists($modelFile)) {
-            require_once $modelFile;
-        }
 
-        // Crear instancia solo si la clase existe.
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
-    }
 
     private function configurarSesion(): void
     {
@@ -205,9 +187,8 @@ class AuthControlador
 
         $usuario = $this->obtenerUsuarioActual();
 
-        // Si hay modelo, intenta refrescar desde DB
-        if ($this->usuarioModelo !== null && method_exists($this->usuarioModelo, 'obtenerPorId')) {
-            $usuarioDb = $this->usuarioModelo->obtenerPorId((int) $usuario['id']);
+        if ($this->UsuarioService !== null && method_exists($this->UsuarioService, 'obtenerPorId')) {
+            $usuarioDb = $this->UsuarioService->obtenerPorId((int) $usuario['id']);
             if (is_array($usuarioDb)) {
                 $usuario = array_merge($usuario, $usuarioDb);
             }
@@ -240,15 +221,15 @@ class AuthControlador
 
         $usuario = null;
 
-        if ($this->usuarioModelo !== null && method_exists($this->usuarioModelo, 'obtenerPorEmail')) {
-            $usuario = $this->usuarioModelo->obtenerPorEmail($email);
+        if ($this->UsuarioService !== null && method_exists($this->UsuarioService, 'obtenerPorEmail')) {
+            $usuario = $this->UsuarioService->obtenerPorEmail($email);
 
             if (!$usuario || !password_verify($password, (string) ($usuario['password'] ?? ''))) {
                 $this->log('Failed login attempt', 'WARNING', ['email' => $email]);
                 return ['success' => false, 'error' => 'Credenciales inválidas'];
             }
         } else {
-            // Fallback temporal mientras no exista modelo.
+
             $usuario = [
                 'id' => 1,
                 'nombre' => 'Juan Perez',
@@ -365,11 +346,11 @@ class AuthControlador
                 ];
             }
 
-       if ($this->usuarioModelo !== null 
-            && method_exists( $this->usuarioModelo,'obtenerPorEmail')
-            && method_exists($this->usuarioModelo,'obtenerPorDni')) 
+       if ($this->UsuarioService !== null 
+            && method_exists( $this->UsuarioService,'obtenerPorEmail')
+            && method_exists($this->UsuarioService,'obtenerPorDni')) 
             {
-            $usuarioExistente = $this->usuarioModelo->obtenerPorEmail($email);
+            $usuarioExistente = $this->UsuarioService->obtenerPorEmail($email);
             if ($usuarioExistente) {
                 return [
                         'success' => false,
@@ -377,7 +358,7 @@ class AuthControlador
                     ];
             }
             $usuarioExistente =
-                    $this->usuarioModelo
+                    $this->UsuarioService
                         ->obtenerPorDni($dni);
 
                 if ($usuarioExistente) {
@@ -388,8 +369,8 @@ class AuthControlador
                     ];
                 }
 
-            if (method_exists($this->usuarioModelo, 'crear')) {
-                $usuarioNuevo = $this->usuarioModelo->crear([
+            if (method_exists($this->UsuarioService, 'crear')) {
+                $usuarioNuevo = $this->UsuarioService->crear([
                     'nombre' => $nombre,
                     'apellido' => $apellido,
                     'email' => $email,
@@ -428,8 +409,8 @@ class AuthControlador
             return ['success' => false, 'error' => 'Nombre inválido'];
         }
 
-        if ($this->usuarioModelo !== null && method_exists($this->usuarioModelo, 'actualizar')) {
-            $resultado = $this->usuarioModelo->actualizar($usuarioId, ['nombre' => $nombre]);
+        if ($this->UsuarioService !== null && method_exists($this->UsuarioService, 'actualizar')) {
+            $resultado = $this->UsuarioService->actualizar($usuarioId, ['nombre' => $nombre]);
             if (!$resultado) {
                 return ['success' => false, 'error' => 'Error al actualizar perfil'];
             }

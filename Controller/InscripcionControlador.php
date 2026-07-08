@@ -5,34 +5,24 @@ declare(strict_types=1);
  * InscripcionControlador - Gestión de inscripciones a cursos y exámenes
  */
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
-require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
+
 
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
-
-require_once __DIR__ . '/../Modelo/CursoModelo.php';
-require_once __DIR__ . '/../Modelo/ExamenModelo.php';
-require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
-require_once __DIR__ . '/../Modelo/HabilitacionExamenModelo.php';
+require_once __DIR__ . '/../Servicios/CursoService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/ExamenService.php';
 
 require_once __DIR__ . '/ValidacionControlador.php';
-
-require_once __DIR__ . '/../Repository/CursoRepository.php';
-
-require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
 class InscripcionControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/inscripcion_controller.log';
 
     private ?inscripcionService $inscripcionService = null;
-    private ?CursoModelo $cursoModelo = null;
-    private ?ExamenModelo $examenModelo = null;
-    private ?FechaCursoModelo $fechaCursoModelo = null;
-    private ?TipoInscripcionModelo $tipoInscripcionModelo = null;
-    private ?DocumentoModelo $documentoModelo = null;
-    private ?HabilitacionExamenModelo $habilitacionExamenModelo = null;
-    private ?CursoRepository $cursoRepository = null;
+    private ?ExamenService $examenService = null;
+    private ValidacionControlador $validacionControlador;
     private ?DocumentoService $documentoService = null;
+    private ?CursoService $cursoService = null;
 
     private function pdo(): \PDO
     {
@@ -43,21 +33,14 @@ class InscripcionControlador
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
+        $this->inscripcionService = new inscripcionService();
+        $this->examenService = new ExamenService();
+        $this->validacionControlador = new ValidacionControlador();
+        $this->documentoService = new DocumentoService();
+        $this->cursoService = new CursoService();
     }
 
-    private function inicializarModelos(): void
-    {
-        if (class_exists('inscripcionService')) $this->inscripcionService = new inscripcionService();
-        if (class_exists('CursoModelo')) $this->cursoModelo = new CursoModelo();
-        if (class_exists('ExamenModelo')) $this->examenModelo = new ExamenModelo();
-        if (class_exists('FechaCursoModelo')) $this->fechaCursoModelo = new FechaCursoModelo();
-        if (class_exists('TipoInscripcionModelo')) $this->tipoInscripcionModelo = new TipoInscripcionModelo();
-        if (class_exists('DocumentoModelo')) $this->documentoModelo = new DocumentoModelo();
-        if (class_exists('HabilitacionExamenModelo')) $this->habilitacionExamenModelo = new HabilitacionExamenModelo();
-        if (class_exists('CursoRepository')) $this->cursoRepository = new CursoRepository();
-        if (class_exists('DocumentoService')) $this->documentoService = new DocumentoService();
-    }
+
 
     private function registrarLog(string $evento, array $datos = []): void
     {
@@ -288,7 +271,7 @@ class InscripcionControlador
     {
         try {
 
-            return $this->cursoRepository
+            return $this->cursoService
                 ->obtenerActivos();
 
         } catch (\Exception $e) {
@@ -309,7 +292,7 @@ class InscripcionControlador
         try {
 
             $examenes =
-                $this->examenModelo
+                $this->examenService
                     ->obtenerProximos(100);
 
             $resultado = [];
@@ -636,7 +619,7 @@ class InscripcionControlador
             }
 
             $curso =
-                $this->cursoRepository
+                $this->cursoService
                     ->obtenerPorId($cursoId);
 
             if (!$curso) {

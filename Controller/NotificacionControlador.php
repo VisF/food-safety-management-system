@@ -2,199 +2,227 @@
 declare(strict_types=1);
 
 /**
- * NotificacionControlador - Gestión de notificaciones y emails
+ * NotificacionControlador
  *
- * Responsabilidades:
- * - Enviar notificaciones por email a usuarios
- * - Alertar cambios de estado del trámite
- * - Enviar comprobantes de inscripción
- * - Enviar resultados de exámenes
- * - Gestionar plantillas de email
- * - Procesar cola de notificaciones pendientes
- * - Mantener historial de notificaciones
- *
- * Dependencias esperadas:
- * - Modelos: NotificacionModelo, UsuarioModelo, InscripcionModelo, DocumentoModelo, ResultadoExamenModelo
- * - Funcionalidad: Envío de emails (SMTP, PHPMailer, etc.)
+ * Responsabilidad:
+ * Coordinar las operaciones de notificaciones.
+ * Toda la lógica de negocio y acceso a datos se delega
+ * a los Services correspondientes.
  */
+
+require_once __DIR__ . '/../Servicios/NotificacionService.php';
+require_once __DIR__ . '/../Servicios/UsuarioService.php';
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/ResultadoExamenService.php';
+require_once __DIR__ . '/../Servicios/CarnetService.php';
 
 class NotificacionControlador
 {
-    private const LOG_FILE = __DIR__ . '/../logs/notificacion_controller.log';
+    private const LOG_FILE =
+        __DIR__ .
+        '/../logs/notificacion_controller.log';
+
     private const TIPO_EMAIL = 'email';
     private const TIPO_SMS = 'sms';
     private const TIPO_SISTEMA = 'sistema';
-    
-    // Constantes para tipos de notificación
-    private const TIPO_CONFIRMACION_INSCRIPCION = 'confirmacion_inscripcion';
-    private const TIPO_CAMBIO_ESTADO = 'cambio_estado';
-    private const TIPO_RECHAZO_DOCUMENTACION = 'rechazo_documentacion';
-    private const TIPO_APROBACION_DOCUMENTACION = 'aprobacion_documentacion';
-    private const TIPO_RESULTADO_EXAMEN = 'resultado_examen';
-    private const TIPO_CARNET_EMITIDO = 'carnet_emitido';
-    private const TIPO_RECUPERACION_PASSWORD = 'recuperacion_password';
-    private const TIPO_COMPROBANTE = 'comprobante';
+
+    private const TIPO_CONFIRMACION_INSCRIPCION =
+        'confirmacion_inscripcion';
+
+    private const TIPO_CAMBIO_ESTADO =
+        'cambio_estado';
+
+    private const TIPO_RECHAZO_DOCUMENTACION =
+        'rechazo_documentacion';
+
+    private const TIPO_APROBACION_DOCUMENTACION =
+        'aprobacion_documentacion';
+
+    private const TIPO_RESULTADO_EXAMEN =
+        'resultado_examen';
+
+    private const TIPO_CARNET_EMITIDO =
+        'carnet_emitido';
+
+    private const TIPO_RECUPERACION_PASSWORD =
+        'recuperacion_password';
+
+    private const TIPO_COMPROBANTE =
+        'comprobante';
 
     private const EMAIL_CONFIG = [
-        'smtp_host' => 'localhost', // Configurado desde config/env.php en obtenerConfiguracionEmail()
-        'smtp_port' => 587,
-        'remitente' => 'noreply@ManipulacionDeAlimentos.local',
-        'nombre_remitente' => 'Sistema de Manipulacion de Alimentos'
+
+        'smtp_host' =>
+            'localhost',
+
+        'smtp_port' =>
+            587,
+
+        'remitente' =>
+            'noreply@ManipulacionDeAlimentos.local',
+
+        'nombre_remitente' =>
+            'Sistema de Manipulación de Alimentos'
     ];
 
-    private ?NotificacionModelo $notificacionModelo = null;
-    private ?UsuarioModelo $usuarioModelo = null;
-    private ?InscripcionModelo $inscripcionModelo = null;
-    private ?DocumentoModelo $documentoModelo = null;
-    private ?ResultadoExamenModelo $resultadoExamenModelo = null;
+    private NotificacionService
+        $notificacionService;
+
+    private UsuarioService
+        $usuarioService;
+
+    private InscripcionService
+        $inscripcionService;
+
+    private DocumentoService
+        $documentoService;
+
+    private ResultadoExamenService
+        $resultadoExamenService;
+
+    private CarnetService
+        $carnetService;
 
     public function __construct()
     {
-        @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
-    }
+        @mkdir(
+            dirname(self::LOG_FILE),
+            0755,
+            true
+        );
 
-    private function pdo(): \PDO
-    {
-        require_once __DIR__ . '/../db/Connection.php';
-        return Connection::getPDO();
-    }
+        $this->notificacionService =
+            new NotificacionService();
 
-    /**
-     * Inicializar todas las dependencias de modelos
-     * @return void
-     */
-    private function inicializarModelos(): void
-    {
-        // Instanciar modelos sólo si existen para permitir fallbacks en entornos de pruebas
-        if (class_exists('NotificacionModelo')) {
-            $this->notificacionModelo = new NotificacionModelo();
-        }
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
-        if (class_exists('InscripcionModelo')) {
-            $this->inscripcionModelo = new InscripcionModelo();
-        }
-        if (class_exists('DocumentoModelo')) {
-            $this->documentoModelo = new DocumentoModelo();
-        }
-        if (class_exists('ResultadoExamenModelo')) {
-            $this->resultadoExamenModelo = new ResultadoExamenModelo();
-        }
+        $this->usuarioService =
+            new UsuarioService();
+
+        $this->inscripcionService =
+            new InscripcionService();
+
+        $this->documentoService =
+            new DocumentoService();
+
+        $this->resultadoExamenService =
+            new ResultadoExamenService();
+
+        $this->carnetService =
+            new CarnetService();
     }
 
     /**
-     * Registrar evento en el log
-     * @param string $evento Descripción del evento
-     * @param array $datos Datos asociados
-     * @return void
+     * Registrar eventos.
      */
-    private function registrarLog(string $evento, array $datos = []): void
-    {
-        $timestamp = date('Y-m-d H:i:s');
-        $usuario_id = $_SESSION['user_id'] ?? 'anonimo';
-        $mensaje = "[$timestamp] Usuario: $usuario_id | Evento: $evento | Datos: " . json_encode($datos) . "\n";
-        @file_put_contents(self::LOG_FILE, $mensaje, FILE_APPEND);
+    private function registrarLog(
+        string $evento,
+        array $datos = []
+    ): void {
+
+        $timestamp =
+            date('Y-m-d H:i:s');
+
+        $usuarioId =
+            $_SESSION['usuario_id']
+            ?? 'anonimo';
+
+        $mensaje =
+            "[{$timestamp}] Usuario: {$usuarioId} | {$evento} | "
+            . json_encode(
+                $datos,
+                JSON_UNESCAPED_UNICODE
+            )
+            . PHP_EOL;
+
+        @file_put_contents(
+            self::LOG_FILE,
+            $mensaje,
+            FILE_APPEND
+        );
     }
 
+
+
+
     /**
-     * Enviar notificación genérica a usuario
-     *
-     * @param int $id_usuario ID del usuario destinatario
-     * @param string $tipo Tipo de notificación (ver constantes TIPO_*)
-     * @param array $datos Array con variables para la plantilla
-     * @return array ['éxito' => bool, 'id_notificacion' => int, 'tipo' => string, 'mensaje' => string]
-     */
-    public function enviarNotificacion(int $id_usuario, string $tipo, array $datos): array
-    {
-        try {
-            $pdo = $this->pdo();
+ * Enviar notificación genérica a un usuario.
+ *
+ * @param int $id_usuario ID del usuario destinatario
+ * @param string $tipo Tipo de notificación
+ * @param array $datos Datos utilizados para la plantilla
+ * @return array Resultado de la operación
+ */
+public function enviarNotificacion(
+    int $id_usuario,
+    string $tipo,
+    array $datos
+): array
+{
+    try {
 
-            // Resolver usuario destinatario: si $id_usuario es 0, intentar inferir desde datos
-            $destino_usuario_id = $id_usuario > 0 ? $id_usuario : null;
-            if (!$destino_usuario_id) {
-                if (!empty($datos['id_inscripcion'])) {
-                    $stmt = $pdo->prepare('SELECT usuario_id FROM inscripciones WHERE id = :id LIMIT 1');
-                    $stmt->execute([':id' => (int)$datos['id_inscripcion']]);
-                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
-                    if ($r) $destino_usuario_id = (int)$r['usuario_id'];
-                }
-                if (!$destino_usuario_id && !empty($datos['id_documento'])) {
-                    $stmt = $pdo->prepare('SELECT i.usuario_id FROM documentos d JOIN inscripciones i ON i.id = d.inscripcion_id WHERE d.id = :id LIMIT 1');
-                    $stmt->execute([':id' => (int)$datos['id_documento']]);
-                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
-                    if ($r) $destino_usuario_id = (int)$r['usuario_id'];
-                }
-                if (!$destino_usuario_id && !empty($datos['email'])) {
-                    $stmt = $pdo->prepare('SELECT id FROM usuarios WHERE email = :email LIMIT 1');
-                    $stmt->execute([':email' => $datos['email']]);
-                    $r = $stmt->fetch(\PDO::FETCH_ASSOC);
-                    if ($r) $destino_usuario_id = (int)$r['id'];
-                }
-            }
+        $resultado =
+            $this->notificacionService
+                ->enviarNotificacion(
+                    $id_usuario,
+                    $tipo,
+                    $datos
+                );
 
-            // Generar plantilla HTML y asunto simple
-            $plantilla = $this->generarPlantilla($tipo, $datos);
-            $asunto = $datos['asunto'] ?? ucfirst(str_replace('_', ' ', $tipo));
+        if (!$resultado['success']) {
 
-            // Obtener email del usuario si existe
-            $email_destino = $datos['email'] ?? null;
-            if ($destino_usuario_id) {
-                $stmt = $pdo->prepare('SELECT email, nombre, apellido FROM usuarios WHERE id = :id LIMIT 1');
-                $stmt->execute([':id' => $destino_usuario_id]);
-                $u = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
-                if ($u) {
-                    $email_destino = $u['email'];
-                }
-            }
-
-            // Envío por mail (intento simple con mail())
-            $enviado = 0;
-            if ($email_destino && $this->validarEmailDestino($email_destino)) {
-                $headers = "MIME-Version: 1.0\r\n" .
-                           "Content-type: text/html; charset=utf-8\r\n" .
-                           "From: " . (self::EMAIL_CONFIG['nombre_remitente'] ?? 'Sistema') . " <" . (self::EMAIL_CONFIG['remitente'] ?? 'noreply@localhost') . ">\r\n";
-                    try {
-                        // Aplicar variables en plantilla
-                        $plantilla = $this->aplicarVariablesPlantilla($plantilla, $datos);
-                        $mailOk = @mail($email_destino, $asunto, $plantilla, $headers);
-                        $enviado = $mailOk ? 1 : 0;
-                    } catch (\Throwable $t) {
-                        $enviado = 0;
-                    }
-            }
-
-            // Insertar en tabla notificaciones solo si se pudo resolver usuario_id
-            $id_notificacion = 0;
-            if ($destino_usuario_id) {
-                $ins = $pdo->prepare('INSERT INTO notificaciones (usuario_id, tipo, asunto, mensaje, enviado, fecha_creacion) VALUES (:uid, :tipo, :asunto, :mensaje, :enviado, NOW())');
-                $ins->execute([':uid' => $destino_usuario_id, ':tipo' => $tipo, ':asunto' => $asunto, ':mensaje' => $plantilla, ':enviado' => $enviado]);
-                $id_notificacion = (int)$pdo->lastInsertId();
-            }
-
-            $this->registrarLog('ENVIAR_NOTIFICACION', ['id_usuario' => $destino_usuario_id, 'tipo' => $tipo, 'enviado' => $enviado, 'id_notificacion' => $id_notificacion]);
-
-            return [
-                'éxito' => true,
-                'id_notificacion' => $id_notificacion,
-                'id_usuario' => $destino_usuario_id,
-                'tipo' => $tipo,
-                'mensaje' => $enviado ? 'Notificación enviada correctamente' : 'Notificación encolada/registrada'
-            ];
-        } catch (\Exception $e) {
-            $this->registrarLog('ERROR_ENVIAR_NOTIFICACION', ['error' => $e->getMessage()]);
             return [
                 'éxito' => false,
                 'id_notificacion' => 0,
                 'id_usuario' => $id_usuario,
                 'tipo' => $tipo,
-                'mensaje' => 'Error al enviar notificación: ' . $e->getMessage()
+                'mensaje' => $resultado['mensaje']
             ];
         }
 
-    }
+        $this->registrarLog(
+            'ENVIAR_NOTIFICACION',
+            [
+                'id_usuario' =>
+                    $id_usuario,
 
+                'tipo' =>
+                    $tipo,
+
+                'id_notificacion' =>
+                    $resultado['notificacion']['id'] ?? 0
+            ]
+        );
+
+        return [
+            'éxito' => true,
+            'id_notificacion' =>
+                $resultado['notificacion']['id'] ?? 0,
+            'id_usuario' => $id_usuario,
+            'tipo' => $tipo,
+            'mensaje' => $resultado['mensaje']
+        ];
+
+    } catch (\Exception $e) {
+
+        $this->registrarLog(
+            'ERROR_ENVIAR_NOTIFICACION',
+            [
+                'error' =>
+                    $e->getMessage()
+            ]
+        );
+
+        return [
+            'éxito' => false,
+            'id_notificacion' => 0,
+            'id_usuario' => $id_usuario,
+            'tipo' => $tipo,
+            'mensaje' =>
+                'Error al enviar notificación: '
+                . $e->getMessage()
+        ];
+    }
+}
     /**
      * Enviar alerta de cambio de estado del trámite
      *

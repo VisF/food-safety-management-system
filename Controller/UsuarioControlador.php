@@ -5,8 +5,8 @@ declare(strict_types=1);
  * UsuarioControlador - Gestión de usuarios del sistema
  * 
  * Dependencias esperadas:
- * - Modelo: Modelo/UsuarioModelo.php (clase UsuarioModelo)
- * - Modelo: Modelo/UsuarioRolModelo.php (clase UsuarioRolModelo)
+ * - Servicio: Servicio/UsuarioService.php (clase UsuarioService)
+ * - Servicio: Servicio/UsuarioRolService.php (clase UsuarioRolService)
  *
  * Vistas esperadas:
  * - vistas/usuarios_listado.php    (mostrar listado de usuarios)
@@ -28,27 +28,16 @@ class UsuarioControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/usuario_controller.log';
     
-    private ?UsuarioModelo $usuarioModelo = null;
-    private ?UsuarioRolModelo $usuarioRolModelo = null;
+    private ?UsuarioService $usuarioService = null;
+    private ?UsuarioRolService $usuarioRolService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
+        $this->usuarioService = new UsuarioService();
+        $this->usuarioRolService = new UsuarioRolService();
     }
 
-    /**
-     * Inicializar modelos si existen
-     */
-    private function inicializarModelos(): void
-    {
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
-        if (class_exists('UsuarioRolModelo')) {
-            $this->usuarioRolModelo = new UsuarioRolModelo();
-        }
-    }
 
     /**
      * Registrar eventos en log
@@ -79,13 +68,12 @@ class UsuarioControlador
     public function listarUsuarios(): array
     {
         try {
-            // Preferir modelo si está disponible
-            if ($this->usuarioModelo) {
-                // No existe método obtenerTodos en el modelo, usar búsqueda amplia
-                $usuarios = $this->usuarioModelo->buscar('nombre', '');
-                // buscar con criterio vacío puede no retornar nada; fallback a consulta directa
-                if (empty($usuarios)) {
-                    $connFile = __DIR__ . '/../db/Connection.php';
+            // Preferir Service si está disponible
+            if ($this->usuarioService) {
+                $usuarios = $this->usuarioService->listarUsuarios();
+            } else {
+                // Fallback a consulta directa
+                $connFile = __DIR__ . '/../db/Connection.php';
                     if (file_exists($connFile)) {
                         require_once $connFile;
                         $pdo = Connection::getPDO();
@@ -140,13 +128,13 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible', 'usuario' => null, 'roles' => []];
-            $usuario = $this->usuarioModelo->obtenerPorId($id);
+            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible', 'usuario' => null, 'roles' => []];
+            $usuario = $this->usuarioService->obtenerPorId($id);
             if (!$usuario) return ['success' => false, 'error' => 'Usuario no encontrado', 'usuario' => null, 'roles' => []];
 
             $roles = [];
-            if ($this->usuarioRolModelo) {
-                $roles = $this->usuarioRolModelo->obtenerRolesPorUsuario($id);
+            if ($this->usuarioRolService) {
+                $roles = $this->usuarioRolService->obtenerRolesPorUsuario($id);
             }
 
             return ['success' => true, 'usuario' => $usuario, 'roles' => $roles, 'error' => null];
@@ -184,7 +172,7 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
+            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
 
             $criterio = 'nombre';
             if (filter_var($termino, FILTER_VALIDATE_EMAIL)) {
@@ -193,7 +181,7 @@ class UsuarioControlador
                 $criterio = 'dni';
             }
 
-            $usuarios = $this->usuarioModelo->buscar($criterio, $termino);
+            $usuarios = $this->usuarioService->buscar($criterio, $termino);
             return ['success' => true, 'usuarios' => $usuarios, 'total' => count($usuarios), 'termino' => $termino];
         } catch (\Exception $e) {
             $this->log('ERROR_BUSCAR_USUARIOS', 'ERROR', ['termino' => $termino, 'error' => $e->getMessage()]);
@@ -219,8 +207,8 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
-            $existe = $this->usuarioModelo->obtenerPorId($id);
+            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
+            $existe = $this->usuarioService->obtenerPorId($id);
             if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
 
             // Validar campos permitidos
@@ -237,10 +225,10 @@ class UsuarioControlador
             }
             if (empty($update)) return ['success' => false, 'error' => 'No hay campos válidos para actualizar'];
 
-            $ok = $this->usuarioModelo->actualizar($id, $update);
+            $ok = $this->usuarioService->actualizar($id, $update);
             if ($ok) {
                 $this->log('USUARIO_ACTUALIZADO', 'INFO', ['id' => $id, 'campos' => array_keys($update)]);
-                $usuario = $this->usuarioModelo->obtenerPorId($id);
+                $usuario = $this->usuarioService->obtenerPorId($id);
                 return ['success' => true, 'message' => 'Usuario actualizado', 'usuario' => $usuario];
             }
             return ['success' => false, 'error' => 'Error al actualizar usuario'];
@@ -270,7 +258,7 @@ class UsuarioControlador
         $passwordConfirm = trim((string)($datos['password_confirm'] ?? ''));
 
         try {
-            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
+            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
 
             // Validaciones
             if (strlen($passwordNueva) < 8 || !preg_match('/[A-Z]/', $passwordNueva) || !preg_match('/[a-z]/', $passwordNueva) || !preg_match('/[0-9]/', $passwordNueva)) {
@@ -292,7 +280,7 @@ class UsuarioControlador
                 return ['success' => false, 'error' => 'Contraseña actual incorrecta'];
             }
 
-            $ok = $this->usuarioModelo->cambiarPassword($id, $passwordNueva);
+            $ok = $this->usuarioService->cambiarPassword($id, $passwordNueva);
             if ($ok) {
                 $this->log('PASSWORD_CAMBIADO', 'INFO', ['id' => $id]);
                 return ['success' => true, 'message' => 'Contraseña actualizada correctamente'];
@@ -318,11 +306,11 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioModelo) return ['success' => false, 'error' => 'Modelo Usuario no disponible'];
-            $existe = $this->usuarioModelo->obtenerPorId($id);
+            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
+            $existe = $this->usuarioService->obtenerPorId($id);
             if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
 
-            $ok = $this->usuarioModelo->eliminar($id);
+            $ok = $this->usuarioService->eliminar($id);
             if ($ok) {
                 $this->log('USUARIO_DESACTIVADO', 'INFO', ['id' => $id]);
                 return ['success' => true, 'message' => 'Usuario desactivado'];
@@ -349,11 +337,11 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible'];
+            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible'];
             // Validar existencia de usuario
-            if ($this->usuarioModelo && !$this->usuarioModelo->obtenerPorId($id_usuario)) return ['success' => false, 'error' => 'Usuario no encontrado'];
+            if ($this->usuarioService && !$this->usuarioService->obtenerPorId($id_usuario)) return ['success' => false, 'error' => 'Usuario no encontrado'];
 
-            $ok = $this->usuarioRolModelo->asignarRol($id_usuario, $id_rol);
+            $ok = $this->usuarioRolService->asignarRol($id_usuario, $id_rol);
             if ($ok) {
                 $this->log('ROL_ASIGNADO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
                 return ['success' => true, 'message' => 'Rol asignado correctamente'];
@@ -380,8 +368,8 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible'];
-            $ok = $this->usuarioRolModelo->removerRol($id_usuario, $id_rol);
+            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible'];
+            $ok = $this->usuarioRolService->removerRol($id_usuario, $id_rol);
             if ($ok) {
                 $this->log('ROL_REMOVIDO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
                 return ['success' => true, 'message' => 'Rol removido correctamente'];
@@ -411,8 +399,8 @@ class UsuarioControlador
         }
 
         try {
-            if (!$this->usuarioRolModelo) return ['success' => false, 'error' => 'Modelo UsuarioRol no disponible', 'roles' => [], 'total' => 0];
-            $roles = $this->usuarioRolModelo->obtenerRolesPorUsuario($id);
+            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible', 'roles' => [], 'total' => 0];
+            $roles = $this->usuarioRolService->obtenerRolesPorUsuario($id);
             return ['success' => true, 'roles' => $roles, 'total' => count($roles)];
         } catch (\Exception $e) {
             $this->log('ERROR_OBTENER_ROLES_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);

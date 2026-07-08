@@ -5,8 +5,8 @@ declare(strict_types=1);
  * ReporteControlador - Generación de reportes y estadísticas del sistema
  * 
  * Dependencias esperadas:
- * - Modelos: AuditoriaAccionesModelo, InscripcionModelo, ResultadoExamenModelo, 
- *   CarnetModelo, UsuarioModelo
+ * - AuditoriaAccionesService, InscripcionService, ResultadoExamenService, 
+ *   CarnetService, UsuarioService
  * 
  * Vistas esperadas:
  * - vistas/actividad_reciente.php
@@ -20,11 +20,11 @@ class ReporteControlador
     private const LOG_FILE = __DIR__ . '/../logs/reporte_controller.log';
     private const DESCARGAS_DIR = __DIR__ . '/../descargas';
     
-    private ?object $auditoriaModelo = null;
-    private ?object $inscripcionModelo = null;
-    private ?object $resultadoExamenModelo = null;
-    private ?object $carnetModelo = null;
-    private ?object $usuarioModelo = null;
+    private ?object $auditoriaService = null;
+    private ?object $InscripcionService = null;
+    private ?object $ResultadoExamenService = null;
+    private ?object $CarnetService = null;
+    private ?object $UsuarioService = null;
 
     private function pdo(): \PDO
     {
@@ -36,31 +36,13 @@ class ReporteControlador
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         @mkdir(self::DESCARGAS_DIR, 0755, true);
-        $this->inicializarModelos();
+        $this->audiotoriaService = new AuditoriaAccionesService();
+        $this->InscripcionService = new InscripcionService();
+        $this->ResultadoExamenService = new ResultadoExamenService();
+        $this->CarnetService = new CarnetService();
+        $this->UsuarioService = new UsuarioService();
     }
 
-    /**
-     * Inicializar modelos si existen
-     */
-    private function inicializarModelos(): void
-    {
-        // Instanciar modelos si están disponibles (fallbacks permiten pruebas sin DB)
-        if (class_exists('AuditoriaAccionesModelo')) {
-            $this->auditoriaModelo = new AuditoriaAccionesModelo();
-        }
-        if (class_exists('InscripcionModelo')) {
-            $this->inscripcionModelo = new InscripcionModelo();
-        }
-        if (class_exists('ResultadoExamenModelo')) {
-            $this->resultadoExamenModelo = new ResultadoExamenModelo();
-        }
-        if (class_exists('CarnetModelo')) {
-            $this->carnetModelo = new CarnetModelo();
-        }
-        if (class_exists('UsuarioModelo')) {
-            $this->usuarioModelo = new UsuarioModelo();
-        }
-    }
 
     /**
      * Registrar eventos en log
@@ -120,8 +102,8 @@ class ReporteControlador
         try {
             // Preferir modelo si existe
             $row = null;
-            if ($this->auditoriaModelo && method_exists($this->auditoriaModelo, 'obtenerPorId')) {
-                $row = $this->auditoriaModelo->obtenerPorId($id_auditoria);
+            if ($this->auditoriaService && method_exists($this->auditoriaService, 'obtenerPorId')) {
+                $row = $this->auditoriaService->obtenerPorId($id_auditoria);
             } else {
                 $stmt = $this->pdo()->prepare('SELECT a.*, u.nombre AS usuario_nombre, u.apellido AS usuario_apellido FROM auditoria_acciones a LEFT JOIN usuarios u ON u.id = a.usuario_id WHERE a.id = :id LIMIT 1');
                 $stmt->execute([':id' => $id_auditoria]);
@@ -199,8 +181,8 @@ class ReporteControlador
             $usuario = $stmt->fetch(\PDO::FETCH_ASSOC) ?: [];
 
             // Preferir modelo
-            if ($this->auditoriaModelo && method_exists($this->auditoriaModelo, 'obtenerPorUsuario')) {
-                $auditorias = $this->auditoriaModelo->obtenerPorUsuario($id_usuario);
+            if ($this->auditoriaService && method_exists($this->auditoriaService, 'obtenerPorUsuario')) {
+                $auditorias = $this->auditoriaService->obtenerPorUsuario($id_usuario);
             } else {
                 $sql = 'SELECT id, accion, tabla, id_registro, datos_anteriores, datos_nuevos, fecha, ip, user_agent FROM auditoria_acciones WHERE usuario_id = :uid ORDER BY fecha DESC LIMIT 1000';
                 $stmt = $this->pdo()->prepare($sql);
@@ -263,8 +245,8 @@ class ReporteControlador
             }
 
             $cambios = [];
-            if ($this->auditoriaModelo && method_exists($this->auditoriaModelo, 'obtenerPorTabla')) {
-                $cambios = $this->auditoriaModelo->obtenerPorTabla($tabla);
+            if ($this->auditoriaService && method_exists($this->auditoriaService, 'obtenerPorTabla')) {
+                $cambios = $this->auditoriaService->obtenerPorTabla($tabla);
             } else {
                 $sql = 'SELECT id, usuario_id, accion, id_registro, datos_anteriores, datos_nuevos, fecha, ip FROM auditoria_acciones WHERE tabla = :tabla ORDER BY fecha DESC LIMIT 2000';
                 $stmt = $this->pdo()->prepare($sql);

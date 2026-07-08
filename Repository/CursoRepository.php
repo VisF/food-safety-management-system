@@ -5,7 +5,7 @@ declare(strict_types=1);
  * CursoRepository - Repositorio para operaciones de cursos
  * 
  * Dependencias:
- * - CursoModelo: Modelo para operaciones de cursos
+ * - db/Connection.php
  * 
  * Funciones principales:
  *

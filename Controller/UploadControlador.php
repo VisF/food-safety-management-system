@@ -13,7 +13,7 @@ declare(strict_types=1);
  * - Mantener archivos temporales
  * 
  * Dependencias:
- * - Modelos: DocumentoModelo
+ * - Servicios: DocumentoService
  */
 
 class UploadControlador
@@ -38,26 +38,17 @@ class UploadControlador
     private const CARPETA_DOCUMENTOS = __DIR__ . '/../uploads/documentos';
     private const CARPETA_TEMPORAL = __DIR__ . '/../uploads/temporal';
 
-    private ?DocumentoModelo $documentoModelo = null;
+    private ?DocumentoService $DocumentoService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         @mkdir(self::CARPETA_DOCUMENTOS, 0755, true);
         @mkdir(self::CARPETA_TEMPORAL, 0755, true);
-        $this->inicializarModelos();
+        $this->DocumentoService = new DocumentoService();
     }
 
-    /**
-     * Inicializar dependencias de modelos
-     */
-    private function inicializarModelos(): void
-    {
-        // Instanciar modelo de documentos si está disponible (fallback seguro)
-        if (class_exists('DocumentoModelo')) {
-            $this->documentoModelo = new DocumentoModelo();
-        }
-    }
+
 
     /**
      * Registrar evento en el log

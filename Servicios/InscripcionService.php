@@ -173,10 +173,10 @@ class InscripcionService
             $this->documentoRepository
                 ->obtenerPorUsuario($usuarioId);
 
-        require_once __DIR__ . '/../Modelo/HabilitacionExamenModelo.php';
+        require_once __DIR__ . '/../Service/HabilitacionExamenService.php';
 
-        $habilitacionModelo =
-            new HabilitacionExamenModelo();
+        $habilitacionService =
+            new HabilitacionExamenService();
 
         $tieneDni = false;
         $tieneFoto = false;
@@ -201,7 +201,7 @@ class InscripcionService
         }
 
         $tieneHabilitacion =
-            $habilitacionModelo
+            $habilitacionService
                 ->tieneHabilitacionVigente($usuarioId);
 
         $faltantes = [];

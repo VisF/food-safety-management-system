@@ -8,11 +8,11 @@ class TramiteControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/tramite_controller.log';
 
-    private ?InscripcionModelo $inscripcionModelo = null;
-    private ?EstadoTramiteModelo $estadoTramiteModelo = null;
-    private ?CarnetModelo $carnetModelo = null;
-    private ?DocumentoModelo $documentoModelo = null;
-    private ?ResultadoExamenModelo $resultadoExamenModelo = null;
+    private ?InscripcionService $InscripcionService = null;
+    private ?EstadoTramiteService $EstadoTramiteService = null;
+    private ?CarnetService $CarnetService = null;
+    private ?DocumentoService $DocumentoService = null;
+    private ?ResultadoExamenService $ResultadoExamenService = null;
 
     private function pdo(): \PDO
     {
@@ -23,17 +23,13 @@ class TramiteControlador
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
+        $this->InscripcionService = new InscripcionService();
+        $this->EstadoTramiteService = new EstadoTramiteService();
+        $this->CarnetService = new CarnetService();
+        $this->DocumentoService = new DocumentoService();
+        $this->ResultadoExamenService = new ResultadoExamenService();
     }
 
-    private function inicializarModelos(): void
-    {
-        if (class_exists('InscripcionModelo')) $this->inscripcionModelo = new InscripcionModelo();
-        if (class_exists('EstadoTramiteModelo')) $this->estadoTramiteModelo = new EstadoTramiteModelo();
-        if (class_exists('CarnetModelo')) $this->carnetModelo = new CarnetModelo();
-        if (class_exists('DocumentoModelo')) $this->documentoModelo = new DocumentoModelo();
-        if (class_exists('ResultadoExamenModelo')) $this->resultadoExamenModelo = new ResultadoExamenModelo();
-    }
 
     private function registrarLog(string $evento, array $datos = []): void
     {

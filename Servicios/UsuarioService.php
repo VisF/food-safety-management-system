@@ -1,107 +1,91 @@
 <?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../Repository/UsuarioRepository.php';
 require_once __DIR__ . '/../dto/UsuarioDTO.php';
-require_once __DIR__ . '/../Modelo/UsuarioModelo.php';
 
 class UsuarioService
 {
-    private UsuarioModelo $usuarioModelo;
+    private UsuarioRepository $usuarioRepository;
 
-    public function __construct(
-        UsuarioModelo $usuarioModelo
-    ) {
-        $this->usuarioModelo = $usuarioModelo;
+    public function __construct()
+    {
+        $this->usuarioRepository =
+            new UsuarioRepository();
     }
 
-    // Consultas
-    public function obtenerPorId(int $id): ?UsuarioDTO 
-    {
+    // =====================================================
+    // CONSULTAS
+    // =====================================================
 
+    public function obtenerPorId(int $id): ?UsuarioDTO
+    {
         $usuario =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorId($id);
 
-        if (!$usuario) {
-            return null;
-        }
-
-        $usuario['roles'] =
-            $this->usuarioModelo
-                ->obtenerRoles($id);
-
-        return UsuarioDTO::fromArray(
-            $usuario
-        );
+        return $usuario
+            ? UsuarioDTO::fromArray($usuario)
+            : null;
     }
-    public function obtenerPorEmail(string $email): ?UsuarioDTO 
+
+    public function obtenerPorEmail(string $email): ?UsuarioDTO
     {
         $usuario =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorEmail($email);
 
-        if (!$usuario) {
-            return null;
-        }
-
-        $usuario['roles'] =
-            $this->usuarioModelo
-                ->obtenerRoles(
-                    (int)$usuario['id']
-                );
-
-        return UsuarioDTO::fromArray(
-            $usuario
-        );
+        return $usuario
+            ? UsuarioDTO::fromArray($usuario)
+            : null;
     }
-    public function obtenerPorDni(string $dni): ?UsuarioDTO 
-    {
 
+    public function obtenerPorDni(string $dni): ?UsuarioDTO
+    {
         $usuario =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorDni($dni);
 
-        if (!$usuario) {
-            return null;
-        }
-
-        $usuario['roles'] =
-            $this->usuarioModelo
-                ->obtenerRoles(
-                    (int)$usuario['id']
-                );
-
-        return UsuarioDTO::fromArray(
-            $usuario
-        );
+        return $usuario
+            ? UsuarioDTO::fromArray($usuario)
+            : null;
     }
-    public function obtenerTodos(): array
+
+    public function listarUsuarios(): array
     {
-        $usuarios =
-            $this->usuarioModelo
-                ->obtenerTodos();
-
-        $resultado = [];
-
-        foreach ($usuarios as $usuario) {
-
-            $usuario['roles'] =
-                $this->usuarioModelo
-                    ->obtenerRoles(
-                        (int)$usuario['id']
-                    );
-
-            $resultado[] =
-                UsuarioDTO::fromArray(
-                    $usuario
-                );
-        }
-
-        return $resultado;
+        return
+            $this->usuarioRepository
+                ->listarUsuarios();
     }
 
-    // Autenticación
-    public function autenticar(string $email, string $password): ?UsuarioDTO {
+    public function contarUsuarios(): array
+    {
+        return
+            $this->usuarioRepository
+                ->contarUsuarios();
+    }
+
+    public function obtenerUsuariosPorRol(
+        string $rol
+    ): array
+    {
+        return
+            $this->usuarioRepository
+                ->obtenerUsuariosPorRol(
+                    $rol
+                );
+    }
+        // =====================================================
+    // AUTENTICACIÓN
+    // =====================================================
+
+    public function autenticar(
+        string $email,
+        string $password
+    ): ?UsuarioDTO
+    {
         $usuario =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorEmail($email);
 
         if (!$usuario) {
@@ -117,26 +101,27 @@ class UsuarioService
             return null;
         }
 
-        $usuario['roles'] =
-            $this->usuarioModelo
-                ->obtenerRoles(
-                    (int)$usuario['id']
-                );
-
         return UsuarioDTO::fromArray(
             $usuario
         );
     }
 
-    // Registro
-    public function registrar(array $datos): UsuarioDTO {
+    // =====================================================
+    // REGISTRO
+    // =====================================================
+
+    public function registrar(
+        array $datos
+    ): UsuarioDTO
+    {
         $existente =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorEmail(
                     $datos['email']
                 );
 
         if ($existente) {
+
             throw new RuntimeException(
                 'El email ya está registrado'
             );
@@ -149,39 +134,50 @@ class UsuarioService
             );
 
         $id =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->crear($datos);
 
         $usuario =
             $this->obtenerPorId($id);
 
         if (!$usuario) {
+
             throw new RuntimeException(
-                'Error al crear usuario'
+                'Error al crear el usuario'
             );
         }
 
         return $usuario;
     }
 
-    // Actualización
-    public function actualizar(int $id,array $datos): UsuarioDTO {
+    // =====================================================
+    // ACTUALIZACIÓN
+    // =====================================================
+
+    public function actualizar(
+        int $id,
+        array $datos
+    ): UsuarioDTO
+    {
         $ok =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->actualizar(
                     $id,
                     $datos
                 );
 
         if (!$ok) {
+
             throw new RuntimeException(
                 'No se pudo actualizar el usuario'
             );
         }
+
         $usuario =
             $this->obtenerPorId($id);
 
         if (!$usuario) {
+
             throw new RuntimeException(
                 'Usuario inexistente'
             );
@@ -189,55 +185,77 @@ class UsuarioService
 
         return $usuario;
     }
+        // =====================================================
+    // ESTADO
+    // =====================================================
 
-    // Estado
-    public function activar(int $id): bool {
+    public function activar(int $id): bool
+    {
         return
-            $this->usuarioModelo
-                ->cambiarEstado(
-                    $id,
-                    true
-                );
-    }   
-    public function desactivar(int $id): bool{
-    return
-        $this->usuarioModelo
-            ->cambiarEstado(
-                $id,
-                false
-            );
+            $this->usuarioRepository
+                ->activarUsuario($id);
     }
 
-    // Roles
-    public function asignarRol(int $usuarioId,int $rolId): bool {
+    public function desactivar(int $id): bool
+    {
         return
-            $this->usuarioModelo
+            $this->usuarioRepository
+                ->desactivarUsuario($id);
+    }
+
+    // =====================================================
+    // ROLES
+    // =====================================================
+
+    public function asignarRol(
+        int $usuarioId,
+        int $rolId
+    ): bool
+    {
+        return
+            $this->usuarioRepository
                 ->asignarRol(
                     $usuarioId,
                     $rolId
                 );
     }
-    public function quitarRol(int $usuarioId, int $rolId): bool {
-    return
-        $this->usuarioModelo
-            ->quitarRol(
-                $usuarioId,
-                $rolId
-            );
+
+    public function quitarRol(
+        int $usuarioId,
+        int $rolId
+    ): bool
+    {
+        return
+            $this->usuarioRepository
+                ->quitarRol(
+                    $usuarioId,
+                    $rolId
+                );
     }
 
-    public function obtenerRoles(int $usuarioId): array {
+    public function obtenerRoles(
+        int $usuarioId
+    ): array
+    {
         return
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerRoles(
                     $usuarioId
                 );
     }
 
-    // Password
-    public function cambiarPassword(int $usuarioId, string $passwordActual, string $passwordNueva): bool {
+    // =====================================================
+    // PASSWORD
+    // =====================================================
+
+    public function cambiarPassword(
+        int $usuarioId,
+        string $passwordActual,
+        string $passwordNueva
+    ): bool
+    {
         $usuario =
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->obtenerPorId(
                     $usuarioId
                 );
@@ -256,7 +274,7 @@ class UsuarioService
         }
 
         return
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->cambiarPassword(
                     $usuarioId,
                     password_hash(
@@ -266,9 +284,13 @@ class UsuarioService
                 );
     }
 
-    public function resetearPassword(int $usuarioId, string $passwordNueva): bool {
+    public function resetearPassword(
+        int $usuarioId,
+        string $passwordNueva
+    ): bool
+    {
         return
-            $this->usuarioModelo
+            $this->usuarioRepository
                 ->cambiarPassword(
                     $usuarioId,
                     password_hash(

@@ -1,5 +1,4 @@
 <?php
-require_once __DIR__ . '/../Controller/ValidacionControlador.php';
 
 
 class HomeService
@@ -48,13 +47,13 @@ class HomeService
         if ($inscripcion !== null) {
 
             require_once __DIR__ .
-                '/../Modelo/HabilitacionExamenModelo.php';
+                '/../Service/HabilitacionExamenService.php';
 
-            $habilitacionModelo =
-                new HabilitacionExamenModelo();
+            $habilitacionService =
+                new HabilitacionExamenService();
 
             $tieneHabilitacion =
-                $habilitacionModelo
+                $habilitacionService
                     ->tieneHabilitacionVigente(
                         $inscripcion->getUsuarioId()
                     );

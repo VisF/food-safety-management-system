@@ -14,6 +14,7 @@ declare(strict_types=1);
  * listar()
  * actualizar()
  * eliminar()
+ * 
  */
 require_once __DIR__ . '/../Repository/AsistenciaRepository.php';
 
@@ -186,5 +187,29 @@ class AsistenciaService
         return
             $this->asistenciaRepository
                 ->eliminar($id);
+    }
+
+    public function verificarMinimoPorcentaje(int $inscripcionId, float $minimo = 80.0): bool
+    {
+        $totales =
+            $this->asistenciaRepository
+                ->obtenerTotalAsistencias(
+                    $inscripcionId
+                );
+
+        $presentes =
+            (int)$totales['presentes'];
+
+        $total =
+            (int)$totales['total'];
+
+        if ($total === 0) {
+            return false;
+        }
+
+        return
+            (($presentes / $total) * 100)
+            >=
+            $minimo;
     }
 }

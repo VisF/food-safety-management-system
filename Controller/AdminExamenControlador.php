@@ -12,19 +12,19 @@ declare(strict_types=1);
  * - Actualizar cupos.
  * - Obtener próximos exámenes.
  */
-require_once __DIR__ . '/../Repository/ExamenRepository.php';
+require_once __DIR__ . '/../Service/ExamenService.php';
 
 class AdminExamenControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/admin_examen_controller.log';
     
-    private ExamenRepository $examenRepository;
+    private ExamenService $examenService;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
-        $this->examenRepository = new ExamenRepository();
+        $this->examenService = new ExamenService();
     }
 
 
@@ -38,7 +38,7 @@ class AdminExamenControlador
     {
         try {
 
-            $id = $this->examenRepository
+            $id = $this->examenService
                 ->crearExamen($datos);
 
             return [
@@ -76,7 +76,7 @@ class AdminExamenControlador
     {
         try {
 
-            $examenes = $this->examenRepository
+            $examenes = $this->examenService
                 ->listarExamenes();
 
             return [
@@ -104,7 +104,7 @@ class AdminExamenControlador
 {
     try {
 
-        $examen = $this->examenRepository
+        $examen = $this->examenService
             ->obtenerExamen($id);
 
         if (!$examen) {
@@ -143,7 +143,7 @@ class AdminExamenControlador
     {
         try {
 
-            $ok = $this->examenRepository
+            $ok = $this->examenService
                 ->actualizarExamen($id, $datos);
 
             return [
@@ -180,7 +180,7 @@ class AdminExamenControlador
     {
         try {
 
-            $this->examenRepository
+            $this->examenService
                 ->activarExamen($id);
 
             return [
@@ -212,7 +212,7 @@ class AdminExamenControlador
     {
         try {
 
-            $this->examenRepository
+            $this->examenService
                 ->desactivarExamen($id);
 
             return [
@@ -247,7 +247,7 @@ class AdminExamenControlador
     {
         try {
 
-            $this->examenRepository
+            $this->examenService
                 ->actualizarCupos($id, $cupos);
 
             return [
@@ -286,7 +286,7 @@ class AdminExamenControlador
 
                 'success' => true,
 
-                'examenes' => $this->examenRepository
+                'examenes' => $this->examenService
                     ->obtenerProximos($cantidad)
 
             ];

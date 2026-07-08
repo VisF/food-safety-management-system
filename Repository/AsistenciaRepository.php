@@ -37,7 +37,7 @@ class AsistenciaRepository
     public function crear(array $datos): int
     {
         $sql = "
-            INSERT INTO asistencia
+            INSERT INTO asistencias
             (
                 inscripcion_id,
                 fecha,
@@ -66,13 +66,13 @@ class AsistenciaRepository
     }
 
     /**
-     * Obtener asistencia por ID.
+     * Obtener asistencias por ID.
      */
     public function obtenerPorId(int $id): ?array
     {
         $stmt = $this->conexion->prepare("
             SELECT *
-            FROM asistencia
+            FROM asistencias
             WHERE id = :id
         ");
 
@@ -92,7 +92,7 @@ class AsistenciaRepository
     {
         $stmt = $this->conexion->prepare("
             SELECT *
-            FROM asistencia
+            FROM asistencias
             WHERE inscripcion_id = :id
             ORDER BY fecha ASC
         ");
@@ -113,7 +113,7 @@ class AsistenciaRepository
             SELECT
                 a.*
 
-            FROM asistencia a
+            FROM asistencias a
 
             INNER JOIN inscripciones i
                 ON i.id = a.inscripcion_id
@@ -140,7 +140,7 @@ class AsistenciaRepository
             SELECT
                 a.*
 
-            FROM asistencia a
+            FROM asistencias a
 
             INNER JOIN inscripciones i
                 ON i.id = a.inscripcion_id
@@ -159,7 +159,7 @@ class AsistenciaRepository
     }
 
         /**
-     * Obtener estadísticas de asistencia de una inscripción.
+     * Obtener estadísticas de asistencias de una inscripción.
      */
     public function obtenerTotalAsistencias(int $inscripcionId): array
     {
@@ -173,7 +173,7 @@ class AsistenciaRepository
                         ELSE 0
                     END
                 ) AS presentes
-            FROM asistencia
+            FROM asistencias
             WHERE inscripcion_id = :id
         ");
 
@@ -203,7 +203,7 @@ class AsistenciaRepository
 
                 c.nombre AS curso
 
-            FROM asistencia a
+            FROM asistencias a
 
             INNER JOIN inscripciones i
                 ON i.id = a.inscripcion_id
@@ -232,7 +232,7 @@ class AsistenciaRepository
     ): bool {
 
         $stmt = $this->conexion->prepare("
-            UPDATE asistencia
+            UPDATE asistencias
             SET
                 fecha = :fecha,
                 presente = :presente,
@@ -250,13 +250,13 @@ class AsistenciaRepository
     }
 
     /**
-     * Eliminar asistencia.
+     * Eliminar asistencias.
      */
     public function eliminar(int $id): bool
     {
         $stmt = $this->conexion->prepare("
             DELETE
-            FROM asistencia
+            FROM asistencias
             WHERE id = :id
         ");
 

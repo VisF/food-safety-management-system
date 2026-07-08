@@ -14,16 +14,13 @@ require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
-require_once __DIR__ . '/../Modelo/InscripcionModelo.php';
-
 require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
-require_once __DIR__ . '/../Modelo/DocumentoModelo.php';
 
-require_once __DIR__ . '/../Modelo/ExamenModelo.php';
+require_once __DIR__ . '/../Servicios/ExamenService.php';
 
-require_once __DIR__ . '/../Modelo/CursoModelo.php';
+require_once __DIR__ . '/../Servicios/CursoService.php';
 
 require_once __DIR__ . '/../Servicios/HomeService.php';
 
@@ -35,17 +32,17 @@ class HomeControlador
     private InscripcionService $inscripcionService;
     private DocumentoService $documentoService;
 
-    private InscripcionModelo $inscripcionModelo;
+    private InscripcionService $InscripcionService;
     private InscripcionRepository $inscripcionRepository;
 
     public function __construct()
     {
-        $this->inscripcionModelo =
-            new InscripcionModelo();
+        $this->InscripcionService =
+            new InscripcionService();
 
         $this->inscripcionService =
             new InscripcionService(
-                $this->inscripcionModelo
+                $this->InscripcionService
             );
 
         $this->homeService =
@@ -53,7 +50,7 @@ class HomeControlador
 
         $this->documentoService =
             new DocumentoService(
-                new DocumentoModelo()
+                new DocumentoService()
             );
         $this->inscripcionRepository =
             new InscripcionRepository();
@@ -94,7 +91,7 @@ class HomeControlador
 
         if (
             $usuario !== null &&
-            class_exists('InscripcionModelo')
+            class_exists('InscripcionService')
         ) {
             $inscripcion =
                 $this->inscripcionService
@@ -107,7 +104,7 @@ class HomeControlador
 
         if ($usuario !== null &&
             class_exists('DocumentoService') &&
-            class_exists('DocumentoModelo'))
+            class_exists('DocumentoService'))
         {
             $documentos =
                 $this->documentoService
@@ -145,10 +142,10 @@ class HomeControlador
             }
         }
 
-        $modeloCurso = new CursoModelo();
+        $servicioCurso = new CursoService();
 
         $cursosBD =
-            $modeloCurso->obtenerActivos();
+            $servicioCurso->obtenerActivos();
 
         $cursosVista = [];
         $inscripcionRepository = new InscripcionRepository();
@@ -284,9 +281,9 @@ class HomeControlador
                 'state' => $doc->getEstado()
             ];
         }
-        $modeloExamen = new ExamenModelo();
+        $examenService = new ExamenService();
 
-        $examenesBD = $modeloExamen->obtenerProximos(5);
+        $examenesBD = $examenService->obtenerProximos(5);
 
         $examenesVista = [];
 
@@ -391,10 +388,10 @@ class HomeControlador
         }
 
         $usuario = null;
-        if (class_exists('UsuarioModelo')) { try { $um = new UsuarioModelo(); $usuario = $um->obtenerPorId($id_usuario); } catch (\Exception $e) { $usuario = null; } }
+        if (class_exists('UsuarioService')) { try { $um = new UsuarioService(); $usuario = $um->obtenerPorId($id_usuario); } catch (\Exception $e) { $usuario = null; } }
 
         $inscripciones = [];
-        if (class_exists('InscripcionModelo')) { try { $im = new InscripcionModelo(); if (method_exists($im, 'obtenerPorUsuario')) $inscripciones = $im->obtenerPorUsuario($id_usuario); } catch (\Exception $e) { $inscripciones = []; } }
+        if (class_exists('InscripcionService')) { try { $im = new InscripcionService(); if (method_exists($im, 'obtenerPorUsuario')) $inscripciones = $im->obtenerPorUsuario($id_usuario); } catch (\Exception $e) { $inscripciones = []; } }
 
         // Filtrar inscripciones para mostrar solo las que requieren acción (estados 1 y 2)
         $tramitesPendientes = [];
@@ -408,7 +405,7 @@ class HomeControlador
         }
 
         $actividad = [];
-        if (class_exists('AuditoriaAccionesModelo')) { try { $am = new AuditoriaAccionesModelo(); if (method_exists($am, 'obtenerRecientes')) $actividad = $am->obtenerRecientes(10); } catch (\Exception $e) { $actividad = []; } }
+        if (class_exists('AuditoriaAccionesService')) { try { $am = new AuditoriaAccionesService(); if (method_exists($am, 'obtenerRecientes')) $actividad = $am->obtenerRecientes(10); } catch (\Exception $e) { $actividad = []; } }
 
         $this->log('Dashboard accessed', 'INFO', ['usuario_id' => $id_usuario]);
 
@@ -477,13 +474,13 @@ class HomeControlador
 
         // limpiar puntos
         $dni_plain = str_replace('.', '', $dni);
-        // intentar modelo CarnetModelo
+        // intentar servicio CarnetService
         $carnet = null;
-        if (class_exists('CarnetModelo')) {
-            try { $cm = new CarnetModelo(); $carnet = $cm->obtenerPorDNI($dni_plain) ?: $cm->obtenerPorDNI($dni); } catch (\Exception $e) { $carnet = null; }
+        if (class_exists('CarnetService')) {
+            try { $cm = new CarnetService(); $carnet = $cm->obtenerPorDNI($dni_plain) ?: $cm->obtenerPorDNI($dni); } catch (\Exception $e) { $carnet = null; }
         }
 
-        // Si no hay modelo, intentar consulta directa a DB (fallback)
+        // Si no hay servicio, intentar consulta directa a DB (fallback)
         if (!$carnet) {
             $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) { $this->log('Public carnet query failed - no DB', 'WARN'); return ['success' => false, 'error' => 'Servicio no disponible', 'carnet' => null]; }
             require_once $conn; $pdo = Connection::getPDO();

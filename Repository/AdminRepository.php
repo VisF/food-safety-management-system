@@ -1003,4 +1003,140 @@ class AdminRepository
             );
         }
 
+        /**
+         * Obtener una solicitud por ID.
+         */
+        public function obtenerSolicitud(int $id): ?array
+        {
+            $stmt = $this->conexion->prepare("
+                SELECT *
+                FROM solicitudes
+                WHERE id = :id
+                LIMIT 1
+            ");
+
+            $stmt->execute([
+                ':id' => $id
+            ]);
+
+            $fila = $stmt->fetch(\PDO::FETCH_ASSOC);
+
+            return $fila ?: null;
+        }
+        /**
+         * Registrar una respuesta a una solicitud.
+         */
+        public function responderSolicitud(int $idSolicitud, array $respuesta): ?int
+        {
+            $stmt = $this->conexion->query("
+                SHOW TABLES LIKE 'solicitud_respuestas'
+            ");
+
+            if ($stmt->rowCount() > 0) {
+
+                $insert = $this->conexion->prepare("
+                    INSERT INTO solicitud_respuestas
+                    (
+                        solicitud_id,
+                        contenido,
+                        creado_por,
+                        fecha_creacion
+                    )
+                    VALUES
+                    (
+                        :sid,
+                        :contenido,
+                        :creador,
+                        NOW()
+                    )
+                ");
+
+                $insert->execute([
+                    ':sid' => $idSolicitud,
+                    ':contenido' => $respuesta['contenido'] ?? '',
+                    ':creador' => $respuesta['creador'] ?? 'admin'
+                ]);
+
+                $idRespuesta =
+                    (int)$this->conexion->lastInsertId();
+
+                $update = $this->conexion->prepare("
+                    UPDATE solicitudes
+                    SET estado = 'respondida'
+                    WHERE id = :id
+                ");
+
+                $update->execute([
+                    ':id' => $idSolicitud
+                ]);
+
+                return $idRespuesta;
+            }
+
+            $update = $this->conexion->prepare("
+                UPDATE solicitudes
+                SET
+                    estado = 'respondida',
+                    respuesta = :respuesta,
+                    fecha_respuesta = NOW()
+                WHERE id = :id
+            ");
+
+            $update->execute([
+                ':respuesta' => $respuesta['contenido'] ?? '',
+                ':id' => $idSolicitud
+            ]);
+
+            return null;
+        }
+        /**
+         * Obtener solicitudes pendientes.
+         */
+        public function obtenerSolicitudesPendientes(): array
+        {
+            $stmt = $this->conexion->prepare("
+                SELECT *
+                FROM solicitudes
+                WHERE estado IN
+                (
+                    'pendiente',
+                    'nuevo'
+                )
+                ORDER BY fecha_creacion DESC
+            ");
+
+            $stmt->execute();
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+        /**
+         * Obtener datos para exportación.
+         */
+        public function obtenerDatosExportacion(): array
+        {
+            $stmt = $this->conexion->prepare("
+                SELECT
+                    u.id AS usuario_id,
+                    u.nombre,
+                    u.apellido,
+                    u.email,
+                    u.dni,
+
+                    i.id AS inscripcion_id,
+                    i.curso_id,
+                    i.estado_tramite_id,
+                    i.fecha_inscripcion
+
+                FROM usuarios u
+
+                LEFT JOIN inscripciones i
+                    ON i.usuario_id = u.id
+            ");
+
+            $stmt->execute();
+
+            return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        }
+
+
 }   

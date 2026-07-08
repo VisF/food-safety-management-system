@@ -5,8 +5,8 @@ declare(strict_types=1);
  * AdminReporteControlador - Gestión administrativa del sistema
  * 
  * Dependencias esperadas:
- * - Modelos: CursoModelo, FechaCursoModelo, ExamenModelo, InscripcionModelo, 
- *   DocumentoModelo, UsuarioModelo
+ * -  cursoService, fechacursoService, InscripcionService, 
+ *   DocumentoService, UsuarioService
  * 
  * Vistas esperadas:
  * - vistas/panel_admin.php
@@ -20,17 +20,20 @@ class AdminReporteControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/admin_controller.log';
     
-    private ?object $cursoModelo = null;
-    private ?object $fechaCursoModelo = null;
-    private ?object $examenModelo = null;
-    private ?object $inscripcionModelo = null;
-    private ?object $documentoModelo = null;
-    private ?object $usuarioModelo = null;
+    private ?object $cursoService = null;
+    private ?object $fechacursoService = null;
+    private ?object $InscripcionService = null;
+    private ?object $DocumentoService = null;
+    private ?object $UsuarioService = null;
 
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
-        $this->inicializarModelos();
+        $this->cursoService = new cursoService();
+        $this->fechacursoService = new FechacursoService();
+        $this->InscripcionService = new InscripcionService();
+        $this->DocumentoService = new DocumentoService();
+        $this->UsuarioService = new UsuarioService();
     }
 
     
