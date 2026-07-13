@@ -7,7 +7,7 @@ use App\Middleware\CsrfMiddleware;
 
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
-
+require_once __DIR__ . '/../Servicios/UsuarioService.php';
 /**
  * AuthControlador - Gestión de autenticación y registro de usuarios
  *
@@ -206,65 +206,101 @@ class AuthControlador
 
     public function procesarLogin(array $datos): array
     {
-        // Validación básica de entrada
-        if (empty($datos['email']) || empty($datos['password'])) {
-            return ['success' => false, 'error' => 'Email y contraseña requeridos'];
-        }
-
-
-        $email = filter_var((string) $datos['email'], FILTER_SANITIZE_EMAIL);
-        $password = (string) $datos['password'];
-
-        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            return ['success' => false, 'error' => 'Email inválido'];
-        }
-
-        $usuario = null;
-
-        if ($this->UsuarioService !== null && method_exists($this->UsuarioService, 'obtenerPorEmail')) {
-            $usuario = $this->UsuarioService->obtenerPorEmail($email);
-
-            if (!$usuario || !password_verify($password, (string) ($usuario['password'] ?? ''))) {
-                $this->log('Failed login attempt', 'WARNING', ['email' => $email]);
-                return ['success' => false, 'error' => 'Credenciales inválidas'];
-            }
-        } else {
-
-            $usuario = [
-                'id' => 1,
-                'nombre' => 'Juan Perez',
-                'email' => $email,
-                'rol' => 'usuario',
+        // Validación básica
+        if (
+            empty($datos['email']) ||
+            empty($datos['password'])
+        ) {
+            return [
+                'success' => false,
+                'error' => 'Email y contraseña requeridos'
             ];
         }
 
+        $email = filter_var(
+            (string)$datos['email'],
+            FILTER_SANITIZE_EMAIL
+        );
+
+        if (
+            !filter_var(
+                $email,
+                FILTER_VALIDATE_EMAIL
+            )
+        ) {
+            return [
+                'success' => false,
+                'error' => 'Email inválido'
+            ];
+        }
+
+        $password = (string)$datos['password'];
+
+        // El Service se encarga de validar usuario y contraseña
+        $usuario =
+            $this->UsuarioService
+                ->autenticar(
+                    $email,
+                    $password
+                );
+
+        if ($usuario === null) {
+
+            $this->log(
+                'Failed login attempt',
+                'WARNING',
+                [
+                    'email' => $email
+                ]
+            );
+
+            return [
+                'success' => false,
+                'error' => 'Credenciales inválidas'
+            ];
+        }
+
+        // Regenerar sesión
         session_regenerate_id(true);
 
-        $_SESSION['usuario_id'] = $usuario['id'];
-        $_SESSION['usuario_nombre'] = $usuario['nombre'];
-        $_SESSION['usuario_email'] = $usuario['email'];
-        
-        $_SESSION['usuario_roles'] = 'usuario';
-        //Parche hasta armar los roles en la base de datos
-        $_SESSION['roles'] = [
-            'usuario'
-        ];
-        $_SESSION['last_activity'] = time();
-        $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+        $_SESSION['usuario_id'] =
+            $usuario->getId();
 
-        $this->log('User logged in successfully', 'INFO', [
-            'usuario_id' => $usuario['id'],
-            'email' => $email
-        ]);
+        $_SESSION['usuario_nombre'] =
+            $usuario->getNombre();
+
+        $_SESSION['usuario_email'] =
+            $usuario->getEmail();
+
+        $_SESSION['usuario_roles'] =
+            $usuario->getRoles();
+
+        // Compatibilidad temporal con código viejo
+        $_SESSION['roles'] =
+            $usuario->getRoles();
+
+        $_SESSION['last_activity'] =
+            time();
+
+        $_SESSION['csrf_token'] =
+            CsrfMiddleware::generateToken();
+
+        $this->log(
+            'User logged in successfully',
+            'INFO',
+            [
+                'usuario_id' => $usuario->getId(),
+                'email' => $usuario->getEmail()
+            ]
+        );
 
         return [
             'success' => true,
             'message' => 'Login exitoso',
             'usuario' => $usuario,
-            'csrf_token' => CsrfMiddleware::generateToken(),
+            'csrf_token' => $_SESSION['csrf_token']
         ];
     }
-
     public function procesarRegistro(array $datos): array
     {
 

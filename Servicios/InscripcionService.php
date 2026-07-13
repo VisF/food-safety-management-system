@@ -29,17 +29,24 @@ require_once __DIR__ . '/../dto/InscripcionDTO.php';
 require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
+
+
+require_once __DIR__ . '/../Servicios/HabilitacionExamenService.php';
+
+        
 class InscripcionService
 {
     private InscripcionRepository $inscripcionRepository;
     private DocumentoRepository $documentoRepository;
     private ExamenRepository $examenRepository;
+    private HabilitacionExamenService $habilitacionService;
     
 
     public function __construct(){
         $this->inscripcionRepository = new InscripcionRepository();
         $this->documentoRepository = new DocumentoRepository();
         $this->examenRepository = new ExamenRepository();
+
     }
     public function tieneCursoActivo(int $usuarioId): bool
     {
@@ -173,10 +180,6 @@ class InscripcionService
             $this->documentoRepository
                 ->obtenerPorUsuario($usuarioId);
 
-        require_once __DIR__ . '/../Service/HabilitacionExamenService.php';
-
-        $habilitacionService =
-            new HabilitacionExamenService();
 
         $tieneDni = false;
         $tieneFoto = false;

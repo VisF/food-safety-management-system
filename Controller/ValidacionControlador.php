@@ -22,6 +22,12 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../Servicios/AsistenciaService.php';
+require_once __DIR__ . '/../Servicios/inscripcionService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/ResultadoExamenService.php';
+require_once __DIR__ . '/../Servicios/HabilitacionExamenService.php';
+
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 
 class ValidacionControlador
@@ -35,7 +41,6 @@ class ValidacionControlador
     private ?DocumentoService $DocumentoService = null;
     private ?AsistenciaService $AsistenciaService = null;
     private ?ResultadoExamenService $ResultadoExamenService = null;
-    private ?EstadoTramiteService $EstadoTramiteService = null;
     private ?HabilitacionExamenService $HabilitacionExamenService = null;
 
     public function __construct()
@@ -45,7 +50,6 @@ class ValidacionControlador
         $this->DocumentoService = new DocumentoService();
         $this->AsistenciaService = new AsistenciaService();
         $this->ResultadoExamenService = new ResultadoExamenService();
-        $this->EstadoTramiteService = new EstadoTramiteService();
         $this->HabilitacionExamenService = new HabilitacionExamenService();
     }
 

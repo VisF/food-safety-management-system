@@ -1,8 +1,19 @@
 <?php
 
 
+require_once __DIR__ .'/../Servicios/HabilitacionExamenService.php';
+
+            
 class HomeService
 {
+
+    private HabilitacionExamenService $habilitacionService;
+
+    public function __construct()
+    {
+        $this->habilitacionService =
+            new HabilitacionExamenService();
+    }
     public function obtenerAccionPrincipal(array $documentos,?object $inscripcion ): array 
     {
 
@@ -46,14 +57,8 @@ class HomeService
 
         if ($inscripcion !== null) {
 
-            require_once __DIR__ .
-                '/../Service/HabilitacionExamenService.php';
 
-            $habilitacionService =
-                new HabilitacionExamenService();
-
-            $tieneHabilitacion =
-                $habilitacionService
+            $this->habilitacionService
                     ->tieneHabilitacionVigente(
                         $inscripcion->getUsuarioId()
                     );
