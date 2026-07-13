@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * DocumentoControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * DocumentoControlador
  *
@@ -30,6 +37,7 @@ class DocumentoControlador
     private DocumentoService $documentoService;
     private DocumentoRepository $documentoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -135,6 +143,7 @@ class DocumentoControlador
 
 
 
+    // Procesa subida.
     public function procesarSubida(): void
 {
     try {

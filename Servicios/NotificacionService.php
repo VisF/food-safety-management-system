@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * NotificacionService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Servicio para gestionar notificaciones.
  *
@@ -39,6 +46,7 @@ class NotificacionService
     private CarnetRepository $carnetRepository;
     private CursoRepository $cursoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->notificacionRepository =

@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * AdminControlador - Gestión administrativa del sistema
  * 
@@ -27,6 +34,7 @@ class AdminControlador
     private ?UsuarioService $usuarioService = null;
     private AdminService $adminService;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -157,6 +165,7 @@ class AdminControlador
             }
         }
 
+    // Obtiene solicitudes pendientes.
     public function obtenerSolicitudesPendientes(): array
         {
             try {

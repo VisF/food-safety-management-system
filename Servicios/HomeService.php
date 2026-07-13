@@ -9,11 +9,13 @@ class HomeService
 
     private HabilitacionExamenService $habilitacionService;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->habilitacionService =
             new HabilitacionExamenService();
     }
+    // Obtiene accion principal.
     public function obtenerAccionPrincipal(array $documentos,?object $inscripcion ): array 
     {
 
@@ -144,6 +146,7 @@ class HomeService
             ];
     }
 
+    // Ejecuta calcular porcentaje.
     private function calcularPorcentaje(
         bool $dni,
         bool $foto,
@@ -167,6 +170,7 @@ class HomeService
         return (int)(($completos / 3) * 100);
     }
 
+    // Obtiene faltantes.
     private function obtenerFaltantes(
         bool $dni,
         bool $foto,

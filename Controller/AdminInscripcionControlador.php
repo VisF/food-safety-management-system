@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminInscripcionControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * AdminInscripcionControlador
  *
@@ -28,6 +35,7 @@ class AdminInscripcionControlador
     private InscripcionRepository $inscripcionRepository;
     private DocumentoRepository $documentoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -38,6 +46,7 @@ class AdminInscripcionControlador
     }
 
     
+    // Lista inscripciones.
     public function listarInscripciones(array $filtros = []): array
 {
     try {
@@ -77,6 +86,7 @@ class AdminInscripcionControlador
     }
 }
 
+    // Obtiene inscripcion.
     public function obtenerInscripcion(int $id): array
     {
         try {
@@ -206,6 +216,7 @@ class AdminInscripcionControlador
         }
     }
 
+    // Ejecuta rechazar documentacion.
     public function rechazarDocumentacion(int $id, string $motivo): array
     {
         try {

@@ -1,25 +1,28 @@
 <?php
 // Script CLI: enviar alertas de vencimiento (ejecutar por cron)
-require_once __DIR__ . '/../../Modelo/AlertaModelo.php';
+require_once __DIR__ . '/../../Servicios/AlertaService.php';
 require_once __DIR__ . '/../../Controller/NotificacionControlador.php';
 
-$alertModel = new AlertaModelo();
+$alertaService = new AlertaService();
 $notiCtrl = new NotificacionControlador();
 
-$pendientes = $alertModel->obtenerAlertasPendientes();
+$pendientes = $alertaService->obtenerPendientes();
+
 foreach ($pendientes as $a) {
+
     $uid = (int)($a['usuario_id'] ?? 0);
     $tipo = $a['tipo'] ?? 'vencimiento';
-    $payload = isset($a['payload']) ? json_decode($a['payload'], true) : [];
+    $payload = isset($a['payload'])
+        ? json_decode($a['payload'], true)
+        : [];
 
-    // Enviar notificación genérica; NotificacionControlador devuelve estructura de resultado
-    $resultado = $notiCtrl->enviarNotificacion($uid, $tipo, $payload ?: []);
-    if (!empty($resultado['éxito']) || !empty($resultado['success'])) {
-        $alertModel->marcarEnviada($a['id']);
-    } else {
-        // Intentaremos marcar como enviada igualmente para evitar reintentos infinitos
-        $alertModel->marcarEnviada($a['id']);
-    }
+    $resultado = $notiCtrl->enviarNotificacion(
+        $uid,
+        $tipo,
+        $payload ?: []
+    );
+
+    $alertaService->marcarEnviada($a['id']);
 }
 
 echo "enviar_alertas_vencimiento: terminado\n";

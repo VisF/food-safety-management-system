@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+
+/**
+ * UsuarioRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../db/Connection.php';
 require_once __DIR__ .'/../Constant/EstadoTramite.php';
 
@@ -9,6 +16,7 @@ class UsuarioRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();

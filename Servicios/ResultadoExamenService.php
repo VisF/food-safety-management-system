@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * ResultadoExamenService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * metodos:
  * crear()
@@ -24,6 +31,7 @@ class ResultadoExamenService
 {
     private ResultadoExamenRepository $resultadoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->resultadoRepository =

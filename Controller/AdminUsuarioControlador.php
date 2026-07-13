@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminUsuarioControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Administración de usuarios.
  *
@@ -22,6 +29,7 @@ class AdminUsuarioControlador
     
     private UsuarioRepository $usuarioRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -31,6 +39,7 @@ class AdminUsuarioControlador
     }
 
     
+    // Ejecuta gestionar usuarios.
     public function gestionarUsuarios(): array
     {
         try {

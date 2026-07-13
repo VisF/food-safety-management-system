@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminCursoControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * AdminCursoControlador - Gestión administrativa del sistema
  * 
@@ -31,6 +38,7 @@ class AdminCursoControlador
 
     private CursoRepository $cursoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -93,6 +101,7 @@ class AdminCursoControlador
     }
 
 
+    // Lista cursos.
     public function listarCursos(): array
     {
         try {
@@ -170,6 +179,7 @@ class AdminCursoControlador
             ];
         }
     }
+    // Ejecuta activar curso.
     public function activarCurso(int $id): array
     {
         try {
@@ -189,6 +199,7 @@ class AdminCursoControlador
             ];
         }
     }
+    // Ejecuta desactivar curso.
     public function desactivarCurso(int $id): array
     {
         try {
@@ -217,6 +228,7 @@ class AdminCursoControlador
             ];
         }
     }
+    // Obtiene cursos activos.
     public function obtenerCursosActivos(): array
     {
         try {
@@ -234,6 +246,7 @@ class AdminCursoControlador
             ];
         }
     }
+    // Obtiene cursos por modalidad.
     public function obtenerCursosPorModalidad(string $modalidad): array
     {
         try {

@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * ResultadoExamenRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Métodos:
  * - crear()
@@ -22,6 +29,7 @@ class ResultadoExamenRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();

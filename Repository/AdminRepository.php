@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+
+/**
+ * AdminRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../db/Connection.php';
 
 require_once __DIR__.'/../Constant/EstadoTramite.php';
@@ -10,6 +17,7 @@ class AdminRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();
@@ -74,6 +82,7 @@ class AdminRepository
         return $estadisticas;
     }
 
+    // Obtiene actividad reciente.
     public function obtenerActividadReciente(int $limite = 20): array
     {
         $limite = max(1, min(100, $limite));
@@ -146,6 +155,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene usuario por id.
         public function obtenerUsuarioPorId(int $id): ?array
         {
             $sql = "
@@ -165,6 +175,7 @@ class AdminRepository
             return $usuario?:null;
         }
 
+        // Busca usuarios.
         public function buscarUsuarios(string $texto): array
         {
             $sql = "
@@ -187,6 +198,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Actualiza usuario.
         public function actualizarUsuario(
             int $id,
             array $datos
@@ -230,6 +242,7 @@ class AdminRepository
                 ->execute($params);
         }
 
+        // Ejecuta cambiar estado usuario.
         public function cambiarEstadoUsuario(
             int $id,
             bool $activo
@@ -247,12 +260,14 @@ class AdminRepository
             ]);
         }
 
+        // Elimina usuario.
         public function eliminarUsuario(int $id): bool
         {
             return $this
                 ->cambiarEstadoUsuario($id,false);
         }
 
+        // Obtiene usuarios activos.
         public function obtenerUsuariosActivos(): array
         {
             return $this->conexion
@@ -265,6 +280,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene usuarios inactivos.
         public function obtenerUsuariosInactivos(): array
         {
             return $this->conexion
@@ -306,6 +322,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene documento por id.
         public function obtenerDocumentoPorId(int $id): ?array
         {
             $stmt = $this->conexion->prepare("
@@ -323,6 +340,7 @@ class AdminRepository
             return $documento ?: null;
         }
 
+        // Obtiene documentos pendientes.
         public function obtenerDocumentosPendientes(): array
         {
             $sql = "
@@ -346,6 +364,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene documentos aprobados.
         public function obtenerDocumentosAprobados(): array
         {
             $sql = "
@@ -365,6 +384,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene documentos rechazados.
         public function obtenerDocumentosRechazados(): array
         {
             $sql = "
@@ -384,6 +404,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene documentos usuario.
         public function obtenerDocumentosUsuario(int $usuarioId): array
         {
             $stmt = $this->conexion->prepare("
@@ -400,6 +421,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Ejecuta aprobar documento.
         public function aprobarDocumento(
             int $id,
             string $observaciones = ''
@@ -420,6 +442,7 @@ class AdminRepository
             ]);
         }
 
+        // Ejecuta rechazar documento.
         public function rechazarDocumento(
             int $id,
             string $motivo
@@ -440,6 +463,7 @@ class AdminRepository
             ]);
         }
 
+        // Elimina documento.
         public function eliminarDocumento(int $id): bool
         {
             $stmt = $this->conexion->prepare("
@@ -453,6 +477,7 @@ class AdminRepository
             ]);
         }
 
+        // Obtiene cantidad documentos pendientes.
         public function obtenerCantidadDocumentosPendientes(): int
         {
             return (int)$this->conexion
@@ -464,6 +489,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad documentos aprobados.
         public function obtenerCantidadDocumentosAprobados(): int
         {
             return (int)$this->conexion
@@ -475,6 +501,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad documentos rechazados.
         public function obtenerCantidadDocumentosRechazados(): int
         {
             return (int)$this->conexion
@@ -503,6 +530,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene examen por id.
         public function obtenerExamenPorId(int $id): ?array
         {
             $stmt = $this->conexion->prepare("
@@ -520,6 +548,7 @@ class AdminRepository
             return $examen ?: null;
         }
 
+        // Obtiene proximos examenes.
         public function obtenerProximosExamenes(int $limite = 10): array
         {
             $stmt = $this->conexion->prepare("
@@ -541,6 +570,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Elimina examen.
         public function eliminarExamen(int $id): bool
         {
             $stmt = $this->conexion->prepare("
@@ -554,6 +584,7 @@ class AdminRepository
             ]);
         }
 
+        // Actualiza examen.
         public function actualizarExamen(
             int $id,
             array $datos
@@ -600,6 +631,7 @@ class AdminRepository
                 ->execute($params);
         }
 
+        // Obtiene cantidad examenes.
         public function obtenerCantidadExamenes(): int
         {
             return (int)$this->conexion
@@ -610,6 +642,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad examenes activos.
         public function obtenerCantidadExamenesActivos(): int
         {
             return (int)$this->conexion
@@ -621,6 +654,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad examenes futuros.
         public function obtenerCantidadExamenesFuturos(): int
         {
             return (int)$this->conexion
@@ -658,6 +692,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene carnet por id.
         public function obtenerCarnetPorId(int $id): ?array
         {
             $stmt = $this->conexion->prepare("
@@ -675,6 +710,7 @@ class AdminRepository
             return $carnet ?: null;
         }
 
+        // Obtiene carnets vigentes.
         public function obtenerCarnetsVigentes(): array
         {
             return $this->conexion
@@ -689,6 +725,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene carnets vencidos.
         public function obtenerCarnetsVencidos(): array
         {
             return $this->conexion
@@ -702,6 +739,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Ejecuta renovar carnet.
         public function renovarCarnet(
             int $id,
             string $fechaVencimiento
@@ -722,6 +760,7 @@ class AdminRepository
             ]);
         }
 
+        // Ejecuta anular carnet.
         public function anularCarnet(int $id): bool
         {
             $stmt = $this->conexion->prepare("
@@ -735,6 +774,7 @@ class AdminRepository
             ]);
         }
 
+        // Obtiene cantidad carnets.
         public function obtenerCantidadCarnets(): int
         {
             return (int)$this->conexion
@@ -745,6 +785,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad carnets activos.
         public function obtenerCantidadCarnetsActivos(): int
         {
             return (int)$this->conexion
@@ -756,6 +797,7 @@ class AdminRepository
                 ->fetchColumn();
         }
 
+        // Obtiene cantidad carnets vencidos.
         public function obtenerCantidadCarnetsVencidos(): int
         {
             return (int)$this->conexion
@@ -795,6 +837,7 @@ class AdminRepository
                 ->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene inscripcion por id.
         public function obtenerInscripcionPorId(int $id): ?array
         {
             $stmt=$this->conexion->prepare("
@@ -810,6 +853,7 @@ class AdminRepository
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
+        // Obtiene inscripciones pendientes.
         public function obtenerInscripcionesPendientes(): array
         {
             $stmt=$this->conexion->prepare("
@@ -831,11 +875,13 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene cantidad inscripciones.
         public function obtenerCantidadInscripciones(): int
         {
             return $this->contar('inscripciones');
         }
 
+        // Obtiene cantidad inscripciones pendientes.
         public function obtenerCantidadInscripcionesPendientes(): int
         {
             return (int)$this->conexion
@@ -876,6 +922,7 @@ class AdminRepository
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
+        // Busca carnet.
         public function buscarCarnet(string $numero): ?array
         {
             $stmt=$this->conexion->prepare("
@@ -891,6 +938,7 @@ class AdminRepository
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
         }
 
+        // Busca usuario.
         public function buscarUsuario(string $texto): array
         {
             $stmt=$this->conexion->prepare("
@@ -939,6 +987,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene ultimos carnets.
         public function obtenerUltimosCarnets(int $limite=10): array
         {
             $stmt=$this->conexion->prepare("
@@ -959,6 +1008,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene ultimos examenes.
         public function obtenerUltimosExamenes(int $limite=10): array
         {
             $stmt=$this->conexion->prepare("
@@ -979,6 +1029,7 @@ class AdminRepository
             return $stmt->fetchAll(PDO::FETCH_ASSOC);
         }
 
+        // Obtiene resumen general.
         public function obtenerResumenGeneral(): array
         {
             return [
@@ -990,11 +1041,13 @@ class AdminRepository
             ];
         }
 
+        // Obtiene cantidad usuarios.
         public function obtenerCantidadUsuarios(): int
         {
             return $this->contar('usuarios');
         }
 
+        // Obtiene cantidad usuarios activos.
         public function obtenerCantidadUsuariosActivos(): int
         {
             return $this->contar(

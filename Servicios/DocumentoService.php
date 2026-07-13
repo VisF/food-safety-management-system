@@ -26,11 +26,13 @@ require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 class DocumentoService
 {
     private DocumentoRepository $documentoRepository;
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->documentoRepository = new DocumentoRepository();
     }
 
+    // Obtiene por usuario.
     public function obtenerPorUsuario(int $usuarioId): array
     {
         $documentos =
@@ -49,6 +51,7 @@ class DocumentoService
 
         return $resultado;
     }
+    // Obtiene estado documentacion.
     public function obtenerEstadoDocumentacion(int $usuarioId): array
     {
         $documentos = $this->documentoRepository->obtenerPorUsuario($usuarioId);
@@ -104,6 +107,7 @@ class DocumentoService
 
 
 
+    // Ejecuta rechazar documento.
     public function rechazarDocumento(int $id, string $observaciones = ''): bool 
     {
         return
@@ -117,6 +121,7 @@ class DocumentoService
 
 
 
+    // Valida documento.
     public function validarDocumento(int $id, string $observaciones = ''): bool 
     {
         return
@@ -126,6 +131,7 @@ class DocumentoService
                     $observaciones
                 );
     }
+    // Obtiene por id.
     public function obtenerPorId(int $id): ?DocumentoDTO 
     {
         $documento =
@@ -141,6 +147,7 @@ class DocumentoService
         );
     }
    
+    // Obtiene validados.
     public function obtenerValidados(int $usuarioId): array
     {
         $documentos =
@@ -155,6 +162,7 @@ class DocumentoService
         );
     }
 
+    // Obtiene no validados.
     public function obtenerNoValidados(int $usuarioId): array
     {
         $documentos =

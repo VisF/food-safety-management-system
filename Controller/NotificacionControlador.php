@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * NotificacionControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * NotificacionControlador
  *
@@ -84,6 +91,7 @@ class NotificacionControlador
     private CarnetService
         $carnetService;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(

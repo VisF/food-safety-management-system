@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminDashboardControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../Servicios/AdminService.php';
 
 class AdminDashboardControlador
@@ -10,6 +17,7 @@ class AdminDashboardControlador
 
     private AdminService $adminService;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(
@@ -22,6 +30,7 @@ class AdminDashboardControlador
             new AdminService();
     }
 
+    // Ejecuta log.
     private function log(
         string $evento,
         string $nivel = 'INFO',
@@ -82,6 +91,7 @@ class AdminDashboardControlador
         }
     }
 
+    // Obtiene estadisticas.
     public function obtenerEstadisticas(): array
     {
         return $this
@@ -89,6 +99,7 @@ class AdminDashboardControlador
             ->obtenerCardsDashboard();
     }
 
+    // Obtiene actividad reciente.
     public function obtenerActividadReciente(
         int $limite = 10
     ): array
@@ -98,6 +109,7 @@ class AdminDashboardControlador
             ->obtenerActividadReciente();
     }
 
+    // Obtiene indicadores.
     public function obtenerIndicadores(): array
     {
         return $this
@@ -105,6 +117,7 @@ class AdminDashboardControlador
             ->obtenerIndicadores();
     }
 
+    // Obtiene resumen general.
     public function obtenerResumenGeneral(): array
     {
         return $this
@@ -112,6 +125,7 @@ class AdminDashboardControlador
             ->obtenerResumenGeneral();
     }
 
+    // Obtiene ultimos usuarios.
     public function obtenerUltimosUsuarios(): array
     {
         return $this
@@ -119,6 +133,7 @@ class AdminDashboardControlador
             ->obtenerUltimosUsuarios();
     }
 
+    // Obtiene ultimos carnets.
     public function obtenerUltimosCarnets(): array
     {
         return $this
@@ -126,6 +141,7 @@ class AdminDashboardControlador
             ->obtenerUltimosCarnets();
     }
 
+    // Obtiene ultimos examenes.
     public function obtenerUltimosExamenes(): array
     {
         return $this

@@ -3,6 +3,13 @@ declare(strict_types=1);
 
 
 
+
+/**
+ * AuthControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 use App\Middleware\CsrfMiddleware;
 
 require_once __DIR__ . '/../helpers/AuthHelper.php';
@@ -44,6 +51,7 @@ class AuthControlador
 
     private ?UsuarioService $UsuarioService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -55,6 +63,7 @@ class AuthControlador
 
 
 
+    // Ejecuta configurar sesion.
     private function configurarSesion(): void
     {
         // No iniciar sesión si ya está activa
@@ -74,6 +83,7 @@ class AuthControlador
         session_start();
     }
 
+    // Valida sesion.
     private function validarSesion(): void
     {
         if (empty($_SESSION)) {
@@ -96,6 +106,7 @@ class AuthControlador
         $_SESSION['last_activity'] = $now;
     }
 
+    // Ejecuta log.
     private function log(string $event, string $level = 'INFO', array $context = []): void
     {
         $timestamp = date('Y-m-d H:i:s');
@@ -111,6 +122,7 @@ class AuthControlador
         error_log($message, 3, self::LOG_FILE);
     }
 
+    // Ejecuta get client ip.
     private function getClientIp(): string
     {
         $ip = '';
@@ -127,6 +139,7 @@ class AuthControlador
     }
 
 
+    // Ejecuta render view.
     private function renderView(string $viewPath, array $datosVista = []): void
     {
         if (!file_exists($viewPath)) {
@@ -140,6 +153,7 @@ class AuthControlador
         include $viewPath;
     }
 
+    // Muestra login.
     public function mostrarLogin(array $datos = []): void
     {
         $datosVista = [
@@ -152,6 +166,7 @@ class AuthControlador
         $this->renderView(self::VIEW_LOGIN, $datosVista);
     }
 
+    // Muestra registro.
     public function mostrarRegistro(array $datos = []): void
     {
         $datosVista = [
@@ -177,6 +192,7 @@ class AuthControlador
         $this->renderView(self::VIEW_REGISTRO, $datosVista);
     }
 
+    // Muestra perfil.
     public function mostrarPerfil(): void
     {
         if (!$this->estaAutenticado()) {
@@ -204,6 +220,7 @@ class AuthControlador
         $this->renderView(self::VIEW_PERFIL, $datosVista);
     }
 
+    // Procesa login.
     public function procesarLogin(array $datos): array
     {
         // Validación básica
@@ -301,6 +318,7 @@ class AuthControlador
             'csrf_token' => $_SESSION['csrf_token']
         ];
     }
+    // Procesa registro.
     public function procesarRegistro(array $datos): array
     {
 
@@ -431,6 +449,7 @@ class AuthControlador
         
     }
 
+    // Actualiza perfil.
     public function actualizarPerfil(array $datos): array
     {
         if (!$this->estaAutenticado()) {
@@ -458,6 +477,7 @@ class AuthControlador
         return ['success' => true, 'message' => 'Perfil actualizado exitosamente'];
     }
 
+    // Ejecuta logout.
     public function logout(): array
     {
         $usuarioId = $_SESSION['usuario_id'] ?? null;
@@ -488,6 +508,7 @@ class AuthControlador
         ];
     }
 
+    // Procesa logout.
     public function procesarLogout(): void
     {
         $this->logout();
@@ -495,11 +516,13 @@ class AuthControlador
         exit;
     }
 
+    // Ejecuta esta autenticado.
     public function estaAutenticado(): bool
     {
         return !empty($_SESSION['usuario_id']);
     }
 
+    // Obtiene usuario actual.
     public function obtenerUsuarioActual(): array
     {
         if (!$this->estaAutenticado()) {
@@ -514,6 +537,7 @@ class AuthControlador
         ];
     }
 
+    // Obtiene info sesion.
     public function obtenerInfoSesion(): array
     {
         if (!$this->estaAutenticado()) {
@@ -536,6 +560,7 @@ class AuthControlador
         ];
     }
 
+    // Ejecuta renovar sesion.
     public function renovarSesion(): array
     {
         if (!$this->estaAutenticado()) {
@@ -552,6 +577,7 @@ class AuthControlador
         ];
     }
 
+    // Valida rol.
     public function validarRol(string $rolRequerido): bool
     {
         if (!$this->estaAutenticado()) {

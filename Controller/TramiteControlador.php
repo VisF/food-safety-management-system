@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * TramiteControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * TramiteControlador - Gestión integral del trámite y cambios de estado
  */
@@ -14,12 +21,14 @@ class TramiteControlador
     private ?DocumentoService $DocumentoService = null;
     private ?ResultadoExamenService $ResultadoExamenService = null;
 
+    // Ejecuta pdo.
     private function pdo(): \PDO
     {
         require_once __DIR__ . '/../db/Connection.php';
         return Connection::getPDO();
     }
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -31,6 +40,7 @@ class TramiteControlador
     }
 
 
+    // Registra log.
     private function registrarLog(string $evento, array $datos = []): void
     {
         $timestamp = date('Y-m-d H:i:s');
@@ -39,6 +49,7 @@ class TramiteControlador
         @file_put_contents(self::LOG_FILE, $mensaje, FILE_APPEND);
     }
 
+    // Obtiene detalle tramite.
     public function obtenerDetalleTramite(int $id_inscripcion): array
     {
         try {
@@ -129,6 +140,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene historial tramite.
     public function obtenerHistorialTramite(int $id_inscripcion): array
     {
         try {
@@ -166,6 +178,7 @@ class TramiteControlador
         }
     }
 
+    // Actualiza estado tramite.
     public function actualizarEstadoTramite(int $id_inscripcion, int $id_estado_nuevo): array
     {
         try {
@@ -217,6 +230,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene comprobante descargable.
     public function obtenerComprobanteDescargable(int $id_inscripcion): array
     {
         try {
@@ -254,6 +268,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene carnet.
     public function obtenerCarnet(int $id_inscripcion): ?array
     {
         try {
@@ -274,6 +289,7 @@ class TramiteControlador
         }
     }
 
+    // Ejecuta verificar vigencia carnet.
     public function verificarVigenciaCarnet(int $id_carnet): array
     {
         try {
@@ -300,6 +316,7 @@ class TramiteControlador
         }
     }
 
+    // Ejecuta cambiar estado tramite.
     public function cambiarEstadoTramite(int $id_inscripcion, string $estado): array
     {
         try {
@@ -320,6 +337,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene tramites usuario.
     public function obtenerTramitesUsuario(int $id_usuario): array
     {
         try {
@@ -350,6 +368,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene tramites pendientes.
     public function obtenerTramitesPendientes(): array
     {
         try {
@@ -394,6 +413,7 @@ class TramiteControlador
         }
     }
 
+    // Obtiene estadisticas tramites.
     public function obtenerEstadisticasTramites(): array
     {
         try {
@@ -476,6 +496,7 @@ class TramiteControlador
         }
     }
 
+    // Registra cambio estado.
     public function registrarCambioEstado(int $id_inscripcion, int $estado_anterior, int $estado_nuevo): array
     {
         try {

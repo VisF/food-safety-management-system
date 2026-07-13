@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * UploadControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * UploadControlador - Gestión de carga y procesamiento de archivos
  * 
@@ -40,6 +47,7 @@ class UploadControlador
 
     private ?DocumentoService $DocumentoService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);

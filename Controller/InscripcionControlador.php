@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * InscripcionControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * InscripcionControlador - Gestión de inscripciones a cursos y exámenes
  */
@@ -24,12 +31,14 @@ class InscripcionControlador
     private ?DocumentoService $documentoService = null;
     private ?CursoService $cursoService = null;
 
+    // Ejecuta pdo.
     private function pdo(): \PDO
     {
         require_once __DIR__ . '/../db/Connection.php';
         return Connection::getPDO();
     }
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -42,6 +51,7 @@ class InscripcionControlador
 
 
 
+    // Registra log.
     private function registrarLog(string $evento, array $datos = []): void
     {
         $timestamp = date('Y-m-d H:i:s');
@@ -50,6 +60,7 @@ class InscripcionControlador
         @file_put_contents(self::LOG_FILE, $mensaje, FILE_APPEND);
     }
 
+    // Crea inscripcion.
     public function crearInscripcion(array $datos): array
     {
         try {
@@ -101,6 +112,7 @@ class InscripcionControlador
         }
     }
 
+    // Valida inscripcion.
     public function validarInscripcion(int $id): array
     {
         try {
@@ -129,6 +141,7 @@ class InscripcionControlador
         }
     }
 
+    // Obtiene inscripciones por usuario.
     public function obtenerInscripcionesPorUsuario(int $usuarioId): array
     {
         try {
@@ -150,6 +163,7 @@ class InscripcionControlador
         }
     }
 
+    // Obtiene inscripcion.
     public function obtenerInscripcion(int $id): ?InscripcionDTO
     {
         try {
@@ -171,6 +185,7 @@ class InscripcionControlador
         }
     }
 
+    // Obtiene inscripciones activas.
     public function obtenerInscripcionesActivas(int $usuarioId): array
     {
         try {
@@ -192,6 +207,7 @@ class InscripcionControlador
         }
     }
 
+    // Ejecuta cancelar inscripcion.
     public function cancelarInscripcion(int $id, string $motivo = ''): array
     {
         try {
@@ -267,6 +283,7 @@ class InscripcionControlador
         }
     }
 
+    // Obtiene cursos disponibles.
     public function obtenerCursosDisponibles(): array
     {
         try {
@@ -287,6 +304,7 @@ class InscripcionControlador
         }
     }
 
+    // Obtiene examenes disponibles.
     public function obtenerExamenesDisponibles(): array
     {
         try {
@@ -364,6 +382,7 @@ class InscripcionControlador
         }
     }
 
+    // Ejecuta confirmar inscripcion examen.
     public function confirmarInscripcionExamen(int $idInscripcion): array
     {
         try {
@@ -448,6 +467,7 @@ class InscripcionControlador
         }
     }
 
+    // Procesa inscripcion examen.
     public function procesarInscripcionExamen(array $datos): array
     {
 
@@ -519,6 +539,7 @@ class InscripcionControlador
 
 
 
+    // Obtiene detalle inscripcion.
     public function obtenerDetalleInscripcion(int $id): array
     {
         try {
@@ -557,6 +578,7 @@ class InscripcionControlador
         }
     }
 
+    // Ejecuta usuario puede inscribirse examen.
     private function usuarioPuedeInscribirseExamen(int $idUsuario): array
     {
         try {
@@ -585,6 +607,7 @@ class InscripcionControlador
         }
     }
 
+    // Ejecuta inscribirse curso.
     public function inscribirseCurso(): void
     {
         try {

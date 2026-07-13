@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * UsuarioControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * UsuarioControlador - Gestión de usuarios del sistema
  * 
@@ -31,6 +38,7 @@ class UsuarioControlador
     private ?UsuarioService $usuarioService = null;
     private ?UsuarioRolService $usuarioRolService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);

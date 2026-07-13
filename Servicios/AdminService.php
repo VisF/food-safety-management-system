@@ -2,12 +2,20 @@
 
 declare(strict_types=1);
 
+
+/**
+ * AdminService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__.'/../Repository/AdminRepository.php';
 
 class AdminService
 {
     private AdminRepository $adminRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct(
         ?AdminRepository $adminRepository = null
     )
@@ -34,6 +42,7 @@ class AdminService
         ];
     }
 
+    // Obtiene cards dashboard.
     public function obtenerCardsDashboard(): array
     {
         $stats =
@@ -85,6 +94,7 @@ class AdminService
         ];
     }
 
+    // Obtiene actividad reciente.
     public function obtenerActividadReciente(): array
     {
         return $this
@@ -92,6 +102,7 @@ class AdminService
             ->obtenerActividadReciente();
     }
 
+    // Obtiene resumen general.
     public function obtenerResumenGeneral(): array
     {
         return $this
@@ -99,6 +110,7 @@ class AdminService
             ->obtenerResumenGeneral();
     }
 
+    // Obtiene estadisticas.
     public function obtenerEstadisticas(): array
     {
         return $this
@@ -117,6 +129,7 @@ class AdminService
             ->obtenerUsuarios();
     }
 
+    // Obtiene usuario por id.
     public function obtenerUsuarioPorId(int $id): ?array
     {
         return $this
@@ -124,6 +137,7 @@ class AdminService
             ->obtenerUsuarioPorId($id);
     }
 
+    // Busca usuarios.
     public function buscarUsuarios(string $texto): array
     {
         $texto = trim($texto);
@@ -137,6 +151,7 @@ class AdminService
             ->buscarUsuarios($texto);
     }
 
+    // Actualiza usuario.
     public function actualizarUsuario(
         int $id,
         array $datos
@@ -150,6 +165,7 @@ class AdminService
             );
     }
 
+    // Ejecuta cambiar estado usuario.
     public function cambiarEstadoUsuario(
         int $id,
         bool $activo
@@ -174,6 +190,7 @@ class AdminService
             ->obtenerDocumentosPendientes();
     }
 
+    // Obtiene documentos aprobados.
     public function obtenerDocumentosAprobados(): array
     {
         return $this
@@ -181,6 +198,7 @@ class AdminService
             ->obtenerDocumentosAprobados();
     }
 
+    // Obtiene documentos rechazados.
     public function obtenerDocumentosRechazados(): array
     {
         return $this
@@ -188,6 +206,7 @@ class AdminService
             ->obtenerDocumentosRechazados();
     }
 
+    // Obtiene documento por id.
     public function obtenerDocumentoPorId(
         int $id
     ): ?array
@@ -197,6 +216,7 @@ class AdminService
             ->obtenerDocumentoPorId($id);
     }
 
+    // Ejecuta aprobar documento.
     public function aprobarDocumento(
         int $id,
         string $observaciones = ''
@@ -210,6 +230,7 @@ class AdminService
             );
     }
 
+    // Ejecuta rechazar documento.
     public function rechazarDocumento(
         int $id,
         string $motivo
@@ -234,6 +255,7 @@ class AdminService
             ->obtenerExamenes();
     }
 
+    // Obtiene examen por id.
     public function obtenerExamenPorId(
         int $id
     ): ?array
@@ -243,6 +265,7 @@ class AdminService
             ->obtenerExamenPorId($id);
     }
 
+    // Obtiene proximos examenes.
     public function obtenerProximosExamenes(
         int $limite = 10
     ): array
@@ -254,6 +277,7 @@ class AdminService
             );
     }
 
+    // Actualiza examen.
     public function actualizarExamen(
         int $id,
         array $datos
@@ -267,6 +291,7 @@ class AdminService
             );
     }
 
+    // Elimina examen.
     public function eliminarExamen(
         int $id
     ): bool
@@ -287,6 +312,7 @@ class AdminService
             ->obtenerCarnets();
     }
 
+    // Obtiene carnet por id.
     public function obtenerCarnetPorId(
         int $id
     ): ?array
@@ -296,6 +322,7 @@ class AdminService
             ->obtenerCarnetPorId($id);
     }
 
+    // Obtiene carnets vigentes.
     public function obtenerCarnetsVigentes(): array
     {
         return $this
@@ -303,6 +330,7 @@ class AdminService
             ->obtenerCarnetsVigentes();
     }
 
+    // Obtiene carnets vencidos.
     public function obtenerCarnetsVencidos(): array
     {
         return $this
@@ -310,6 +338,7 @@ class AdminService
             ->obtenerCarnetsVencidos();
     }
 
+    // Ejecuta renovar carnet.
     public function renovarCarnet(
         int $id,
         string $fecha
@@ -323,6 +352,7 @@ class AdminService
             );
     }
 
+    // Ejecuta anular carnet.
     public function anularCarnet(
         int $id
     ): bool
@@ -342,6 +372,7 @@ class AdminService
             ->obtenerInscripciones();
     }
 
+    // Obtiene inscripcion por id.
     public function obtenerInscripcionPorId(
         int $id
     ): ?array
@@ -350,6 +381,7 @@ class AdminService
             ->obtenerInscripcionPorId($id);
     }
 
+    // Obtiene inscripciones pendientes.
     public function obtenerInscripcionesPendientes(): array
     {
         return $this->adminRepository
@@ -374,6 +406,7 @@ class AdminService
             ->buscarPorDni($dni);
     }
 
+    // Busca usuario.
     public function buscarUsuario(
         string $texto
     ): array
@@ -400,6 +433,7 @@ class AdminService
             ->obtenerUltimosUsuarios($cantidad);
     }
 
+    // Obtiene ultimos carnets.
     public function obtenerUltimosCarnets(
         int $cantidad = 10
     ): array
@@ -408,6 +442,7 @@ class AdminService
             ->obtenerUltimosCarnets($cantidad);
     }
 
+    // Obtiene ultimos examenes.
     public function obtenerUltimosExamenes(
         int $cantidad = 10
     ): array
@@ -446,6 +481,7 @@ class AdminService
         ];
     }
 
+    // Obtiene dashboard completo.
     public function obtenerDashboardCompleto(): array
     {
         return [
@@ -490,6 +526,7 @@ class AdminService
         ];
     }
 
+    // Obtiene datos inspector.
     public function obtenerDatosInspector(
         string $dni
     ): ?array

@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * ValidacionControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * ValidacionControlador - Gestión de validaciones de inscripciones
  *
@@ -43,6 +50,7 @@ class ValidacionControlador
     private ?ResultadoExamenService $ResultadoExamenService = null;
     private ?HabilitacionExamenService $HabilitacionExamenService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);

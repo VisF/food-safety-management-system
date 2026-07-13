@@ -10,6 +10,7 @@
  * Nota: estas funciones son auxiliares y deben ejecutarse en entorno controlado (CLI o tarea de mantenimiento)
  */
 class MigracionControlador {
+    // Inicializa las dependencias de la clase.
     public function __construct() {}
 
     // Importa lote de registros provenientes de DIPA o legacy
@@ -18,12 +19,14 @@ class MigracionControlador {
         // TODO: leer CSV/SQL/XML y mapear
     }
 
+    // Ejecuta mapear registro legacy.
     public function mapearRegistroLegacy(array $row): array {
         // Mapear columnas legacy a la estructura actual del sistema
         // TODO: mapear columnas legacy a entidades del sistema
         return [];
     }
 
+    // Procesa lote.
     public function procesarLote(array $rows) {
         // Procesar lote de registros y generar registro de auditoría
         // TODO: procesar lote y registrar auditoría

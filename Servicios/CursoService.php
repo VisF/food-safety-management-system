@@ -1,12 +1,20 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * CursoService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../Repository/CursoRepository.php';
 
 class CursoService
 {
     private CursoRepository $cursoRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->cursoRepository =

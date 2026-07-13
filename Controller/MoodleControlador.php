@@ -16,6 +16,7 @@ class MoodleControlador {
     protected $moodleModel;
     protected $documentoModel;
 
+    // Inicializa las dependencias de la clase.
     public function __construct() {
         $this->moodleModel = new MoodleService();
         $this->documentoModel = new DocumentoService();
@@ -45,6 +46,7 @@ class MoodleControlador {
         return $res ? ['success' => true, 'documento' => $res] : ['success' => false, 'message' => 'Error al guardar certificado'];
     }
 
+    // Lista certificados pendientes.
     public function listarCertificadosPendientes(): array
 {
     $docs =

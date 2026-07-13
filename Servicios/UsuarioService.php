@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * UsuarioService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../Repository/UsuarioRepository.php';
 require_once __DIR__ . '/../dto/UsuarioDTO.php';
 
@@ -8,6 +15,7 @@ class UsuarioService
 {
     private UsuarioRepository $usuarioRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->usuarioRepository =
@@ -29,6 +37,7 @@ class UsuarioService
             : null;
     }
 
+    // Obtiene por email.
     public function obtenerPorEmail(string $email): ?UsuarioDTO
     {
         $usuario =
@@ -40,6 +49,7 @@ class UsuarioService
             : null;
     }
 
+    // Obtiene por dni.
     public function obtenerPorDni(string $dni): ?UsuarioDTO
     {
         $usuario =
@@ -51,6 +61,7 @@ class UsuarioService
             : null;
     }
 
+    // Lista usuarios.
     public function listarUsuarios(): array
     {
         return
@@ -58,6 +69,7 @@ class UsuarioService
                 ->listarUsuarios();
     }
 
+    // Ejecuta contar usuarios.
     public function contarUsuarios(): array
     {
         return
@@ -65,6 +77,7 @@ class UsuarioService
                 ->contarUsuarios();
     }
 
+    // Obtiene usuarios por rol.
     public function obtenerUsuariosPorRol(
         string $rol
     ): array
@@ -196,6 +209,7 @@ class UsuarioService
                 ->activarUsuario($id);
     }
 
+    // Ejecuta desactivar.
     public function desactivar(int $id): bool
     {
         return
@@ -220,6 +234,7 @@ class UsuarioService
                 );
     }
 
+    // Ejecuta quitar rol.
     public function quitarRol(
         int $usuarioId,
         int $rolId
@@ -233,6 +248,7 @@ class UsuarioService
                 );
     }
 
+    // Obtiene roles.
     public function obtenerRoles(
         int $usuarioId
     ): array
@@ -284,6 +300,7 @@ class UsuarioService
                 );
     }
 
+    // Ejecuta resetear password.
     public function resetearPassword(
         int $usuarioId,
         string $passwordNueva

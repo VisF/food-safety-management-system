@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * ExamenRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Métodos:
  * - listarExamenes()
@@ -26,10 +33,12 @@ class ExamenRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();
     }
+    // Lista examenes.
     public function listarExamenes(): array
     {
         $sql = "
@@ -51,6 +60,7 @@ class ExamenRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    // Ejecuta contar examenes.
     public function contarExamenes(): int
     {
         $stmt = $this->conexion->query("
@@ -61,6 +71,7 @@ class ExamenRepository
         return (int)$stmt->fetchColumn();
     }
 
+    // Obtiene examen.
     public function obtenerExamen(int $id): ?array
     {
         $sql = "
@@ -93,6 +104,7 @@ class ExamenRepository
 
 
 
+    // Crea examen.
     public function crearExamen(array $datos): int
     {
         $sql = "
@@ -137,6 +149,7 @@ class ExamenRepository
 
 
 
+    // Actualiza examen.
     public function actualizarExamen(int $id,array $datos): bool
     {
         $sql = "
@@ -171,6 +184,7 @@ class ExamenRepository
 
         ]);
     }
+    // Ejecuta activar examen.
     public function activarExamen(int $id): bool
     {
         $stmt = $this->conexion->prepare("
@@ -183,6 +197,7 @@ class ExamenRepository
             ':id' => $id
         ]);
     }
+    // Ejecuta desactivar examen.
     public function desactivarExamen(int $id): bool
     {
         $stmt = $this->conexion->prepare("
@@ -196,6 +211,7 @@ class ExamenRepository
         ]);
     }
 
+    // Actualiza cupos.
     public function actualizarCupos(int $id,int $cupos): bool
     {
         $stmt = $this->conexion->prepare("
@@ -209,6 +225,7 @@ class ExamenRepository
             ':id' => $id
         ]);
     }
+    // Obtiene proximos.
     public function obtenerProximos(int $dias = 30): array
     {
         $sql = "

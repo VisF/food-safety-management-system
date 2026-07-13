@@ -42,17 +42,20 @@ class InscripcionService
     private HabilitacionExamenService $habilitacionService;
     
 
+    // Inicializa las dependencias de la clase.
     public function __construct(){
         $this->inscripcionRepository = new InscripcionRepository();
         $this->documentoRepository = new DocumentoRepository();
         $this->examenRepository = new ExamenRepository();
 
     }
+    // Ejecuta tiene curso activo.
     public function tieneCursoActivo(int $usuarioId): bool
     {
         return $this->inscripcionRepository
             ->tieneCursoActivo($usuarioId);
     }
+    // Obtiene por id.
     public function obtenerPorId(int $id): ?InscripcionDTO 
     {
         $inscripcion =
@@ -67,6 +70,7 @@ class InscripcionService
             $inscripcion
         );
     }
+    // Obtiene por usuario.
     public function obtenerPorUsuario(int $usuarioId    ): array 
     {
         $inscripciones =
@@ -87,6 +91,7 @@ class InscripcionService
 
         return $resultado;
     }
+    // Obtiene ultima por usuario.
     public function obtenerUltimaPorUsuario(int $usuarioId): ?InscripcionDTO 
     {
         $inscripcion =
@@ -103,6 +108,7 @@ class InscripcionService
             $inscripcion
         );
     }
+    // Crea la operaci?n correspondiente.
     public function crear(array $datos): ?InscripcionDTO
     {
         $id = $this->inscripcionRepository->crear($datos);
@@ -121,6 +127,7 @@ class InscripcionService
 
         return InscripcionDTO::fromArray($inscripcion);
     }
+    // Ejecuta cancelar.
     public function cancelar(int $id, string $motivo = ''): bool
     {
         return $this->inscripcionRepository
@@ -129,6 +136,7 @@ class InscripcionService
                 $motivo
             );
     }
+    // Obtiene activas.
     public function obtenerActivas(int $usuarioId): array
     {
         $rows =
@@ -147,6 +155,7 @@ class InscripcionService
 
         return $resultado;
     }
+    // Ejecuta verificar duplicado.
     public function verificarDuplicado(int $usuarioId, int $cursoId): bool
     {
         return $this->inscripcionRepository
@@ -155,11 +164,13 @@ class InscripcionService
                 $cursoId
             );
     }
+    // Ejecuta contar inscriptos curso.
     public function contarInscriptosCurso(int $cursoId): int
     {
         return $this->inscripcionRepository
             ->contarInscriptosCurso($cursoId);
     }
+    // Obtiene detalle inscripcion.
     public function obtenerDetalleInscripcion(int $id): ?InscripcionDTO
     {
         $inscripcion =
@@ -174,6 +185,7 @@ class InscripcionService
             $inscripcion
         );
     }
+    // Ejecuta usuario puede inscribirse examen.
     public function usuarioPuedeInscribirseExamen(int $usuarioId): array
     {
         $documentos =
@@ -228,6 +240,7 @@ class InscripcionService
         ];
     }
 
+    // Ejecuta confirmar inscripcion examen.
     public function confirmarInscripcionExamen(int $idInscripcion): bool
     {
         $inscripcion =
@@ -257,6 +270,7 @@ class InscripcionService
 
         return true;
     }
+    // Actualiza estado inscripcion.
     public function actualizarEstadoInscripcion(int $id, int $estado): bool
     {
         return
@@ -266,6 +280,7 @@ class InscripcionService
                     $estado
                 );
     }
+    // Ejecuta agregar observacion.
     public function agregarObservacion(int $id, string $texto): bool
     {
         return
@@ -275,6 +290,7 @@ class InscripcionService
                     $texto
                 );
     }
+    // Ejecuta verificar habilitacion.
     public function verificarHabilitacion(int $idInscripcion): ?InscripcionDTO
     {
         return $this->obtenerPorId($idInscripcion);

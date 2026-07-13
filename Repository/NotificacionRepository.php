@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * NotificacionRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Repositorio para gestionar notificaciones.
  *
@@ -32,6 +39,7 @@ class NotificacionRepository
 {
     private PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();

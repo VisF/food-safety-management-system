@@ -1,6 +1,13 @@
 <?php
 
 declare(strict_types=1);
+
+/**
+ * InscripcionRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /** faltan? 
  * obtenerUltimaInscripcionPorUsuario() ok
 
@@ -31,6 +38,7 @@ declare(strict_types=1);
 *   agregarObservacion() ok
 
 *   cancelar() ok
+ * obtenerUsuarioIdPorInscripcion() ok  
  * 
  * 
  */
@@ -41,6 +49,7 @@ class InscripcionRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();
@@ -50,6 +59,7 @@ class InscripcionRepository
    
    
    
+   // Lista inscripciones.
    public function listarInscripciones(array $filtros = []): array
     {
         $where = [];
@@ -127,6 +137,7 @@ class InscripcionRepository
 
     
   
+    // Obtiene por estado.
     public function obtenerPorEstado(int $estado): array
 {
     $stmt = $this->conexion->prepare("
@@ -145,6 +156,7 @@ class InscripcionRepository
     
 
  
+    // Actualiza la operaci?n correspondiente.
     public function actualizar(int $id, array $datos): bool
     {
     $permitidos = [
@@ -186,6 +198,7 @@ class InscripcionRepository
 
     
   
+    // Ejecuta verificar duplicado.
     public function verificarDuplicado(int $usuarioId, int $cursoId): bool
     {
         $stmt = $this->conexion->prepare("
@@ -206,6 +219,7 @@ class InscripcionRepository
     }
     
    
+    // Ejecuta contar inscriptos curso.
     public function contarInscriptosCurso(int $cursoId): int
     {
         $stmt = $this->conexion->prepare("
@@ -224,6 +238,7 @@ class InscripcionRepository
         return (int)$stmt->fetchColumn();
     }
     
+    // Ejecuta tiene curso activo.
     public function tieneCursoActivo(int $usuarioId): bool
     {
         $stmt = $this->conexion->prepare("
@@ -249,6 +264,7 @@ class InscripcionRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    // Ejecuta contar inscripciones.
     public function contarInscripciones(array $filtros = []): int
     {
         $where = [];
@@ -301,6 +317,7 @@ class InscripcionRepository
         return (int)$stmt->fetchColumn();
     }
 
+    // Obtiene por id.
     public function obtenerPorId(int $id): ?array
     {
         $sql = "
@@ -415,6 +432,7 @@ class InscripcionRepository
         return $stmt->execute();
     }
 
+    // Obtiene pendientes.
     public function obtenerPendientes(): array
     {
         $sql = "
@@ -444,6 +462,7 @@ class InscripcionRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Obtiene por usuario.
     public function obtenerPorUsuario(int $usuarioId): array
     {
         $sql = "
@@ -470,6 +489,7 @@ class InscripcionRepository
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    // Obtiene por curso.
     public function obtenerPorCurso(int $cursoId): array
     {
         $sql = "
@@ -500,6 +520,7 @@ class InscripcionRepository
     }
 
 
+    // Crea la operaci?n correspondiente.
     public function crear(array $datos): int
     {
         $stmt = $this->conexion->prepare("
@@ -541,6 +562,7 @@ class InscripcionRepository
         return (int)$this->conexion->lastInsertId();
     }
 
+    // Ejecuta cancelar.
     public function cancelar(int $id, string $motivo = ''): bool
     {
         $stmt = $this->conexion->prepare("
@@ -560,6 +582,7 @@ class InscripcionRepository
             ':id' => $id
         ]);
     }
+    // Ejecuta inscribir examen.
     public function inscribirExamen(int $idInscripcion, int $idExamen): bool
         {
             $stmt = $this->conexion->prepare("
@@ -576,6 +599,7 @@ class InscripcionRepository
                 ':id' => $idInscripcion
             ]);
         }
+    // Obtiene ultima inscripcion por usuario.
     public function obtenerUltimaInscripcionPorUsuario(int $usuarioId): ?array
     {
         $sql = "
@@ -663,5 +687,24 @@ class InscripcionRepository
         return $modalidad !== false
             ? $modalidad
             : null;
+    }
+
+    // Obtiene usuario id por inscripcion.
+    public function obtenerUsuarioIdPorInscripcion(int $inscripcionId): ?int
+    {
+        $stmt = $this->db->prepare("
+            SELECT usuario_id
+            FROM inscripciones
+            WHERE id = :id
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':id' => $inscripcionId
+        ]);
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ? (int)$resultado['usuario_id'] : null;
     }
 }

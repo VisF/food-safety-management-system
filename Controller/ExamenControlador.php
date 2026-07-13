@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * ExamenControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * ExamenControlador
  *
@@ -65,6 +72,7 @@ class ExamenControlador
     private ?AsistenciaService $asistenciaService = null;
     private ?InscripcionService $inscripcionService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -74,6 +82,7 @@ class ExamenControlador
         $this->inscripcionService = new InscripcionService();
 
     }
+    // Ejecuta guardar.
     public function guardar(): void
     {
 
@@ -283,6 +292,7 @@ class ExamenControlador
         }
     }
 
+    // Obtiene examenes disponibles.
     public function obtenerExamenesDisponibles(): array
     {
         try {
@@ -304,6 +314,7 @@ class ExamenControlador
         }
     }
 
+    // Registra resultado.
     public function registrarResultado(int $idInscripcion, array $datos): array {
 
         try {
@@ -399,6 +410,7 @@ class ExamenControlador
         }
     }
 
+    // Obtiene resultado.
     public function obtenerResultado(int $idInscripcion): ?array {
 
         try {
@@ -423,6 +435,7 @@ class ExamenControlador
         }
     }
 
+    // Ejecuta verificar habilitacion.
     public function verificarHabilitacion(int $idInscripcion): array
     {
         try {
@@ -470,6 +483,7 @@ class ExamenControlador
         }
     }
 
+    // Obtiene asistencia.
     public function obtenerAsistencia(int $idInscripcion): array
     {
         try {
@@ -494,6 +508,7 @@ class ExamenControlador
         }
     }
 
+    // Registra asistencia.
     public function registrarAsistencia(int $idInscripcion, bool $presente): array {
 
         try {
@@ -545,6 +560,7 @@ class ExamenControlador
         }
     }
 
+   // Obtiene proximos examenes.
    public function obtenerProximosExamenes(int $idUsuario): array
     {
         try {
@@ -569,6 +585,7 @@ class ExamenControlador
         }
     }
 
+    // Obtiene aprobados.
     public function obtenerAprobados(int $idExamen): array
     {
         try {

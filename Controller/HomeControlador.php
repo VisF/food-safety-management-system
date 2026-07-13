@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * HomeControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * HomeControlador - Gestión de la página inicio del sistema
  * 
@@ -35,6 +42,7 @@ class HomeControlador
     private InscripcionService $InscripcionService;
     private InscripcionRepository $inscripcionRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->InscripcionService =
@@ -635,6 +643,7 @@ class HomeControlador
         return ['title' => 'Términos y Condiciones', 'contenido' => $contenido];
     }
 
+    // Obtiene texto estado.
     private function obtenerTextoEstado(int $estado): string
     {
         return match ($estado) {

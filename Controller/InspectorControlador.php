@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * InspectorControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * InspectorControlador - Funciones para inspectores de alimentos
  * 
@@ -21,6 +28,7 @@ class InspectorControlador
     private ?object $CarnetService = null;
     private ?object $InscripcionService = null;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);

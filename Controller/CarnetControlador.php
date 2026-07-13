@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * CarnetControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * CarnetControlador
  * Gestión de emisión, consulta y anulación de carnets.
@@ -13,6 +20,7 @@ class CarnetControlador
     private const LOG_FILE =
         __DIR__ . '/../logs/carnet_controller.log';
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         require_once __DIR__ . '/../db/Connection.php';
@@ -26,6 +34,7 @@ class CarnetControlador
             );
     }
 
+    // Registra log.
     private function registrarLog(
         string $evento,
         array $datos = []

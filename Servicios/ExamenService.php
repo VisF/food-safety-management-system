@@ -20,12 +20,20 @@
  */
 declare(strict_types=1);
 
+
+/**
+ * ExamenService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
 
 class ExamenService
 {
     private ExamenRepository $examenRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->examenRepository = new ExamenRepository();
@@ -142,12 +150,14 @@ class ExamenService
         return $this->examenRepository
             ->obtenerDetalleExamen($id);
     }
+    // Obtiene disponibles.
     public function obtenerDisponibles(): array
     {
         return
             $this->examenRepository
                 ->obtenerDisponibles();
     }
+    // Obtiene proximos por usuario.
     public function obtenerProximosPorUsuario(int $usuarioId): array
     {
         return
@@ -156,6 +166,7 @@ class ExamenService
                     $usuarioId
                 );
     }
+    // Obtiene aprobados.
     public function obtenerAprobados(int $idExamen): array
     {
         return

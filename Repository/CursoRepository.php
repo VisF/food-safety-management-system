@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * CursoRepository - Repositorio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * CursoRepository - Repositorio para operaciones de cursos
  * 
@@ -38,6 +45,7 @@ class CursoRepository
 {
     private \PDO $conexion;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->conexion = Connection::getPDO();
@@ -62,6 +70,7 @@ class CursoRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    // Obtiene por id.
     public function obtenerPorId(int $id): ?array
     {
         $sql = "
@@ -80,6 +89,7 @@ class CursoRepository
         return $curso ?: null;
     }
 
+    // Obtiene activos.
     public function obtenerActivos(): array
     {
         $sql = "
@@ -96,6 +106,7 @@ class CursoRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
+    // Obtiene por modalidad.
     public function obtenerPorModalidad(string $modalidad): array
     {
         $sql = "
@@ -193,6 +204,7 @@ class CursoRepository
         return $stmt->execute();
     }
 
+    // Ejecuta activar.
     public function activar(int $id): bool
     {
         $stmt = $this->conexion->prepare("
@@ -206,6 +218,7 @@ class CursoRepository
         return $stmt->execute();
     }
 
+    // Ejecuta desactivar.
     public function desactivar(int $id): bool
     {
         $stmt = $this->conexion->prepare("
@@ -237,6 +250,7 @@ class CursoRepository
         return (int)$stmt->fetchColumn() > 0;
     }
 
+    // Ejecuta contar inscripciones.
     public function contarInscripciones(int $idCurso): int
     {
         $stmt = $this->conexion->prepare("

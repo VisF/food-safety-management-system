@@ -1,5 +1,12 @@
 <?php
 declare(strict_types=1);
+
+/**
+ * AsistenciaService - Servicio del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Servicio para gestionar las asistencias.
  * 
@@ -22,6 +29,7 @@ class AsistenciaService
 {
     private AsistenciaRepository $asistenciaRepository;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->asistenciaRepository =
@@ -189,6 +197,7 @@ class AsistenciaService
                 ->eliminar($id);
     }
 
+    // Ejecuta verificar minimo porcentaje.
     public function verificarMinimoPorcentaje(int $inscripcionId, float $minimo = 80.0): bool
     {
         $totales =

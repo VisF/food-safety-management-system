@@ -1,6 +1,13 @@
 <?php
 declare(strict_types=1);
 
+
+/**
+ * AdminExamenControlador - Controlador del sistema.
+ *
+ * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
+ */
+
 /**
  * Responsabilidades:
  * - Listar exámenes.
@@ -20,6 +27,7 @@ class AdminExamenControlador
     
     private ExamenService $examenService;
 
+    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
@@ -72,6 +80,7 @@ class AdminExamenControlador
     }
 
     
+    // Lista examenes.
     public function listarExamenes(): array
     {
         try {
@@ -100,6 +109,7 @@ class AdminExamenControlador
             ];
         }
     } 
+    // Obtiene examen.
     public function obtenerExamen(int $id): array
 {
     try {
@@ -139,6 +149,7 @@ class AdminExamenControlador
     }
 }
 
+    // Actualiza examen.
     public function actualizarExamen(int $id, array $datos): array
     {
         try {
@@ -176,6 +187,7 @@ class AdminExamenControlador
             ];
         }
     }
+    // Ejecuta activar examen.
     public function activarExamen(int $id): array
     {
         try {
@@ -208,6 +220,7 @@ class AdminExamenControlador
             ];
 }
     }
+    // Ejecuta desactivar examen.
     public function desactivarExamen(int $id): array
     {
         try {
@@ -243,6 +256,7 @@ class AdminExamenControlador
             ];
         }
     }
+    // Actualiza cupos.
     public function actualizarCupos(int $id, int $cupos): array
     {
         try {
@@ -278,6 +292,7 @@ class AdminExamenControlador
             ];
         }
     }
+    // Obtiene proximos.
     public function obtenerProximos(int $cantidad = 5): array
     {
         try {
@@ -311,6 +326,7 @@ class AdminExamenControlador
             ];
         }
     }
+    // Ejecuta log.
     private function log(string $mensaje, string $nivel = 'INFO', array $contexto = []): void
     {
         $linea = sprintf(
