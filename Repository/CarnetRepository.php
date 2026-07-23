@@ -1,41 +1,36 @@
 <?php
 declare(strict_types=1);
 
-
 /**
- * CarnetRepository - Repositorio del sistema.
+ * CarnetRepository
  *
- * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
- */
-
-/**
- * Métodos:
- * - crear()
- * - obtenerPorInscripcion()
- * - obtenerPorDNI()
- * - verificarVigencia()
- * - actualizar()
- * - obtenerCarnetsVencidos()
- * - renovar()
+ * Encapsula todas las operaciones de persistencia
+ * relacionadas con los carnets.
  */
 
 require_once __DIR__ . '/../db/Connection.php';
 
 class CarnetRepository
 {
-    private \PDO $conexion;
+    private PDO $conexion;
 
-    // Inicializa las dependencias de la clase.
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
         $this->conexion = Connection::getPDO();
     }
 
     /**
-     * Crear un carnet.
+     * Crea un nuevo carnet.
+     *
+     * @param array $datos
+     * @return array|null
      */
     public function crear(array $datos): ?array
     {
+        // Verificar que el número no exista.
         $stmt = $this->conexion->prepare("
             SELECT id
             FROM carnets
@@ -73,114 +68,136 @@ class CarnetRepository
 
         $stmt->execute([
             ':inscripcion' => $datos['id_inscripcion'],
-            ':numero' => $datos['numero_carnet'],
-            ':emision' => $datos['fecha_emision'],
+            ':numero'      => $datos['numero_carnet'],
+            ':emision'     => $datos['fecha_emision'],
             ':vencimiento' => $datos['fecha_vencimiento']
         ]);
 
         return [
-            'id' => (int)$this->conexion->lastInsertId(),
-            'id_inscripcion' => $datos['id_inscripcion'],
-            'numero_carnet' => $datos['numero_carnet']
+            'id'               => (int) $this->conexion->lastInsertId(),
+            'id_inscripcion'   => $datos['id_inscripcion'],
+            'numero_carnet'    => $datos['numero_carnet'],
+            'fecha_emision'    => $datos['fecha_emision'],
+            'fecha_vencimiento'=> $datos['fecha_vencimiento'],
+            'activo'           => 1
         ];
     }
 
-    /**
-     * Obtener carnet por inscripción.
+        /**
+     * Obtiene un carnet por su ID.
+     *
+     * @param int $id
+     * @return array|null
      */
-    public function obtenerPorInscripcion(
-        int $idInscripcion
-    ): ?array
+    public function obtenerPorId(int $id): ?array
     {
-        $stmt = $this->conexion->prepare("
+        $sql = "
             SELECT *
             FROM carnets
-            WHERE inscripcion_id = :id
-            LIMIT 1
-        ");
-
-        $stmt->execute([
-            ':id' => $idInscripcion
-        ]);
-
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        return $row ?: null;
-    }
-
-    /**
-     * Obtener carnet por DNI.
-     */
-    public function obtenerPorDNI(
-        string $dni
-    ): ?array
-    {
-        $stmt = $this->conexion->prepare("
-            SELECT c.*
-
-            FROM carnets c
-
-            INNER JOIN inscripciones i
-                ON c.inscripcion_id = i.id
-
-            INNER JOIN usuarios u
-                ON u.id = i.usuario_id
-
-            WHERE u.dni = :dni
-
-            LIMIT 1
-        ");
-
-        $stmt->execute([
-            ':dni' => $dni
-        ]);
-
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
-
-        return $row ?: null;
-    }
-        /**
-     * Verificar si un carnet está vigente.
-     */
-    public function verificarVigencia(
-        int $id
-    ): bool
-    {
-        $stmt = $this->conexion->prepare("
-            SELECT
-                fecha_vencimiento,
-                activo
-            FROM carnets
             WHERE id = :id
-        ");
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
 
         $stmt->execute([
             ':id' => $id
         ]);
 
-        $row = $stmt->fetch(\PDO::FETCH_ASSOC);
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
 
-        if (!$row) {
-            return false;
-        }
-
-        if ((int)$row['activo'] !== 1) {
-            return false;
-        }
-
-        return
-            strtotime($row['fecha_vencimiento'])
-            >
-            time();
+        return $resultado ?: null;
     }
 
     /**
-     * Actualizar un carnet.
+     * Obtiene un carnet por el ID de la inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
      */
-    public function actualizar(
-        int $id,
-        array $datos
-    ): bool
+    public function obtenerPorInscripcionId(int $idInscripcion): ?array
+    {
+        $sql = "
+            SELECT *
+            FROM carnets
+            WHERE inscripcion_id = :id
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':id' => $idInscripcion
+        ]);
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
+    }
+
+    /**
+     * Obtiene un carnet por su número.
+     *
+     * @param string $numeroCarnet
+     * @return array|null
+     */
+    public function obtenerPorNumero(string $numeroCarnet): ?array
+    {
+        $sql = "
+            SELECT *
+            FROM carnets
+            WHERE numero_carnet = :numero
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':numero' => $numeroCarnet
+        ]);
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
+    }
+
+    /**
+     * Obtiene un carnet asociado a un DNI.
+     *
+     * @param string $dni
+     * @return array|null
+     */
+    public function obtenerPorDni(string $dni): ?array
+    {
+        $sql = "
+            SELECT c.*
+            FROM carnets c
+            INNER JOIN inscripciones i
+                ON c.inscripcion_id = i.id
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+            WHERE u.dni = :dni
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':dni' => $dni
+        ]);
+
+        $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
+    }
+        /**
+     * Actualiza un carnet.
+     *
+     * @param int $id
+     * @param array $datos
+     * @return bool
+     */
+    public function actualizar(int $id, array $datos): bool
     {
         $sql = "
             UPDATE carnets
@@ -195,51 +212,203 @@ class CarnetRepository
         $stmt = $this->conexion->prepare($sql);
 
         return $stmt->execute([
-            ':id' => $id,
-            ':numero' => $datos['numero_carnet'],
-            ':emision' => $datos['fecha_emision'],
-            ':vencimiento' => $datos['fecha_vencimiento'],
-            ':activo' => (int)$datos['activo']
+            ':id'           => $id,
+            ':numero'       => $datos['numero_carnet'],
+            ':emision'      => $datos['fecha_emision'],
+            ':vencimiento'  => $datos['fecha_vencimiento'],
+            ':activo'       => (int) $datos['activo']
         ]);
     }
 
     /**
-     * Obtener carnets vencidos.
+     * Anula un carnet.
+     *
+     * @param int $idCarnet
+     * @return bool
      */
-    public function obtenerCarnetsVencidos(): array
+    public function anular(int $idCarnet): bool
     {
-        $stmt = $this->conexion->query("
-            SELECT *
-            FROM carnets
-            WHERE
-                activo = 1
-                AND fecha_vencimiento < CURDATE()
-            ORDER BY fecha_vencimiento ASC
-        ");
+        $sql = "
+            UPDATE carnets
+            SET activo = 0
+            WHERE id = :id
+        ";
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $stmt = $this->conexion->prepare($sql);
+
+        return $stmt->execute([
+            ':id' => $idCarnet
+        ]);
     }
 
     /**
-     * Renovar un carnet.
+     * Renueva un carnet.
+     *
+     * @param int $idCarnet
+     * @param string $fechaVencimiento
+     * @return bool
      */
     public function renovar(
-        int $id,
+        int $idCarnet,
         string $fechaVencimiento
     ): bool
     {
-        $stmt = $this->conexion->prepare("
+        $sql = "
             UPDATE carnets
             SET
                 fecha_emision = CURDATE(),
                 fecha_vencimiento = :vencimiento,
                 activo = 1
             WHERE id = :id
-        ");
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
 
         return $stmt->execute([
-            ':vencimiento' => $fechaVencimiento,
-            ':id' => $id
+            ':id'          => $idCarnet,
+            ':vencimiento' => $fechaVencimiento
         ]);
+    }
+        /**
+     * Lista todos los carnets activos.
+     *
+     * @return array
+     */
+    public function listarActivos(): array
+    {
+        $sql = "
+            SELECT *
+            FROM carnets
+            WHERE activo = 1
+            ORDER BY fecha_emision DESC
+        ";
+
+        $stmt = $this->conexion->query($sql);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Obtiene todos los carnets vencidos.
+     *
+     * @return array
+     */
+    public function obtenerCarnetsVencidos(): array
+    {
+        $sql = "
+            SELECT *
+            FROM carnets
+            WHERE activo = 1
+              AND fecha_vencimiento < CURDATE()
+            ORDER BY fecha_vencimiento ASC
+        ";
+
+        $stmt = $this->conexion->query($sql);
+
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+    /**
+     * Obtiene el último carnet emitido para un usuario.
+     */
+    public function obtenerPorUsuarioId(
+        int $usuarioId
+    ): ?array
+    {
+        $sql = "
+            SELECT c.*
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON i.id = c.inscripcion_id
+
+            WHERE i.usuario_id = :usuario
+
+            ORDER BY c.fecha_emision DESC
+
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':usuario' => $usuarioId
+        ]);
+
+        $carnet = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $carnet ?: null;
+    }
+    /**
+     * Obtiene la ruta del PDF del carnet.
+     */
+    public function obtenerPdfPorDni(
+        string $dni
+    ): ?string
+    {
+        $sql = "
+            SELECT c.ruta_pdf
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON i.id = c.inscripcion_id
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            WHERE u.dni = :dni
+
+            ORDER BY c.fecha_emision DESC
+
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':dni' => $dni
+        ]);
+
+        $ruta = $stmt->fetchColumn();
+
+        return $ruta ?: null;
+    }
+    /**
+     * Obtener el último carnet de un usuario.
+     *
+     * @param int $usuarioId
+     * @return array|null
+     */
+    public function obtenerUltimoCarnetUsuario(
+        int $usuarioId
+    ): ?array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                c.*
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON i.id = c.inscripcion_id
+
+            WHERE
+                i.usuario_id = :usuario
+
+            ORDER BY
+                c.fecha_vencimiento DESC
+
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':usuario' => $usuarioId
+        ]);
+
+        $carnet =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $carnet ?: null;
     }
 }

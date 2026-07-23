@@ -297,4 +297,40 @@ class ResultadoExamenRepository
 
         return (float)$stmt->fetchColumn();
     }
+
+    /**
+     * Obtener el último examen reprobado de un usuario.
+     */
+    public function obtenerUltimoExamenReprobadoUsuario(
+        int $usuarioId
+    ): ?array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                re.*
+
+            FROM resultado_examen re
+
+            INNER JOIN inscripciones i
+                ON i.id = re.inscripcion_id
+
+            WHERE
+                i.usuario_id = :usuario
+                AND re.aprobado = 0
+
+            ORDER BY
+                re.fecha_resultado DESC
+
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':usuario' => $usuarioId
+        ]);
+
+        $resultado =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $resultado ?: null;
+    }
 }

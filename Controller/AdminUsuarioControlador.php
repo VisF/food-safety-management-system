@@ -21,20 +21,20 @@ declare(strict_types=1);
  * - UsuarioRepository
  */
 
-require_once __DIR__ . '/../Repository/UsuarioRepository.php';
+require_once __DIR__ . '/../Servicios/UsuarioService.php';
 
 class AdminUsuarioControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/admin_controller.log';
     
-    private UsuarioRepository $usuarioRepository;
+    private UsuarioService $usuarioService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         
-        $this->usuarioRepository = new UsuarioRepository();
+        $this->usuarioService = new UsuarioService();
 
     }
 
@@ -43,22 +43,19 @@ class AdminUsuarioControlador
     public function gestionarUsuarios(): array
     {
         try {
-
-            $usuarios = $this->usuarioRepository->listarUsuarios();
-
-            $total = count($usuarios);
-
-            $estadisticas = $this->usuarioRepository->contarUsuarios();
+            $datos =
+                $this->usuarioService
+                    ->gestionarUsuarios();
 
             return [
                 'success' => true,
-                'usuarios' => $usuarios,
-                'total' => $total,
-                'activos' => $estadisticas['activos'],
-                'inactivos' => $estadisticas['inactivos']
+                'usuarios' => $datos['usuarios'],
+                'total' => $datos['total'],
+                'activos' => $datos['activos'],
+                'inactivos' => $datos['inactivos']
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al gestionar usuarios',
@@ -97,35 +94,39 @@ class AdminUsuarioControlador
     {
         try {
 
-            $id = $this->usuarioRepository->crear($datos);
+            $usuario =
+                $this->usuarioService
+                    ->crear($datos);
 
             $this->log(
                 'Usuario creado',
                 'INFO',
                 [
-                    'id_usuario' => $id,
-                    'email' => $datos['email'] ?? null
+                    'id_usuario' => $usuario->getId(),
+                    'email' => $usuario->getEmail()
                 ]
             );
 
             return [
                 'success' => true,
                 'message' => 'Usuario creado correctamente',
-                'id_usuario' => $id
+                'usuario' => $usuario
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al crear usuario',
                 'ERROR',
-                ['error' => $e->getMessage()]
+                [
+                    'error' => $e->getMessage()
+                ]
             );
 
             return [
                 'success' => false,
                 'message' => 'Error al crear usuario: ' . $e->getMessage(),
-                'id_usuario' => null
+                'usuario' => null
             ];
         }
     }
@@ -145,12 +146,12 @@ class AdminUsuarioControlador
     {
         try {
 
-            $this->usuarioRepository->actualizar(
+            $this->usuarioService->actualizar(
                 $id,
                 $datos
             );
 
-            $usuario = $this->usuarioRepository
+            $usuario = $this->usuarioService
                 ->obtenerPorId($id);
 
             $this->log(
@@ -165,7 +166,7 @@ class AdminUsuarioControlador
                 'usuario' => $usuario
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al actualizar usuario',
@@ -197,8 +198,8 @@ class AdminUsuarioControlador
     {
         try {
 
-            $this->usuarioRepository
-                ->desactivarUsuario($id);
+            $this->usuarioService
+                ->desactivar($id);
 
             $this->log(
                 'Usuario desactivado',
@@ -211,7 +212,7 @@ class AdminUsuarioControlador
                 'message' => 'Usuario desactivado correctamente'
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al desactivar usuario',

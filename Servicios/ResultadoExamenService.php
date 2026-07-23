@@ -204,4 +204,17 @@ class ResultadoExamenService
                     $examenId
                 );
     }
+    /**
+     * Obtener el último examen reprobado de un usuario.
+     */
+    public function obtenerUltimoExamenReprobadoUsuario(
+        int $usuarioId
+    ): ?array
+    {
+        return
+            $this->resultadoRepository
+                ->obtenerUltimoExamenReprobadoUsuario(
+                    $usuarioId
+                );
+    }
 }

@@ -32,6 +32,8 @@ declare(strict_types=1);
  * - vistas/crear_respuesta_admin.php
  */
 
+require_once __DIR__ . '/../Repository/CursoRepository.php';
+
 class AdminCursoControlador
 {
     private const LOG_FILE = __DIR__ . '/../logs/admin_curso_controller.log';
@@ -43,7 +45,7 @@ class AdminCursoControlador
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
-        require_once __DIR__ . '/../Repository/CursoRepository.php';
+        
 
         $this->cursoRepository = new CursoRepository();
     }
@@ -204,23 +206,40 @@ class AdminCursoControlador
     {
         try {
 
-            if ($this->cursoRepository->contarInscripciones($id) > 0) {
+            $resultado = $this->cursoService->desactivar($id);
 
+            if ($resultado['success']) {
                 return [
-                    'success' => false,
-                    'message' => 'El curso posee inscripciones activas'
+                    'success' => true,
+                    'message' => 'Curso desactivado'
                 ];
-
             }
 
-            $this->cursoRepository->desactivar($id);
+            switch ($resultado['codigo']) {
 
-            return [
-                'success' => true,
-                'message' => 'Curso desactivado'
-            ];
+                case 'CURSO_CON_INSCRIPCIONES':
+                    return [
+                        'success' => false,
+                        'message' => 'El curso posee inscripciones activas'
+                    ];
 
-        } catch (Exception $e) {
+                default:
+                    return [
+                        'success' => false,
+                        'message' => 'No fue posible desactivar el curso.'
+                    ];
+            }
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al desactivar curso',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
 
             return [
                 'success' => false,

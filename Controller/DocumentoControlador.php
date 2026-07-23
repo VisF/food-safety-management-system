@@ -28,7 +28,7 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../Services/DocumentoService.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
-
+require_once __DIR__ . '/../Services/UploadService.php';
 
 class DocumentoControlador
 {
@@ -36,6 +36,7 @@ class DocumentoControlador
     
     private DocumentoService $documentoService;
     private DocumentoRepository $documentoRepository;
+    private UploadService $uploadService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
@@ -43,6 +44,7 @@ class DocumentoControlador
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         $this->documentoService = new DocumentoService();
         $this->documentoRepository = new DocumentoRepository();
+        $this->uploadService = new UploadService();
     }
 
 
@@ -190,64 +192,28 @@ class DocumentoControlador
             exit;
         }
 
-        $extension = strtolower(
-            pathinfo(
-                $archivo['name'],
-                PATHINFO_EXTENSION
-            )
-        );
+        $resultado =
+            $this->uploadService
+                ->procesarCarga(
+                    $archivo,
+                    UploadService::CARPETA_DOCUMENTOS,
+                    $tipoDocumento
+                );
 
-        $permitidas = [
-            'pdf',
-            'jpg',
-            'jpeg',
-            'png'
-        ];
-
-        if (!in_array($extension, $permitidas, true)) {
+        if (!$resultado['success']) {
 
             header(
                 'Location: ' .
                 BASE_URL .
-                '/subida_documentacion?toast=formato_invalido'
+                '/subida_documentacion?toast=error_subida'
             );
 
             exit;
         }
 
-        $directorio = __DIR__ . '/../uploads';
-
-        if (!is_dir($directorio)) {
-
-            mkdir(
-                $directorio,
-                0775,
-                true
-            );
-        }
-
-        $nombreArchivo =
-            $tipoDocumento .
-            '_usuario_' .
-            $usuarioId .
-            '_' .
-            time() .
-            '.' .
-            $extension;
-
-        $rutaFisica =
-            $directorio .
-            '/' .
-            $nombreArchivo;
-
-        move_uploaded_file(
-            $archivo['tmp_name'],
-            $rutaFisica
-        );
-
         $rutaBD =
-            '/uploads/' .
-            $nombreArchivo;
+            '/uploads/documentos/' .
+            $resultado['nombre'];
 
         $existente =
             $this->documentoRepository
@@ -262,8 +228,11 @@ class DocumentoControlador
                 ->actualizarDocumento(
                     (int)$existente['id'],
                     [
-                        'nombre_original' => $archivo['name'],
-                        'ruta_archivo' => $rutaBD
+                        'nombre_original' =>
+                            $resultado['nombre'],
+
+                        'ruta_archivo' =>
+                            $rutaBD
                     ]
                 );
 

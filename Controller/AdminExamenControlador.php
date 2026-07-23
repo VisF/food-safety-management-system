@@ -59,22 +59,20 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al crear examen',
                 'ERROR',
-                ['error' => $e->getMessage()]
+                [
+                    'error' => $e->getMessage()
+                ]
             );
 
             return [
-
                 'success' => false,
-
                 'message' => $e->getMessage(),
-
                 'id_examen' => null
-
             ];
         }
     }
@@ -88,18 +86,23 @@ class AdminExamenControlador
             $examenes = $this->examenService
                 ->listarExamenes();
 
+            $total = $this->examenService
+                ->contarExamenes();
+
             return [
                 'success' => true,
                 'examenes' => $examenes,
-                'total' => count($examenes)
+                'total' => $total
             ];
 
-        } catch (Exception $e) {
+       } catch (Throwable $e) {
 
             $this->log(
                 'Error al listar exámenes',
                 'ERROR',
-                ['error' => $e->getMessage()]
+                [
+                    'error' => $e->getMessage()
+                ]
             );
 
             return [
@@ -111,7 +114,7 @@ class AdminExamenControlador
     } 
     // Obtiene examen.
     public function obtenerExamen(int $id): array
-{
+    {
     try {
 
         $examen = $this->examenService
@@ -131,23 +134,63 @@ class AdminExamenControlador
             'examen' => $examen
         ];
 
-    } catch (Exception $e) {
+        } catch (Throwable $e) {
 
-        $this->log(
-            'Error al obtener examen',
-            'ERROR',
-            [
-                'id' => $id,
-                'error' => $e->getMessage()
-            ]
-        );
+            $this->log(
+                'Error al obtener examen',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
 
-        return [
-            'success' => false,
-            'examen' => []
-        ];
+            return [
+                'success' => false,
+                'examen' => []
+            ];
+        }
     }
-}
+
+    // Obtiene detalle examen.
+    public function obtenerDetalleExamen(int $id): array
+    {
+        try {
+
+            $examen = $this->examenService
+                ->obtenerDetalleExamen($id);
+
+            if ($examen === null) {
+
+                return [
+                    'success' => false,
+                    'examen' => []
+                ];
+
+            }
+
+            return [
+                'success' => true,
+                'examen' => $examen
+            ];
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al obtener detalle del examen',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'examen' => []
+            ];
+        }
+    }
 
     // Actualiza examen.
     public function actualizarExamen(int $id, array $datos): array
@@ -167,7 +210,7 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al actualizar examen',
@@ -179,11 +222,8 @@ class AdminExamenControlador
             );
 
             return [
-
                 'success' => false,
-
                 'message' => $e->getMessage()
-
             ];
         }
     }
@@ -203,7 +243,7 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al activar examen',
@@ -218,7 +258,8 @@ class AdminExamenControlador
                 'success' => false,
                 'message' => $e->getMessage()
             ];
-}
+        }
+
     }
     // Ejecuta desactivar examen.
     public function desactivarExamen(int $id): array
@@ -236,8 +277,8 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
-    
+        } catch (Throwable $e) {
+
             $this->log(
                 'Error al desactivar examen',
                 'ERROR',
@@ -248,11 +289,8 @@ class AdminExamenControlador
             );
 
             return [
-
                 'success' => false,
-
                 'message' => $e->getMessage()
-
             ];
         }
     }
@@ -272,7 +310,7 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al actualizar cupos',
@@ -306,7 +344,7 @@ class AdminExamenControlador
 
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al obtener próximos exámenes',

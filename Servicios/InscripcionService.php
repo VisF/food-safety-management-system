@@ -20,6 +20,10 @@
  * actualizarEstadoInscripcion() ok
  * agregarObservacion() ok
  * verificarHabilitacion() ok
+ * listarInscripciones() ok
+ * obtenerInscripcion() ok
+ * validarDocumentacion() ok
+ * rechazarDocumentacion() ok
  * 
  * 
  * 
@@ -47,6 +51,7 @@ class InscripcionService
         $this->inscripcionRepository = new InscripcionRepository();
         $this->documentoRepository = new DocumentoRepository();
         $this->examenRepository = new ExamenRepository();
+        $this->habilitacionService = new HabilitacionExamenService();
 
     }
     // Ejecuta tiene curso activo.
@@ -216,7 +221,7 @@ class InscripcionService
         }
 
         $tieneHabilitacion =
-            $habilitacionService
+            $this->habilitacionService
                 ->tieneHabilitacionVigente($usuarioId);
 
         $faltantes = [];
@@ -295,4 +300,202 @@ class InscripcionService
     {
         return $this->obtenerPorId($idInscripcion);
     }
+
+    /**
+     * Listar inscripciones.
+     */
+    public function listarInscripciones(array $filtros = []): array
+    {
+        return [
+            'inscripciones' => $this->inscripcionRepository
+                ->listarInscripciones($filtros),
+
+            'total' => $this->inscripcionRepository
+                ->contarInscripciones($filtros)
+        ];
+    }
+    /**
+     * Obtener inscripción.
+     */
+    public function obtenerInscripcion(int $id): ?array
+    {
+        return $this->inscripcionRepository
+            ->obtenerInscripcion($id);
+    }
+    /**
+     * Validar documentación.
+     */
+    public function validarDocumentacion(int $idInscripcion): array
+    {
+        $inscripcion = $this->inscripcionRepository
+            ->obtenerInscripcion($idInscripcion);
+
+        if (!$inscripcion) {
+            return [
+                'success' => false,
+                'codigo' => 'INSCRIPCION_INEXISTENTE'
+            ];
+        }
+
+        $docs = $this->documentoRepository
+            ->obtenerPorUsuario(
+                (int)$inscripcion['usuario_id']
+            );
+
+        $faltantes = [];
+
+        foreach ($docs as $documento) {
+
+            if (($documento['estado'] ?? 'pendiente') !== 'aprobado') {
+                $faltantes[] = $documento['tipo_documento'];
+            }
+        }
+
+        if (!empty($faltantes)) {
+
+            return [
+                'success' => false,
+                'codigo' => 'DOCUMENTACION_INCOMPLETA',
+                'faltantes' => $faltantes
+            ];
+        }
+
+        $this->inscripcionRepository
+            ->actualizarEstadoInscripcion(
+                $idInscripcion,
+                EstadoTramite::DOCUMENTACION_APROBADA
+            );
+
+        return [
+            'success' => true
+        ];
+    }
+    /**
+     * Rechazar documentación.
+     */
+    public function rechazarDocumentacion(
+        int $id,
+        string $motivo
+    ): array {
+
+        $inscripcion = $this->inscripcionRepository
+            ->obtenerInscripcion($id);
+
+        if (!$inscripcion) {
+            return [
+                'success' => false,
+                'codigo' => 'INSCRIPCION_INEXISTENTE'
+            ];
+        }
+
+        $this->inscripcionRepository
+            ->actualizarEstadoInscripcion(
+                $id,
+                EstadoTramite::RECHAZADO
+            );
+
+        $this->inscripcionRepository
+            ->agregarObservacion(
+                $id,
+                "\nRechazo: " . $motivo
+            );
+
+        if (class_exists('NotificacionControlador')) {
+
+            try {
+
+                $nc = new NotificacionControlador();
+
+                if (method_exists($nc, 'enviarNotificacion')) {
+
+                    $nc->enviarNotificacion(
+                        (int)$inscripcion['usuario_id'],
+                        'documentacion_rechazada',
+                        [
+                            'motivo' => $motivo
+                        ]
+                    );
+                }
+
+            } catch (Throwable $e) {
+                // Ignorar error de notificación.
+            }
+        }
+
+        return [
+            'success' => true
+        ];
+    }
+    public function obtenerModalidadCurso(int $idInscripcion): ?string
+    {
+        return $this->inscripcionRepository
+            ->obtenerModalidadCurso(
+                $idInscripcion
+            );
+    }
+    /**
+     * Obtener el curso asociado a una inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
+     */
+    public function obtenerCurso(
+        int $idInscripcion
+    ): ?array
+    {
+        return
+            $this->inscripcionRepository
+                ->obtenerCurso(
+                    $idInscripcion
+                );
+    }
+
+    /**
+     * Obtener el tipo de inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
+     */
+    public function obtenerTipoInscripcion(
+        int $idInscripcion
+    ): ?array
+    {
+        return
+            $this->inscripcionRepository
+                ->obtenerTipoInscripcion(
+                    $idInscripcion
+                );
+    }
+
+    /**
+     * Actualizar estado del trámite.
+     *
+     * @param int $idInscripcion
+     * @param int $estado
+     * @return bool
+     */
+    public function actualizarEstadoTramite(
+        int $idInscripcion,
+        int $estado
+    ): bool
+    {
+        return
+            $this->inscripcionRepository
+                ->actualizarEstadoTramite(
+                    $idInscripcion,
+                    $estado
+                );
+    }
+    /**
+     * Obtener inscripciones pendientes de validación.
+     *
+     * @return array
+     */
+    public function obtenerPendientesValidacion(): array
+    {
+        return
+            $this->inscripcionRepository
+                ->obtenerPendientesValidacion();
+    }
+    
 }

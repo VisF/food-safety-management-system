@@ -29,9 +29,7 @@ class CarnetControlador
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
         $this->carnetService =
-            new CarnetService(
-                Connection::getPDO()
-            );
+            new CarnetService();
     }
 
     // Registra log.
@@ -115,41 +113,22 @@ class CarnetControlador
     /**
      * Obtener carnet por inscripción
      */
-    public function obtenerCarnetPorInscripcion(
-        int $idInscripcion
-    ): ?array
+    public function obtenerCarnetPorInscripcion(int $idInscripcion): ?array
     {
         try {
 
-            $pdo = Connection::getPDO();
-
-            $stmt = $pdo->prepare(
-                "SELECT *
-                 FROM carnets
-                 WHERE inscripcion_id = :id
-                 LIMIT 1"
-            );
-
-            $stmt->execute([
-                ':id' => $idInscripcion
-            ]);
-
-            $carnet =
-                $stmt->fetch(
-                    PDO::FETCH_ASSOC
+            return $this->carnetService
+                ->obtenerPorInscripcionId(
+                    $idInscripcion
                 );
 
-            return $carnet ?: null;
-
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
 
             $this->registrarLog(
                 'ERROR_OBTENER_CARNET',
                 [
-                    'id_inscripcion' =>
-                        $idInscripcion,
-                    'error' =>
-                        $e->getMessage()
+                    'id_inscripcion' => $idInscripcion,
+                    'error' => $e->getMessage()
                 ]
             );
 
@@ -160,41 +139,22 @@ class CarnetControlador
     /**
      * Obtener carnet por número
      */
-    public function obtenerPorNumero(
-        string $numeroCarnet
-    ): ?array
+    public function obtenerPorNumero(string $numeroCarnet): ?array
     {
         try {
 
-            $pdo = Connection::getPDO();
-
-            $stmt = $pdo->prepare(
-                "SELECT *
-                 FROM carnets
-                 WHERE numero_carnet = :numero
-                 LIMIT 1"
-            );
-
-            $stmt->execute([
-                ':numero' => $numeroCarnet
-            ]);
-
-            $carnet =
-                $stmt->fetch(
-                    PDO::FETCH_ASSOC
+            return $this->carnetService
+                ->obtenerPorNumero(
+                    $numeroCarnet
                 );
 
-            return $carnet ?: null;
-
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
 
             $this->registrarLog(
                 'ERROR_OBTENER_CARNET_NUMERO',
                 [
-                    'numero_carnet' =>
-                        $numeroCarnet,
-                    'error' =>
-                        $e->getMessage()
+                    'numero_carnet' => $numeroCarnet,
+                    'error' => $e->getMessage()
                 ]
             );
 
@@ -205,54 +165,35 @@ class CarnetControlador
     /**
      * Anular carnet
      */
-    public function anularCarnet(
-        int $idCarnet
-    ): array
+    public function anularCarnet(int $idCarnet): array
     {
         try {
 
-            $pdo = Connection::getPDO();
-
-            $stmt = $pdo->prepare(
-                "UPDATE carnets
-                 SET activo = 0
-                 WHERE id = :id"
-            );
-
-            $stmt->execute([
-                ':id' => $idCarnet
-            ]);
+            $resultado = $this->carnetService
+                ->anularCarnet($idCarnet);
 
             $this->registrarLog(
                 'CARNET_ANULADO',
                 [
-                    'id_carnet' =>
-                        $idCarnet
+                    'id_carnet' => $idCarnet
                 ]
             );
 
-            return [
-                'success' => true,
-                'mensaje' =>
-                    'Carnet anulado correctamente'
-            ];
+            return $resultado;
 
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
 
             $this->registrarLog(
                 'ERROR_ANULAR_CARNET',
                 [
-                    'id_carnet' =>
-                        $idCarnet,
-                    'error' =>
-                        $e->getMessage()
+                    'id_carnet' => $idCarnet,
+                    'error' => $e->getMessage()
                 ]
             );
 
             return [
                 'success' => false,
-                'mensaje' =>
-                    $e->getMessage()
+                'mensaje' => $e->getMessage()
             ];
         }
     }
@@ -264,26 +205,15 @@ class CarnetControlador
     {
         try {
 
-            $pdo = Connection::getPDO();
+            return $this->carnetService
+                ->listarActivos();
 
-            $stmt = $pdo->query(
-                "SELECT *
-                 FROM carnets
-                 WHERE activo = 1
-                 ORDER BY fecha_emision DESC"
-            );
-
-            return $stmt->fetchAll(
-                PDO::FETCH_ASSOC
-            );
-
-        } catch (\Exception $e) {
+        } catch (Throwable $e) {
 
             $this->registrarLog(
                 'ERROR_LISTAR_CARNETS',
                 [
-                    'error' =>
-                        $e->getMessage()
+                    'error' => $e->getMessage()
                 ]
             );
 

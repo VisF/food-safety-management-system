@@ -1,22 +1,11 @@
 <?php
 declare(strict_types=1);
 
-
 /**
- * CarnetService - Servicio del sistema.
+ * CarnetService
  *
- * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
- */
-
-/**
- * Métodos:
- * - crear()
- * - obtenerPorInscripcion()
- * - obtenerPorDNI()
- * - verificarVigencia()
- * - actualizar()
- * - obtenerCarnetsVencidos()
- * - renovar()
+ * Contiene toda la lógica de negocio relacionada
+ * con la gestión de carnets.
  */
 
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
@@ -25,103 +14,341 @@ class CarnetService
 {
     private CarnetRepository $carnetRepository;
 
-    // Inicializa las dependencias de la clase.
+    /**
+     * Constructor.
+     */
     public function __construct()
     {
-        $this->carnetRepository =
-            new CarnetRepository();
+        $this->carnetRepository = new CarnetRepository();
     }
 
     /**
-     * Crear un carnet.
+     * Obtiene un carnet por su ID.
      */
-    public function crear(array $datos): ?array
+    public function obtenerPorId(int $id): ?array
     {
-        return
-            $this->carnetRepository
-                ->crear($datos);
+        return $this->carnetRepository
+            ->obtenerPorId($id);
     }
 
     /**
-     * Obtener carnet por inscripción.
+     * Obtiene un carnet por el ID de inscripción.
      */
-    public function obtenerPorInscripcion(
+    public function obtenerPorInscripcionId(
         int $idInscripcion
     ): ?array
     {
-        return
-            $this->carnetRepository
-                ->obtenerPorInscripcion(
-                    $idInscripcion
-                );
+        return $this->carnetRepository
+            ->obtenerPorInscripcionId(
+                $idInscripcion
+            );
     }
 
     /**
-     * Obtener carnet por DNI.
+     * Obtiene un carnet por número.
      */
-    public function obtenerPorDNI(
+    public function obtenerPorNumero(
+        string $numeroCarnet
+    ): ?array
+    {
+        return $this->carnetRepository
+            ->obtenerPorNumero(
+                $numeroCarnet
+            );
+    }
+
+    /**
+     * Obtiene un carnet por DNI.
+     */
+    public function obtenerPorDni(
         string $dni
+    ): ?array
+    {
+        return $this->carnetRepository
+            ->obtenerPorDni($dni);
+    }
+
+    /**
+     * Lista todos los carnets activos.
+     */
+    public function listarActivos(): array
+    {
+        return $this->carnetRepository
+            ->listarActivos();
+    }
+
+    /**
+     * Obtiene todos los carnets vencidos.
+     */
+    public function obtenerCarnetsVencidos(): array
+    {
+        return $this->carnetRepository
+            ->obtenerCarnetsVencidos();
+    }
+        /**
+     * Verifica si un carnet está vigente.
+     *
+     * @param int $idCarnet
+     * @return bool
+     */
+    public function verificarVigencia(int $idCarnet): bool
+    {
+        $carnet = $this->carnetRepository
+            ->obtenerPorId($idCarnet);
+
+        if ($carnet === null) {
+            return false;
+        }
+
+        if ((int)$carnet['activo'] !== 1) {
+            return false;
+        }
+
+        return strtotime($carnet['fecha_vencimiento']) > time();
+    }
+
+    /**
+     * Anula un carnet.
+     *
+     * @param int $idCarnet
+     * @return array
+     */
+    public function anularCarnet(int $idCarnet): array
+    {
+        $carnet = $this->carnetRepository
+            ->obtenerPorId($idCarnet);
+
+        if ($carnet === null) {
+            return [
+                'success' => false,
+                'mensaje' => 'El carnet no existe.'
+            ];
+        }
+
+        if ((int)$carnet['activo'] === 0) {
+            return [
+                'success' => false,
+                'mensaje' => 'El carnet ya se encuentra anulado.'
+            ];
+        }
+
+        $resultado = $this->carnetRepository
+            ->anular($idCarnet);
+
+        return [
+            'success' => $resultado,
+            'mensaje' => $resultado
+                ? 'Carnet anulado correctamente.'
+                : 'No fue posible anular el carnet.'
+        ];
+    }
+        /**
+     * Renueva un carnet.
+     *
+     * @param int $idCarnet
+     * @param string $fechaVencimiento
+     * @return array
+     */
+    public function renovarCarnet(
+        int $idCarnet,
+        string $fechaVencimiento
+    ): array
+    {
+        $carnet = $this->carnetRepository
+            ->obtenerPorId($idCarnet);
+
+        if ($carnet === null) {
+            return [
+                'success' => false,
+                'mensaje' => 'El carnet no existe.'
+            ];
+        }
+
+        $resultado = $this->carnetRepository
+            ->renovar(
+                $idCarnet,
+                $fechaVencimiento
+            );
+
+        return [
+            'success' => $resultado,
+            'mensaje' => $resultado
+                ? 'Carnet renovado correctamente.'
+                : 'No fue posible renovar el carnet.'
+        ];
+    }
+
+    /**
+     * Emite un nuevo carnet.
+     *
+     * @param int $idInscripcion
+     * @return array
+     */
+    public function emitirCarnet(
+        int $idInscripcion
+    ): array
+    {
+        // Verificar si la inscripción ya posee un carnet.
+        $existente = $this->carnetRepository
+            ->obtenerPorInscripcionId(
+                $idInscripcion
+            );
+
+        if ($existente !== null) {
+            return [
+                'success' => false,
+                'mensaje' => 'La inscripción ya posee un carnet emitido.'
+            ];
+        }
+
+        $fechaEmision = date('Y-m-d');
+        $fechaVencimiento = date(
+            'Y-m-d',
+            strtotime('+3 años')
+        );
+
+        $datos = [
+            'id_inscripcion'    => $idInscripcion,
+            'numero_carnet'     => $this->generarNumeroCarnet(),
+            'fecha_emision'     => $fechaEmision,
+            'fecha_vencimiento' => $fechaVencimiento
+        ];
+
+        $carnet = $this->carnetRepository
+            ->crear($datos);
+
+        if ($carnet === null) {
+            return [
+                'success' => false,
+                'mensaje' => 'No fue posible emitir el carnet.'
+            ];
+        }
+
+        return [
+            'success' => true,
+            'mensaje' => 'Carnet emitido correctamente.',
+            'carnet' => $carnet
+        ];
+    }
+        /**
+     * Genera un número de carnet único.
+     *
+     * Formato:
+     * CAR-YYYY-XXXXXXXX
+     */
+    private function generarNumeroCarnet(): string
+    {
+        do {
+
+            $numero = sprintf(
+                'CAR-%s-%08d',
+                date('Y'),
+                random_int(1, 99999999)
+            );
+
+        } while (
+            $this->carnetRepository
+                ->obtenerPorNumero($numero) !== null
+        );
+
+        return $numero;
+    }
+    /**
+     * Obtiene el último carnet de un usuario.
+     */
+    public function obtenerPorUsuarioId(
+        int $usuarioId
+    ): ?array
+    {
+        return $this->carnetRepository
+            ->obtenerPorUsuarioId(
+                $usuarioId
+            );
+    }
+    /**
+     * Obtiene el estado del carnet de un usuario.
+     */
+    public function obtenerEstadoPorDni(
+        string $dni
+    ): ?array
+    {
+        $carnet = $this->obtenerPorDni($dni);
+
+        if ($carnet === null) {
+            return null;
+        }
+
+        $vigente =
+            strtotime($carnet['fecha_vencimiento']) > time();
+
+        return [
+            'id' => (int)$carnet['id'],
+            'numero_carnet' => $carnet['numero_carnet'],
+            'estado' => $vigente ? 'vigente' : 'vencido',
+            'fecha_emision' => $carnet['fecha_emision'],
+            'fecha_vencimiento' => $carnet['fecha_vencimiento'],
+            'vigente' => $vigente,
+            'dias_para_vencer' => $vigente
+                ? floor(
+                    (
+                        strtotime($carnet['fecha_vencimiento'])
+                        - time()
+                    ) / 86400
+                )
+                : null
+        ];
+    }
+    /**
+    * Verifica la vigencia de un carnet mediante DNI.
+    */
+    public function verificarVigenciaPorDni(
+        string $dni
+    ): array
+    {
+        $carnet = $this->obtenerEstadoPorDni($dni);
+
+        if ($carnet === null) {
+            return [
+                'success' => true,
+                'vigente' => false,
+                'mensaje' => 'Carnet no encontrado',
+                'carnet' => null
+            ];
+        }
+
+        return [
+            'success' => true,
+            'vigente' => $carnet['vigente'],
+            'mensaje' => $carnet['vigente']
+                ? 'Carnet vigente'
+                : 'Carnet vencido',
+            'carnet' => $carnet
+        ];
+    }
+    /**
+     * Obtiene la ruta del PDF del carnet.
+     */
+    public function obtenerPdfPorDni(
+        string $dni
+    ): ?string
+    {
+        return $this->carnetRepository
+            ->obtenerPdfPorDni($dni);
+    }
+    /**
+     * Obtener el último carnet de un usuario.
+     *
+     * @param int $usuarioId
+     * @return array|null
+     */
+    public function obtenerUltimoCarnetUsuario(
+        int $usuarioId
     ): ?array
     {
         return
             $this->carnetRepository
-                ->obtenerPorDNI(
-                    $dni
-                );
-    }
-
-    /**
-     * Verificar vigencia.
-     */
-    public function verificarVigencia(
-        int $id
-    ): bool
-    {
-        return
-            $this->carnetRepository
-                ->verificarVigencia(
-                    $id
-                );
-    }
-        /**
-     * Actualizar un carnet.
-     */
-    public function actualizar(
-        int $id,
-        array $datos
-    ): bool
-    {
-        return
-            $this->carnetRepository
-                ->actualizar(
-                    $id,
-                    $datos
-                );
-    }
-
-    /**
-     * Obtener carnets vencidos.
-     */
-    public function obtenerCarnetsVencidos(): array
-    {
-        return
-            $this->carnetRepository
-                ->obtenerCarnetsVencidos();
-    }
-
-    /**
-     * Renovar un carnet.
-     */
-    public function renovar(
-        int $id,
-        string $fechaVencimiento
-    ): bool
-    {
-        return
-            $this->carnetRepository
-                ->renovar(
-                    $id,
-                    $fechaVencimiento
+                ->obtenerUltimoCarnetUsuario(
+                    $usuarioId
                 );
     }
 }

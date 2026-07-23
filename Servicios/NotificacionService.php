@@ -1,52 +1,17 @@
 <?php
 declare(strict_types=1);
 
-
-/**
- * NotificacionService - Servicio del sistema.
- *
- * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
- */
-
-/**
- * Servicio para gestionar notificaciones.
- *
- * Métodos:
- * crear()
- * enviarNotificacion()
- * obtenerPorId()
- * obtenerPendientes()
- * obtenerPorUsuario()
- * obtenerPorTipo()
- * marcarEnviada()
- * eliminar()
- * enviarRecuperacionPassword()
- * enviarResultadoExamen()
- * enviarCarnetEmitido()
- * enviarConfirmacionInscripcion()
- * enviarDocumentacionAprobada()
- * enviarDocumentacionRechazada()
- */
-
 require_once __DIR__ . '/../Repository/NotificacionRepository.php';
 require_once __DIR__ . '/../Repository/UsuarioRepository.php';
-require_once __DIR__ . '/../Repository/InscripcionRepository.php';
-require_once __DIR__ . '/../Repository/DocumentoRepository.php';
-require_once __DIR__ . '/../Repository/ResultadoExamenRepository.php';
-require_once __DIR__ . '/../Repository/CarnetRepository.php';
-require_once __DIR__ . '/../Repository/CursoRepository.php';
 
 class NotificacionService
 {
-    private NotificacionRepository $notificacionRepository;
-    private UsuarioRepository $usuarioRepository;
-    private InscripcionRepository $inscripcionRepository;
-    private DocumentoRepository $documentoRepository;
-    private ResultadoExamenRepository $resultadoRepository;
-    private CarnetRepository $carnetRepository;
-    private CursoRepository $cursoRepository;
+    private NotificacionRepository
+        $notificacionRepository;
 
-    // Inicializa las dependencias de la clase.
+    private UsuarioRepository
+        $usuarioRepository;
+
     public function __construct()
     {
         $this->notificacionRepository =
@@ -54,45 +19,14 @@ class NotificacionService
 
         $this->usuarioRepository =
             new UsuarioRepository();
-
-        $this->inscripcionRepository =
-            new InscripcionRepository();
-
-        $this->documentoRepository =
-            new DocumentoRepository();
-
-        $this->resultadoRepository =
-            new ResultadoExamenRepository();
-
-        $this->carnetRepository =
-            new CarnetRepository();
-
-        $this->cursoRepository =
-            new CursoRepository();
     }
 
-    /**
-     * Crear notificación.
-     */
-    public function crear(
-        array $datos
-    ): ?array
-    {
-        $id =
-            $this->notificacionRepository
-                ->crear($datos);
-
-        if (!$id) {
-            return null;
-        }
-
-        return
-            $this->notificacionRepository
-                ->obtenerPorId($id);
-    }
+    // =====================================================
+    // CONSULTAS
+    // =====================================================
 
     /**
-     * Obtener una notificación.
+     * Obtiene una notificación.
      */
     public function obtenerPorId(
         int $id
@@ -104,17 +38,38 @@ class NotificacionService
     }
 
     /**
-     * Obtener pendientes.
+     * Obtiene las notificaciones
+     * pendientes de un usuario.
      */
-    public function obtenerPendientes(): array
+    public function obtenerPendientes(
+        int $usuarioId
+    ): array
     {
         return
             $this->notificacionRepository
-                ->obtenerPendientes();
+                ->obtenerPendientes(
+                    $usuarioId
+                );
     }
 
     /**
-     * Obtener por usuario.
+     * Obtiene el historial
+     * de un usuario.
+     */
+    public function obtenerHistorial(
+        int $usuarioId
+    ): array
+    {
+        return
+            $this->notificacionRepository
+                ->obtenerHistorial(
+                    $usuarioId
+                );
+    }
+
+    /**
+     * Obtiene todas las notificaciones
+     * de un usuario.
      */
     public function obtenerPorUsuario(
         int $usuarioId
@@ -128,7 +83,8 @@ class NotificacionService
     }
 
     /**
-     * Obtener por tipo.
+     * Obtiene notificaciones
+     * por tipo.
      */
     public function obtenerPorTipo(
         string $tipo
@@ -140,8 +96,92 @@ class NotificacionService
                     $tipo
                 );
     }
-        /**
-     * Marcar una notificación como enviada.
+
+    // =====================================================
+    // CREACIÓN
+    // =====================================================
+
+    /**
+     * Registra una notificación.
+     */
+    public function crear(
+        array $datos
+    ): ?array
+    {
+        $id =
+            $this->notificacionRepository
+                ->crear($datos);
+
+        if ($id <= 0) {
+            return null;
+        }
+
+        return
+            $this->notificacionRepository
+                ->obtenerPorId($id);
+    }
+
+    /**
+     * Envía una notificación.
+     */
+    public function enviarNotificacion(
+        int $usuarioId,
+        string $tipo,
+        array $datos = []
+    ): array
+    {
+        $usuario =
+            $this->usuarioRepository
+                ->obtenerPorId(
+                    $usuarioId
+                );
+
+        if (!$usuario) {
+
+            return [
+                'success' => false,
+                'mensaje' =>
+                    'Usuario inexistente'
+            ];
+        }
+
+        $notificacion =
+            $this->crear([
+                'usuario_id' =>
+                    $usuarioId,
+                'tipo' =>
+                    $tipo,
+                'asunto' =>
+                    $datos['asunto']
+                    ?? 'Notificación',
+                'mensaje' =>
+                    $datos['mensaje']
+                    ?? ''
+            ]);
+
+        if ($notificacion === null) {
+
+            return [
+                'success' => false,
+                'mensaje' =>
+                    'No fue posible registrar la notificación'
+            ];
+        }
+
+        return [
+            'success' => true,
+            'mensaje' =>
+                'Notificación registrada correctamente',
+            'notificacion' =>
+                $notificacion
+        ];
+    }
+    // =====================================================
+    // MODIFICACIONES
+    // =====================================================
+
+    /**
+     * Marca una notificación como enviada.
      */
     public function marcarEnviada(
         int $id
@@ -153,135 +193,131 @@ class NotificacionService
     }
 
     /**
-     * Eliminar una notificación.
+     * Marca todas las notificaciones
+     * de un usuario como enviadas.
+     */
+    public function marcarTodasEnviadas(
+        int $usuarioId
+    ): bool
+    {
+        return
+            $this->notificacionRepository
+                ->marcarTodasEnviadas(
+                    $usuarioId
+                );
+    }
+
+    /**
+     * Elimina una notificación.
      */
     public function eliminar(
         int $id
     ): bool
     {
+        if (
+            !$this->notificacionRepository
+                ->existe($id)
+        ) {
+            return false;
+        }
+
         return
             $this->notificacionRepository
                 ->eliminar($id);
     }
 
     /**
-     * Enviar una notificación.
+     * Elimina todas las notificaciones
+     * de un usuario.
      */
-    public function enviarNotificacion(
-        int $usuarioId,
-        string $tipo,
-        array $payload = []
-    ): array
-    {
-        $usuario =
-            $this->usuarioRepository
-                ->obtenerPorId($usuarioId);
-
-        if (!$usuario) {
-            return [
-                'success' => false,
-                'mensaje' => 'Usuario inexistente'
-            ];
-        }
-
-        $asunto =
-            $payload['asunto']
-            ?? 'Notificación';
-
-        $mensaje =
-            $payload['mensaje']
-            ?? '';
-
-        $notificacion =
-            $this->crear([
-                'usuario_id' => $usuarioId,
-                'tipo' => $tipo,
-                'asunto' => $asunto,
-                'mensaje' => $mensaje
-            ]);
-
-        if (!$notificacion) {
-            return [
-                'success' => false,
-                'mensaje' => 'No se pudo crear la notificación'
-            ];
-        }
-
-        return [
-            'success' => true,
-            'mensaje' => 'Notificación registrada correctamente',
-            'notificacion' => $notificacion
-        ];
-    }
-
-    /**
-     * Obtener notificaciones no enviadas.
-     */
-    public function obtenerNoEnviadas(): array
-    {
-        return
-            $this->notificacionRepository
-                ->obtenerNoEnviadas();
-    }
-
-    /**
-     * Obtener por estado.
-     */
-    public function obtenerPorEstado(
-        bool $enviado
-    ): array
-    {
-        return
-            $this->notificacionRepository
-                ->obtenerPorEstado($enviado);
-    }
-
-    /**
-     * Obtener últimas notificaciones.
-     */
-    public function obtenerUltimas(
-        int $cantidad = 20
-    ): array
-    {
-        return
-            $this->notificacionRepository
-                ->obtenerUltimas($cantidad);
-    }
-        /**
-     * Enviar recuperación de contraseña.
-     */
-    public function enviarRecuperacionPassword(
-        int $usuarioId,
-        string $token,
-        string $fechaExpiracion
+    public function eliminarPorUsuario(
+        int $usuarioId
     ): bool
     {
-        $usuario =
-            $this->usuarioRepository
-                ->obtenerPorId($usuarioId);
+        return
+            $this->notificacionRepository
+                ->eliminarPorUsuario(
+                    $usuarioId
+                );
+    }
 
-        if (!$usuario) {
-            return false;
-        }
+    // =====================================================
+    // ESTADÍSTICAS
+    // =====================================================
 
-        $this->notificacionRepository
-            ->guardarRecoveryToken(
-                $usuarioId,
-                $token,
-                $fechaExpiracion
-            );
-
-        return $this->crear([
-            'usuario_id' => $usuarioId,
-            'tipo' => 'email',
-            'asunto' => 'Recuperación de contraseña',
-            'mensaje' =>
-                'Se solicitó una recuperación de contraseña.'
-        ]) !== null;
+    /**
+     * Cuenta las notificaciones pendientes.
+     */
+    public function contarPendientes(): int
+    {
+        return
+            $this->notificacionRepository
+                ->contarPendientes();
     }
 
     /**
-     * Notificar resultado de examen.
+     * Cuenta las notificaciones enviadas.
+     */
+    public function contarEnviadas(): int
+    {
+        return
+            $this->notificacionRepository
+                ->contarEnviadas();
+    }
+
+    /**
+     * Cuenta las notificaciones
+     * de un usuario.
+     */
+    public function contarPorUsuario(
+        int $usuarioId
+    ): int
+    {
+        return
+            $this->notificacionRepository
+                ->contarPorUsuario(
+                    $usuarioId
+                );
+    }
+
+    /**
+     * Cuenta las notificaciones
+     * de un tipo.
+     */
+    public function contarPorTipo(
+        string $tipo
+    ): int
+    {
+        return
+            $this->notificacionRepository
+                ->contarPorTipo(
+                    $tipo
+                );
+    }
+
+    // =====================================================
+    // COLA
+    // =====================================================
+
+    /**
+     * Obtiene la cola de notificaciones.
+     */
+    public function obtenerColaPendiente(
+        int $limite = 100
+    ): array
+    {
+        return
+            $this->notificacionRepository
+                ->obtenerColaPendiente(
+                    $limite
+                );
+    }
+        // =====================================================
+    // NOTIFICACIONES DEL SISTEMA
+    // =====================================================
+
+    /**
+     * Notifica el resultado de un examen.
      */
     public function enviarResultadoExamen(
         int $resultadoId
@@ -289,7 +325,9 @@ class NotificacionService
     {
         $resultado =
             $this->resultadoRepository
-                ->obtenerPorId($resultadoId);
+                ->obtenerPorId(
+                    $resultadoId
+                );
 
         if (!$resultado) {
             return false;
@@ -305,17 +343,21 @@ class NotificacionService
             return false;
         }
 
-        return $this->crear([
-            'usuario_id' => $inscripcion['usuario_id'],
-            'tipo' => 'sistema',
-            'asunto' => 'Resultado de examen',
-            'mensaje' =>
-                'Su resultado de examen ya se encuentra disponible.'
-        ]) !== null;
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $inscripcion['usuario_id'],
+                'tipo' =>
+                    'resultado_examen',
+                'asunto' =>
+                    'Resultado de examen',
+                'mensaje' =>
+                    'El resultado de su examen ya se encuentra disponible.'
+            ]) !== null;
     }
 
     /**
-     * Notificar emisión de carnet.
+     * Notifica la emisión de un carnet.
      */
     public function enviarCarnetEmitido(
         int $carnetId
@@ -323,7 +365,9 @@ class NotificacionService
     {
         $carnet =
             $this->carnetRepository
-                ->obtenerPorId($carnetId);
+                ->obtenerPorId(
+                    $carnetId
+                );
 
         if (!$carnet) {
             return false;
@@ -339,17 +383,21 @@ class NotificacionService
             return false;
         }
 
-        return $this->crear([
-            'usuario_id' => $inscripcion['usuario_id'],
-            'tipo' => 'sistema',
-            'asunto' => 'Carnet emitido',
-            'mensaje' =>
-                'Su carnet fue emitido correctamente.'
-        ]) !== null;
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $inscripcion['usuario_id'],
+                'tipo' =>
+                    'carnet_emitido',
+                'asunto' =>
+                    'Carnet emitido',
+                'mensaje' =>
+                    'Su carnet fue emitido correctamente.'
+            ]) !== null;
     }
 
     /**
-     * Notificar confirmación de inscripción.
+     * Notifica una inscripción confirmada.
      */
     public function enviarConfirmacionInscripcion(
         int $inscripcionId
@@ -357,62 +405,147 @@ class NotificacionService
     {
         $inscripcion =
             $this->inscripcionRepository
-                ->obtenerPorId($inscripcionId);
+                ->obtenerPorId(
+                    $inscripcionId
+                );
 
         if (!$inscripcion) {
             return false;
         }
 
-        return $this->crear([
-            'usuario_id' => $inscripcion['usuario_id'],
-            'tipo' => 'sistema',
-            'asunto' => 'Inscripción confirmada',
-            'mensaje' =>
-                'Su inscripción fue registrada correctamente.'
-        ]) !== null;
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $inscripcion['usuario_id'],
+                'tipo' =>
+                    'inscripcion_confirmada',
+                'asunto' =>
+                    'Inscripción confirmada',
+                'mensaje' =>
+                    'Su inscripción fue registrada correctamente.'
+            ]) !== null;
     }
 
     /**
-     * Notificar documentación aprobada.
+     * Notifica la aprobación
+     * de la documentación.
      */
     public function enviarDocumentacionAprobada(
         int $usuarioId
     ): bool
     {
-        $cantidad =
-            $this->notificacionRepository
-                ->contarDocumentos($usuarioId);
-
-        $aprobados =
-            $this->notificacionRepository
-                ->contarDocumentosAprobados($usuarioId);
-
-        if ($cantidad === 0 || $cantidad !== $aprobados) {
-            return false;
-        }
-
-        return $this->crear([
-            'usuario_id' => $usuarioId,
-            'tipo' => 'sistema',
-            'asunto' => 'Documentación aprobada',
-            'mensaje' =>
-                'Toda su documentación fue aprobada.'
-        ]) !== null;
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $usuarioId,
+                'tipo' =>
+                    'documentacion_aprobada',
+                'asunto' =>
+                    'Documentación aprobada',
+                'mensaje' =>
+                    'Toda su documentación fue aprobada correctamente.'
+            ]) !== null;
     }
 
     /**
-     * Notificar documentación rechazada.
+     * Notifica el rechazo
+     * de la documentación.
      */
     public function enviarDocumentacionRechazada(
         int $usuarioId,
         string $motivo
     ): bool
     {
-        return $this->crear([
-            'usuario_id' => $usuarioId,
-            'tipo' => 'sistema',
-            'asunto' => 'Documentación rechazada',
-            'mensaje' => $motivo
-        ]) !== null;
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $usuarioId,
+                'tipo' =>
+                    'documentacion_rechazada',
+                'asunto' =>
+                    'Documentación rechazada',
+                'mensaje' =>
+                    $motivo
+            ]) !== null;
+    }
+        // =====================================================
+    // RECUPERACIÓN DE CONTRASEÑA
+    // =====================================================
+
+    /**
+     * Registra una notificación de
+     * recuperación de contraseña.
+     */
+    public function enviarRecuperacionPassword(
+        int $usuarioId
+    ): bool
+    {
+        $usuario =
+            $this->usuarioRepository
+                ->obtenerPorId(
+                    $usuarioId
+                );
+
+        if (!$usuario) {
+            return false;
+        }
+
+        return
+            $this->crear([
+                'usuario_id' =>
+                    $usuarioId,
+                'tipo' =>
+                    'recuperacion_password',
+                'asunto' =>
+                    'Recuperación de contraseña',
+                'mensaje' =>
+                    'Se solicitó una recuperación de contraseña para su cuenta.'
+            ]) !== null;
+    }
+
+    // =====================================================
+    // UTILIDADES
+    // =====================================================
+
+    /**
+     * Verifica si existen notificaciones
+     * pendientes para un usuario.
+     */
+    public function tienePendientes(
+        int $usuarioId
+    ): bool
+    {
+        return
+            $this->contarPorUsuario(
+                $usuarioId
+            ) > 0;
+    }
+
+    /**
+     * Obtiene la última notificación
+     * de un usuario.
+     */
+    public function obtenerUltimaPorUsuario(
+        int $usuarioId
+    ): ?array
+    {
+        return
+            $this->notificacionRepository
+                ->obtenerUltimaPorUsuario(
+                    $usuarioId
+                );
+    }
+
+    /**
+     * Verifica la existencia
+     * de una notificación.
+     */
+    public function existe(
+        int $id
+    ): bool
+    {
+        return
+            $this->notificacionRepository
+                ->existe($id);
     }
 }

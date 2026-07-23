@@ -22,4 +22,17 @@ final class EstadoTramite
     private function __construct()
     {
     }
+    public static function desdeNombre(string $nombre): ?int
+    {
+        return [
+            'pendiente'               => self::PENDIENTE,
+            'documentacion_pendiente' => self::DOCUMENTACION_PENDIENTE,
+            'documentacion_aprobada'  => self::DOCUMENTACION_APROBADA,
+            'inscripto_examen'        => self::INSCRIPTO_EXAMEN,
+            'aprobado'                => self::APROBADO,
+            'rechazado'               => self::RECHAZADO,
+            'cancelado'               => self::CANCELADO,
+            'carnet_emitido'          => self::CARNET_EMITIDO,
+        ][strtolower($nombre)] ?? null;
+    }
 }

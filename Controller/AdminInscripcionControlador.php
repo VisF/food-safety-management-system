@@ -21,84 +21,120 @@ declare(strict_types=1);
  * - Cambiar estados.
  *
  * Dependencias:
- * - InscripcionRepository
- * - DocumentoRepository
+ * - InscripcionService: Servicio para operaciones de inscripciones.
  * - NotificacionControlador (opcional)
  */
-require_once __DIR__ . '/../Repository/InscripcionRepository.php';
-require_once __DIR__ . '/../Repository/DocumentoRepository.php';
+require_once __DIR__ . '/../Service/InscripcionService.php';
+
 
 class AdminInscripcionControlador
 {
-    private const LOG_FILE = __DIR__ . '/../logs/admin_inscripcion_controller.log';
-    
-    private InscripcionRepository $inscripcionRepository;
-    private DocumentoRepository $documentoRepository;
+    private const LOG_FILE =
+    __DIR__ . '/../logs/admin_inscripcion_controller.log';
+
+    private InscripcionService $inscripcionService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
-        @mkdir(dirname(self::LOG_FILE), 0755, true);
-
-        $this->inscripcionRepository = new InscripcionRepository();
-
-        $this->documentoRepository = new DocumentoRepository();
-    }
-
-    
-    // Lista inscripciones.
-    public function listarInscripciones(array $filtros = []): array
-{
-    try {
-
-        $inscripciones = $this->inscripcionRepository
-            ->listarInscripciones($filtros);
-
-        $total = $this->inscripcionRepository
-            ->contarInscripciones($filtros);
-
-        $limite = (int)($filtros['limite'] ?? 50);
-
-        return [
-            'success' => true,
-            'inscripciones' => $inscripciones,
-            'total' => $total,
-            'paginas' => (int)ceil($total / max(1, $limite))
-        ];
-
-    } catch (Exception $e) {
-
-        $this->log(
-            'Error al listar inscripciones',
-            'ERROR',
-            [
-                'filtros' => $filtros,
-                'error' => $e->getMessage()
-            ]
+        @mkdir(
+            dirname(self::LOG_FILE),
+            0755,
+            true
         );
 
-        return [
-            'success' => false,
-            'inscripciones' => [],
-            'total' => 0,
-            'paginas' => 0
-        ];
+        $this->inscripcionService =
+            new InscripcionService();
     }
-}
 
-    // Obtiene inscripcion.
+    // Ejecuta log.
+    private function log(
+        string $evento,
+        string $nivel = 'INFO',
+        array $contexto = []
+    ): void {
+
+        $fecha = date('Y-m-d H:i:s');
+
+        $mensaje = sprintf(
+            "[%s] [%s] %s %s\n",
+            $fecha,
+            $nivel,
+            $evento,
+            json_encode(
+                $contexto,
+                JSON_UNESCAPED_UNICODE
+            )
+        );
+
+        error_log(
+            $mensaje,
+            3,
+            self::LOG_FILE
+        );
+    }
+
+    // Lista inscripciones.
+    public function listarInscripciones(array $filtros = []): array
+    {
+        try {
+
+            $resultado =
+                $this->inscripcionService
+                    ->listarInscripciones($filtros);
+
+            $limite =
+                (int)($filtros['limite'] ?? 50);
+
+            return [
+                'success' => true,
+                'inscripciones' =>
+                    $resultado['inscripciones'],
+                'total' =>
+                    $resultado['total'],
+                'paginas' =>
+                    (int)ceil(
+                        $resultado['total']
+                        / max(1, $limite)
+                    )
+            ];
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al listar inscripciones',
+                'ERROR',
+                [
+                    'filtros' => $filtros,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'inscripciones' => [],
+                'total' => 0,
+                'paginas' => 0
+            ];
+        }
+    }
+
+    // Obtiene inscripción.
     public function obtenerInscripcion(int $id): array
     {
         try {
 
-            $inscripcion = $this->inscripcionRepository
-                ->obtenerInscripcion($id);
+            $inscripcion =
+                $this->inscripcionService
+                    ->obtenerInscripcion($id);
 
             if ($inscripcion === null) {
+
                 return [
                     'success' => false,
                     'inscripcion' => []
                 ];
+
             }
 
             return [
@@ -106,7 +142,7 @@ class AdminInscripcionControlador
                 'inscripcion' => $inscripcion
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al obtener inscripción',
@@ -125,78 +161,62 @@ class AdminInscripcionControlador
     }
 
     /**
-     * Validar documentación de una inscripción
-     * 
-     * @param int $id_inscripcion ID de la inscripción
-     * @return array [
-     *   'success' => bool,
-     *   'message' => string,
-     *   'inscripcion' => array
-     * ]
+     * Validar documentación de una inscripción.
      */
     public function validarDocumentacion(int $id_inscripcion): array
     {
         try {
 
-            $inscripcion = $this->inscripcionRepository
-                ->obtenerInscripcion($id_inscripcion);
+            $resultado =
+                $this->inscripcionService
+                    ->validarDocumentacion($id_inscripcion);
 
-            
-            if (!$inscripcion) {
+            if ($resultado['success']) {
+
+                $this->log(
+                    'Documentación validada',
+                    'INFO',
+                    [
+                        'id_inscripcion' => $id_inscripcion
+                    ]
+                );
+
                 return [
-                    'success' => false,
-                    'message' => 'Inscripción inexistente',
+                    'success' => true,
+                    'message' => 'Documentación validada correctamente',
                     'inscripcion' => []
                 ];
             }
 
-            $docs = $this->documentoRepository
-                ->obtenerPorUsuario(
-                    (int)$inscripcion['usuario_id']
-                );
+            switch ($resultado['codigo']) {
 
-            $faltantes = [];
+                case 'INSCRIPCION_INEXISTENTE':
 
-            foreach ($docs as $documento) {
+                    return [
+                        'success' => false,
+                        'message' => 'Inscripción inexistente',
+                        'inscripcion' => []
+                    ];
 
-                if (($documento['estado'] ?? 'pendiente') !== 'aprobado') {
+                case 'DOCUMENTACION_INCOMPLETA':
 
-                    $faltantes[] = $documento['tipo_documento'];
+                    return [
+                        'success' => false,
+                        'message' => 'Documentación incompleta: ' .
+                            implode(', ', $resultado['faltantes']),
+                        'inscripcion' => []
+                    ];
 
-                }
+                default:
 
+                    return [
+                        'success' => false,
+                        'message' => 'No fue posible validar la documentación.',
+                        'inscripcion' => []
+                    ];
             }
 
-            if (!empty($faltantes)) {
-
-                return [
-                    'success' => false,
-                    'message' => 'Documentación incompleta: ' . implode(', ', $faltantes),
-                    'inscripcion' => $docs
-                ];
-
-            }
-
-            $this->inscripcionRepository->actualizarEstadoInscripcion(
-                $id_inscripcion,
-                EstadoTramite::DOCUMENTACION_APROBADA
-            );
-
-            $this->log(
-                'Documentación validada',
-                'INFO',
-                [
-                    'id_inscripcion' => $id_inscripcion
-                ]
-            );
-
-            return [
-                'success' => true,
-                'message' => 'Documentación validada correctamente',
-                'inscripcion' => $docs
-            ];
-
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al validar documentación',
@@ -212,75 +232,58 @@ class AdminInscripcionControlador
                 'message' => 'Error al validar documentación: ' . $e->getMessage(),
                 'inscripcion' => []
             ];
-
         }
     }
-
-    // Ejecuta rechazar documentacion.
+    // Ejecuta rechazar documentación.
     public function rechazarDocumentacion(int $id, string $motivo): array
     {
         try {
 
-            $ins = $this->inscripcionRepository->obtenerInscripcion($id);
+            $resultado =
+                $this->inscripcionService
+                    ->rechazarDocumentacion(
+                        $id,
+                        $motivo
+                    );
 
-            if (!$ins) {
+            if ($resultado['success']) {
+
+                $this->log(
+                    'Documentación rechazada',
+                    'INFO',
+                    [
+                        'id_inscripcion' => $id,
+                        'motivo' => $motivo
+                    ]
+                );
+
                 return [
-                    'success' => false,
-                    'message' => 'Inscripción no encontrada',
+                    'success' => true,
+                    'message' => 'Documentación rechazada correctamente',
                     'inscripcion' => []
                 ];
             }
 
-            $this->inscripcionRepository->actualizarEstadoInscripcion(
-                $id,
-                EstadoTramite::RECHAZADO
-            );
+            switch ($resultado['codigo']) {
 
-            $this->inscripcionRepository->agregarObservacion(
-                $id,
-                "\nRechazo: " . $motivo
-            );
+                case 'INSCRIPCION_INEXISTENTE':
 
-            $this->log(
-                'Documentación rechazada',
-                'INFO',
-                [
-                    'id_inscripcion' => $id,
-                    'motivo' => $motivo
-                ]
-            );
+                    return [
+                        'success' => false,
+                        'message' => 'Inscripción no encontrada',
+                        'inscripcion' => []
+                    ];
 
-            if (class_exists('NotificacionControlador')) {
+                default:
 
-                try {
-
-                    $nc = new NotificacionControlador();
-
-                    if (method_exists($nc, 'enviarNotificacion')) {
-
-                        $nc->enviarNotificacion(
-                            (int)$ins['usuario_id'],
-                            'documentacion_rechazada',
-                            [
-                                'motivo' => $motivo
-                            ]
-                        );
-
-                    }
-
-                } catch (Exception $e) {
-                    // Se ignora el error de notificación para no afectar el flujo principal.
-                }
-
+                    return [
+                        'success' => false,
+                        'message' => 'No fue posible rechazar la documentación.',
+                        'inscripcion' => []
+                    ];
             }
 
-            return [
-                'success' => true,
-                'message' => 'Documentación rechazada, usuario notificado',
-                'inscripcion' => $ins
-            ];
-
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al rechazar documentación',
@@ -296,7 +299,6 @@ class AdminInscripcionControlador
                 'message' => 'Error al rechazar documentación: ' . $e->getMessage(),
                 'inscripcion' => []
             ];
-
         }
     }
 }

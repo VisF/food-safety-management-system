@@ -21,25 +21,27 @@ declare(strict_types=1);
  * - Eliminar documento.
  *
  * Dependencias:
- * - DocumentoRepository
+ * - DocumentoService
  */
 
-require_once __DIR__ . '/../Repository/DocumentoRepository.php';
+
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
 class AdminDocumentoControlador
 {
     private const LOG_FILE =
         __DIR__ . '/../logs/admin_documento_controller.log';
 
-    private DocumentoRepository $documentoRepository;
+
+    private DocumentoService $documentoService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
-        $this->documentoRepository =
-            new DocumentoRepository();
+        $this->documentoService =
+            new DocumentoService();
     }
 
     /**
@@ -76,18 +78,16 @@ class AdminDocumentoControlador
     public function listarDocumentos(): array
     {
         try {
-
-            $documentos =
-                $this->documentoRepository
-                    ->listarDocumentos();
+            $datos = $this->documentoService
+                ->listarDocumentos();
 
             return [
                 'success' => true,
-                'documentos' => $documentos,
-                'total' => count($documentos)
+                'documentos' => $datos['documentos'],
+                'total' => $datos['total']
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al listar documentos',
@@ -111,10 +111,9 @@ class AdminDocumentoControlador
     public function obtenerDocumento(int $id): array
     {
         try {
-
             $documento =
-                $this->documentoRepository
-                    ->obtenerPorId($id);
+                $this->documentoService
+                    ->obtenerDocumento($id);
 
             if (!$documento) {
 
@@ -129,7 +128,7 @@ class AdminDocumentoControlador
                 'documento' => $documento
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al obtener documento',
@@ -153,18 +152,17 @@ class AdminDocumentoControlador
     public function obtenerPendientes(): array
     {
         try {
-
-            $documentos =
-                $this->documentoRepository
+            $datos =
+                $this->documentoService
                     ->obtenerPendientes();
 
             return [
                 'success' => true,
-                'documentos' => $documentos,
-                'total' => count($documentos)
+                'documentos' => $datos['documentos'],
+                'total' => $datos['total']
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al obtener documentos pendientes',
@@ -184,54 +182,47 @@ class AdminDocumentoControlador
         /**
      * Aprobar un documento.
      */
-    public function validarDocumento(
-        int $id,
-        string $observaciones = ''
-    ): array
+    public function validarDocumento(int $id,string $observaciones = ''): array
     {
         try {
-
-            $documento =
-                $this->documentoRepository
-                    ->obtenerPorId($id);
-
-            if (!$documento) {
-
-                return [
-                    'success' => false,
-                    'message' => 'Documento no encontrado'
-                ];
-            }
-
-            $ok =
-                $this->documentoRepository
+            $resultado =
+                $this->documentoService
                     ->validarDocumento(
                         $id,
                         $observaciones
                     );
 
-            if (!$ok) {
+            if ($resultado['success']) {
+
+                $this->log(
+                    'Documento aprobado',
+                    'INFO',
+                    [
+                        'id_documento' => $id
+                    ]
+                );
 
                 return [
-                    'success' => false,
-                    'message' => 'No se pudo aprobar el documento'
+                    'success' => true,
+                    'message' => 'Documento aprobado correctamente'
                 ];
             }
 
-            $this->log(
-                'Documento aprobado',
-                'INFO',
-                [
-                    'id_documento' => $id
-                ]
-            );
+            switch ($resultado['codigo']) {
 
-            return [
-                'success' => true,
-                'message' => 'Documento aprobado correctamente'
-            ];
+                case 'DOCUMENTO_INEXISTENTE':
+                    return [
+                        'success' => false,
+                        'message' => 'Documento no encontrado'
+                    ];
 
-        } catch (Exception $e) {
+                default:
+                    return [
+                        'success' => false,
+                        'message' => 'No se pudo aprobar el documento'
+                    ];
+            }
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al aprobar documento',
@@ -259,48 +250,46 @@ class AdminDocumentoControlador
     {
         try {
 
-            $documento =
-                $this->documentoRepository
-                    ->obtenerPorId($id);
-
-            if (!$documento) {
-
-                return [
-                    'success' => false,
-                    'message' => 'Documento no encontrado'
-                ];
-            }
-
-            $ok =
-                $this->documentoRepository
+            $resultado =
+                $this->documentoService
                     ->rechazarDocumento(
                         $id,
                         $observaciones
                     );
 
-            if (!$ok) {
+            if ($resultado['success']) {
+
+                $this->log(
+                    'Documento rechazado',
+                    'INFO',
+                    [
+                        'id_documento' => $id,
+                        'observaciones' => $observaciones
+                    ]
+                );
 
                 return [
-                    'success' => false,
-                    'message' => 'No se pudo rechazar el documento'
+                    'success' => true,
+                    'message' => 'Documento rechazado correctamente'
                 ];
             }
 
-            $this->log(
-                'Documento rechazado',
-                'INFO',
-                [
-                    'id_documento' => $id,
-                    'observaciones' => $observaciones
-                ]
-            );
+            switch ($resultado['codigo']) {
 
-            return [
-                'success' => true,
-                'message' => 'Documento rechazado correctamente'
-            ];
+                case 'DOCUMENTO_INEXISTENTE':
+                    return [
+                        'success' => false,
+                        'message' => 'Documento no encontrado'
+                    ];
 
-        } catch (Exception $e) {
+                default:
+                    return [
+                        'success' => false,
+                        'message' => 'No se pudo rechazar el documento'
+                    ];
+            }
+
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al rechazar documento',
@@ -325,9 +314,8 @@ class AdminDocumentoControlador
         try {
 
             $documento =
-                $this->documentoRepository
+                $this->documentoService
                     ->descargarDocumento($id);
-
             if (!$documento) {
 
                 return [
@@ -351,7 +339,7 @@ class AdminDocumentoControlador
                 'documento' => $documento
             ];
 
-        } catch (Exception $e) {
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al descargar documento',
@@ -377,44 +365,42 @@ class AdminDocumentoControlador
     {
         try {
 
-            $documento =
-                $this->documentoRepository
-                    ->obtenerPorId($id);
-
-            if (!$documento) {
-
-                return [
-                    'success' => false,
-                    'message' => 'Documento no encontrado'
-                ];
-            }
-
-            $ok =
-                $this->documentoRepository
+            $resultado =
+                $this->documentoService
                     ->eliminarDocumento($id);
 
-            if (!$ok) {
+            if ($resultado['success']) {
+
+                $this->log(
+                    'Documento eliminado',
+                    'INFO',
+                    [
+                        'id_documento' => $id
+                    ]
+                );
 
                 return [
-                    'success' => false,
-                    'message' => 'No se pudo eliminar el documento'
+                    'success' => true,
+                    'message' => 'Documento eliminado correctamente'
                 ];
             }
 
-            $this->log(
-                'Documento eliminado',
-                'INFO',
-                [
-                    'id_documento' => $id
-                ]
-            );
+            switch ($resultado['codigo']) {
 
-            return [
-                'success' => true,
-                'message' => 'Documento eliminado correctamente'
-            ];
+                case 'DOCUMENTO_INEXISTENTE':
+                    return [
+                        'success' => false,
+                        'message' => 'Documento no encontrado'
+                    ];
 
-        } catch (Exception $e) {
+                default:
+                    return [
+                        'success' => false,
+                        'message' => 'No se pudo eliminar el documento'
+                    ];
+            }
+
+        } catch (Throwable $e) {
 
             $this->log(
                 'Error al eliminar documento',

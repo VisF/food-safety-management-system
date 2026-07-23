@@ -123,7 +123,7 @@ class UsuarioService
     // REGISTRO
     // =====================================================
 
-    public function registrar(
+    public function crear(
         array $datos
     ): UsuarioDTO
     {
@@ -139,6 +139,14 @@ class UsuarioService
                 'El email ya está registrado'
             );
         }
+        if (
+            $this->usuarioRepository
+                ->existeDni($datos['dni'])
+        ) {
+            throw new RuntimeException(
+                'El DNI ya está registrado'
+            );
+        }
 
         $datos['password'] =
             password_hash(
@@ -152,6 +160,7 @@ class UsuarioService
 
         $usuario =
             $this->obtenerPorId($id);
+            
 
         if (!$usuario) {
 
@@ -167,36 +176,16 @@ class UsuarioService
     // ACTUALIZACIÓN
     // =====================================================
 
-    public function actualizar(
-        int $id,
-        array $datos
-    ): UsuarioDTO
+    public function actualizar(int $id,array $datos): ?UsuarioDTO
     {
-        $ok =
-            $this->usuarioRepository
-                ->actualizar(
-                    $id,
-                    $datos
-                );
-
-        if (!$ok) {
-
-            throw new RuntimeException(
-                'No se pudo actualizar el usuario'
-            );
+        if (
+            !$this->usuarioRepository
+                ->actualizar($id, $datos)
+        ) {
+            return null;
         }
 
-        $usuario =
-            $this->obtenerPorId($id);
-
-        if (!$usuario) {
-
-            throw new RuntimeException(
-                'Usuario inexistente'
-            );
-        }
-
-        return $usuario;
+        return $this->obtenerPorId($id);
     }
         // =====================================================
     // ESTADO
@@ -316,4 +305,97 @@ class UsuarioService
                     )
                 );
     }
+    // Gestiona usuarios.
+    public function gestionarUsuarios(): array
+    {
+        $usuarios =
+            $this->usuarioRepository
+                ->listarUsuarios();
+
+        $estadisticas =
+            $this->usuarioRepository
+                ->contarUsuarios();
+
+        return [
+            'usuarios' => $usuarios,
+            'total' => count($usuarios),
+            'activos' => $estadisticas['activos'],
+            'inactivos' => $estadisticas['inactivos']
+        ];
+    }
+        // =====================================================
+    // BÚSQUEDAS
+    // =====================================================
+
+    /**
+     * Busca usuarios por apellido.
+     *
+     * @param string $apellido
+     * @return array
+     */
+    public function buscarPorApellido(
+        string $apellido
+    ): array
+    {
+        return
+            $this->usuarioRepository
+                ->buscarPorApellido(
+                    $apellido
+                );
+    }
+
+    /**
+     * Obtiene los datos públicos de un usuario.
+     *
+     * @param string $dni
+     * @return array|null
+     */
+    public function obtenerDatosPublicos(
+        string $dni
+    ): ?array
+    {
+        $usuario =
+            $this->usuarioRepository
+                ->obtenerPorDni($dni);
+
+        if (!$usuario) {
+            return null;
+        }
+
+        return [
+            'id' => $usuario['id'],
+            'nombre' => $usuario['nombre'],
+            'apellido' => $usuario['apellido'],
+            'dni' => $usuario['dni']
+        ];
+    }
+    public function buscar(string $criterio,string $valor): array
+    {
+        return
+            $this->usuarioRepository
+                ->buscar(
+                    $criterio,
+                    $valor
+                );
+    }
+    public function existeEmail(string $email,?int $ignorarUsuario = null): bool
+    {
+        return
+            $this->usuarioRepository
+                ->existeEmail(
+                    $email,
+                    $ignorarUsuario
+                );
+    }
+
+    public function existeDni(string $dni,?int $ignorarUsuario = null): bool
+    {
+        return
+            $this->usuarioRepository
+                ->existeDni(
+                    $dni,
+                    $ignorarUsuario
+                );
+    }
+
 }

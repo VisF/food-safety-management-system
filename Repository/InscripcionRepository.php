@@ -707,4 +707,132 @@ class InscripcionRepository
 
         return $resultado ? (int)$resultado['usuario_id'] : null;
     }
+    /**
+     * Obtener el curso asociado a una inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
+     */
+    public function obtenerCurso(
+        int $idInscripcion
+    ): ?array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                c.*
+
+            FROM cursos c
+
+            INNER JOIN inscripciones i
+                ON i.curso_id = c.id
+
+            WHERE
+                i.id = :id
+
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':id' => $idInscripcion
+        ]);
+
+        $curso =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $curso ?: null;
+    }
+
+    /**
+     * Obtener el tipo de inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
+     */
+    public function obtenerTipoInscripcion(
+        int $idInscripcion
+    ): ?array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                ti.*
+
+            FROM tipo_inscripcion ti
+
+            INNER JOIN inscripciones i
+                ON i.tipo_inscripcion_id = ti.id
+
+            WHERE
+                i.id = :id
+
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':id' => $idInscripcion
+        ]);
+
+        $tipo =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $tipo ?: null;
+    }
+
+    /**
+     * Actualizar estado del trámite.
+     *
+     * @param int $idInscripcion
+     * @param int $estado
+     * @return bool
+     */
+    public function actualizarEstadoTramite(
+        int $idInscripcion,
+        int $estado
+    ): bool
+    {
+        $stmt = $this->conexion->prepare("
+            UPDATE inscripciones
+
+            SET estado_tramite_id = :estado
+
+            WHERE id = :id
+        ");
+
+        return $stmt->execute([
+            ':estado' => $estado,
+            ':id' => $idInscripcion
+        ]);
+    }
+    public function obtenerPendientesValidacion(): array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                i.*,
+                u.nombre,
+                u.apellido,
+                c.nombre AS curso_nombre,
+                c.modalidad
+
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            LEFT JOIN cursos c
+                ON c.id = i.curso_id
+
+            WHERE
+                i.estado_tramite_id = :estado
+
+            ORDER BY
+                i.fecha_inscripcion ASC
+        ");
+
+        $stmt->execute([
+            ':estado' =>
+                EstadoTramite::PENDIENTE
+        ]);
+
+        return
+            $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
 }

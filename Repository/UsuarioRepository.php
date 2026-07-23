@@ -383,6 +383,18 @@ class UsuarioRepository
                 'Ya existe un usuario con ese email.'
             );
         }
+        if (
+            isset($datos['dni'])
+            &&
+            $this->existeDni(
+                $datos['dni'],
+                $id
+            )
+        ) {
+            throw new RuntimeException(
+                'Ya existe un usuario con ese DNI.'
+            );
+        }
 
         $campos = [];
         $parametros = [
@@ -698,5 +710,127 @@ class UsuarioRepository
             ':password' => $password,
             ':id' => $usuarioId
         ]);
+    }
+
+
+    /**
+     * Busca usuarios por apellido.
+     *
+     * @param string $apellido
+     * @return array
+     */
+    public function buscarPorApellido(
+        string $apellido
+    ): array
+    {
+        $sql = "
+            SELECT *
+            FROM usuarios
+            WHERE apellido LIKE :apellido
+            ORDER BY apellido, nombre
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':apellido' => '%' . $apellido . '%'
+        ]);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    /**
+     * Verifica si un DNI ya existe.
+     */
+    public function existeDni(
+        string $dni,
+        ?int $ignorarUsuario = null
+    ): bool
+    {
+        $sql = "
+            SELECT COUNT(*)
+
+            FROM usuarios
+
+            WHERE dni = :dni
+        ";
+
+        if ($ignorarUsuario !== null) {
+            $sql .= " AND id <> :id";
+        }
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->bindValue(
+            ':dni',
+            $dni
+        );
+
+        if ($ignorarUsuario !== null) {
+            $stmt->bindValue(
+                ':id',
+                $ignorarUsuario,
+                \PDO::PARAM_INT
+            );
+        }
+
+        $stmt->execute();
+
+        return (int)$stmt->fetchColumn() > 0;
+    }
+    /**
+     * Busca usuarios por un criterio.
+     *
+     * Criterios permitidos:
+     * - nombre
+     * - apellido
+     * - email
+     * - dni
+     */
+    public function buscar(
+        string $criterio,
+        string $valor
+    ): array
+    {
+        $permitidos = [
+            'nombre',
+            'apellido',
+            'email',
+            'dni'
+        ];
+
+        if (!in_array($criterio, $permitidos, true)) {
+            throw new InvalidArgumentException(
+                'Criterio de búsqueda inválido.'
+            );
+        }
+
+        $sql = "
+            SELECT
+                u.id,
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+                u.telefono,
+                u.domicilio,
+                u.activo,
+                u.fecha_creacion
+
+            FROM usuarios u
+
+            WHERE u.{$criterio} LIKE :valor
+
+            ORDER BY
+                u.apellido,
+                u.nombre
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':valor' => '%' . trim($valor) . '%'
+        ]);
+
+        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 }

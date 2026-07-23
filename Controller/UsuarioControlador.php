@@ -13,7 +13,7 @@ declare(strict_types=1);
  * 
  * Dependencias esperadas:
  * - Servicio: Servicio/UsuarioService.php (clase UsuarioService)
- * - Servicio: Servicio/UsuarioRolService.php (clase UsuarioRolService)
+ * 
  *
  * Vistas esperadas:
  * - vistas/usuarios_listado.php    (mostrar listado de usuarios)
@@ -23,7 +23,7 @@ declare(strict_types=1);
  * Métodos del controlador:
  * - listarUsuarios()                 -> Retorna array de usuarios
  * - obtenerUsuario($id)              -> Retorna array de un usuario
- * - buscarUsuarios($termino)         -> Retorna array de usuarios encontrados
+ * - buscarUsuarios($criterio, $valor)       -> Retorna array de usuarios encontrados
  * - actualizarUsuario($id, $datos)   -> Retorna array con resultado
  * - cambiarPassword($id, $datos)     -> Retorna array con resultado
  * - desactivarUsuario($id)           -> Retorna array con resultado
@@ -36,14 +36,14 @@ class UsuarioControlador
     private const LOG_FILE = __DIR__ . '/../logs/usuario_controller.log';
     
     private ?UsuarioService $usuarioService = null;
-    private ?UsuarioRolService $usuarioRolService = null;
+
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         $this->usuarioService = new UsuarioService();
-        $this->usuarioRolService = new UsuarioRolService();
+        
     }
 
 
@@ -59,390 +59,531 @@ class UsuarioControlador
     }
 
     /**
-     * Listar todos los usuarios activos
-     * 
-     * VISTA A LLAMAR: vistas/usuarios_listado.php
-     * 
-     * @return array Array con estructura:
-     *   [
-     *     'success' => bool,
-     *     'usuarios' => [
-     *       ['id' => 1, 'nombre' => '...', 'email' => '...', 'dni' => '...', ...],
-     *       ...
-     *     ],
-     *     'total' => int
-     *   ]
+     * Listar usuarios.
      */
     public function listarUsuarios(): array
     {
         try {
-            // Preferir Service si está disponible
-            if ($this->usuarioService) {
-                $usuarios = $this->usuarioService->listarUsuarios();
-            } else {
-                // Fallback a consulta directa
-                $connFile = __DIR__ . '/../db/Connection.php';
-                    if (file_exists($connFile)) {
-                        require_once $connFile;
-                        $pdo = Connection::getPDO();
-                        $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
-                        $stmt->execute();
-                        $usuarios = $stmt->fetchAll();
-                    }
-                }
-            } else {
-                $usuarios = [];
-                $connFile = __DIR__ . '/../db/Connection.php';
-                if (file_exists($connFile)) {
-                    require_once $connFile;
-                    $pdo = Connection::getPDO();
-                    $stmt = $pdo->prepare('SELECT id, nombre, apellido, dni, email, telefono, domicilio, activo FROM usuarios WHERE activo = 1 ORDER BY nombre ASC');
-                    $stmt->execute();
-                    $usuarios = $stmt->fetchAll();
-                }
-            }
+
+            $usuarios =
+                $this->usuarioService
+                    ->listarUsuarios();
 
             return [
                 'success' => true,
-                'message' => 'Usuarios listados',
-                'usuarios' => $usuarios ?: [],
-                'total' => count($usuarios ?: [])
+                'usuarios' => $usuarios,
+                'total' => count($usuarios)
             ];
-        } catch (\Exception $e) {
-            $this->log('ERROR_LISTAR_USUARIOS', 'ERROR', ['error' => $e->getMessage()]);
-            return ['success' => false, 'message' => 'Error listando usuarios', 'usuarios' => [], 'total' => 0];
-        }
-    }
 
-    /**
-     * Obtener detalles de un usuario específico
-     * 
-     * VISTA A LLAMAR: vistas/usuario_detalle.php
-     * 
-     * @param int $id ID del usuario
-     * @return array Array con estructura:
-     *   [
-     *     'success' => bool,
-     *     'usuario' => ['id' => ..., 'nombre' => ..., ...],
-     *     'roles' => [['id' => 1, 'nombre' => '...'], ...],
-     *     'error' => string|null
-     *   ]
-     */
-    public function obtenerUsuario(int $id): array
-    {
-        // Validación de entrada: el ID debe ser positivo
-        if ($id <= 0) {
-            return ['success' => false, 'error' => 'ID de usuario inválido'];
-        }
+        } catch (\Throwable $e) {
 
-        try {
-            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible', 'usuario' => null, 'roles' => []];
-            $usuario = $this->usuarioService->obtenerPorId($id);
-            if (!$usuario) return ['success' => false, 'error' => 'Usuario no encontrado', 'usuario' => null, 'roles' => []];
+            $this->log(
+                'ERROR_LISTAR_USUARIOS',
+                'ERROR',
+                [
+                    'error' => $e->getMessage()
+                ]
+            );
 
-            $roles = [];
-            if ($this->usuarioRolService) {
-                $roles = $this->usuarioRolService->obtenerRolesPorUsuario($id);
-            }
-
-            return ['success' => true, 'usuario' => $usuario, 'roles' => $roles, 'error' => null];
-        } catch (\Exception $e) {
-            $this->log('ERROR_OBTENER_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error obteniendo usuario', 'usuario' => null, 'roles' => []];
-        }
-    }
-
-    /**
-     * Buscar usuarios por término (nombre, email, dni)
-     * 
-     * VISTA A LLAMAR: vistas/usuarios_listado.php (con resultados de búsqueda)
-     * 
-     * @param string $termino Criterio de búsqueda
-     * @return array Array con estructura:
-     *   [
-     *     'success' => bool,
-     *     'usuarios' => [...],
-     *     'total' => int,
-     *     'termino' => string
-     *   ]
-     */
-    public function buscarUsuarios(string $termino): array
-    {
-        $termino = trim($termino);
-        // Validación simple del término de búsqueda para evitar consultas muy amplias
-        if (strlen($termino) < 3) {
             return [
                 'success' => false,
-                'error' => 'El término debe tener al menos 3 caracteres',
                 'usuarios' => [],
                 'total' => 0
             ];
         }
-
-        try {
-            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
-
-            $criterio = 'nombre';
-            if (filter_var($termino, FILTER_VALIDATE_EMAIL)) {
-                $criterio = 'email';
-            } elseif (preg_match('/^[0-9]{6,10}$/', $termino)) {
-                $criterio = 'dni';
-            }
-
-            $usuarios = $this->usuarioService->buscar($criterio, $termino);
-            return ['success' => true, 'usuarios' => $usuarios, 'total' => count($usuarios), 'termino' => $termino];
-        } catch (\Exception $e) {
-            $this->log('ERROR_BUSCAR_USUARIOS', 'ERROR', ['termino' => $termino, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error en búsqueda', 'usuarios' => [], 'total' => 0, 'termino' => $termino];
-        }
     }
 
     /**
-     * Actualizar datos de un usuario (excepto password)
-     * 
-     * VISTA A LLAMAR: vistas/editar_usuario.php
-     * 
-     * @param int $id ID del usuario
-     * @param array $datos Datos a actualizar: nombre, apellido, telefono, domicilio, email
-     * @return array Array con resultado:
-     *   ['success' => bool, 'message' => string, 'usuario' => array|null]
+     * Obtener usuario.
      */
-    public function actualizarUsuario(int $id, array $datos): array
-    {
-        // Validación de entrada: ID válido
-        if ($id <= 0) {
-            return ['success' => false, 'error' => 'ID de usuario inválido'];
-        }
-
-        try {
-            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
-            $existe = $this->usuarioService->obtenerPorId($id);
-            if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
-
-            // Validar campos permitidos
-            $allowed = ['nombre','apellido','telefono','domicilio','email'];
-            $update = [];
-            foreach ($allowed as $f) {
-                if (isset($datos[$f])) {
-                    $val = trim((string)$datos[$f]);
-                    if ($f === 'email' && $val !== '' && !filter_var($val, FILTER_VALIDATE_EMAIL)) {
-                        return ['success' => false, 'error' => 'Email inválido'];
-                    }
-                    $update[$f] = $val;
-                }
-            }
-            if (empty($update)) return ['success' => false, 'error' => 'No hay campos válidos para actualizar'];
-
-            $ok = $this->usuarioService->actualizar($id, $update);
-            if ($ok) {
-                $this->log('USUARIO_ACTUALIZADO', 'INFO', ['id' => $id, 'campos' => array_keys($update)]);
-                $usuario = $this->usuarioService->obtenerPorId($id);
-                return ['success' => true, 'message' => 'Usuario actualizado', 'usuario' => $usuario];
-            }
-            return ['success' => false, 'error' => 'Error al actualizar usuario'];
-        } catch (\Exception $e) {
-            $this->log('ERROR_ACTUALIZAR_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error al actualizar usuario'];
-        }
-    }
-
-    /**
-     * Cambiar contraseña de un usuario
-     * 
-     * @param int $id ID del usuario
-     * @param array $datos Array con: password_actual, password_nueva, password_confirm
-     * @return array Array con resultado:
-     *   ['success' => bool, 'message' => string]
-     */
-    public function cambiarPassword(int $id, array $datos): array
-    {
-        // Validación de entrada: ID válido
-        if ($id <= 0) {
-            return ['success' => false, 'error' => 'ID de usuario inválido'];
-        }
-
-        $passwordActual = trim((string)($datos['password_actual'] ?? ''));
-        $passwordNueva = trim((string)($datos['password_nueva'] ?? ''));
-        $passwordConfirm = trim((string)($datos['password_confirm'] ?? ''));
-
-        try {
-            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
-
-            // Validaciones
-            if (strlen($passwordNueva) < 8 || !preg_match('/[A-Z]/', $passwordNueva) || !preg_match('/[a-z]/', $passwordNueva) || !preg_match('/[0-9]/', $passwordNueva)) {
-                return ['success' => false, 'error' => 'La nueva contraseña no cumple los requisitos de seguridad'];
-            }
-            if ($passwordNueva !== $passwordConfirm) return ['success' => false, 'error' => 'Las contraseñas no coinciden'];
-
-            // Obtener hash actual desde BD
-            $connFile = __DIR__ . '/../db/Connection.php';
-            if (!file_exists($connFile)) return ['success' => false, 'error' => 'Conexión a BD no disponible'];
-            require_once $connFile;
-            $pdo = Connection::getPDO();
-            $stmt = $pdo->prepare('SELECT password FROM usuarios WHERE id = :id');
-            $stmt->execute([':id' => $id]);
-            $row = $stmt->fetch();
-            if (!$row || !isset($row['password'])) return ['success' => false, 'error' => 'Usuario no encontrado'];
-
-            if (!password_verify($passwordActual, $row['password'])) {
-                return ['success' => false, 'error' => 'Contraseña actual incorrecta'];
-            }
-
-            $ok = $this->usuarioService->cambiarPassword($id, $passwordNueva);
-            if ($ok) {
-                $this->log('PASSWORD_CAMBIADO', 'INFO', ['id' => $id]);
-                return ['success' => true, 'message' => 'Contraseña actualizada correctamente'];
-            }
-            return ['success' => false, 'error' => 'Error al actualizar contraseña'];
-        } catch (\Exception $e) {
-            $this->log('ERROR_CAMBIAR_PASSWORD', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error cambiando contraseña'];
-        }
-    }
-
-    /**
-     * Desactivar un usuario (marcar como inactivo)
-     * 
-     * @param int $id ID del usuario
-     * @return array Array con resultado:
-     *   ['success' => bool, 'message' => string]
-     */
-    public function desactivarUsuario(int $id): array
+    public function obtenerUsuario(
+        int $id
+    ): array
     {
         if ($id <= 0) {
-            return ['success' => false, 'error' => 'ID de usuario inválido'];
+
+            return [
+                'success' => false,
+                'usuario' => null,
+                'roles' => []
+            ];
         }
 
         try {
-            if (!$this->usuarioService) return ['success' => false, 'error' => 'Service Usuario no disponible'];
-            $existe = $this->usuarioService->obtenerPorId($id);
-            if (!$existe) return ['success' => false, 'error' => 'Usuario no encontrado'];
 
-            $ok = $this->usuarioService->eliminar($id);
-            if ($ok) {
-                $this->log('USUARIO_DESACTIVADO', 'INFO', ['id' => $id]);
-                return ['success' => true, 'message' => 'Usuario desactivado'];
+            $usuario =
+                $this->usuarioService
+                    ->obtenerPorId($id);
+
+            if (!$usuario) {
+
+                return [
+                    'success' => false,
+                    'usuario' => null,
+                    'roles' => []
+                ];
             }
-            return ['success' => false, 'error' => 'Error al desactivar usuario'];
-        } catch (\Exception $e) {
-            $this->log('ERROR_DESACTIVAR_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error desactivando usuario'];
+
+            return [
+                'success' => true,
+                'usuario' => $usuario,
+                'roles' =>
+                    $this->usuarioService
+                        ->obtenerRoles($id)
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_OBTENER_USUARIO',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'usuario' => null,
+                'roles' => []
+            ];
         }
     }
 
     /**
-     * Asignar un rol a un usuario
-     * 
-     * @param int $id_usuario ID del usuario
-     * @param int $id_rol ID del rol
-     * @return array Array con resultado:
-     *   ['success' => bool, 'message' => string]
+     * Buscar usuarios.
      */
-    public function asignarRol(int $id_usuario, int $id_rol): array
+    public function buscarUsuarios(
+        string $criterio,
+        string $valor
+    ): array
     {
-        if ($id_usuario <= 0 || $id_rol <= 0) {
-            return ['success' => false, 'error' => 'IDs inválidos'];
-        }
-
         try {
-            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible'];
-            // Validar existencia de usuario
-            if ($this->usuarioService && !$this->usuarioService->obtenerPorId($id_usuario)) return ['success' => false, 'error' => 'Usuario no encontrado'];
 
-            $ok = $this->usuarioRolService->asignarRol($id_usuario, $id_rol);
-            if ($ok) {
-                $this->log('ROL_ASIGNADO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
-                return ['success' => true, 'message' => 'Rol asignado correctamente'];
-            }
-            return ['success' => false, 'error' => 'Error al asignar rol (posible duplicado o rol inexistente)'];
-        } catch (\Exception $e) {
-            $this->log('ERROR_ASIGNAR_ROL', 'ERROR', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error asignando rol'];
+            $usuarios =
+                $this->usuarioService
+                    ->buscar(
+                        $criterio,
+                        $valor
+                    );
+
+            return [
+                'success' => true,
+                'usuarios' => $usuarios,
+                'total' => count($usuarios)
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_BUSCAR_USUARIOS',
+                'ERROR',
+                [
+                    'criterio' => $criterio,
+                    'valor' => $valor,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'usuarios' => [],
+                'total' => 0
+            ];
         }
     }
-
     /**
-     * Remover un rol de un usuario
-     * 
-     * @param int $id_usuario ID del usuario
-     * @param int $id_rol ID del rol
-     * @return array Array con resultado:
-     *   ['success' => bool, 'message' => string]
+     * Actualizar usuario.
      */
-    public function removerRol(int $id_usuario, int $id_rol): array
-    {
-        if ($id_usuario <= 0 || $id_rol <= 0) {
-            return ['success' => false, 'error' => 'IDs inválidos'];
-        }
-
-        try {
-            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible'];
-            $ok = $this->usuarioRolService->removerRol($id_usuario, $id_rol);
-            if ($ok) {
-                $this->log('ROL_REMOVIDO', 'INFO', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol]);
-                return ['success' => true, 'message' => 'Rol removido correctamente'];
-            }
-            return ['success' => false, 'error' => 'Asignación no existe o error al remover'];
-        } catch (\Exception $e) {
-            $this->log('ERROR_REMOVER_ROL', 'ERROR', ['usuario_id' => $id_usuario, 'rol_id' => $id_rol, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error removiendo rol'];
-        }
-    }
-
-    /**
-     * Obtener todos los roles asignados a un usuario
-     * 
-     * @param int $id ID del usuario
-     * @return array Array con estructura:
-     *   [
-     *     'success' => bool,
-     *     'roles' => [['id' => 1, 'nombre' => '...', ...], ...],
-     *     'total' => int
-     *   ]
-     */
-    public function obtenerRolesUsuario(int $id): array
+    public function actualizarUsuario(
+        int $id,
+        array $datos
+    ): array
     {
         if ($id <= 0) {
-            return ['success' => false, 'error' => 'ID de usuario inválido', 'roles' => [], 'total' => 0];
+
+            return [
+                'success' => false,
+                'mensaje' => 'ID de usuario inválido.'
+            ];
         }
 
         try {
-            if (!$this->usuarioRolService) return ['success' => false, 'error' => 'Service UsuarioRol no disponible', 'roles' => [], 'total' => 0];
-            $roles = $this->usuarioRolService->obtenerRolesPorUsuario($id);
-            return ['success' => true, 'roles' => $roles, 'total' => count($roles)];
-        } catch (\Exception $e) {
-            $this->log('ERROR_OBTENER_ROLES_USUARIO', 'ERROR', ['id' => $id, 'error' => $e->getMessage()]);
-            return ['success' => false, 'error' => 'Error obteniendo roles', 'roles' => [], 'total' => 0];
+
+            $usuario =
+                $this->usuarioService
+                    ->actualizar(
+                        $id,
+                        $datos
+                    );
+
+            if (!$usuario) {
+
+                return [
+                    'success' => false,
+                    'mensaje' => 'No se pudo actualizar el usuario.'
+                ];
+            }
+
+            $this->log(
+                'USUARIO_ACTUALIZADO',
+                'INFO',
+                [
+                    'id' => $id
+                ]
+            );
+
+            return [
+                'success' => true,
+                'usuario' => $usuario
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_ACTUALIZAR_USUARIO',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ];
         }
     }
 
     /**
-     * Obtener información de estadísticas de usuarios
-     * 
-     * @return array Array con estadísticas:
-     *   ['total_usuarios' => int, 'usuarios_activos' => int, 'usuarios_inactivos' => int]
+     * Cambiar contraseña.
+     */
+    public function cambiarPassword(
+        int $id,
+        array $datos
+    ): array
+    {
+        if ($id <= 0) {
+
+            return [
+                'success' => false,
+                'mensaje' => 'ID de usuario inválido.'
+            ];
+        }
+
+        try {
+
+            $ok =
+                $this->usuarioService
+                    ->cambiarPassword(
+                        $id,
+                        $datos['password_actual'],
+                        $datos['password_nueva']
+                    );
+
+            if (!$ok) {
+
+                return [
+                    'success' => false,
+                    'mensaje' =>
+                        'La contraseña actual es incorrecta.'
+                ];
+            }
+
+            $this->log(
+                'PASSWORD_CAMBIADO',
+                'INFO',
+                [
+                    'id' => $id
+                ]
+            );
+
+            return [
+                'success' => true
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_CAMBIAR_PASSWORD',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Desactivar usuario.
+     */
+    public function desactivarUsuario(
+        int $id
+    ): array
+    {
+        if ($id <= 0) {
+
+            return [
+                'success' => false,
+                'mensaje' => 'ID de usuario inválido.'
+            ];
+        }
+
+        try {
+
+            $ok =
+                $this->usuarioService
+                    ->desactivar($id);
+
+            if (!$ok) {
+
+                return [
+                    'success' => false,
+                    'mensaje' =>
+                        'No se pudo desactivar el usuario.'
+                ];
+            }
+
+            $this->log(
+                'USUARIO_DESACTIVADO',
+                'INFO',
+                [
+                    'id' => $id
+                ]
+            );
+
+            return [
+                'success' => true
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_DESACTIVAR_USUARIO',
+                'ERROR',
+                [
+                    'id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+    /**
+     * Asignar rol.
+     */
+    public function asignarRol(
+        int $usuarioId,
+        int $rolId
+    ): array
+    {
+        if ($usuarioId <= 0 || $rolId <= 0) {
+
+            return [
+                'success' => false,
+                'mensaje' => 'Parámetros inválidos.'
+            ];
+        }
+
+        try {
+
+            $ok =
+                $this->usuarioService
+                    ->asignarRol(
+                        $usuarioId,
+                        $rolId
+                    );
+
+            if (!$ok) {
+
+                return [
+                    'success' => false,
+                    'mensaje' => 'No se pudo asignar el rol.'
+                ];
+            }
+
+            $this->log(
+                'ROL_ASIGNADO',
+                'INFO',
+                [
+                    'usuario' => $usuarioId,
+                    'rol' => $rolId
+                ]
+            );
+
+            return [
+                'success' => true
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_ASIGNAR_ROL',
+                'ERROR',
+                [
+                    'usuario' => $usuarioId,
+                    'rol' => $rolId,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Remover rol.
+     */
+    public function removerRol(
+        int $usuarioId,
+        int $rolId
+    ): array
+    {
+        if ($usuarioId <= 0 || $rolId <= 0) {
+
+            return [
+                'success' => false,
+                'mensaje' => 'Parámetros inválidos.'
+            ];
+        }
+
+        try {
+
+            $ok =
+                $this->usuarioService
+                    ->quitarRol(
+                        $usuarioId,
+                        $rolId
+                    );
+
+            if (!$ok) {
+
+                return [
+                    'success' => false,
+                    'mensaje' => 'No se pudo remover el rol.'
+                ];
+            }
+
+            $this->log(
+                'ROL_REMOVIDO',
+                'INFO',
+                [
+                    'usuario' => $usuarioId,
+                    'rol' => $rolId
+                ]
+            );
+
+            return [
+                'success' => true
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_REMOVER_ROL',
+                'ERROR',
+                [
+                    'usuario' => $usuarioId,
+                    'rol' => $rolId,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'mensaje' => $e->getMessage()
+            ];
+        }
+    }
+
+    /**
+     * Obtener roles del usuario.
+     */
+    public function obtenerRolesUsuario(
+        int $usuarioId
+    ): array
+    {
+        if ($usuarioId <= 0) {
+
+            return [
+                'success' => false,
+                'roles' => []
+            ];
+        }
+
+        try {
+
+            $roles =
+                $this->usuarioService
+                    ->obtenerRoles(
+                        $usuarioId
+                    );
+
+            return [
+                'success' => true,
+                'roles' => $roles,
+                'total' => count($roles)
+            ];
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_OBTENER_ROLES',
+                'ERROR',
+                [
+                    'usuario' => $usuarioId,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'roles' => []
+            ];
+        }
+    }
+
+    /**
+     * Obtener estadísticas.
      */
     public function obtenerEstadisticas(): array
     {
         try {
-            $connFile = __DIR__ . '/../db/Connection.php';
-            if (!file_exists($connFile)) return ['total_usuarios' => 0, 'usuarios_activos' => 0, 'usuarios_inactivos' => 0];
-            require_once $connFile;
-            $pdo = Connection::getPDO();
 
-            $stmt = $pdo->prepare('SELECT COUNT(*) as total FROM usuarios');
-            $stmt->execute();
-            $total = (int)$stmt->fetchColumn();
+            return
+                $this->usuarioService
+                    ->contarUsuarios();
 
-            $stmt = $pdo->prepare('SELECT COUNT(*) as activos FROM usuarios WHERE activo = 1');
-            $stmt->execute();
-            $activos = (int)$stmt->fetchColumn();
+        } catch (\Throwable $e) {
 
-            $inactivos = $total - $activos;
-            return ['total_usuarios' => $total, 'usuarios_activos' => $activos, 'usuarios_inactivos' => $inactivos];
-        } catch (\Exception $e) {
-            $this->log('ERROR_OBTENER_ESTADISTICAS', 'ERROR', ['error' => $e->getMessage()]);
-            return ['total_usuarios' => 0, 'usuarios_activos' => 0, 'usuarios_inactivos' => 0];
+            $this->log(
+                'ERROR_OBTENER_ESTADISTICAS',
+                'ERROR',
+                [
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            return [
+                'total' => 0,
+                'activos' => 0,
+                'inactivos' => 0
+            ];
         }
     }
 }

@@ -16,7 +16,7 @@ class HomeService
             new HabilitacionExamenService();
     }
     // Obtiene accion principal.
-    public function obtenerAccionPrincipal(array $documentos,?object $inscripcion ): array 
+    public function obtenerAccionPrincipal(int $usuarioId, array $documentos,?object $inscripcion ): array 
     {
 
         $tieneDni = false;
@@ -56,15 +56,9 @@ class HomeService
                 'Curso de Manipulación de Alimentos';
         }
 
+        $tieneHabilitacion = $this->habilitacionService
+                ->tieneHabilitacionVigente($usuarioId);
 
-        if ($inscripcion !== null) {
-
-
-            $this->habilitacionService
-                    ->tieneHabilitacionVigente(
-                        $inscripcion->getUsuarioId()
-                    );
-        }
         if ($inscripcion !== null
                 &&
                 $inscripcion->getTipoInscripcionId() === 1

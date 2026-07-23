@@ -20,52 +20,70 @@ declare(strict_types=1);
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
 
-require_once __DIR__ . '/../Servicios/InscripcionService.php';
-require_once __DIR__ . '/../Repository/InscripcionRepository.php';
-
-require_once __DIR__ . '/../Servicios/DocumentoService.php';
-
-require_once __DIR__ . '/../Servicios/ExamenService.php';
-
-require_once __DIR__ . '/../Servicios/CursoService.php';
-
 require_once __DIR__ . '/../Servicios/HomeService.php';
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/CursoService.php';
+require_once __DIR__ . '/../Servicios/ExamenService.php';
+require_once __DIR__ . '/../Servicios/UsuarioService.php';
+require_once __DIR__ . '/../Servicios/CarnetService.php';
+require_once __DIR__ . '/../Servicios/AdminService.php';
 
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 class HomeControlador
 {
-    private const LOG_FILE = __DIR__ . '/../logs/home_controller.log';
+    private const LOG_FILE =
+        __DIR__ . '/../logs/home_controller.log';
+
+    private HomeService $homeService;
+
     private InscripcionService $inscripcionService;
+
     private DocumentoService $documentoService;
 
-    private InscripcionService $InscripcionService;
-    private InscripcionRepository $inscripcionRepository;
+    private CursoService $cursoService;
 
-    // Inicializa las dependencias de la clase.
+    private ExamenService $examenService;
+
+    private UsuarioService $usuarioService;
+
+    private CarnetService $carnetService;
+
+    private AdminService $adminService;
+
     public function __construct()
     {
-        $this->InscripcionService =
-            new InscripcionService();
-
-        $this->inscripcionService =
-            new InscripcionService(
-                $this->InscripcionService
-            );
+        @mkdir(
+            dirname(self::LOG_FILE),
+            0755,
+            true
+        );
 
         $this->homeService =
             new HomeService();
 
+        $this->inscripcionService =
+            new InscripcionService();
+
         $this->documentoService =
-            new DocumentoService(
-                new DocumentoService()
-            );
-        $this->inscripcionRepository =
-            new InscripcionRepository();
+            new DocumentoService();
 
-        @mkdir(dirname(self::LOG_FILE), 0755, true);
+        $this->cursoService =
+            new CursoService();
+
+        $this->examenService =
+            new ExamenService();
+
+        $this->usuarioService =
+            new UsuarioService();
+
+        $this->carnetService =
+            new CarnetService();
+
+        $this->adminService =
+            new AdminService();
     }
-
 
     /**
      * Registrar eventos en log
@@ -78,29 +96,15 @@ class HomeControlador
         error_log($message, 3, self::LOG_FILE);
     }
 
-    /**
-     * Mostrar página principal del sitio
-     * 
-     * VISTA A LLAMAR: vistas/index.php
-     * 
-     * @return array Array con datos para la vista:
-     *   [
-     *     'title' => 'Sistema de Gestión de Carnets de Manipuladores',
-     *     'user_autenticado' => bool,
-     *     'user_data' => array|null
-     *   ]
-     */
     public function mostrarIndex(): array
     {
-        $usuario = AuthHelper::usuarioActual();
-
+        $usuario =
+            AuthHelper::usuarioActual();
 
         $inscripcion = null;
 
-        if (
-            $usuario !== null &&
-            class_exists('InscripcionService')
-        ) {
+        if ($usuario !== null) {
+
             $inscripcion =
                 $this->inscripcionService
                     ->obtenerUltimaPorUsuario(
@@ -110,31 +114,134 @@ class HomeControlador
 
         $documentos = [];
 
-        if ($usuario !== null &&
-            class_exists('DocumentoService') &&
-            class_exists('DocumentoService'))
-        {
+        if ($usuario !== null) {
+
             $documentos =
                 $this->documentoService
                     ->obtenerPorUsuario(
                         $usuario['id']
                     );
         }
+
         $this->log(
             'Index page visited',
             'INFO',
             [
-                'usuario_id' => $usuario['id'] ?? null
+                'usuario_id' =>
+                    $usuario['id'] ?? null
             ]
         );
-        $documentosVista = [];
 
-        $tieneMoodleAprobado = false;
+        $tieneMoodleAprobado =
+            $this->tieneMoodleAprobado(
+                $documentos
+            );
 
+        $cursosVista =
+            $this->obtenerCursosVista(
+                $tieneMoodleAprobado,
+                $inscripcion
+            );
+
+        $documentosVista =
+            $this->obtenerDocumentosVista(
+                $documentos
+            );
+
+        $examenesVista =
+            $this->obtenerExamenesVista();
+
+        $accionPrincipal =
+            $this->homeService
+                ->obtenerAccionPrincipal(
+                    $usuario['id'] ?? 0,
+                    $documentos,
+                    $inscripcion
+                );
+
+        return [
+
+            'page_title' =>
+                'App Ciudadana - Inicio',
+
+            'welcome_text' =>
+                'Bienvenido de nuevo,',
+
+            'usuario' =>
+                $usuario,
+
+            'tramite' => [
+
+                'label' =>
+                    'Estado del Trámite',
+
+                'titulo' =>
+                    $accionPrincipal['titulo'],
+
+                'estado' =>
+                    $inscripcion !== null
+                        ? $this->obtenerTextoEstado(
+                            $inscripcion->getEstadoId()
+                        )
+                        : 'Sin inscripción',
+
+                'fecha_vencimiento' =>
+                    null,
+
+                'progreso' =>
+                    $accionPrincipal['porcentaje'] . '%',
+
+                'porcentaje' =>
+                    $accionPrincipal['porcentaje'],
+
+                'accion_principal' => [
+
+                    'texto' =>
+                        $accionPrincipal['texto'],
+
+                    'ruta' =>
+                        $accionPrincipal['ruta']
+                ]
+            ],
+
+            'documentos' =>
+                $documentosVista,
+
+            'cursos' =>
+                $cursosVista,
+
+            'examenes' =>
+                $examenesVista,
+
+            'documentos_faltantes' =>
+                $accionPrincipal['faltantes'] ?? [],
+
+            'carnet' => [
+
+                'descarga_habilitada' =>
+                    false,
+
+                'ruta_descarga' =>
+                    'carnet_emitido',
+
+                'etiqueta_descarga' =>
+                    'Descargar Carnet'
+            ]
+        ];
+    }
+    /**
+     * Determina si el usuario posee un certificado Moodle aprobado.
+     */
+    private function tieneMoodleAprobado(
+        array $documentos
+    ): bool
+    {
         foreach ($documentos as $doc) {
 
             $tipoDocumento =
-                strtoupper($doc->getTipoDocumento());
+                strtoupper(
+                    $doc->getTipoDocumento()
+                );
 
             if (
                 (
@@ -145,20 +252,29 @@ class HomeControlador
                 &&
                 $doc->getEstado() === 'aprobado'
             ) {
-                $tieneMoodleAprobado = true;
-                break;
+                return true;
             }
         }
 
-        $servicioCurso = new CursoService();
+        return false;
+    }
+    /**
+     * Genera la información de cursos para la vista.
+     */
+    private function obtenerCursosVista(
+        bool $tieneMoodleAprobado,
+        $inscripcion
+    ): array
+    {
+        if ($tieneMoodleAprobado) {
+            return [];
+        }
 
         $cursosBD =
-            $servicioCurso->obtenerActivos();
+            $this->cursoService
+                ->obtenerActivos();
 
         $cursosVista = [];
-        $inscripcionRepository = new InscripcionRepository();
-
-        if (!$tieneMoodleAprobado) {
 
         foreach ($cursosBD as $curso) {
 
@@ -171,11 +287,12 @@ class HomeControlador
                     &&
                     $inscripcion->getTipoInscripcionId() === 1;
             }
-           $inscriptos =
-                    $inscripcionRepository
-                        ->contarInscriptosCurso(
-                            (int)$curso['id']
-                        );
+
+            $inscriptos =
+                $this->inscripcionService
+                    ->contarInscriptosCurso(
+                        (int)$curso['id']
+                    );
 
             $cupos =
                 (int)$curso['cupos'];
@@ -184,247 +301,392 @@ class HomeControlador
                 max(
                     0,
                     $cupos - $inscriptos
-            );
+                );
+
             $cursosVista[] = [
 
-                            'id' => (int)$curso['id'],
+                'id' => (int)$curso['id'],
 
-                            'nombre' => $curso['nombre'],
+                'nombre' => $curso['nombre'],
 
-                            'descripcion' => $curso['descripcion'],
+                'descripcion' => $curso['descripcion'],
 
-                            'modalidad' => ucfirst(
-                                $curso['modalidad']
-                            ),
+                'modalidad' =>
+                    ucfirst($curso['modalidad']),
 
-                            'fecha_inicio' =>
-                                $curso['fecha_inicio'],
+                'fecha_inicio' =>
+                    $curso['fecha_inicio'],
 
-                            'hora_inicio' =>
-                                substr(
-                                    (string)$curso['hora_inicio'],
-                                    0,
-                                    5
-                                ),
+                'hora_inicio' =>
+                    substr(
+                        (string)$curso['hora_inicio'],
+                        0,
+                        5
+                    ),
 
-                            'ubicacion' =>
-                                $curso['ubicacion'],
+                'ubicacion' =>
+                    $curso['ubicacion'],
 
-                            'cupos' =>
-                                (int)$curso['cupos'],
+                'cupos' =>
+                    $cupos,
 
-                            'inscripto' =>
-                                $yaInscripto,
+                'inscripto' =>
+                    $yaInscripto,
 
-                            'cupos_totales' =>
-                                $cupos,
+                'cupos_totales' =>
+                    $cupos,
 
-                            'inscriptos' =>
-                                $inscriptos,
+                'inscriptos' =>
+                    $inscriptos,
 
-                            'cupos_disponibles' =>
-                                $cuposDisponibles,
-                        ];
-            }
+                'cupos_disponibles' =>
+                    $cuposDisponibles
+            ];
         }
+
+        return $cursosVista;
+    }
+
+    /**
+     * Genera la información de documentos para la vista.
+     */
+    private function obtenerDocumentosVista(
+        array $documentos
+    ): array
+    {
+        $documentosVista = [];
+
         foreach ($documentos as $doc) {
-            $icono = 'description';
-            switch (
+
+            $tipo =
                 strtoupper(
                     $doc->getTipoDocumento()
-                )) 
-            {
-                case 'DNI':
-                    $icono = 'badge';
-                    break;
-
-                case 'FOTO':
-                    $icono = 'add_a_photo';
-                    break;
-            }
-            $tipo = strtoupper($doc->getTipoDocumento());
+                );
 
             switch ($tipo) {
 
                 case 'DNI':
+
                     $label = 'DNI';
-                    $descripcion = 'Documento de identidad';
+                    $descripcion =
+                        'Documento de identidad';
                     $icono = 'badge';
                     break;
 
                 case 'FOTO_CARNET':
                 case 'FOTO':
+
                     $label = 'Foto carnet';
-                    $descripcion = 'Fotografía actual';
-                    $icono = 'account_circle';
+                    $descripcion =
+                        'Fotografía actual';
+                    $icono =
+                        'account_circle';
                     break;
 
                 case 'CERTIFICADO_MOODLE':
-                case 'MOODLE':                   
-                    $label = 'Certificado Moodle';
-                    if ($doc->getEstado() === 'aprobado') {
-                        $descripcion = 'Curso aprobado';
-                    } elseif ($doc->getEstado() === 'rechazado') {
-                        $descripcion = 'Requiere corrección';
+                case 'MOODLE':
+
+                    $label =
+                        'Certificado Moodle';
+
+                    if (
+                        $doc->getEstado()
+                        === 'aprobado'
+                    ) {
+
+                        $descripcion =
+                            'Curso aprobado';
+
+                    } elseif (
+                        $doc->getEstado()
+                        === 'rechazado'
+                    ) {
+
+                        $descripcion =
+                            'Requiere corrección';
+
                     } else {
-                        $descripcion = 'Pendiente de revisión';
+
+                        $descripcion =
+                            'Pendiente de revisión';
                     }
+
                     $icono = 'school';
                     break;
 
                 default:
-                    $label = ucfirst(
-                        str_replace('_', ' ', $doc->getTipoDocumento())
-                    );
 
-                    $descripcion = 'Documento cargado';
-                    $icono = 'description';
+                    $label =
+                        ucfirst(
+                            str_replace(
+                                '_',
+                                ' ',
+                                $doc->getTipoDocumento()
+                            )
+                        );
+
+                    $descripcion =
+                        'Documento cargado';
+
+                    $icono =
+                        'description';
             }
 
             $documentosVista[] = [
+
                 'label' => $label,
-                'descripcion' => $descripcion,
-                'icon' => $icono,
-                'route' => 'subida_documentacion',
-                'state' => $doc->getEstado()
+
+                'descripcion' =>
+                    $descripcion,
+
+                'icon' =>
+                    $icono,
+
+                'route' =>
+                    'subida_documentacion',
+
+                'state' =>
+                    $doc->getEstado()
             ];
         }
-        $examenService = new ExamenService();
 
-        $examenesBD = $examenService->obtenerProximos(5);
+        return $documentosVista;
+    }
+    
+    /**
+     * Genera la información de exámenes para la vista.
+     */
+    private function obtenerExamenesVista(): array
+    {
+        $examenesBD =
+            $this->examenService
+                ->obtenerProximos(5);
 
         $examenesVista = [];
 
         foreach ($examenesBD as $examen) {
 
-            $fecha = new DateTime($examen['fecha']);
+            $fecha =
+                new DateTime(
+                    $examen['fecha']
+                );
 
             $examenesVista[] = [
-                'month' => strtoupper($fecha->format('M')),
-                'day' => $fecha->format('d'),
-                'title' => 'Examen de Manipulación de Alimentos',
-                'time' => substr($examen['hora'], 0, 5),
-                'place' => $examen['ubicacion']
-                    . (!empty($examen['aula']) ? ' - ' . $examen['aula'] : ''),
-                'available' => ((int)$examen['cupos'] > 0) ? 1 : 0,
-                'route' => 'inscripcion_examen?id=' . $examen['id'],
-                'id' => (int)$examen['id']
+
+                'month' =>
+                    strtoupper(
+                        $fecha->format('M')
+                    ),
+
+                'day' =>
+                    $fecha->format('d'),
+
+                'title' =>
+                    'Examen de Manipulación de Alimentos',
+
+                'time' =>
+                    substr(
+                        $examen['hora'],
+                        0,
+                        5
+                    ),
+
+                'place' =>
+                    $examen['ubicacion']
+                    .
+                    (
+                        !empty($examen['aula'])
+                        ? ' - ' . $examen['aula']
+                        : ''
+                    ),
+
+                'available' =>
+                    ((int)$examen['cupos'] > 0)
+                        ? 1
+                        : 0,
+
+                'route' =>
+                    'inscripcion_examen?id='
+                    . $examen['id'],
+
+                'id' =>
+                    (int)$examen['id']
             ];
         }
 
+        return $examenesVista;
+    }
 
-        $accionPrincipal =
-            $this->homeService
-                ->obtenerAccionPrincipal(
-                    $documentos,
-                    $inscripcion
+
+    public function mostrarDashboard(
+        int $id_usuario
+    ): array
+    {
+        $current =
+            $_SESSION['user_id'] ?? null;
+
+        $isAdmin =
+            $_SESSION['is_admin'] ?? false;
+
+        if (
+            !$current
+            ||
+            (
+                (int)$current !== (int)$id_usuario
+                &&
+                !$isAdmin
+            )
+        ) {
+
+            $this->log(
+                'Dashboard access denied',
+                'WARN',
+                [
+                    'requested' => $id_usuario,
+                    'current' => $current
+                ]
+            );
+
+            return [
+                'title' => 'Mi Panel de Control',
+                'usuario' => null,
+                'inscripciones_activas' => [],
+                'tramites_pendientes' => [],
+                'actividad_reciente' => []
+            ];
+        }
+
+        $usuario =
+            $this->usuarioService
+                ->obtenerPorId(
+                    $id_usuario
                 );
 
-    return [
-        'page_title' => 'App Ciudadana - Inicio',
+        $inscripciones =
+            $this->inscripcionService
+                ->obtenerPorUsuario(
+                    $id_usuario
+                );
 
-        'welcome_text' => 'Bienvenido de nuevo,',
+        $tramitesPendientes =
+            $this->obtenerTramitesPendientes(
+                $inscripciones
+            );
 
-        'usuario' => $usuario,
+        $actividad =
+            $this->obtenerActividadReciente();
 
-        'tramite' => [
-            'label' => 'Estado del Trámite',
-
-        'titulo' =>
-                    $accionPrincipal['titulo'],
-
-        'estado' =>
-                $inscripcion !== null
-                ? $this->obtenerTextoEstado(
-                    $inscripcion->getEstadoId()
-                )
-                : 'Sin inscripción',
-            
-        'fecha_vencimiento' => null,
-
-        'progreso' => $accionPrincipal['porcentaje'] . '%',
-        
-        'porcentaje' => $accionPrincipal['porcentaje'],
-
-        'accion_principal' => [
-                'texto' => $accionPrincipal['texto'],
-                'ruta' => $accionPrincipal['ruta']
-            ],
-            
-        ],
-
-        'documentos' => $documentosVista,
-        'cursos' => $cursosVista,
-        'examenes' => $examenesVista,
-        
-        'documentos_faltantes' =>
-                        isset($accionPrincipal['faltantes'])
-                            ? $accionPrincipal['faltantes']
-                            : [],
-
-        'carnet' => [
-            'descarga_habilitada' => false,
-            'ruta_descarga' => 'carnet_emitido',
-            'etiqueta_descarga' => 'Descargar Carnet'
-        ]
-    ];
-}
-
-    /**
-     * Mostrar dashboard para usuarios autenticados
-     * 
-     * VISTA A LLAMAR: vistas/dashboard.php
-     * 
-     * @param int $id_usuario ID del usuario autenticado
-     * @return array Array con datos para la vista:
-     *   [
-     *     'title' => 'Mi Panel de Control',
-     *     'usuario' => [...],
-     *     'inscripciones_activas' => [...],
-     *     'tramites_pendientes' => [...],
-     *     'actividad_reciente' => [...]
-     *   ]
-     */
-    public function mostrarDashboard(int $id_usuario): array
-    {
-        $current = $_SESSION['user_id'] ?? null;
-        $isAdmin = $_SESSION['is_admin'] ?? false;
-        // Comprobación de permisos: solo el usuario mismo o admin puede ver el dashboard solicitado
-        if (!$current || ((int)$current !== (int)$id_usuario && !$isAdmin)) {
-            $this->log('Dashboard access denied', 'WARN', ['requested' => $id_usuario, 'current' => $current]);
-            return ['title' => 'Mi Panel de Control', 'usuario' => null, 'inscripciones_activas' => [], 'tramites_pendientes' => [], 'actividad_reciente' => []];
-        }
-
-        $usuario = null;
-        if (class_exists('UsuarioService')) { try { $um = new UsuarioService(); $usuario = $um->obtenerPorId($id_usuario); } catch (\Exception $e) { $usuario = null; } }
-
-        $inscripciones = [];
-        if (class_exists('InscripcionService')) { try { $im = new InscripcionService(); if (method_exists($im, 'obtenerPorUsuario')) $inscripciones = $im->obtenerPorUsuario($id_usuario); } catch (\Exception $e) { $inscripciones = []; } }
-
-        // Filtrar inscripciones para mostrar solo las que requieren acción (estados 1 y 2)
-        $tramitesPendientes = [];
-        foreach ($inscripciones as $ins) 
-        { 
-            if (in_array((int)($ins['estado_tramite_id'] ?? $ins['id_estado'] ?? 0), 
-                [EstadoTramite::PENDIENTE,
-                EstadoTramite::DOCUMENTACION_APROBADA,
-                EstadoTramite::INSCRIPTO_EXAMEN], 
-                true)) $tramitesPendientes[] = $ins; 
-        }
-
-        $actividad = [];
-        if (class_exists('AuditoriaAccionesService')) { try { $am = new AuditoriaAccionesService(); if (method_exists($am, 'obtenerRecientes')) $actividad = $am->obtenerRecientes(10); } catch (\Exception $e) { $actividad = []; } }
-
-        $this->log('Dashboard accessed', 'INFO', ['usuario_id' => $id_usuario]);
+        $this->log(
+            'Dashboard accessed',
+            'INFO',
+            [
+                'usuario_id' => $id_usuario
+            ]
+        );
 
         return [
-            'title' => 'Mi Panel de Control',
-            'usuario' => $usuario,
-            'inscripciones_activas' => $inscripciones,
-            'tramites_pendientes' => $tramitesPendientes,
-            'actividad_reciente' => $actividad
+
+            'title' =>
+                'Mi Panel de Control',
+
+            'usuario' =>
+                $usuario,
+
+            'inscripciones_activas' =>
+                $inscripciones,
+
+            'tramites_pendientes' =>
+                $tramitesPendientes,
+
+            'actividad_reciente' =>
+                $actividad
         ];
     }
+
+
+    /**
+     * Obtiene únicamente los trámites que requieren acción.
+     */
+    private function obtenerTramitesPendientes(
+        array $inscripciones
+    ): array
+    {
+        $tramites = [];
+
+        foreach ($inscripciones as $inscripcion) {
+
+            $estado =
+                (int)(
+                    $inscripcion['estado_tramite_id']
+                    ??
+                    $inscripcion['id_estado']
+                    ??
+                    0
+                );
+
+            if (
+                in_array(
+                    $estado,
+                    [
+                        EstadoTramite::PENDIENTE,
+                        EstadoTramite::DOCUMENTACION_APROBADA,
+                        EstadoTramite::INSCRIPTO_EXAMEN
+                    ],
+                    true
+                )
+            ) {
+                $tramites[] =
+                    $inscripcion;
+            }
+        }
+
+        return $tramites;
+    }
+
+
+    /**
+     * Obtiene la actividad reciente del sistema.
+     */
+    private function obtenerActividadReciente(): array
+    {
+        if (
+            !class_exists(
+                'AuditoriaAccionesService'
+            )
+        ) {
+            return [];
+        }
+
+        try {
+
+            $service =
+                new AuditoriaAccionesService();
+
+            if (
+                method_exists(
+                    $service,
+                    'obtenerRecientes'
+                )
+            ) {
+                return $service
+                    ->obtenerRecientes(10);
+            }
+
+        } catch (\Exception $e) {
+
+            $this->log(
+                'Error obteniendo actividad reciente',
+                'ERROR',
+                [
+                    'mensaje' =>
+                        $e->getMessage()
+                ]
+            );
+        }
+
+        return [];
+    }
+
 
     /**
      * Mostrar página de consulta pública por DNI
@@ -467,113 +729,14 @@ class HomeControlador
      *     'error' => string | null
      *   ]
      */
-    public function consultarCarnetPorDNI(string $dni): array
+   public function consultarCarnetPorDNI(string $dni): array
     {
-        $dni = trim($dni);
-        
-        // Validación sintáctica del DNI público (formato: XX.XXX.XXX)
-        if (!preg_match('/^\d{1,2}\.\d{3}\.\d{3}$/', $dni)) {
-            return [
-                'success' => false,
-                'error' => 'Formato de DNI inválido (XX.XXX.XXX)',
-                'carnet' => null
-            ];
-        }
-
-        // limpiar puntos
-        $dni_plain = str_replace('.', '', $dni);
-        // intentar servicio CarnetService
-        $carnet = null;
-        if (class_exists('CarnetService')) {
-            try { $cm = new CarnetService(); $carnet = $cm->obtenerPorDNI($dni_plain) ?: $cm->obtenerPorDNI($dni); } catch (\Exception $e) { $carnet = null; }
-        }
-
-        // Si no hay servicio, intentar consulta directa a DB (fallback)
-        if (!$carnet) {
-            $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) { $this->log('Public carnet query failed - no DB', 'WARN'); return ['success' => false, 'error' => 'Servicio no disponible', 'carnet' => null]; }
-            require_once $conn; $pdo = Connection::getPDO();
-            $sql = 'SELECT c.numero_carnet, c.fecha_emision, c.fecha_vencimiento, c.vigente FROM carnets c JOIN inscripciones i ON c.inscripcion_id = i.id JOIN usuarios u ON i.usuario_id = u.id WHERE u.dni = :dni OR u.dni = :dni_plain LIMIT 1';
-            $stmt = $pdo->prepare($sql);
-            $stmt->execute([':dni' => $dni, ':dni_plain' => $dni_plain]);
-            $carnet = $stmt->fetch(\PDO::FETCH_ASSOC) ?: null;
-        }
-
-        if (!$carnet) {
-            $this->log('Public carnet query - not found', 'INFO', ['dni' => $dni]);
-            return ['success' => false, 'error' => 'No se encontró información', 'carnet' => null];
-        }
-
-        $public = [
-            'numero_carnet' => $carnet['numero_carnet'] ?? $carnet['numero'] ?? null,
-            'fecha_emision' => $carnet['fecha_emision'] ?? null,
-            'fecha_vencimiento' => $carnet['fecha_vencimiento'] ?? null,
-            'vigente' => isset($carnet['vigente']) ? ((int)$carnet['vigente'] === 1) : null
-        ];
-
-        $this->log('Public carnet query', 'INFO', ['dni' => $dni]);
-
-        return ['success' => true, 'error' => null, 'carnet' => $public];
+        return $this->carnetService->consultarPublicoPorDNI($dni);
     }
 
-    /**
-     * Obtener información estadística de la plataforma
-     * 
-     * @return array Array con estadísticas:
-     *   [
-     *     'total_usuarios' => int,
-     *     'carnets_vigentes' => int,
-     *     'tramites_en_proceso' => int,
-     *     'inscripciones_este_mes' => int
-     *   ]
-     */
     public function obtenerEstadisticas(): array
     {
-        $conn = __DIR__ . '/../db/Connection.php'; if (!file_exists($conn)) return ['total_usuarios' => 0, 'carnets_vigentes' => 0, 'tramites_en_proceso' => 0, 'inscripciones_este_mes' => 0]; require_once $conn; $pdo = Connection::getPDO();
-        try {
-            $totalUsuarios = (int)$pdo->query('SELECT COUNT(*) FROM usuarios WHERE activo = 1')->fetchColumn();
-            $carnets = (int)$pdo->query('SELECT COUNT(*) FROM carnets WHERE vigente = 1')->fetchColumn();
-            $stmtTramites = $pdo->prepare(
-                "SELECT COUNT(*)
-                FROM inscripciones
-                WHERE estado_tramite_id IN (
-                    :estado1,
-                    :estado2,
-                    :estado3
-                )"
-            );
-
-            $stmtTramites->execute([
-                ':estado1' => EstadoTramite::PENDIENTE,
-                ':estado2' => EstadoTramite::DOCUMENTACION_APROBADA,
-                ':estado3' => EstadoTramite::INSCRIPTO_EXAMEN
-            ]);
-
-            $tramites =
-                (int)$stmtTramites->fetchColumn();
-            $inicioMes = date('Y-m-01 00:00:00'); $ahora = date('Y-m-d H:i:s');
-            $stmtInicioMes = $pdo->prepare(
-                'SELECT COUNT(*)
-                FROM inscripciones
-                WHERE fecha_inscripcion
-                BETWEEN :inicio AND :fin'
-            );
-
-            $stmtInicioMes->execute([
-                ':inicio' => $inicioMes,
-                ':fin' => $ahora
-            ]);
-
-            $insMes =
-                (int)$stmtInicioMes->fetchColumn();
-            return 
-            ['total_usuarios' => $totalUsuarios, 
-            'carnets_vigentes' => $carnets, 
-            'tramites_en_proceso' => $tramites, 
-            'inscripciones_este_mes' => (int)$insMes];
-        } catch (\Exception $e) {
-            $this->log('Error obtener estadisticas', 'ERROR', ['error' => $e->getMessage()]);
-            return ['total_usuarios' => 0, 'carnets_vigentes' => 0, 'tramites_en_proceso' => 0, 'inscripciones_este_mes' => 0];
-        }
+        return $this->adminService->obtenerEstadisticas();
     }
 
     /**

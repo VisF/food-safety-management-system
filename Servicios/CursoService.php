@@ -38,9 +38,7 @@ class CursoService
     /**
      * Obtener curso por ID.
      */
-    public function obtenerPorId(
-        int $id
-    ): ?array {
+    public function obtenerPorId(int $id): ?array {
 
         return
             $this->cursoRepository
@@ -60,9 +58,8 @@ class CursoService
     /**
      * Obtener cursos por modalidad.
      */
-    public function obtenerPorModalidad(
-        string $modalidad
-    ): array {
+    public function obtenerPorModalidad(string $modalidad): array 
+    {
 
         return
             $this->cursoRepository
@@ -78,16 +75,14 @@ class CursoService
     /**
      * Crear curso.
      */
-    public function crear(
-        array $datos
-    ): ?array {
+    public function crear(array $datos): ?array 
+    {
 
-        if (
-            $this->cursoRepository
+        if ($this->cursoRepository
                 ->existeNombre(
                     $datos['nombre']
-                )
-        ) {
+                )) 
+        {
             return null;
         }
 
@@ -107,10 +102,8 @@ class CursoService
     /**
      * Actualizar curso.
      */
-    public function actualizar(
-        int $id,
-        array $datos
-    ): bool {
+    public function actualizar(int $id,array $datos): bool 
+    {
 
         return
             $this->cursoRepository
@@ -123,10 +116,8 @@ class CursoService
     /**
      * Activar curso.
      */
-    public function activar(
-        int $id
-    ): bool {
-
+    public function activar(int $id): bool 
+    {
         return
             $this->cursoRepository
                 ->activar($id);
@@ -135,20 +126,20 @@ class CursoService
     /**
      * Desactivar curso.
      */
-    public function desactivar(
-        int $id
-    ): bool {
-
-        if (
-            $this->cursoRepository
-                ->contarInscripciones($id) > 0
-        ) {
-            return false;
+    public function desactivar(int $id): array
+    {
+        if ($this->cursoRepository->contarInscripciones($id) > 0) {
+            return [
+                'success' => false,
+                'codigo' => 'CURSO_CON_INSCRIPCIONES'
+            ];
         }
 
-        return
-            $this->cursoRepository
-                ->desactivar($id);
+        $this->cursoRepository->desactivar($id);
+
+        return [
+            'success' => true
+        ];
     }
 
     // ==========================
@@ -158,10 +149,8 @@ class CursoService
     /**
      * Verificar si existe un curso.
      */
-    public function existeNombre(
-        string $nombre
-    ): bool {
-
+    public function existeNombre(string $nombre): bool 
+    {
         return
             $this->cursoRepository
                 ->existeNombre(
@@ -172,10 +161,8 @@ class CursoService
     /**
      * Contar inscripciones.
      */
-    public function contarInscripciones(
-        int $cursoId
-    ): int {
-
+    public function contarInscripciones(int $cursoId): int 
+    {
         return
             $this->cursoRepository
                 ->contarInscripciones(
