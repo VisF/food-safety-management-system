@@ -70,7 +70,7 @@ class ExamenService
      * Obtener próximos exámenes.
      */
     public function obtenerProximos(
-        int $cantidad = 5
+        int $cantidad = 10
     ): array
     {
         return $this->examenRepository
@@ -175,4 +175,5 @@ class ExamenService
                     $idExamen
                 );
     }
+
 }

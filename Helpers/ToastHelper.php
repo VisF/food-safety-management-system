@@ -133,7 +133,11 @@ class ToastHelper
                 'mensaje' => 'El apellido ingresado no es válido.',
                 'tipo' => 'warning'
             ],
-
+            'login_requerido' => [
+                'mensaje' => 'Debe iniciar sesión para inscribirse a un examen.',
+                'tipo' => 'warning'
+            ],
+        
             default => null
         };
     }

@@ -140,3 +140,19 @@
 [2026-07-17 21:10:49] [INFO] IP: ::1 | User logged out | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-07-17 21:10:55] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno2@test.com"}
 [2026-07-23 18:54:38] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-24 15:58:39] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-07-24 15:58:52] [INFO] IP: ::1 | User logged out | {"usuario_id":4,"email":"alumno3@test.com"}
+[2026-07-24 15:59:06] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":5,"email":"alumno4@test.com"}
+[2026-07-27 17:25:28] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 17:44:42] [WARNING] IP: ::1 | Failed login attempt | {"email":"pruebacompletauno@test.com"}
+[2026-07-29 17:44:45] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:01:14] [INFO] IP: ::1 | User logged out | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:01:20] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-29 18:02:41] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-29 18:02:47] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:08:46] [INFO] IP: ::1 | User logged out | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:08:53] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-29 18:13:44] [INFO] IP: ::1 | User logged out | {"usuario_id":2,"email":"alumno1@test.com"}
+[2026-07-29 18:13:49] [WARNING] IP: ::1 | Failed login attempt | {"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:13:52] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
+[2026-07-29 18:48:38] [INFO] IP: ::1 | User logged out | {"usuario_id":14,"email":"pruebacompletauno@test.com"}

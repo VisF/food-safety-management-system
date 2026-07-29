@@ -39,25 +39,32 @@ class ExamenRepository
         $this->conexion = Connection::getPDO();
     }
     // Lista examenes.
-    public function listarExamenes(): array
+   public function listarExamenes(): array
     {
         $sql = "
             SELECT
-                id,
-                fecha,
-                hora,
-                ubicacion,
-                aula,
-                cupos,
-                activo
-            FROM examenes
-            ORDER BY fecha DESC, hora DESC
+                e.id,
+                e.fecha,
+                e.hora,
+                e.ubicacion AS lugar,
+                e.aula,
+                e.cupos AS cupos_totales,
+                e.cupos AS cupos_disponibles,
+                CASE
+                    WHEN e.activo = 1 THEN 'ACTIVO'
+                    ELSE 'INACTIVO'
+                END AS estado
+            FROM examenes e
+            ORDER BY
+                e.fecha DESC,
+                e.hora DESC
         ";
 
         $stmt = $this->conexion->prepare($sql);
+
         $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
 
     // Ejecuta contar examenes.
@@ -226,29 +233,38 @@ class ExamenRepository
         ]);
     }
     // Obtiene proximos.
-    public function obtenerProximos(int $dias = 30): array
+    public function obtenerProximos(int $cantidad = 10): array
     {
-        $sql = "
-            SELECT
-                id,
-                fecha,
-                hora,
-                ubicacion,
-                aula,
-                cupos
-            FROM examenes
-            WHERE activo = 1
-            AND fecha BETWEEN CURDATE()
-                        AND DATE_ADD(CURDATE(), INTERVAL :dias DAY)
-            ORDER BY fecha ASC, hora ASC
-        ";
+            $sql = "
+                SELECT
+                    e.*,
+                    (e.cupos - COUNT(i.id)) AS cupos_libres
+                FROM examenes e
+
+                LEFT JOIN inscripciones i
+                    ON i.examen_id = e.id
+
+                WHERE
+                    e.activo = 1
+                    AND e.fecha >= CURDATE()
+
+                GROUP BY e.id
+
+                HAVING cupos_libres > 0
+
+                ORDER BY
+                    e.fecha ASC,
+                    e.hora ASC
+
+                LIMIT :cantidad
+            ";
 
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->bindValue(
-            ':dias',
-            $dias,
-            \PDO::PARAM_INT
+                ':cantidad',
+                $cantidad,
+                \PDO::PARAM_INT
         );
 
         $stmt->execute();

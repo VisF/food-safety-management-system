@@ -13,18 +13,6 @@ $router->map(
     }
 );
 
-$router->map(
-    'POST',
-    '/inscripciones',
-    function () {
-        
-    require_once __DIR__ . '/../Controller/InscripcionControlador.php';
-
-    $controller = new InscripcionControlador();
-
-    $controller->procesarInscripcionExamen($_POST);
-    }
-);
 //---------- Ruta para inscribirse a un curso (sin examen) ---------
 
 $router->map(
@@ -341,19 +329,7 @@ $router->map(
         $controlador->guardar();
     }
 );
-$router->map(
-    'GET',
-    '/admin/examenes',
-    function () {
 
-        require_once __DIR__.'/../Views/admin_examenes.php';
-
-        $vista = new AdminExamenesVista();
-
-        $vista->mostrar();
-
-    }
-);
 
 //---------- Rutas relacionadas con otras vistas ---------
 $router->map(
@@ -480,7 +456,7 @@ $router->map(
 
         $resultado = $controller->procesarInscripcionExamen($_POST);
 
-        if ($resultado['success']) {
+       if ($resultado['success']) {
 
             header(
                 'Location: /manipulacionDeAlimentos/index.php?toast=inscripcion_exitosa'
@@ -488,14 +464,26 @@ $router->map(
 
         } else {
 
-            $toast =
-                urlencode(
-                    $resultado['mensaje']
-                    ?? 'No fue posible completar la inscripción'
-                );
+            switch ($resultado['mensaje']) {
+                                case 'Debe iniciar sesión para inscribirse a un examen.':
+                                    $toast = 'login_requerido';
+                                    break;
+
+                                case 'Debe completar la documentación requerida':
+                                    $toast = 'documentacion_incompleta';
+                                    break;
+
+                                case 'Ya posee una inscripción activa a un examen.':
+                                    $toast = 'ya_inscripto';
+                                    break;
+
+                                default:
+                                    $toast = 'error_inscripcion';
+                                    break;
+                            }
 
             header(
-                "Location: /manipulacionDeAlimentos/index.php?toast_error={$toast}"
+                "Location: /manipulacionDeAlimentos/index.php?toast={$toast}"
             );
         }
 
@@ -520,6 +508,69 @@ $router->map(
         ConfirmarInscripcionExamenVista::mostrar();
     }
 );
+
+$router->map(
+    'GET',
+    '/consulta-publica',
+    function () {
+
+        $_GET['data'] = json_encode([
+            'page_title' => 'Consulta Pública de Carnets',
+
+            'formulario' => [
+                'dni' => '',
+            ],
+
+            'resultado' => [
+                'encontrado' => false
+            ]
+        ]);
+
+        require_once __DIR__ . '/../Views/consulta_publica.php';
+
+        $vista = new ConsultaPublicaVista();
+        $vista->mostrar();
+    }
+);
+
+//BORRAR DESDE ACA
+
+$router->map(
+    'GET',
+    '/consulta-publica-demo',
+    function () {
+
+        $_GET['data'] = json_encode([
+            'page_title' => 'Consulta Pública de Carnets',
+
+            'formulario' => [
+                'dni' => '40123456',
+            ],
+
+            'resultado' => [
+                'encontrado' => true,
+                'id_carnet' => 1,
+                'nombre' => 'Juan',
+                'apellido' => 'Pérez',
+                'dni' => '40123456',
+                'numero_carnet' => 'C-2026-000001',
+                'fecha_emision' => '15/07/2026',
+                'fecha_vencimiento' => '15/07/2029',
+                'vigente' => true,
+                'codigo_qr' => '/manipulacionDeAlimentos/img/qr-demo.png'
+            ]
+        ]);
+
+        require_once __DIR__ . '/../Views/consulta_publica.php';
+
+        $vista = new ConsultaPublicaVista();
+        $vista->mostrar();
+    }
+);
+
+//HASTA ACA
+
+
 
 //Para borrar despues
 $router->map(
@@ -548,5 +599,116 @@ $router->map(
         require_once __DIR__ . '/../Views/detalle_tramite.php';
 
         DetalleTramiteVista::mostrar();
+    }
+);
+
+/*==========================================================
+    ADMIN - EXÁMENES
+==========================================================*/
+
+$router->map(
+    'GET',
+    '/admin/examenes',
+    function () {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->mostrarListado();
+    }
+);
+
+$router->map(
+    'GET',
+    '/admin/examenes/nuevo',
+    function () {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->mostrarFormularioCrear();
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/examenes/nuevo',
+    function () {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->crearExamen($_POST);
+    }
+);
+
+$router->map(
+    'GET',
+    '/admin/examenes/[i:id]',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->mostrarDetalle((int)$id);
+    }
+);
+
+$router->map(
+    'GET',
+    '/admin/examenes/[i:id]/editar',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->mostrarFormularioEditar((int)$id);
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/examenes/[i:id]/editar',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->actualizarExamen(
+            (int)$id,
+            $_POST
+        );
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/examenes/[i:id]/desactivar',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->desactivarExamen((int)$id);
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/examenes/[i:id]/activar',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->activarExamen((int)$id);
     }
 );

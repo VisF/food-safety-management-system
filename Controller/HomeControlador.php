@@ -154,11 +154,19 @@ class HomeControlador
         $accionPrincipal =
             $this->homeService
                 ->obtenerAccionPrincipal(
-                    $usuario['id'] ?? 0,
-                    $documentos,
-                    $inscripcion
+                        $usuario['id'] ?? 0,
+                        $inscripcion
                 );
+        $proximoExamen = null;
 
+        if ($usuario !== null) {
+
+            $proximoExamen =
+                $this->homeService
+                    ->obtenerProximoExamen(
+                        $usuario['id']
+                    );
+        }
         return [
 
             'page_title' =>
@@ -212,6 +220,9 @@ class HomeControlador
 
             'examenes' =>
                 $examenesVista,
+
+            'proximo_examen' =>
+                $proximoExamen,
 
             'documentos_faltantes' =>
                 $accionPrincipal['faltantes'] ?? [],
@@ -460,8 +471,10 @@ class HomeControlador
     {
         $examenesBD =
             $this->examenService
-                ->obtenerProximos(5);
+                ->obtenerProximos(10);
+        
 
+    
         $examenesVista = [];
 
         foreach ($examenesBD as $examen) {

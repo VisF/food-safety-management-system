@@ -411,4 +411,78 @@ class CarnetRepository
 
         return $carnet ?: null;
     }
+    public function obtenerCarnetPublicoPorDni(string $dni): ?array
+    {
+        $sql = "
+            SELECT
+                c.id AS id_carnet,
+                c.numero_carnet,
+                c.fecha_emision,
+                c.fecha_vencimiento,
+                c.ruta_pdf,
+                c.vigente,
+
+                i.usuario_id,
+
+                u.nombre,
+                u.apellido,
+                u.dni
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON c.inscripcion_id = i.id
+
+            INNER JOIN usuarios u
+                ON i.usuario_id = u.id
+
+            WHERE u.dni = :dni
+
+            LIMIT 1
+
+            ORDER BY c.fecha_emision DESC
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':dni' => $dni
+        ]);
+
+        $carnet = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $carnet ?: null;
+    }
+    public function obtenerPorIdConsultaPublica(int $idCarnet): ?array
+    {
+        $sql = "
+            SELECT
+                c.id,
+                c.inscripcion_id,
+                c.numero_carnet,
+                c.fecha_emision,
+                c.fecha_vencimiento,
+                c.ruta_pdf,
+                c.vigente,
+
+                i.usuario_id
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON c.inscripcion_id = i.id
+
+            WHERE c.id = :id
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':id' => $idCarnet
+        ]);
+
+        $carnet = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $carnet ?: null;
+    }
 }

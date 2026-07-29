@@ -1,0 +1,6 @@
+[2026-07-27 17:27:20] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
+[2026-07-27 17:27:20] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"dni_tarjeta_1785166040_6a6778d8e50fa.png"}
+[2026-07-27 17:27:27] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
+[2026-07-27 17:27:27] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"foto_carnet_tarjeta_1785166047_6a6778df98bbb.png"}
+[2026-07-27 17:27:31] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
+[2026-07-27 17:27:31] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"moodle_tarjeta_1785166051_6a6778e3e4607.png"}

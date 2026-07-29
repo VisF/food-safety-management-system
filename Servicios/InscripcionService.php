@@ -35,7 +35,7 @@ require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
 
 
-require_once __DIR__ . '/../Servicios/HabilitacionExamenService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
         
 class InscripcionService
@@ -43,7 +43,7 @@ class InscripcionService
     private InscripcionRepository $inscripcionRepository;
     private DocumentoRepository $documentoRepository;
     private ExamenRepository $examenRepository;
-    private HabilitacionExamenService $habilitacionService;
+    private DocumentoService $documentoService;
     
 
     // Inicializa las dependencias de la clase.
@@ -51,7 +51,7 @@ class InscripcionService
         $this->inscripcionRepository = new InscripcionRepository();
         $this->documentoRepository = new DocumentoRepository();
         $this->examenRepository = new ExamenRepository();
-        $this->habilitacionService = new HabilitacionExamenService();
+        $this->documentoService = new DocumentoService();
 
     }
     // Ejecuta tiene curso activo.
@@ -193,54 +193,29 @@ class InscripcionService
     // Ejecuta usuario puede inscribirse examen.
     public function usuarioPuedeInscribirseExamen(int $usuarioId): array
     {
-        $documentos =
-            $this->documentoRepository
-                ->obtenerPorUsuario($usuarioId);
-
-
-        $tieneDni = false;
-        $tieneFoto = false;
-
-        foreach ($documentos as $documento) {
-
-            if (($documento['estado'] ?? '') !== 'aprobado') {
-                continue;
-            }
-
-            switch (strtolower($documento['tipo_documento'])) {
-
-                case 'dni':
-                    $tieneDni = true;
-                    break;
-
-                case 'foto':
-                case 'foto_carnet':
-                    $tieneFoto = true;
-                    break;
-            }
-        }
-
-        $tieneHabilitacion =
-            $this->habilitacionService
-                ->tieneHabilitacionVigente($usuarioId);
+        $estado = $this->documentoService
+            ->obtenerEstadoDocumentacion($usuarioId);
 
         $faltantes = [];
 
-        if (!$tieneDni) {
+        if (!$estado['dni']) {
             $faltantes[] = 'DNI';
         }
 
-        if (!$tieneFoto) {
+        if (!$estado['foto']) {
             $faltantes[] = 'Foto Carnet';
         }
 
-        if (!$tieneHabilitacion) {
-            $faltantes[] =
-                'No posee una habilitación vigente para rendir el examen';
+        if (
+            !$estado['asistencia']
+            &&
+            !$estado['moodle']
+        ) {
+            $faltantes[] = 'Curso aprobado';
         }
 
         return [
-            'puede' => empty($faltantes),
+            'puede' => $estado['completo'],
             'faltantes' => $faltantes
         ];
     }
@@ -344,19 +319,18 @@ class InscripcionService
 
         $faltantes = [];
 
-        foreach ($docs as $documento) {
+        $estado =
+            $this->documentoService
+                ->obtenerEstadoDocumentacion(
+                    (int)$inscripcion['usuario_id']
+                );
 
-            if (($documento['estado'] ?? 'pendiente') !== 'aprobado') {
-                $faltantes[] = $documento['tipo_documento'];
-            }
-        }
-
-        if (!empty($faltantes)) {
+        if (!$estado['completo']) {
 
             return [
                 'success' => false,
                 'codigo' => 'DOCUMENTACION_INCOMPLETA',
-                'faltantes' => $faltantes
+                'faltantes' => $this->obtenerFaltantesDocumentacion($estado)
             ];
         }
 
@@ -496,6 +470,24 @@ class InscripcionService
         return
             $this->inscripcionRepository
                 ->obtenerPendientesValidacion();
+    }
+
+    /**
+     * Verificar si un usuario tiene un examen activo.
+     *
+     * @param int $usuarioId
+     * @return bool
+     */
+    public function tieneExamenActivo(int $usuarioId): bool
+    {
+        return $this->inscripcionRepository
+            ->tieneExamenActivo($usuarioId);
+    }
+    
+    public function obtenerProximoExamenUsuario(int $usuarioId): ?array
+    {
+        return $this->inscripcionRepository
+            ->obtenerProximoExamenUsuario($usuarioId);
     }
     
 }

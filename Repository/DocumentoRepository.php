@@ -357,4 +357,31 @@ class DocumentoRepository
 
         return $documento ?: null;
     }
+
+   public function obtenerFotoCarnet(int $usuarioId): ?array
+    {
+        $sql = "
+            SELECT
+                id,
+                usuario_id,
+                ruta_archivo,
+                nombre_original,
+                tipo_mime
+            FROM documentos
+            WHERE usuario_id = :usuario_id
+            AND tipo_documento = 'foto_carnet'
+            AND estado = 'aprobado'
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':usuario_id' => $usuarioId
+        ]);
+
+        $documento = $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $documento ?: null;
+    }
 }

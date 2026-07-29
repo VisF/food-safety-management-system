@@ -14,7 +14,10 @@ declare(strict_types=1);
  * - Validar cumplimiento de requisitos.
  * - Verificar documentación.
  * - Verificar asistencia.
- * - Verificar habilitación para examen.
+ * - Validar cumplimiento de requisitos.
+ * - Verificar documentación.
+ * - Verificar asistencia.
+ * - Procesar la validación integral.
  * - Procesar la validación integral.
  */
 
@@ -23,7 +26,7 @@ require_once __DIR__ . '/../Servicios/asistenciaService.php';
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
 require_once __DIR__ . '/../Servicios/documentoService.php';
 require_once __DIR__ . '/../Servicios/resultadoExamenService.php';
-require_once __DIR__ . '/../Servicios/habilitacionExamenService.php';
+
 
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
@@ -42,13 +45,13 @@ class ValidacionControlador
 
     private InscripcionService $inscripcionService;
 
-    private documentoService $documentoService;
+    private DocumentoService $documentoService;
 
-    private asistenciaService $asistenciaService;
+    private AsistenciaService $asistenciaService;
 
-    private resultadoExamenService $resultadoExamenService;
+    private ResultadoExamenService $resultadoExamenService;
 
-    private habilitacionExamenService $habilitacionExamenService;
+
 
     /**
      * Inicializa las dependencias.
@@ -68,16 +71,15 @@ class ValidacionControlador
             new InscripcionService();
 
         $this->documentoService =
-            new documentoService();
+            new DocumentoService();
 
         $this->asistenciaService =
-            new asistenciaService();
+            new AsistenciaService();
 
         $this->resultadoExamenService =
-            new resultadoExamenService();
+            new ResultadoExamenService();
 
-        $this->habilitacionExamenService =
-            new habilitacionExamenService();
+
     }
 
     /**
@@ -106,15 +108,13 @@ class ValidacionControlador
         );
     }
 
-    /**
+  /**
      * Validar documentación completa.
      *
      * @param int $id_inscripcion ID de la inscripción
      * @return array
      */
-    public function validarDocumentacion(
-        int $id_inscripcion
-    ): array
+    public function validarDocumentacion(int $id_inscripcion): array
     {
         try {
 
@@ -143,75 +143,38 @@ class ValidacionControlador
             $usuarioId =
                 $inscripcion->getUsuarioId();
 
-            $documentos =
+            $estado =
                 $this->documentoService
-                    ->obtenerPorUsuario(
+                    ->obtenerEstadoDocumentacion(
                         $usuarioId
                     );
 
-            $presentes = [];
-
-            foreach ($documentos as $documento) {
-
-                if (!$documento->estaAprobado()) {
-                    continue;
-                }
-
-                $presentes[] =
-                    strtolower(
-                        $documento->getTipoDocumento()
-                    );
-            }
-
             $faltantes = [];
 
-            if (
-                !in_array(
-                    'dni',
-                    $presentes,
-                    true
-                )
-            ) {
+            if (!$estado['dni']) {
                 $faltantes[] = 'DNI';
             }
 
-            if (
-                !in_array(
-                    'foto_carnet',
-                    $presentes,
-                    true
-                )
-            ) {
+            if (!$estado['foto']) {
                 $faltantes[] = 'Foto Carnet';
             }
 
-            if ($modalidad === 'virtual') {
+            if (
+                $modalidad === 'virtual'
+                && !$estado['moodle']
+            ) {
 
-                if (
-                    !in_array(
-                        'moodle',
-                        $presentes,
-                        true
-                    )
-                ) {
+                $faltantes[] =
+                    'Certificado Moodle';
+            }
 
-                    $faltantes[] =
-                        'Certificado Moodle';
-                }
+            if (
+                $modalidad !== 'virtual'
+                && !$estado['asistencia']
+            ) {
 
-            } else {
-
-                if (
-                    !in_array(
-                        'asistencia',
-                        $presentes,
-                        true
-                    )
-                ) {
-
-                    $faltantes[] =
-                        'Constancia de asistencia';
-                }
+                $faltantes[] =
+                    'Constancia de asistencia';
             }
 
             return [
@@ -450,13 +413,7 @@ class ValidacionControlador
                         $id_inscripcion
                     ),
 
-                'habilitacion' => [
-                    'valido' =>
-                        $this->habilitacionExamenService
-                            ->tieneHabilitacionVigente(
-                                $inscripcion->getUsuarioId()
-                            )
-                ]
+                
             ];
 
             $resultadoGeneral = true;

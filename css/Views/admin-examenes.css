@@ -1,0 +1,76 @@
+.examen-admin__encabezado {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.examen-admin__encabezado .app-vista-button {
+    width: auto;
+    flex: 0 0 auto;
+    align-self: flex-start;
+}
+
+.examen-admin__encabezado .app-vista-button {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0.75rem;
+}
+
+.examen-admin__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;   /* Más separación entre botones */
+    min-width: 14rem;
+}
+
+.app-vista-table tbody td {
+    padding: 1.5rem 1rem;
+}
+
+.app-vista-table tbody tr:not(:last-child) td {
+    border-bottom: 1px solid var(--outline-variant);
+}
+
+.app-vista-table th:last-child,
+.app-vista-table td:last-child {
+    width: 240px;
+}
+
+.examen-admin__acciones {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
+    min-width: 220px;
+}
+
+.examen-admin__acciones form {
+    grid-column: 1 / -1;
+}
+
+.examen-admin__acciones form button {
+    width: 100%;
+}
+
+.estado {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: .3rem .7rem;
+    border-radius: 999px;
+    font-size: .8rem;
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+.estado--activo {
+    color: #15803d;
+    background: #dcfce7;
+    border: 1px solid #86efac;
+}
+
+.estado--inactivo {
+    color: #991b1b;
+    background: #fee2e2;
+    border: 1px solid #fca5a5;
+}

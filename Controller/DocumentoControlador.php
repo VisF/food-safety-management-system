@@ -26,9 +26,9 @@ declare(strict_types=1);
  */
 
 
-require_once __DIR__ . '/../Services/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
-require_once __DIR__ . '/../Services/UploadService.php';
+require_once __DIR__ . '/../Servicios/UploadService.php';
 
 class DocumentoControlador
 {

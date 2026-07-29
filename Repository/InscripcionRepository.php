@@ -835,4 +835,59 @@ class InscripcionRepository
         return
             $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
+
+    public function tieneExamenActivo(int $usuarioId): bool
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT COUNT(*)
+            FROM inscripciones
+            WHERE usuario_id = :usuario
+            AND tipo_inscripcion_id = 2
+            AND estado_tramite_id = :inscripto
+        ");
+
+        $stmt->execute([
+            ':usuario'   => $usuarioId,
+            ':inscripto' => EstadoTramite::INSCRIPTO_EXAMEN
+        ]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    }
+
+    public function obtenerProximoExamenUsuario(int $usuarioId): ?array
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT
+                i.id,
+                e.id AS examen_id,
+                e.fecha,
+                e.hora,
+                e.ubicacion,
+                e.aula,
+                i.estado_tramite_id
+
+            FROM inscripciones i
+            INNER JOIN examenes e
+                ON e.id = i.examen_id
+
+            WHERE
+                i.usuario_id = :usuario
+                AND i.tipo_inscripcion_id = 2
+                AND i.estado_tramite_id = :inscripto
+
+            ORDER BY e.fecha ASC, e.hora ASC
+
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':usuario'   => $usuarioId,
+            ':inscripto' => EstadoTramite::INSCRIPTO_EXAMEN
+        ]);
+
+        $examen =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $examen ?: null;
+    }
 }

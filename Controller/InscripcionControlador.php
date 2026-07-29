@@ -471,10 +471,26 @@ class InscripcionControlador
     public function procesarInscripcionExamen(array $datos): array
     {
 
-        $idUsuario =
-                (int)($datos['id_usuario']
-                ?? $_SESSION['usuario_id']
-                ?? 0);
+    $idUsuario =
+        (int)($datos['id_usuario']
+        ?? $_SESSION['usuario_id']
+        ?? 0);
+
+    if ($idUsuario <= 0) {
+        return [
+                'success' => false,
+                'codigo'  => 'login_requerido',
+                'mensaje' => 'Debe iniciar sesión para inscribirse a un examen.'
+            ];
+    }
+
+    if ($this->inscripcionService->tieneExamenActivo($idUsuario)) {
+
+        return [
+            'success' => false,
+            'mensaje' => 'Ya posee una inscripción activa a un examen.'
+        ];
+    }
 
         $validacion =
             $this->usuarioPuedeInscribirseExamen(

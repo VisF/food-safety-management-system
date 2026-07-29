@@ -499,6 +499,84 @@ class InicioVista
         </div>
 
     </section>
+
+    <?php if ($inicioData['proximo_examen'] !== null): ?>
+
+    <section class="home-proximo-examen">
+
+        <h4 class="home-examenes__titulo">
+
+            Mi examen
+
+        </h4>
+
+        <article class="app-vista-card home-examen-card">
+
+            <div class="home-examen-card__contenido">
+
+                <h5 class="home-examen-card__titulo">
+
+                    Examen de Manipulación de Alimentos
+
+                </h5>
+
+                <p class="home-examen-card__detalle">
+
+                    <span class="material-symbols-outlined">
+                        calendar_today
+                    </span>
+
+                    <?= date(
+                        'd/m/Y',
+                        strtotime($inicioData['proximo_examen']['fecha'])
+                    ); ?>
+
+                </p>
+
+                <p class="home-examen-card__detalle">
+
+                    <span class="material-symbols-outlined">
+                        schedule
+                    </span>
+
+                    <?= substr(
+                        $inicioData['proximo_examen']['hora'],
+                        0,
+                        5
+                    ); ?>
+
+                </p>
+
+                <p class="home-examen-card__detalle">
+
+                    <span class="material-symbols-outlined">
+                        location_on
+                    </span>
+
+                    <?= $this->e(
+                        $inicioData['proximo_examen']['ubicacion']
+                    ); ?>
+
+                    <?php if (!empty($inicioData['proximo_examen']['aula'])): ?>
+
+                        - <?= $this->e(
+                            $inicioData['proximo_examen']['aula']
+                        ); ?>
+
+                    <?php endif; ?>
+
+                </p>
+
+            </div>
+
+        </article>
+
+    </section>
+
+    <?php endif; ?>
+
+    <?php if ($inicioData['proximo_examen'] === null): ?>
+
     <section id="proximos-examenes" class="home-examenes">
 
     <h4 class="home-examenes__titulo">
@@ -605,6 +683,7 @@ class InicioVista
         </div>
 
     </section>
+    <?php endif; ?>
     <section class="home-carnet">
 
         <a

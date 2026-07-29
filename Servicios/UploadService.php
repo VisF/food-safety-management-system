@@ -50,7 +50,7 @@ class UploadService
     private const CARPETA_UPLOADS =
         __DIR__ . '/../uploads';
 
-    private const CARPETA_DOCUMENTOS =
+    public const CARPETA_DOCUMENTOS =
         __DIR__ . '/../uploads/documentos';
 
     private const CARPETA_CARNETS =

@@ -19,7 +19,7 @@ declare(strict_types=1);
  * - Actualizar cupos.
  * - Obtener próximos exámenes.
  */
-require_once __DIR__ . '/../Service/ExamenService.php';
+require_once __DIR__ . '/../Servicios/ExamenService.php';
 
 class AdminExamenControlador
 {
@@ -363,6 +363,19 @@ class AdminExamenControlador
 
             ];
         }
+    }
+    public function mostrarListado(): void
+    {
+        $resultado = $this->listarExamenes();
+
+        require_once __DIR__ . '/../Views/admin_examenes.php';
+
+        $vista = new ExamenAdminVista();
+
+        $vista->mostrar([
+            'page_title' => 'Gestión de Exámenes',
+            'examenes' => $resultado['examenes']
+        ]);
     }
     // Ejecuta log.
     private function log(string $mensaje, string $nivel = 'INFO', array $contexto = []): void

@@ -1,9 +1,5 @@
 <?php
 
-require_once __DIR__ . '/../Servicios/DocumentoService.php';
-require_once __DIR__ . '/../dto/DocumentoDTO.php';
-
-
 /*
 obtenerEstadoDocumentacion()
 
@@ -20,19 +16,18 @@ rechazarDocumento()
 
 */
 
+require_once __DIR__ . '/../dto/DocumentoDTO.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
-require_once __DIR__ . '/HabilitacionExamenService.php';
-
 
 class DocumentoService
 {
     private DocumentoRepository $documentoRepository;
-    private HabilitacionExamenService $habilitacionService;
+
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->documentoRepository = new DocumentoRepository();
-        $this->habilitacionService = new HabilitacionExamenService();
+
     }
 
     // Obtiene por usuario.
@@ -70,26 +65,29 @@ class DocumentoService
                 continue;
             }
 
-            switch ($doc['tipo_documento']) {
-                case 'dni':
-                    $tieneDni = true;
-                    break;
+            switch (strtolower($doc['tipo_documento'])) {
+                    case 'dni':
+                        $tieneDni = true;
+                        break;
 
-                case 'foto_carnet':
-                    $tieneFoto = true;
-                    break;
+                    case 'foto':
+                    case 'foto_carnet':
+                        $tieneFoto = true;
+                        break;
 
-                case 'asistencia':
-                    $tieneAsistencia = true;
-                    break;
+                    case 'asistencia':
+                        $tieneAsistencia = true;
+                        break;
 
-                case 'moodle':
-                    $tieneMoodle = true;
-                    break;
-            }
+                    case 'moodle':
+                    case 'certificado_moodle':
+                        $tieneMoodle = true;
+                        break;
+                }
         }
 
         $completos = 0;
+        $total = 3;
 
         if ($tieneDni) $completos++;
         if ($tieneFoto) $completos++;
@@ -97,9 +95,9 @@ class DocumentoService
 
         return [
             'completos' => $completos,
-            'total' => 3,
-            'porcentaje' => ($completos / 3) * 100,
-            'completo' => ($completos === 3),
+            'total' => $total,
+            'porcentaje' => (int)(($completos / $total) * 100),
+            'completo' => ($completos === $total),
 
             'dni' => $tieneDni,
             'foto' => $tieneFoto,
@@ -261,40 +259,6 @@ class DocumentoService
                 'success' => false,
                 'codigo' => 'ERROR_VALIDACION'
             ];
-        }
-
-        $tipoDocumento =
-            strtoupper(
-                $documento['tipo_documento'] ?? ''
-            );
-
-        if (
-            $tipoDocumento === 'MOODLE'
-            ||
-            $tipoDocumento === 'CERTIFICADO_MOODLE'
-        ) {
-
-            $usuarioId =
-                (int)$documento['usuario_id'];
-
-            if (
-                !$this->habilitacionService
-                    ->tieneHabilitacionVigente(
-                        $usuarioId
-                    )
-            ) {
-
-                $this->habilitacionService
-                    ->crear([
-                        'usuario_id' => $usuarioId,
-                        'curso_id' => null,
-                        'fecha_habilitacion' => date('Y-m-d'),
-                        'fecha_vencimiento' => date(
-                            'Y-m-d',
-                            strtotime('+6 months')
-                        )
-                    ]);
-            }
         }
 
         return [

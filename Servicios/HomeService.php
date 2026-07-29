@@ -1,52 +1,30 @@
 <?php
 
 
-require_once __DIR__ .'/../Servicios/HabilitacionExamenService.php';
+require_once __DIR__ .'/../Servicios/DocumentoService.php';
+require_once __DIR__ .'/../Servicios/InscripcionService.php';
 
             
 class HomeService
 {
 
-    private HabilitacionExamenService $habilitacionService;
+    private DocumentoService $documentoService;
+    private InscripcionService $inscripcionService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
-        $this->habilitacionService =
-            new HabilitacionExamenService();
+        $this->documentoService =
+            new DocumentoService();
+        $this->inscripcionService =
+            new InscripcionService();
     }
     // Obtiene accion principal.
-    public function obtenerAccionPrincipal(int $usuarioId, array $documentos,?object $inscripcion ): array 
+    public function obtenerAccionPrincipal(int $usuarioId,?object $inscripcion ): array 
     {
 
-        $tieneDni = false;
-        $tieneFoto = false;
-        $tieneHabilitacion = false;
-        $asistenciaValida = false;
         $tituloTramite = 'Carnet de Manipulador';
 
-        foreach ($documentos as $doc) {
-
-            if ($doc->getEstado() !== 'aprobado') {
-                continue;
-            }
-
-            switch (
-                strtoupper(
-                    $doc->getTipoDocumento()
-                )
-            ) {
-                case 'DNI':
-                    $tieneDni = true;
-                    break;
-
-                case 'FOTO':
-                case 'FOTO_CARNET':
-                    $tieneFoto = true;
-                    break;
-
-            }
-        }
 
 
         if ($inscripcion !== null && $inscripcion->getTipoInscripcionId() === 1) 
@@ -56,8 +34,9 @@ class HomeService
                 'Curso de Manipulación de Alimentos';
         }
 
-        $tieneHabilitacion = $this->habilitacionService
-                ->tieneHabilitacionVigente($usuarioId);
+        $estadoDocumentacion =
+                 $this->documentoService
+                    ->obtenerEstadoDocumentacion($usuarioId);
 
         if ($inscripcion !== null
                 &&
@@ -83,11 +62,11 @@ class HomeService
                     'porcentaje' => 100
                 ];
             }
-        $estado = $inscripcion !== null
+        $estadoTramite = $inscripcion !== null
                 ? $inscripcion->getEstadoId()
                 : null;
 
-        if ($estado === EstadoTramite::INSCRIPTO_EXAMEN) {
+        if ($estadoTramite === EstadoTramite::INSCRIPTO_EXAMEN){
 
             return [
 
@@ -104,29 +83,20 @@ class HomeService
                 'porcentaje' => 100
             ];
         }
-
         $documentacionCompleta =
-                $tieneDni
-                && $tieneFoto
-                && $tieneHabilitacion;
+            $estadoDocumentacion['completo'];
 
         if (!$documentacionCompleta) {
 
             return [
                 'titulo' => $tituloTramite,
                 'faltantes' => $this->obtenerFaltantes(
-                                    $tieneDni,
-                                    $tieneFoto,
-                                    $tieneHabilitacion,
-                                ),
+                        $estadoDocumentacion
+                    ),
                 'texto' => 'Completar documentación',
                 'ruta' => 'subida_documentacion',
                 'completa' => false,
-                'porcentaje' => $this->calcularPorcentaje(
-                    $tieneDni,
-                    $tieneFoto,
-                    $tieneHabilitacion,
-                )
+                'porcentaje' => $estadoDocumentacion['porcentaje']
             ];
         }
 
@@ -140,51 +110,33 @@ class HomeService
             ];
     }
 
-    // Ejecuta calcular porcentaje.
-    private function calcularPorcentaje(
-        bool $dni,
-        bool $foto,
-        bool $habilitacion
-    ): int {
-
-        $completos = 0;
-
-        if ($dni) {
-            $completos++;
-        }
-
-        if ($foto) {
-            $completos++;
-        }
-
-        if ($habilitacion) {
-            $completos++;
-        }
-
-        return (int)(($completos / 3) * 100);
-    }
 
     // Obtiene faltantes.
-    private function obtenerFaltantes(
-        bool $dni,
-        bool $foto,
-        bool $habilitacion
-    ): array {
-
+    private function obtenerFaltantes(array $estado): array
+    {
         $faltantes = [];
 
-        if (!$dni) {
+        if (!$estado['dni']) {
             $faltantes[] = 'DNI';
         }
 
-        if (!$foto) {
+        if (!$estado['foto']) {
             $faltantes[] = 'Foto Carnet';
         }
 
-        if (!$habilitacion) {
-            $faltantes[] = 'Falta una habilitación vigente para rendir el examen';
+        if (
+            !$estado['asistencia']
+            &&
+            !$estado['moodle']
+        ) {
+            $faltantes[] = 'Curso aprobado';
         }
 
         return $faltantes;
+    }
+    public function obtenerProximoExamen(int $usuarioId): ?array
+    {
+        return $this->inscripcionService
+            ->obtenerProximoExamenUsuario($usuarioId);
     }
 }
