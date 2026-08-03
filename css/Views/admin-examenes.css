@@ -1,8 +1,9 @@
 .examen-admin__encabezado {
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    gap: 1rem;
+    align-items: flex-start;
+    gap: 2rem;
+    margin-bottom: 1.75rem;
     flex-wrap: wrap;
 }
 
@@ -10,31 +11,119 @@
     width: auto;
     flex: 0 0 auto;
     align-self: flex-start;
+    padding: .75rem 1.25rem;
+    border-radius: .75rem;
 }
 
-.examen-admin__encabezado .app-vista-button {
-    padding: 0.75rem 1.25rem;
-    border-radius: 0.75rem;
-}
-
-.examen-admin__acciones {
+.examen-admin__herramientas {
     display: flex;
-    flex-direction: column;
-    gap: 0.75rem;   /* Más separación entre botones */
-    min-width: 14rem;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 1.5rem;
+}
+
+.examen-admin__herramientas form {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    font-size: .95rem;
+    font-weight: 600;
+}
+
+.examen-admin__herramientas select {
+    min-width: 220px;
+    height: 46px;
+    padding: 0 .9rem;
+    border-radius: .75rem;
+    border: 1px solid var(--outline);
+    background: white;
+    font-size: .95rem;
+}
+
+.examen-admin__tabla {
+    overflow-x: auto;
+    border-radius: 1rem;
+    border: 1px solid var(--outline-variant);
+}
+
+.app-vista-table{
+    width:100%;
+    border-collapse:collapse;
+
+    /* table-layout:fixed; */
+}
+
+.app-vista-table thead {
+    background: #f7f8fb;
+}
+
+.app-vista-table thead th {
+    padding: 1.2rem 1rem;
+    font-weight: 700;
+    color: #1f2937;
+    border-bottom: 1px solid var(--outline-variant);
+    white-space: nowrap;
 }
 
 .app-vista-table tbody td {
-    padding: 1.5rem 1rem;
+    padding: 1.75rem 1rem;
+    vertical-align: middle;
 }
 
 .app-vista-table tbody tr:not(:last-child) td {
     border-bottom: 1px solid var(--outline-variant);
 }
 
+.app-vista-table tbody tr {
+    transition: .15s;
+}
+
+.app-vista-table tbody tr:hover {
+    background: #fafcff;
+}
+
+.app-vista-table th:nth-child(1),
+.app-vista-table td:nth-child(1) {
+    width: 120px;
+}
+
+.app-vista-table th:nth-child(2),
+.app-vista-table td:nth-child(2) {
+    width: 90px;
+}
+
+.app-vista-table th:nth-child(3),
+.app-vista-table td:nth-child(3) {
+    width: 190px;
+}
+
+.app-vista-table th:nth-child(4),
+.app-vista-table td:nth-child(4) {
+    width: 170px;
+}
+
+.app-vista-table th:nth-child(5),
+.app-vista-table td:nth-child(5) {
+    width: 110px;
+    text-align: center;
+}
+
+.app-vista-table th:nth-child(6),
+.app-vista-table td:nth-child(6) {
+    width: 120px;
+    text-align: center;
+}
+
+.app-vista-table th:nth-child(7),
+.app-vista-table td:nth-child(7) {
+    width: 120px;
+    text-align: center;
+}
+
+/* La última columna ocupa el resto */
 .app-vista-table th:last-child,
 .app-vista-table td:last-child {
-    width: 240px;
+    min-width: 240px;
 }
 
 .examen-admin__acciones {
@@ -56,7 +145,7 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    padding: .3rem .7rem;
+    padding: .3rem .8rem;
     border-radius: 999px;
     font-size: .8rem;
     font-weight: 600;
@@ -73,4 +162,114 @@
     color: #991b1b;
     background: #fee2e2;
     border: 1px solid #fca5a5;
+}
+
+.examen-admin__mobile{
+
+    display:none;
+
+}
+
+/* ===========================
+   TABLET Y CELULAR
+=========================== */
+
+@media (max-width: 900px) {
+    .examen-admin__tabla{
+
+        display:none;
+
+    }
+
+    .examen-admin__mobile{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:1.25rem;
+
+    }
+    .examen-mobile-card{
+
+        background:white;
+
+        border:1px solid var(--outline-variant);
+
+        border-radius:1rem;
+
+        padding:1rem;
+
+        box-shadow:0 2px 8px rgba(0,0,0,.05);
+
+    }
+    .examen-mobile-card__acciones{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:.75rem;
+
+        margin-top:1rem;
+
+    }
+
+    .examen-mobile-card__datos{
+
+        display:flex;
+
+        flex-direction:column;
+
+        gap:.5rem;
+
+        margin-top:.75rem;
+
+    }
+
+    .examen-mobile-card__header{
+
+        display:flex;
+
+        justify-content:flex-end;
+
+    }
+
+    
+
+    .examen-admin__encabezado {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .examen-admin__herramientas {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1rem;
+    }
+
+    .examen-admin__herramientas form {
+        width: 100%;
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .examen-admin__herramientas select {
+        width: 100%;
+        min-width: auto;
+    }
+
+    .examen-admin__encabezado .app-vista-button {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .examen-admin__tabla {
+        overflow-x: auto;
+    }
+
+    .app-vista-table {
+        min-width: 1050px;
+    }
 }

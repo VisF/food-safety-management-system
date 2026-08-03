@@ -66,6 +66,98 @@ class ExamenRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    public function listarExamenesProgramadosAscendente(): array
+    {
+        $sql = "
+            SELECT
+                id,
+                fecha,
+                hora,
+                ubicacion AS lugar,
+                aula,
+                cupos AS cupos_totales,
+                (
+                    cupos -
+                    (
+                        SELECT COUNT(*)
+                        FROM inscripciones i
+                        WHERE i.examen_id = examenes.id
+                    )
+                ) AS cupos_disponibles,
+                CASE
+                    WHEN activo = 1 THEN 'ACTIVO'
+                    ELSE 'INACTIVO'
+                END AS estado
+            FROM examenes
+            WHERE TIMESTAMP(fecha, hora) >= NOW()
+            ORDER BY fecha ASC, hora ASC
+        ";
+        return $this->conexion
+            ->query($sql)
+            ->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    public function listarExamenesProgramadosDescendente(): array
+    {
+        $sql = "
+            SELECT
+                id,
+                fecha,
+                hora,
+                ubicacion AS lugar,
+                aula,
+                cupos AS cupos_totales,
+                (
+                    cupos -
+                    (
+                        SELECT COUNT(*)
+                        FROM inscripciones i
+                        WHERE i.examen_id = examenes.id
+                    )
+                ) AS cupos_disponibles,
+                CASE
+                    WHEN activo = 1 THEN 'ACTIVO'
+                    ELSE 'INACTIVO'
+                END AS estado
+            FROM examenes
+            WHERE TIMESTAMP(fecha, hora) >= NOW()
+            ORDER BY fecha DESC, hora DESC
+        ";
+        return $this->conexion
+            ->query($sql)
+            ->fetchAll(PDO::FETCH_ASSOC);
+    }
+    public function listarHistorialExamenesDescendente(): array
+    {
+        $sql = "
+            SELECT
+                id,
+                fecha,
+                hora,
+                ubicacion AS lugar,
+                aula,
+                cupos AS cupos_totales,
+                (
+                    cupos -
+                    (
+                        SELECT COUNT(*)
+                        FROM inscripciones i
+                        WHERE i.examen_id = examenes.id
+                    )
+                ) AS cupos_disponibles,
+                CASE
+                    WHEN activo = 1 THEN 'ACTIVO'
+                    ELSE 'INACTIVO'
+                END AS estado
+            FROM examenes
+            WHERE TIMESTAMP(fecha, hora) < NOW()
+            ORDER BY fecha DESC, hora DESC
+        ";
+
+        return $this->conexion
+            ->query($sql)
+            ->fetchAll(PDO::FETCH_ASSOC);
+    }
 
     // Ejecuta contar examenes.
     public function contarExamenes(): int
@@ -156,8 +248,13 @@ class ExamenRepository
 
 
 
-    // Actualiza examen.
-    public function actualizarExamen(int $id,array $datos): bool
+    /**
+     * Actualiza un examen.
+     */
+    public function actualizarExamen(
+        int $id,
+        array $datos
+    ): bool
     {
         $sql = "
             UPDATE examenes
@@ -166,56 +263,76 @@ class ExamenRepository
                 hora = :hora,
                 ubicacion = :ubicacion,
                 aula = :aula,
-                cupos = :cupos,
-                activo = :activo
+                cupos = :cupos
             WHERE id = :id
         ";
 
         $stmt = $this->conexion->prepare($sql);
 
-        return $stmt->execute([
+        $stmt->bindValue(
+            ':fecha',
+            $datos['fecha']
+        );
 
-            ':id'         => $id,
+        $stmt->bindValue(
+            ':hora',
+            $datos['hora']
+        );
 
-            ':fecha'      => $datos['fecha'],
+        $stmt->bindValue(
+            ':ubicacion',
+            $datos['ubicacion']
+        );
 
-            ':hora'       => $datos['hora'],
+        $stmt->bindValue(
+            ':aula',
+            $datos['aula']
+        );
 
-            ':ubicacion'  => $datos['ubicacion'],
+        $stmt->bindValue(
+            ':cupos',
+            $datos['cupos'],
+            PDO::PARAM_INT
+        );
 
-            ':aula'       => $datos['aula'],
+        $stmt->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
 
-            ':cupos'      => (int)$datos['cupos'],
-
-            ':activo'     => (int)$datos['activo']
-
-        ]);
+        return $stmt->execute();
     }
-    // Ejecuta activar examen.
-    public function activarExamen(int $id): bool
+    
+    /**
+    * Actualiza el estado de un examen.
+    */
+    public function actualizarEstado(
+        int $id,
+        bool $activo
+    ): bool
     {
-        $stmt = $this->conexion->prepare("
+        $sql = "
             UPDATE examenes
-            SET activo = 1
+            SET activo = :activo
             WHERE id = :id
-        ");
+        ";
 
-        return $stmt->execute([
-            ':id' => $id
-        ]);
-    }
-    // Ejecuta desactivar examen.
-    public function desactivarExamen(int $id): bool
-    {
-        $stmt = $this->conexion->prepare("
-            UPDATE examenes
-            SET activo = 0
-            WHERE id = :id
-        ");
+        $stmt = $this->conexion->prepare($sql);
 
-        return $stmt->execute([
-            ':id' => $id
-        ]);
+        $stmt->bindValue(
+            ':activo',
+            $activo ? 1 : 0,
+            PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
+
+        return $stmt->execute();
     }
 
     // Actualiza cupos.
@@ -331,6 +448,140 @@ class ExamenRepository
             'activo' => (int)$row['activo']
         ];
     }
+
+    /**
+     * Obtiene toda la información necesaria para administrar
+     * la inscripción de un alumno a un examen.
+     */
+    public function obtenerAdministracionInscripcion(int $id): ?array
+    {
+        $sql = "
+            SELECT
+
+                i.id AS inscripcion_id,
+                i.usuario_id,
+                i.examen_id,
+                i.observaciones,
+
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+
+                e.fecha,
+                e.hora,
+                e.ubicacion,
+                e.aula,
+
+                et.nombre AS estado,
+
+                EXISTS(
+                    SELECT 1
+                    FROM documentos d
+                    WHERE
+                        d.usuario_id = u.id
+                        AND d.tipo_documento = 'dni'
+                        AND d.estado = 'aprobado'
+                ) AS dni_aprobado,
+
+                EXISTS(
+                    SELECT 1
+                    FROM documentos d
+                    WHERE
+                        d.usuario_id = u.id
+                        AND d.tipo_documento = 'foto_carnet'
+                        AND d.estado = 'aprobado'
+                ) AS foto_aprobada,
+
+                EXISTS(
+                    SELECT 1
+                    FROM inscripciones ic
+                    WHERE
+                        ic.usuario_id = u.id
+                        AND ic.tipo_inscripcion_id = 1
+                        AND ic.estado_tramite_id = 5
+                ) AS curso_aprobado
+
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            INNER JOIN examenes e
+                ON e.id = i.examen_id
+
+            LEFT JOIN estados_tramite et
+                ON et.id = i.estado_tramite_id
+
+            WHERE
+                i.id = :id
+
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        $stmt->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
+
+        $resultado = $stmt->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+        return $resultado ?: null;
+    }
+    public function obtenerInscriptos(int $examenId): array
+    {
+        $sql = "
+            SELECT
+                i.id AS inscripcion_id,
+                u.id AS usuario_id,
+                u.dni,
+                u.apellido,
+                u.nombre,
+                u.email,
+                i.fecha_inscripcion,
+                et.nombre AS estado
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            LEFT JOIN estados_tramite et
+                ON et.id = i.estado_tramite_id
+
+            WHERE
+                i.examen_id = :examen_id
+                AND i.tipo_inscripcion_id = 2
+
+            ORDER BY
+                u.apellido ASC,
+                u.nombre ASC
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        $stmt->bindValue(
+            ':examen_id',
+            $examenId,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
+
+        return $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+    }
     /**
      * Obtener exámenes con cupos disponibles.
      */
@@ -434,5 +685,124 @@ class ExamenRepository
         $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+    }
+    /**
+     * Actualiza el estado del trámite de una inscripción.
+     */
+    public function actualizarEstadoTramiteInscripcion(int $idInscripcion,int $estado): bool
+    {
+        $sql = "
+            UPDATE inscripciones
+
+            SET estado_tramite_id = :estado
+
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        $stmt->bindValue(
+            ':estado',
+            $estado,
+            PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':id',
+            $idInscripcion,
+            PDO::PARAM_INT
+        );
+
+        return $stmt->execute();
+    }
+
+    /*
+    */
+    public function guardarAdministracionInscripcion(int $id,int $estadoTramite,string $observaciones): bool
+    {
+        $this->conexion->beginTransaction();
+
+        try {
+
+            $this->actualizarEstadoTramite(
+                $id,
+                $estadoTramite
+            );
+
+            $this->actualizarObservaciones(
+                $id,
+                $observaciones
+            );
+
+            $this->conexion->commit();
+
+            return true;
+
+        } catch (Throwable $e) {
+
+            $this->conexion->rollBack();
+
+            throw $e;
+        }
+    }
+    /**
+    * Actualiza el estado del trámite de una inscripción.
+    */
+    private function actualizarEstadoTramite(int $id,int $estadoTramite): bool
+    {
+        $sql = "
+            UPDATE inscripciones
+            SET estado_tramite_id = :estado
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        $stmt->bindValue(
+            ':estado',
+            $estadoTramite,
+            PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
+
+        return $stmt->execute();
+    }
+    /**
+    * Actualiza las observaciones de una inscripción.
+     */
+    private function actualizarObservaciones(int $id,string $observaciones): bool
+    {
+        $sql = "
+            UPDATE inscripciones
+            SET observaciones = :observaciones
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        $stmt->bindValue(
+            ':observaciones',
+            $observaciones,
+            PDO::PARAM_STR
+        );
+
+        $stmt->bindValue(
+            ':id',
+            $id,
+            PDO::PARAM_INT
+        );
+
+        return $stmt->execute();
     }
 }

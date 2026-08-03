@@ -190,19 +190,56 @@ include __DIR__ . '/header.php';
 
                 </div>
 
-                <a
-                    href="<?php echo $this->getRoute('nuevo'); ?>"
-                    class="app-vista-button app-vista-button--primary">
+                <div class="examen-admin__herramientas">
 
-                    <span class="material-symbols-outlined">
-                        add
-                    </span>
+                    <form
+                        action="<?php echo $this->getRoute('admin'); ?>/examenes"
+                        method="get">
 
-                    <span>
-                        Nuevo examen
-                    </span>
+                        <label for="orden">
+                            Ordenar por:
+                        </label>
 
-                </a>
+                        <select
+                            id="orden"
+                            name="orden"
+                            onchange="this.form.submit()">
+
+                            <option
+                                value="asc"
+                                <?php echo (($data['orden'] ?? 'asc') === 'asc') ? 'selected' : ''; ?>>
+
+                                Fecha más cercana
+
+                            </option>
+
+                            <option
+                                value="desc"
+                                <?php echo (($data['orden'] ?? 'asc') === 'desc') ? 'selected' : ''; ?>>
+
+                                Fecha más lejana
+
+                            </option>
+
+                        </select>
+
+                    </form>
+
+                    <a
+                        href="<?php echo $this->getRoute('nuevo'); ?>"
+                        class="app-vista-button app-vista-button--primary">
+
+                        <span class="material-symbols-outlined">
+                            add
+                        </span>
+
+                        <span>
+                            Nuevo examen
+                        </span>
+
+                    </a>
+
+                </div>
 
             </div>
 
@@ -369,8 +406,146 @@ include __DIR__ . '/header.php';
 
                 </table>
 
+            </div> <!-- examen-admin__tabla -->
+            <div class="examen-admin__mobile">
+
+    <?php if (empty($data['examenes'])): ?>
+
+        <p class="app-vista-table__empty">
+            No hay exámenes registrados.
+        </p>
+
+    <?php else: ?>
+
+    <?php foreach ($data['examenes'] as $examen): ?>
+
+        <article class="examen-mobile-card">
+
+            <div class="examen-mobile-card__header">
+
+                <span class="estado <?php echo $examen['estado'] === 'ACTIVO'
+                    ? 'estado--activo'
+                    : 'estado--inactivo'; ?>">
+
+                    <?php echo $this->e($examen['estado']); ?>
+
+                </span>
+
             </div>
 
+            <div class="examen-mobile-card__datos">
+
+                <p>
+
+                    <strong>📅 Fecha:</strong>
+
+                    <?php echo date('d/m/Y', strtotime($examen['fecha'])); ?>
+
+                </p>
+
+                <p>
+
+                    <strong>🕒 Hora:</strong>
+
+                    <?php echo substr($this->e($examen['hora']),0,5); ?>
+
+                </p>
+
+                <p>
+
+                    <strong>📍 Lugar:</strong>
+
+                    <?php echo $this->e($examen['lugar']); ?>
+
+                </p>
+
+                <p>
+
+                    <strong>🚪 Aula:</strong>
+
+                    <?php echo $this->e($examen['aula']); ?>
+
+                </p>
+
+                <p>
+
+                    <strong>👥 Cupos:</strong>
+
+                    <?php echo $this->e($examen['cupos_totales']); ?>
+
+                </p>
+
+                <p>
+
+                    <strong>✔ Disponibles:</strong>
+
+                    <?php echo $this->e($examen['cupos_disponibles']); ?>
+
+                </p>
+
+            </div>
+
+            <div class="examen-mobile-card__acciones">
+
+                <a
+                    class="app-vista-button app-vista-button--secondary"
+                    href="<?php echo $this->getRoute('detalle',(int)$examen['id']); ?>">
+
+                    Ver
+
+                </a>
+
+                <a
+                    class="app-vista-button app-vista-button--primary"
+                    href="<?php echo $this->getRoute('editar',(int)$examen['id']); ?>">
+
+                    Editar
+
+                </a>
+
+    <?php if (($examen['estado'] ?? '') === 'ACTIVO'): ?>
+
+                <form
+                    method="post"
+                    action="<?php echo $this->getRoute('desactivar',(int)$examen['id']); ?>">
+
+                    <button
+                        class="app-vista-button app-vista-button--danger"
+                        type="submit">
+
+                        Desactivar
+
+                    </button>
+
+                </form>
+
+    <?php else: ?>
+
+                <form
+                    method="post"
+                    action="<?php echo $this->getRoute('activar',(int)$examen['id']); ?>">
+
+                    <button
+                        class="app-vista-button app-vista-button--success"
+                        type="submit">
+
+                        Activar
+
+                    </button>
+
+                </form>
+
+    <?php endif; ?>
+
+            </div>
+
+        </article>
+
+    <?php endforeach; ?>
+
+    <?php endif; ?>
+
+    </div>
         </section>
                 </div>
 

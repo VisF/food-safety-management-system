@@ -9,17 +9,25 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
+require_once __DIR__ . '/../Repository/ExamenRepository.php';
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
+
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 class CarnetService
 {
     private CarnetRepository $carnetRepository;
-
+    private ExamenRepository $examenRepository;
+    private InscripcionService $inscripcionService;
     /**
      * Constructor.
      */
     public function __construct()
     {
         $this->carnetRepository = new CarnetRepository();
+        $this->examenRepository = new ExamenRepository();
+        $this->inscripcionService = new InscripcionService();
+
     }
 
     /**
@@ -180,54 +188,64 @@ class CarnetService
 
     /**
      * Emite un nuevo carnet.
-     *
-     * @param int $idInscripcion
-     * @return array
      */
-    public function emitirCarnet(
-        int $idInscripcion
-    ): array
+    public function emitirCarnet(int $idInscripcion): array
     {
-        // Verificar si la inscripción ya posee un carnet.
         $existente = $this->carnetRepository
             ->obtenerPorInscripcionId(
                 $idInscripcion
             );
 
         if ($existente !== null) {
+
             return [
                 'success' => false,
                 'mensaje' => 'La inscripción ya posee un carnet emitido.'
             ];
         }
 
-        $fechaEmision = date('Y-m-d');
-        $fechaVencimiento = date(
-            'Y-m-d',
-            strtotime('+3 años')
-        );
+        $fechaEmision = new DateTime();
+
+        $fechaVencimiento = (clone $fechaEmision)
+            ->modify('+3 years');
 
         $datos = [
-            'id_inscripcion'    => $idInscripcion,
-            'numero_carnet'     => $this->generarNumeroCarnet(),
-            'fecha_emision'     => $fechaEmision,
-            'fecha_vencimiento' => $fechaVencimiento
+
+            'id_inscripcion' => $idInscripcion,
+
+            'numero_carnet' => $this->generarNumeroCarnet(),
+
+            'fecha_emision' => $fechaEmision->format('Y-m-d'),
+
+            'fecha_vencimiento' => $fechaVencimiento->format('Y-m-d')
+
         ];
 
         $carnet = $this->carnetRepository
             ->crear($datos);
 
         if ($carnet === null) {
+
             return [
                 'success' => false,
                 'mensaje' => 'No fue posible emitir el carnet.'
             ];
         }
 
+        $this->inscripcionService
+            ->actualizarEstadoTramite(
+                $idInscripcion,
+                EstadoTramite::CARNET_EMITIDO
+            );
+
         return [
+
             'success' => true,
+
             'mensaje' => 'Carnet emitido correctamente.',
+
             'carnet' => $carnet
+
         ];
     }
         /**

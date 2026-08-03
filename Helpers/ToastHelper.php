@@ -137,7 +137,51 @@ class ToastHelper
                 'mensaje' => 'Debe iniciar sesión para inscribirse a un examen.',
                 'tipo' => 'warning'
             ],
-        
+            'examen_creado' => [
+                'mensaje' =>
+                    'El examen fue creado correctamente.',
+                'tipo' =>
+                    'success'
+            ],
+
+            'error_crear_examen' => [
+                'mensaje' =>
+                    'No fue posible crear el examen.',
+                'tipo' =>
+                    'error'
+            ],
+            'examen_no_encontrado' => [
+                'mensaje' => 'El examen solicitado no existe.',
+                'tipo'    => 'error'
+            ],
+            'examen_actualizado' => [
+                'mensaje' => 'El examen fue actualizado correctamente.',
+                'tipo'    => 'success'
+            ],
+
+            'error_actualizar_examen' => [
+                'mensaje' => 'No fue posible actualizar el examen.',
+                'tipo'    => 'error'
+            ],
+            'examen_activado' => [
+                'mensaje' => 'El examen fue activado correctamente.',
+                'tipo' => 'success'
+            ],
+
+            'examen_desactivado' => [
+                'mensaje' => 'El examen fue desactivado correctamente.',
+                'tipo' => 'success'
+            ],
+
+            'error_estado_examen' => [
+                'mensaje' => 'No fue posible cambiar el estado del examen.',
+                'tipo' => 'error'
+            ],
+            'examen_sin_cambios' => [
+                'mensaje' => 'No se realizaron cambios en el examen.',
+                'tipo'    => 'info'
+            ],
+                    
             default => null
         };
     }

@@ -20,6 +20,7 @@ declare(strict_types=1);
  * - Obtener próximos exámenes.
  */
 require_once __DIR__ . '/../Servicios/ExamenService.php';
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 class AdminExamenControlador
 {
@@ -37,27 +38,72 @@ class AdminExamenControlador
 
 
 
+  /**
+     * Muestra el formulario de creación de un examen.
+     */
+    public function mostrarFormularioCrear(): void
+    {
+        require_once __DIR__ . '/../Views/admin_examen_form.php';
+
+        $vista = new ExamenFormVista();
+
+        $vista->mostrar([
+
+            'page_title' => 'Nuevo Examen',
+
+            'modo' => 'crear',
+
+            'examen' => [
+
+                'fecha' => '',
+                'hora' => '',
+                'ubicacion' => '',
+                'aula' => '',
+                'cupos' => ''
+
+            ],
+
+            'errores' => []
+
+        ]);
+    }
     /**
-     * Crear una nueva instancia de examen
-        * @param array $datos Datos del examen a crear
-        * @return array Resultado de la operación
+    * Guarda un nuevo examen.
     */
-    public function crearExamen(array $datos): array
+    public function guardarNuevoExamen(): void
     {
         try {
+
+            $datos = [
+
+                'fecha' => trim($_POST['fecha'] ?? ''),
+
+                'hora' => trim($_POST['hora'] ?? ''),
+
+                'ubicacion' => trim($_POST['ubicacion'] ?? ''),
+
+                'aula' => trim($_POST['aula'] ?? ''),
+
+                'cupos' => (int)($_POST['cupos'] ?? 0)
+
+            ];
 
             $id = $this->examenService
                 ->crearExamen($datos);
 
-            return [
+            $this->log(
+                'Examen creado correctamente',
+                'INFO',
+                [
+                    'id_examen' => $id
+                ]
+            );
 
-                'success' => true,
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=examen_creado'
+            );
 
-                'message' => 'Examen creado correctamente',
-
-                'id_examen' => $id
-
-            ];
+            exit;
 
         } catch (Throwable $e) {
 
@@ -69,11 +115,37 @@ class AdminExamenControlador
                 ]
             );
 
-            return [
-                'success' => false,
-                'message' => $e->getMessage(),
-                'id_examen' => null
-            ];
+            require_once __DIR__ . '/../Views/admin_examen_form.php';
+
+            $vista = new ExamenFormVista();
+
+            $vista->mostrar([
+
+                'page_title' => 'Nuevo Examen',
+
+                'modo' => 'crear',
+
+                'examen' => [
+
+                    'fecha' => $_POST['fecha'] ?? '',
+
+                    'hora' => $_POST['hora'] ?? '',
+
+                    'ubicacion' => $_POST['ubicacion'] ?? '',
+
+                    'aula' => $_POST['aula'] ?? '',
+
+                    'cupos' => $_POST['cupos'] ?? ''
+
+                ],
+
+                'errores' => [
+
+                    $e->getMessage()
+
+                ]
+
+            ]);
         }
     }
 
@@ -227,73 +299,32 @@ class AdminExamenControlador
             ];
         }
     }
-    // Ejecuta activar examen.
-    public function activarExamen(int $id): array
+    /**
+     * Activa un examen.
+     */
+    public function activarExamen(
+        int $id
+    ): void
     {
-        try {
-
-            $this->examenService
-                ->activarExamen($id);
-
-            return [
-
-                'success' => true,
-
-                'message' => 'Examen activado correctamente'
-
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al activar examen',
-                'ERROR',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
-        }
-
+        $this->cambiarEstadoExamen(
+            $id,
+            true
+        );
     }
-    // Ejecuta desactivar examen.
-    public function desactivarExamen(int $id): array
+
+    /**
+     * Desactiva un examen.
+     */
+    public function desactivarExamen(
+        int $id
+    ): void
     {
-        try {
-
-            $this->examenService
-                ->desactivarExamen($id);
-
-            return [
-
-                'success' => true,
-
-                'message' => 'Examen desactivado correctamente'
-
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al desactivar examen',
-                'ERROR',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
-        }
+        $this->cambiarEstadoExamen(
+            $id,
+            false
+        );
     }
+
     // Actualiza cupos.
     public function actualizarCupos(int $id, int $cupos): array
     {
@@ -364,9 +395,145 @@ class AdminExamenControlador
             ];
         }
     }
+    public function mostrarDetalle(int $id): void
+    {
+        try {
+
+            $detalle = $this->examenService->obtenerDetalle(
+                $id
+            );
+
+            if ($detalle === null) {
+
+                header(
+                    'Location: /manipulacionDeAlimentos/admin/examenes?toast=examen_no_encontrado'
+                );
+
+                exit;
+            }
+
+            require_once __DIR__ . '/../Views/admin_examen_detalle.php';
+
+            $vista = new ExamenDetalleVista();
+
+            $vista->mostrar(
+                $detalle
+            );
+
+        } catch (Throwable $e) {
+
+            error_log(
+                $e->getMessage()
+            );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_cargar_examen'
+            );
+
+            exit;
+        }
+    }
+    /**
+     * Muestra el formulario para editar un examen.
+     */
+    public function mostrarFormularioEditar(int $id): void
+    {
+        $examen = $this->examenService
+            ->obtenerExamen($id);
+
+        if ($examen === null) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=examen_no_encontrado'
+            );
+
+            exit;
+        }
+
+        require_once __DIR__ . '/../Views/admin_examen_form.php';
+
+        $vista = new ExamenFormVista();
+
+        $vista->mostrar([
+            'page_title' => 'Editar Examen',
+            'modo'       => 'editar',
+            'examen'     => $examen,
+            'errores'    => []
+        ]);
+    }
+
+    /**
+     * Guarda la edición de un examen.
+     */
+    public function guardarEdicion(int $id): void
+    {
+        try {
+
+            $datos = [
+                'fecha'      => trim($_POST['fecha'] ?? ''),
+                'hora'       => trim($_POST['hora'] ?? ''),
+                'ubicacion'  => trim($_POST['ubicacion'] ?? ''),
+                'aula'       => trim($_POST['aula'] ?? ''),
+                'cupos'      => (int) ($_POST['cupos'] ?? 0)
+            ];
+
+            $actualizado = $this->examenService->actualizarExamen(
+                $id,
+                $datos
+            );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=' .
+                ($actualizado
+                    ? 'examen_actualizado'
+                    : 'examen_sin_cambios')
+            );
+
+            exit;
+
+        } catch (InvalidArgumentException $e) {
+
+            require_once __DIR__ . '/../Views/admin_examen_form.php';
+
+            $vista = new ExamenFormVista();
+
+            $datos['id'] = $id;
+
+            $vista->mostrar([
+                'page_title' => 'Editar Examen',
+                'modo'       => 'editar',
+                'examen'     => $datos,
+                'errores'    => [
+                    $e->getMessage()
+                ]
+            ]);
+
+        } catch (Throwable $e) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_actualizar_examen'
+            );
+
+            exit;
+        }
+    }
+
+
     public function mostrarListado(): void
     {
-        $resultado = $this->listarExamenes();
+        $orden = $_GET['orden'] ?? 'asc';
+
+        if ($orden === 'desc') {
+
+            $examenes = $this->examenService
+                ->listarExamenesProgramadosDescendente();
+
+        } else {
+
+            $examenes = $this->examenService
+                ->listarExamenesProgramadosAscendente();
+
+        }
 
         require_once __DIR__ . '/../Views/admin_examenes.php';
 
@@ -374,8 +541,137 @@ class AdminExamenControlador
 
         $vista->mostrar([
             'page_title' => 'Gestión de Exámenes',
-            'examenes' => $resultado['examenes']
+            'examenes' => $examenes,
+            'orden' => $orden
         ]);
+    }
+
+    public function mostrarAdministracionInscripcion(int $id): void
+    {
+        $data = $this->examenService
+            ->obtenerAdministracionInscripcion($id);
+
+        if ($data === null) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=inscripcion_no_encontrada'
+            );
+
+            exit;
+        }
+
+        require_once __DIR__ .
+            '/../Views/admin_inscripcion_examen.php';
+
+        $vista = new AdminInscripcionExamenVista();
+
+        $vista->mostrar($data);
+    }
+    /**
+    * Guarda el resultado de una inscripción a examen.
+    */
+    public function guardarAdministracionInscripcion(int $id): void
+    {
+        try {
+
+            $datos = [
+
+                'estado' => trim(
+                    $_POST['estado'] ?? ''
+                ),
+
+                'observaciones' => trim(
+                    $_POST['observaciones'] ?? ''
+                )
+
+            ];
+
+            $this->examenService
+                ->guardarAdministracionInscripcion(
+                    $id,
+                    $datos
+                );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=resultado_examen_guardado'
+            );
+
+            exit;
+
+        } catch (InvalidArgumentException $e) {
+
+            $data = $this->examenService
+                ->obtenerAdministracionInscripcion(
+                    $id
+                );
+
+            if ($data !== null) {
+
+                $data['errores'] = [
+                    $e->getMessage()
+                ];
+
+                require_once __DIR__ .
+                    '/../Views/admin_inscripcion_examen.php';
+
+                $vista = new AdminInscripcionExamenVista();
+
+                $vista->mostrar(
+                    $data
+                );
+
+                return;
+            }
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_guardar_resultado'
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_guardar_resultado'
+            );
+
+            exit;
+        }
+    }
+
+    /**
+     * Cambia el estado de un examen.
+     */
+    private function cambiarEstadoExamen(
+        int $id,
+        bool $activo
+    ): void
+    {
+        try {
+
+            $this->examenService->cambiarEstado(
+                $id,
+                $activo
+            );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=' .
+                ($activo
+                    ? 'examen_activado'
+                    : 'examen_desactivado')
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_estado_examen'
+            );
+
+            exit;
+
+        }
     }
     // Ejecuta log.
     private function log(string $mensaje, string $nivel = 'INFO', array $contexto = []): void

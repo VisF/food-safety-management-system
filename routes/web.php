@@ -302,31 +302,33 @@ $router->map(
     }
 );
 
+//---------- Rutas relacionadas con la gestión de exámenes ---------
 
-//---------- Rutas relacionadas con exámenes ---------
 $router->map(
     'GET',
-    '/admin/crear_examen',
+    '/admin/examenes/nuevo',
     function () {
 
-        require_once __DIR__ . '/../Views/crear_examen.php';
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
 
-        $vista = new CrearExamenVista();
+        $controlador = new AdminExamenControlador();
 
-        $vista->mostrar();
+        $controlador->mostrarFormularioCrear();
+
     }
 );
 
 $router->map(
     'POST',
-    '/admin/crear_examen_guardar',
+    '/admin/examenes',
     function () {
 
-        require_once __DIR__ . '/../Controller/ExamenControlador.php';
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
 
-        $controlador = new ExamenControlador();
+        $controlador = new AdminExamenControlador();
 
-        $controlador->guardar();
+        $controlador->guardarNuevoExamen();
+
     }
 );
 
@@ -601,7 +603,6 @@ $router->map(
         DetalleTramiteVista::mostrar();
     }
 );
-
 /*==========================================================
     ADMIN - EXÁMENES
 ==========================================================*/
@@ -654,7 +655,9 @@ $router->map(
 
         $controller = new AdminExamenControlador();
 
-        $controller->mostrarDetalle((int)$id);
+        $controller->mostrarDetalle(
+            (int) $id
+        );
     }
 );
 
@@ -667,22 +670,38 @@ $router->map(
 
         $controller = new AdminExamenControlador();
 
-        $controller->mostrarFormularioEditar((int)$id);
+        $controller->mostrarFormularioEditar(
+            (int) $id
+        );
     }
 );
 
 $router->map(
     'POST',
-    '/admin/examenes/[i:id]/editar',
+    '/admin/examenes/[i:id]',
     function ($id) {
 
         require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
 
         $controller = new AdminExamenControlador();
 
-        $controller->actualizarExamen(
-            (int)$id,
-            $_POST
+        $controller->guardarEdicion(
+            (int) $id
+        );
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/examenes/[i:id]/activar',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->activarExamen(
+            (int) $id
         );
     }
 );
@@ -696,19 +715,38 @@ $router->map(
 
         $controller = new AdminExamenControlador();
 
-        $controller->desactivarExamen((int)$id);
+        $controller->desactivarExamen(
+            (int) $id
+        );
     }
 );
 
 $router->map(
-    'POST',
-    '/admin/examenes/[i:id]/activar',
+    'GET',
+    '/admin/inscripciones/[i:id]',
     function ($id) {
 
         require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
 
         $controller = new AdminExamenControlador();
 
-        $controller->activarExamen((int)$id);
+        $controller->mostrarAdministracionInscripcion(
+            (int) $id
+        );
+    }
+);
+
+$router->map(
+    'POST',
+    '/admin/inscripciones/[i:id]',
+    function ($id) {
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->guardarAdministracionInscripcion(
+            (int) $id
+        );
     }
 );

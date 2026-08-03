@@ -1,7 +1,10 @@
 <?php
 /**
- * Metodos:
+ * Métodos:
  * listarExamenes
+ * listarExamenesProgramadosAscendente
+ * listarExamenesProgramadosDescendente
+ * listarHistorialExamenesDescendente
  * contarExamenes
  * obtenerExamen
  * obtenerProximos
@@ -15,6 +18,7 @@
  * obtenerDisponibles
  * obtenerProximosPorUsuario
  * obtenerAprobados
+ *
  * 
  * 
  */
@@ -28,15 +32,18 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
+require_once __DIR__ . '/../Servicios/CarnetService.php';
 
 class ExamenService
 {
     private ExamenRepository $examenRepository;
+    private CarnetService $carnetService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
         $this->examenRepository = new ExamenRepository();
+        $this->carnetService = new CarnetService();
     }
 
     /**
@@ -48,6 +55,32 @@ class ExamenService
             ->listarExamenes();
     }
 
+    /**
+     * Obtener exámenes programados ordenados por fecha ascendente.
+     */
+    public function listarExamenesProgramadosAscendente(): array
+    {
+        return $this->examenRepository
+            ->listarExamenesProgramadosAscendente();
+    }
+
+    /**
+     * Obtener exámenes programados ordenados por fecha descendente.
+     */
+    public function listarExamenesProgramadosDescendente(): array
+    {
+        return $this->examenRepository
+            ->listarExamenesProgramadosDescendente();
+    }
+
+    /**
+     * Obtener historial de exámenes.
+     */
+    public function listarHistorialExamenesDescendente(): array
+    {
+        return $this->examenRepository
+            ->listarHistorialExamenesDescendente();
+    }
     /**
      * Contar exámenes.
      */
@@ -76,48 +109,374 @@ class ExamenService
         return $this->examenRepository
             ->obtenerProximos($cantidad);
     }
-     /**
-     * Crear examen.
+
+    /**
+     * Crea un nuevo examen.
+     *
+     * @param array $datos
+     * @return int
+     * @throws InvalidArgumentException
+     * @throws RuntimeException
      */
     public function crearExamen(array $datos): int
     {
+        $fecha = trim($datos['fecha'] ?? '');
+
+        $hora = trim($datos['hora'] ?? '');
+
+        $ubicacion = trim($datos['ubicacion'] ?? '');
+
+        $aula = trim($datos['aula'] ?? '');
+
+        $cupos = (int)($datos['cupos'] ?? 0);
+
+        if ($fecha === '') {
+            throw new InvalidArgumentException(
+                'Debe ingresar una fecha.'
+            );
+        }
+
+        if ($hora === '') {
+            throw new InvalidArgumentException(
+                'Debe ingresar una hora.'
+            );
+        }
+
+        if ($ubicacion === '') {
+            throw new InvalidArgumentException(
+                'Debe ingresar una ubicación.'
+            );
+        }
+
+        if ($aula === '') {
+            throw new InvalidArgumentException(
+                'Debe ingresar un aula.'
+            );
+        }
+
+        if ($cupos <= 0) {
+            throw new InvalidArgumentException(
+                'La cantidad de cupos debe ser mayor a cero.'
+            );
+        }
+
+    $fechaHoraExamen = strtotime($fecha . ' ' . $hora);
+
+    if ($fechaHoraExamen === false) {
+        throw new InvalidArgumentException(
+            'La fecha u hora ingresada no es válida.'
+        );
+    }
+
+    if ($fechaHoraExamen < time()) {
+        throw new InvalidArgumentException(
+            'No puede crear un examen con una fecha y hora anteriores al momento actual.'
+        );
+    }
+
         return $this->examenRepository
-            ->crearExamen($datos);
+            ->crearExamen([
+                'fecha' => $fecha,
+                'hora' => $hora,
+                'ubicacion' => $ubicacion,
+                'aula' => $aula,
+                'cupos' => $cupos
+            ]);
     }
 
     /**
      * Actualizar examen.
      */
-    public function actualizarExamen(
+    public function actualizarExamen(int $id,array $datos): bool
+    {
+        $examen = $this->obtenerExamen($id);
+
+        if ($examen === null) {
+            throw new InvalidArgumentException(
+                'El examen no existe.'
+            );
+        }
+
+        if (empty($datos['fecha'])) {
+            throw new InvalidArgumentException(
+                'Debe ingresar una fecha.'
+            );
+        }
+
+        if (empty($datos['hora'])) {
+            throw new InvalidArgumentException(
+                'Debe ingresar una hora.'
+            );
+        }
+
+        if (empty($datos['ubicacion'])) {
+            throw new InvalidArgumentException(
+                'Debe ingresar una ubicación.'
+            );
+        }
+
+        if (empty($datos['aula'])) {
+            throw new InvalidArgumentException(
+                'Debe ingresar un aula.'
+            );
+        }
+
+        if (($datos['cupos'] ?? 0) <= 0) {
+            throw new InvalidArgumentException(
+                'La cantidad de cupos debe ser mayor a cero.'
+            );
+        }
+
+        $fechaHora = strtotime(
+            $datos['fecha'] . ' ' . $datos['hora']
+        );
+
+        if ($fechaHora < time()) {
+            throw new InvalidArgumentException(
+                'La fecha y hora del examen no pueden ser anteriores al momento actual.'
+            );
+        }
+
+        $huboCambios =
+            $examen['fecha'] !== $datos['fecha']
+            || $examen['hora'] !== $datos['hora']
+            || trim($examen['ubicacion']) !== trim($datos['ubicacion'])
+            || trim($examen['aula']) !== trim($datos['aula'])
+            || (int) $examen['cupos'] !== (int) $datos['cupos'];
+
+        if (!$huboCambios) {
+            return true;
+        }
+
+        return $this->examenRepository->actualizarExamen(
+            $id,
+            $datos
+        );
+    }
+    public function obtenerDetalle(int $id): ?array
+    {
+        $examen = $this->examenRepository->obtenerExamen(
+            $id
+        );
+
+        if ($examen === null) {
+
+            return null;
+        }
+
+        $inscriptos = $this->examenRepository->obtenerInscriptos(
+            $id
+        );
+
+        $cuposTotales = (int) ($examen['cupos'] ?? 0);
+
+        $cantidadInscriptos = count(
+            $inscriptos
+        );
+
+        $cuposDisponibles = max(
+            0,
+            $cuposTotales - $cantidadInscriptos
+        );
+        foreach ($inscriptos as &$inscripto) {
+
+            $inscripto['estado'] = match ($inscripto['estado']) {
+
+                'PENDIENTE' => 'Pendiente',
+
+                'DOCUMENTACION_PENDIENTE' => 'Documentación pendiente',
+
+                'DOCUMENTACION_APROBADA' => 'Documentación aprobada',
+
+                'INSCRIPTO_EXAMEN' => 'Inscripto',
+
+                'APROBADO' => 'Aprobado',
+
+                'RECHAZADO' => 'Rechazado',
+
+                'CANCELADO' => 'Cancelado',
+
+                'CARNET_EMITIDO' => 'Carnet emitido',
+
+                default => $inscripto['estado']
+
+            };
+        }
+
+        return [
+
+            'page_title' => 'Detalle del examen',
+
+            'examen' => [
+
+                'id' => (int) $examen['id'],
+                'fecha' => $examen['fecha'],
+                'hora' => $examen['hora'],
+                'lugar' => $examen['ubicacion'],
+                'aula' => $examen['aula'],
+                'estado' => ((int) $examen['activo'] === 1)
+                    ? 'Activo'
+                    : 'Inactivo',
+                'cupos_totales' => $cuposTotales,
+                'cupos_disponibles' => $cuposDisponibles
+
+            ],
+
+            'inscriptos' => $inscriptos
+
+        ];
+    }
+
+    /**
+    * Obtiene toda la información necesaria para administrar
+    * la inscripción de un alumno a un examen.
+    */
+    public function obtenerAdministracionInscripcion(int $id): ?array
+    {
+        $datos = $this->examenRepository
+            ->obtenerAdministracionInscripcion(
+                $id
+            );
+
+        if ($datos === null) {
+
+            return null;
+        }
+
+        return [
+
+            'page_title' => 'Administrar inscripción',
+
+            'examen' => [
+
+                'id' => (int) $datos['examen_id'],
+                'fecha' => $datos['fecha'],
+                'hora' => $datos['hora'],
+                'ubicacion' => $datos['ubicacion'],
+                'aula' => $datos['aula']
+
+            ],
+
+            'alumno' => [
+
+                'id' => (int) $datos['usuario_id'],
+                'nombre' => $datos['nombre'],
+                'apellido' => $datos['apellido'],
+                'dni' => $datos['dni'],
+                'email' => $datos['email']
+
+            ],
+
+            'documentacion' => [
+
+                'dni' => (bool) $datos['dni_aprobado'],
+                'foto' => (bool) $datos['foto_aprobada'],
+                'curso' => (bool) $datos['curso_aprobado']
+
+            ],
+
+            'inscripcion' => [
+
+                'id' => (int) $datos['inscripcion_id'],
+
+                'estado' => $datos['estado'],
+
+                'observaciones' =>
+                    $datos['observaciones'] ?? ''
+
+            ]
+
+        ];
+    }
+
+    /**
+     * Guarda el resultado de una inscripción de examen.
+     */
+    public function guardarAdministracionInscripcion(int $id,array $datos): bool
+    {
+        $inscripcion = $this->examenRepository
+            ->obtenerAdministracionInscripcion(
+                $id
+            );
+
+        if ($inscripcion === null) {
+
+            throw new InvalidArgumentException(
+                'La inscripción no existe.'
+            );
+        }
+
+        $estado = strtoupper(
+            trim($datos['estado'] ?? '')
+        );
+
+        $estadoTramite = match ($estado) {
+
+            'APROBADO' =>
+                EstadoTramite::APROBADO,
+
+            'DESAPROBADO' =>
+                EstadoTramite::RECHAZADO,
+
+            default =>
+                throw new InvalidArgumentException(
+                    'Debe seleccionar un resultado.'
+                )
+        };
+
+        $observaciones = trim(
+            $datos['observaciones'] ?? ''
+        );
+
+        $resultado = $this->examenRepository
+            ->guardarAdministracionInscripcion(
+                $id,
+                $estadoTramite,
+                $observaciones
+            );
+
+        if (!$resultado) {
+
+            return false;
+        }
+
+        if ($estadoTramite === EstadoTramite::APROBADO) {
+
+            $carnet = $this->carnetService
+                ->emitirCarnet($id);
+
+            if (!$carnet['success']) {
+
+                throw new RuntimeException(
+                    $carnet['mensaje']
+                );
+            }
+        }
+
+        return true;
+    }
+
+    /**
+     * Cambia el estado de un examen.
+     */
+    public function cambiarEstado(
         int $id,
-        array $datos
+        bool $activo
     ): bool
     {
-        return $this->examenRepository
-            ->actualizarExamen(
-                $id,
-                $datos
+        $examen = $this->obtenerExamen($id);
+
+        if ($examen === null) {
+            throw new InvalidArgumentException(
+                'El examen no existe.'
             );
-    }
+        }
 
-    /**
-     * Activar examen.
-     */
-    public function activarExamen(int $id): bool
-    {
-        return $this->examenRepository
-            ->activarExamen($id);
+        return $this->examenRepository->actualizarEstado(
+            $id,
+            $activo
+        );
     }
-
-    /**
-     * Desactivar examen.
-     */
-    public function desactivarExamen(int $id): bool
-    {
-        return $this->examenRepository
-            ->desactivarExamen($id);
-    }
-
     /**
      * Actualizar cupos.
      */
