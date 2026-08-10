@@ -203,6 +203,9 @@ include __DIR__ . '/header.php';
     $this->getHeader(
         $data
     );
+    $inscripcionFinalizada =
+    $data['inscripcion']['estado']
+    === 'CARNET_EMITIDO';
 
 ?>
 
@@ -439,6 +442,7 @@ include __DIR__ . '/header.php';
                 </div>
 
             </section>
+            <?php if (!$inscripcionFinalizada): ?>
                  <section class="app-vista-card">
 
                 <h3 class="font-title-lg mb-6">
@@ -446,7 +450,19 @@ include __DIR__ . '/header.php';
                     Resultado
 
                 </h3>
+                <?php if ($inscripcionFinalizada): ?>
 
+                <div class="space-y-2">
+
+                    <p class="text-green-700 font-semibold">
+
+                        ✅ Aprobado
+
+                    </p>
+
+                </div>
+
+                <?php else: ?>
                 <div class="space-y-4">
 
                     <label
@@ -517,9 +533,28 @@ include __DIR__ . '/header.php';
                     <?php endif; ?>
 
                 </div>
+                <?php endif; ?>
+
+            </section>
+            <?php else: ?>
+
+            <section class="app-vista-card">
+
+                <h3 class="font-title-lg mb-6">
+
+                    Resultado
+
+                </h3>
+
+                <p class="text-green-700 font-semibold">
+
+                    ✔ El examen ya fue aprobado y el carnet fue emitido.
+
+                </p>
 
             </section>
 
+            <?php endif; ?>
             <section class="app-vista-card">
 
                 <h3 class="font-title-lg mb-6">
@@ -533,13 +568,11 @@ include __DIR__ . '/header.php';
                     name="observaciones"
                     rows="6"
                     maxlength="1000"
-                    placeholder="Ingrese observaciones sobre el examen..."><?php
-
-                        echo $this->e(
-                            $data['inscripcion']['observaciones']
-                        );
-
-                    ?></textarea>
+                    placeholder="Ingrese observaciones sobre el examen..."
+                    <?php echo $inscripcionFinalizada
+                        ? 'readonly'
+                        : '';
+                    ?>></textarea>
 
             </section>
 
@@ -582,6 +615,53 @@ include __DIR__ . '/header.php';
 
 <?php endif; ?>
 
+
+<?php if (
+    !empty($data['requiere_confirmacion'])
+): ?>
+
+        <script>
+
+            document.addEventListener(
+                'DOMContentLoaded',
+                function () {
+
+                    const confirmar =
+                        confirm(
+                            'El alumno no posee toda la documentación requerida.\n\n'
+                            + '¿Está seguro de aprobar el examen y emitir el carnet?'
+                        );
+
+                    if (confirmar) {
+
+                        const formulario =
+                            document.querySelector('form');
+
+                        const input =
+                            document.createElement('input');
+
+                        input.type = 'hidden';
+
+                        input.name =
+                            'confirmar_aprobacion';
+
+                        input.value =
+                            '1';
+
+                        formulario.appendChild(
+                            input
+                        );
+
+                        formulario.submit();
+
+                    }
+
+                }
+            );
+
+        </script>
+
+        <?php endif; ?>
             <div
                 class="flex justify-end gap-4">
 
@@ -596,25 +676,27 @@ include __DIR__ . '/header.php';
                     Cancelar
 
                 </a>
+                <?php if ($inscripcionFinalizada): ?>
+
+                <a
+                    href="..."
+                    class="app-vista-button app-vista-button--primary">
+
+                    Ver carnet
+
+                </a>
+
+                <?php else: ?>
 
                 <button
                     type="submit"
                     class="app-vista-button app-vista-button--primary">
 
-                    <span
-                        class="material-symbols-outlined">
-
-                        save
-
-                    </span>
-
-                    <span>
-
-                        Guardar
-
-                    </span>
+                    Guardar
 
                 </button>
+
+                <?php endif; ?>
 
             </div>
 

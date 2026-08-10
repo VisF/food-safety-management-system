@@ -137,10 +137,37 @@ class HomeControlador
                 $documentos
             );
 
+      $carnetVigente = null;
+
+        $mostrarExamenes = true;
+
+        $puedeInscribirse =
+            true;
+
+        if ($usuario !== null) {
+
+            $carnetVigente =
+                $this->carnetService
+                    ->obtenerEstadoRenovacionUsuario(
+                        $usuario['id']
+                    );
+
+            if (
+                $carnetVigente !== null
+                && $carnetVigente['estado'] === 'vigente'
+            ) {
+
+                $puedeInscribirse = false;
+
+                $mostrarExamenes = false;
+            }
+        }
+
         $cursosVista =
             $this->obtenerCursosVista(
                 $tieneMoodleAprobado,
-                $inscripcion
+                $inscripcion,
+                $puedeInscribirse
             );
 
         $documentosVista =
@@ -149,13 +176,15 @@ class HomeControlador
             );
 
         $examenesVista =
-            $this->obtenerExamenesVista();
+            $this->obtenerExamenesVista(
+                $puedeInscribirse
+            );
 
         $accionPrincipal =
             $this->homeService
                 ->obtenerAccionPrincipal(
-                        $usuario['id'] ?? 0,
-                        $inscripcion
+                    $usuario['id'] ?? 0,
+                    $inscripcion
                 );
         $proximoExamen = null;
 
@@ -166,6 +195,24 @@ class HomeControlador
                     ->obtenerProximoExamen(
                         $usuario['id']
                     );
+        }
+
+        if (
+            $carnetVigente !== null
+            && $inscripcion !== null
+            && $inscripcion->getEstadoId() === EstadoTramite::CARNET_EMITIDO
+        ) {
+
+            $accionPrincipal = [
+
+                'titulo' => 'Carnet de Manipulador de Alimentos',
+
+                'texto' => 'Trámite finalizado.',
+
+                'ruta' => '/manipulacionDeAlimentos/carnet',
+
+                'porcentaje' => 100
+            ];
         }
         return [
 
@@ -223,6 +270,11 @@ class HomeControlador
 
             'proximo_examen' =>
                 $proximoExamen,
+            'carnet_vigente' =>
+                $carnetVigente,
+
+            'mostrar_examenes' =>
+                $mostrarExamenes,
 
             'documentos_faltantes' =>
                 $accionPrincipal['faltantes'] ?? [],
@@ -274,7 +326,8 @@ class HomeControlador
      */
     private function obtenerCursosVista(
         bool $tieneMoodleAprobado,
-        $inscripcion
+        $inscripcion,
+        bool $puedeInscribirse
     ): array
     {
         if ($tieneMoodleAprobado) {
@@ -351,7 +404,10 @@ class HomeControlador
                     $inscriptos,
 
                 'cupos_disponibles' =>
-                    $cuposDisponibles
+                    $cuposDisponibles,
+
+                'puede_inscribirse' =>
+                    $puedeInscribirse
             ];
         }
 
@@ -464,17 +520,15 @@ class HomeControlador
         return $documentosVista;
     }
     
-    /**
+        /**
      * Genera la información de exámenes para la vista.
      */
-    private function obtenerExamenesVista(): array
+    private function obtenerExamenesVista(bool $puedeInscribirse): array
     {
         $examenesBD =
             $this->examenService
                 ->obtenerProximos(10);
-        
 
-    
         $examenesVista = [];
 
         foreach ($examenesBD as $examen) {
@@ -523,7 +577,10 @@ class HomeControlador
                     . $examen['id'],
 
                 'id' =>
-                    (int)$examen['id']
+                    (int)$examen['id'],
+
+                'puede_inscribirse' =>
+                    $puedeInscribirse
             ];
         }
 

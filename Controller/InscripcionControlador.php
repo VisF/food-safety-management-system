@@ -19,6 +19,7 @@ require_once __DIR__ . '/../Servicios/CursoService.php';
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Servicios/ExamenService.php';
 
+
 require_once __DIR__ . '/ValidacionControlador.php';
 
 class InscripcionControlador
@@ -30,6 +31,7 @@ class InscripcionControlador
     private ValidacionControlador $validacionControlador;
     private ?DocumentoService $documentoService = null;
     private ?CursoService $cursoService = null;
+
 
     // Ejecuta pdo.
     private function pdo(): \PDO
@@ -47,6 +49,7 @@ class InscripcionControlador
         $this->validacionControlador = new ValidacionControlador();
         $this->documentoService = new DocumentoService();
         $this->cursoService = new CursoService();
+ 
     }
 
 
@@ -483,7 +486,21 @@ class InscripcionControlador
                 'mensaje' => 'Debe iniciar sesión para inscribirse a un examen.'
             ];
     }
+    if (
+        !$this->inscripcionService
+            ->puedeIniciarNuevaInscripcion(
+                $idUsuario
+            )
+    ) {
 
+        return [
+            'success' => false,
+            'mensaje' =>
+                'Ya posee un carnet vigente. '
+                . 'No puede inscribirse nuevamente hasta '
+                . 'iniciar el período de renovación.'
+        ];
+    }
     if ($this->inscripcionService->tieneExamenActivo($idUsuario)) {
 
         return [
@@ -645,6 +662,21 @@ class InscripcionControlador
                 $_POST['curso_id']
                 ?? 0
             );
+            if (
+                !$this->inscripcionService
+                    ->puedeIniciarNuevaInscripcion(
+                        $usuarioId
+                    )
+            ) {
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/?toast=carnet_vigente'
+                );
+
+                exit;
+            }
 
             if ($cursoId <= 0) {
 

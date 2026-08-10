@@ -15,7 +15,8 @@ require_once __DIR__ . '/../Servicios/InscripcionService.php';
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 class CarnetService
-{
+{   
+    private const DIAS_RENOVACION = 30;
     private CarnetRepository $carnetRepository;
     private ExamenRepository $examenRepository;
     private InscripcionService $inscripcionService;
@@ -341,6 +342,82 @@ class CarnetService
                 ? 'Carnet vigente'
                 : 'Carnet vencido',
             'carnet' => $carnet
+        ];
+    }
+    /**
+     * Obtiene el estado de renovación del carnet de un usuario.
+     */
+    public function obtenerEstadoRenovacionUsuario(int $usuarioId): ?array
+    {
+        $carnet = $this->obtenerUltimoCarnetUsuario(
+            $usuarioId
+        );
+
+        if ($carnet === null) {
+
+            return null;
+        }
+
+        $fechaVencimiento = new DateTime(
+            $carnet['fecha_vencimiento']
+        );
+
+        $hoy = new DateTime();
+
+        $diasRestantes = (int)$hoy->diff(
+            $fechaVencimiento
+        )->format('%r%a');
+
+        if ($diasRestantes < 0) {
+
+            $estado = 'vencido';
+
+        } elseif ($diasRestantes <= self::DIAS_RENOVACION) {
+
+            $estado = 'proximo_vencimiento';
+
+        } else {
+
+            $estado = 'vigente';
+        }
+
+        return [
+
+            'numero_carnet' =>
+                $carnet['numero_carnet'],
+
+            'fecha_emision' =>
+                $carnet['fecha_emision'],
+
+            'fecha_vencimiento' =>
+                $carnet['fecha_vencimiento'],
+
+            'dias_restantes' =>
+                $diasRestantes,
+
+            'estado' =>
+                $estado,
+
+            'puede_renovar' =>
+                $estado !== 'vigente',
+
+            'mensaje' => (
+                match ($estado) {
+
+                    'vigente' =>
+                        'Su carnet se encuentra vigente. Podrá renovarlo '
+                        . self::DIAS_RENOVACION
+                        . ' días antes del vencimiento.',
+
+                    'proximo_vencimiento' =>
+                        'Su carnet vence en '
+                        . $diasRestantes
+                        . ' días. Ya puede iniciar la renovación.',
+
+                    'vencido' =>
+                        'Su carnet se encuentra vencido. Debe inscribirse nuevamente al examen.'
+                }
+            )
         ];
     }
     /**

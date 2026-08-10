@@ -63,24 +63,56 @@ class HomeService
                 ];
             }
         $estadoTramite = $inscripcion !== null
-                ? $inscripcion->getEstadoId()
-                : null;
+        ? $inscripcion->getEstadoId()
+        : null;
 
-        if ($estadoTramite === EstadoTramite::INSCRIPTO_EXAMEN){
+        if (
+            $estadoTramite === EstadoTramite::CARNET_EMITIDO
+        ) {
 
             return [
 
-                'titulo' => $tituloTramite,
+                'titulo' =>
+                    'Carnet de Manipulador',
 
-                'faltantes' => [],
+                'faltantes' =>
+                    [],
 
-                'texto' => 'Rendir el examen',
+                'texto' =>
+                    'Trámite finalizado',
 
-                'ruta' => 'detalle_examen',
+                'ruta' =>
+                    'carnet',
 
-                'completa' => true,
+                'completa' =>
+                    true,
 
-                'porcentaje' => 100
+                'porcentaje' =>
+                    100
+            ];
+        }
+
+        if ($estadoTramite === EstadoTramite::INSCRIPTO_EXAMEN) {
+
+            return [
+
+                'titulo' =>
+                    $tituloTramite,
+
+                'faltantes' =>
+                    [],
+
+                'texto' =>
+                    'Rendir el examen',
+
+                'ruta' =>
+                    'detalle_examen',
+
+                'completa' =>
+                    true,
+
+                'porcentaje' =>
+                    100
             ];
         }
         $documentacionCompleta =

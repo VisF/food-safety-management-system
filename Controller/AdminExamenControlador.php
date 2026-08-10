@@ -582,7 +582,11 @@ class AdminExamenControlador
 
                 'observaciones' => trim(
                     $_POST['observaciones'] ?? ''
-                )
+                ),
+
+                'confirmar_aprobacion' =>
+                    isset($_POST['confirmar_aprobacion'])
+                    && $_POST['confirmar_aprobacion'] === '1'
 
             ];
 
@@ -606,7 +610,10 @@ class AdminExamenControlador
                 );
 
             if ($data !== null) {
+                if ($e->getCode() === 1001) {
 
+                    $data['requiere_confirmacion'] = true;
+                }
                 $data['errores'] = [
                     $e->getMessage()
                 ];

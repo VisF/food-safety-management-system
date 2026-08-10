@@ -30,13 +30,15 @@
  * 
 */
 require_once __DIR__ . '/../dto/InscripcionDTO.php';
+
 require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
-
+require_once __DIR__ . '/../Repository/CarnetRepository.php';
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
         
 class InscripcionService
 {
@@ -44,6 +46,8 @@ class InscripcionService
     private DocumentoRepository $documentoRepository;
     private ExamenRepository $examenRepository;
     private DocumentoService $documentoService;
+    private CarnetRepository $carnetRepository;
+
     
 
     // Inicializa las dependencias de la clase.
@@ -52,7 +56,19 @@ class InscripcionService
         $this->documentoRepository = new DocumentoRepository();
         $this->examenRepository = new ExamenRepository();
         $this->documentoService = new DocumentoService();
+        $this->carnetRepository = new CarnetRepository();
 
+    }
+    // Ejecuta puede iniciar nueva inscripción.
+    public function puedeIniciarNuevaInscripcion(int $usuarioId): bool
+    {
+        $carnet =
+            $this->carnetRepository
+                ->obtenerCarnetVigentePorUsuario(
+                    $usuarioId
+                );
+
+        return $carnet === null;
     }
     // Ejecuta tiene curso activo.
     public function tieneCursoActivo(int $usuarioId): bool
@@ -220,21 +236,38 @@ class InscripcionService
         ];
     }
 
-    // Ejecuta confirmar inscripcion examen.
     public function confirmarInscripcionExamen(int $idInscripcion): bool
     {
         $inscripcion =
             $this->inscripcionRepository
-                ->obtenerPorId($idInscripcion);
+                ->obtenerPorId(
+                    $idInscripcion
+                );
 
         if (!$inscripcion) {
+
+            return false;
+        }
+
+        $usuarioId =
+            (int)$inscripcion['usuario_id'];
+
+        if (
+            !$this->puedeIniciarNuevaInscripcion(
+                $usuarioId
+            )
+        ) {
+
             return false;
         }
 
         if (
             !$this->inscripcionRepository
-                ->confirmarInscripcionExamen($idInscripcion)
+                ->confirmarInscripcionExamen(
+                    $idInscripcion
+                )
         ) {
+
             return false;
         }
 

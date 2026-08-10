@@ -140,7 +140,132 @@ class InicioVista
         </h2>
 
     </section>
+    <?php if (!empty($inicioData['carnet_vigente'])): ?>
 
+    <section class="home-carnet-vigente">
+
+        <article class="app-vista-card">
+
+            <div class="home-carnet-vigente__header">
+
+                <h3>
+
+                    Carnet vigente
+
+                </h3>
+
+                <span class="app-vista-chip app-vista-chip--vigente">
+
+                    Vigente
+
+                </span>
+
+            </div>
+
+            <p>
+
+                <strong>N°</strong>
+
+                <?= $this->e(
+                    $inicioData['carnet_vigente']['numero_carnet']
+                ); ?>
+
+            </p>
+
+            <p>
+
+                <strong>Emitido:</strong>
+
+                <?= date(
+                    'd/m/Y',
+                    strtotime(
+                        $inicioData['carnet_vigente']['fecha_emision']
+                    )
+                ); ?>
+
+            </p>
+
+            <p>
+
+                <strong>Vence:</strong>
+
+                <?= date(
+                    'd/m/Y',
+                    strtotime(
+                        $inicioData['carnet_vigente']['fecha_vencimiento']
+                    )
+                ); ?>
+
+            </p>
+
+            <p>
+
+                <?= $this->e(
+                    $inicioData['carnet_vigente']['mensaje']
+                ); ?>
+
+            </p>
+            <?php if (
+                $inicioData['carnet_vigente']['estado']
+                === 'vigente'
+            ): ?>
+
+                <p>
+
+                    <strong>
+
+                        Días restantes:
+
+                    </strong>
+
+                    <?= (int)$inicioData['carnet_vigente']['dias_restantes']; ?>
+
+                </p>
+
+            <?php elseif (
+                $inicioData['carnet_vigente']['estado']
+                === 'proximo_vencimiento'
+            ): ?>
+
+                <p>
+
+                    <strong>
+
+                        Vence en:
+
+                    </strong>
+
+                    <?= (int)$inicioData['carnet_vigente']['dias_restantes']; ?>
+
+                    días
+
+                </p>
+
+            <?php else: ?>
+
+                <p>
+
+                    <strong>
+
+                        Venció hace:
+
+                    </strong>
+
+                    <?= abs(
+                        (int)$inicioData['carnet_vigente']['dias_restantes']
+                    ); ?>
+
+                    días
+
+                </p>
+
+            <?php endif; ?>
+
+        </article>
+
+    </section>
+
+    <?php endif; ?>
     <article class="app-vista-card home-tramite">
 
         <div class="home-tramite__header">
@@ -196,15 +321,40 @@ class InicioVista
 
         </p>
 
-        <p class="home-tramite__accion">
+        <?php if (
+                $inicioData['tramite']['estado']
+                === 'CARNET_EMITIDO'
+            ): ?>
 
-            <strong>Siguiente paso:</strong>
+                <p class="home-tramite__accion">
 
-            <?= $this->e(
-                $inicioData['tramite']['accion_principal']['texto']
-            ); ?>
+                    <strong>
 
-        </p>
+                        Estado:
+
+                    </strong>
+
+                    Trámite finalizado.
+
+                </p>
+
+            <?php else: ?>
+
+                <p class="home-tramite__accion">
+
+                    <strong>
+
+                        Siguiente paso:
+
+                    </strong>
+
+                    <?= $this->e(
+                        $inicioData['tramite']['accion_principal']['texto']
+                    ); ?>
+
+                </p>
+
+            <?php endif; ?>
 
         <?php
 
@@ -217,19 +367,46 @@ class InicioVista
 
             ?>
 
-            <a
-                class="app-vista-button app-vista-button--primary home-tramite__boton"
-                href="<?= $href ?>"
-                role="button"
-            >
+            <?php if (
+                    $inicioData['tramite']['estado']
+                    === 'CARNET_EMITIDO'
+                ): ?>
 
-                <span class="material-symbols-outlined">
-                    task_alt
-                </span>
+                    <a
+                        class="app-vista-button app-vista-button--primary home-tramite__boton"
+                        href="/manipulacionDeAlimentos/carnet"
+                        role="button"
+                    >
 
-                <?= $inicioData['tramite']['accion_principal']['texto'] ?>
+                        <span class="material-symbols-outlined">
 
-            </a>
+                            badge
+
+                        </span>
+
+                        Descargar carnet
+
+                    </a>
+
+                <?php else: ?>
+
+                    <a
+                        class="app-vista-button app-vista-button--primary home-tramite__boton"
+                        href="<?= $href ?>"
+                        role="button"
+                    >
+
+                        <span class="material-symbols-outlined">
+
+                            task_alt
+
+                        </span>
+
+                        <?= $inicioData['tramite']['accion_principal']['texto'] ?>
+
+                    </a>
+
+                <?php endif; ?>
 
         </article>
                         <section class="home-documentos">
@@ -450,7 +627,10 @@ class InicioVista
 
                             </span>
 
-                            <?php if (!$curso['inscripto']): ?>
+                            <?php if (
+                                !$curso['inscripto']
+                                && $curso['puede_inscribirse']
+                            ): ?>
 
                                 <form
                                     method="POST"
@@ -475,7 +655,7 @@ class InicioVista
 
                                 </form>
 
-                            <?php else: ?>
+                            <?php elseif ($curso['inscripto']): ?>
 
                                 <button
                                     class="app-vista-button app-vista-button--secondary"
@@ -483,6 +663,17 @@ class InicioVista
                                 >
 
                                     Ya inscripto
+
+                                </button>
+
+                            <?php else: ?>
+
+                                <button
+                                    class="app-vista-button app-vista-button--secondary"
+                                    disabled
+                                >
+
+                                    Ya posee un carnet vigente
 
                                 </button>
 
@@ -500,7 +691,7 @@ class InicioVista
 
     </section>
 
-    <?php if ($inicioData['proximo_examen'] !== null): ?>
+<?php if ($inicioData['proximo_examen'] !== null): ?>
 
     <section class="home-proximo-examen">
 
@@ -575,7 +766,10 @@ class InicioVista
 
     <?php endif; ?>
 
-    <?php if ($inicioData['proximo_examen'] === null): ?>
+<?php if (
+    $inicioData['proximo_examen'] === null
+    && ($inicioData['mostrar_examenes'] ?? true)
+): ?>
 
     <section id="proximos-examenes" class="home-examenes">
 
@@ -663,14 +857,30 @@ class InicioVista
 
                             </span>
 
-                            <a
-                                href="/manipulacionDeAlimentos/detalle_examen?id=<?= (int)$exam['id']; ?>"
-                                class="app-vista-button app-vista-button--primary"
-                            >
+                            <?php if ($exam['puede_inscribirse']): ?>
 
-                                Inscribirse
+                                <a
+                                    href="/manipulacionDeAlimentos/detalle_examen?id=<?= (int)$exam['id']; ?>"
+                                    class="app-vista-button app-vista-button--primary"
+                                >
 
-                            </a>
+                                    Inscribirse
+
+                                </a>
+
+                            <?php else: ?>
+
+                                <button
+                                    type="button"
+                                    class="app-vista-button app-vista-button--secondary"
+                                    disabled
+                                >
+
+                                    Ya posee un carnet vigente
+
+                                </button>
+
+                            <?php endif; ?>
 
                         </div>
 
@@ -684,35 +894,7 @@ class InicioVista
 
     </section>
     <?php endif; ?>
-    <section class="home-carnet">
 
-        <a
-            class="app-vista-button app-vista-button--secondary home-carnet__boton"
-            href="<?= $this->getRoute(
-                (string)$inicioData['carnet']['ruta_descarga']
-            ); ?>"
-            role="button"
-        >
-
-            <span class="material-symbols-outlined">
-
-                download
-
-            </span>
-
-            <?= $this->e(
-                $inicioData['carnet']['etiqueta_descarga']
-            ); ?>
-
-        </a>
-
-        <p class="home-carnet__descripcion">
-
-            Disponible una vez aprobado el examen.
-
-        </p>
-
-    </section>
 
     </main>
 

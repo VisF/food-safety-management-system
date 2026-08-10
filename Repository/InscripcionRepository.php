@@ -599,26 +599,37 @@ class InscripcionRepository
                 ':id' => $idInscripcion
             ]);
         }
-    // Obtiene ultima inscripcion por usuario.
+    /**
+     * Obtiene la última inscripción realizada por un usuario.
+     */
     public function obtenerUltimaInscripcionPorUsuario(int $usuarioId): ?array
     {
         $sql = "
             SELECT *
             FROM inscripciones
             WHERE usuario_id = :usuario
-            ORDER BY fecha_inscripcion DESC
+
+            ORDER BY
+                CASE
+                    WHEN estado_tramite_id = :carnet_emitido THEN 1
+                    ELSE 2
+                END,
+                fecha_inscripcion DESC,
+                id DESC
+
             LIMIT 1
         ";
 
         $stmt = $this->conexion->prepare($sql);
-        $stmt->execute([
-            ':usuario' => $usuarioId
-        ]);
 
+        $stmt->execute([
+            ':usuario' => $usuarioId,
+            ':carnet_emitido' => EstadoTramite::CARNET_EMITIDO
+        ]);
         $fila = $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $fila ?: null;
-        }
+    }
           
     /// Obtener última inscripción de un usuario
 

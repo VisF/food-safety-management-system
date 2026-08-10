@@ -457,10 +457,10 @@ class ExamenRepository
     {
         $sql = "
             SELECT
-
                 i.id AS inscripcion_id,
                 i.usuario_id,
                 i.examen_id,
+                i.estado_tramite_id,
                 i.observaciones,
 
                 u.nombre,
@@ -726,7 +726,7 @@ class ExamenRepository
 
         try {
 
-            $this->actualizarEstadoTramite(
+            $this->actualizarEstadoTramitePriv(
                 $id,
                 $estadoTramite
             );
@@ -747,10 +747,38 @@ class ExamenRepository
             throw $e;
         }
     }
+
+    /**
+     * Actualiza el estado de una inscripción
+     * Metodo publico
+     */
+    public function actualizarEstadoTramite(
+        int $id,
+        int $estadoTramite
+    ): bool
+    {
+        $sql = "
+            UPDATE inscripciones
+            SET estado_tramite_id = :estado
+            WHERE id = :id
+        ";
+
+        $stmt = $this->conexion->prepare(
+            $sql
+        );
+
+        return $stmt->execute([
+            ':estado' =>
+                $estadoTramite,
+
+            ':id' =>
+                $id
+        ]);
+    }
     /**
     * Actualiza el estado del trámite de una inscripción.
     */
-    private function actualizarEstadoTramite(int $id,int $estadoTramite): bool
+    private function actualizarEstadoTramitePriv(int $id,int $estadoTramite): bool
     {
         $sql = "
             UPDATE inscripciones

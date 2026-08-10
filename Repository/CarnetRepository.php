@@ -82,6 +82,39 @@ class CarnetRepository
             'activo'           => 1
         ];
     }
+    public function obtenerCarnetVigentePorUsuario(int $usuarioId): ?array
+    {
+        $sql = "
+            SELECT
+                id,
+                numero_carnet,
+                fecha_emision,
+                fecha_vencimiento,
+                activo
+            FROM carnets
+            WHERE inscripcion_id IN (
+                SELECT id
+                FROM inscripciones
+                WHERE usuario_id = :usuario
+            )
+            AND activo = 1
+            AND fecha_vencimiento >= CURDATE()
+            ORDER BY fecha_vencimiento DESC
+            LIMIT 1
+        ";
+
+        $stmt =
+            $this->conexion->prepare($sql);
+
+        $stmt->execute([
+            ':usuario' => $usuarioId
+        ]);
+
+        $fila =
+            $stmt->fetch(PDO::FETCH_ASSOC);
+
+        return $fila ?: null;
+    }
 
         /**
      * Obtiene un carnet por su ID.
