@@ -145,7 +145,8 @@ class PanelAdminVista
 
             'admin' => '/manipulacionDeAlimentos/admin',
 
-            'crear_examen' => '/manipulacionDeAlimentos/admin/crear_examen',
+            'nuevo' =>
+                '/manipulacionDeAlimentos/admin/examenes/nuevo',
 
             'admin_examenes' => '/manipulacionDeAlimentos/admin/examenes',
 
@@ -218,7 +219,7 @@ class PanelAdminVista
                 <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
 
                     <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('crear_examen'); ?>">
+                    href="<?php echo $this->getRoute('nuevo'); ?>">
 
                         <span class="material-symbols-outlined panel-admin-action__icono">
                             calendar_today

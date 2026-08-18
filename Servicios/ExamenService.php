@@ -392,13 +392,20 @@ class ExamenService
     }
     /**
      * Guarda el resultado de una inscripción de examen.
-    */
+     *
+     * APROBADO y CARNET_EMITIDO son estados diferentes.
+     *
+     * APROBADO:
+     * El alumno aprobó el examen, pero el carnet todavía
+     * no fue emitido/cargado.
+     */
     public function guardarAdministracionInscripcion(int $id,array $datos): bool
     {
-        $inscripcion = $this->examenRepository
-            ->obtenerAdministracionInscripcion(
-                $id
-            );
+        $inscripcion =
+            $this->examenRepository
+                ->obtenerAdministracionInscripcion(
+                    $id
+                );
 
         if ($inscripcion === null) {
 
@@ -414,18 +421,6 @@ class ExamenService
 
             throw new InvalidArgumentException(
                 'El carnet ya fue emitido para esta inscripción.'
-            );
-        }
-
-        $carnetExistente = $this->carnetService
-            ->obtenerPorInscripcionId(
-                $id
-            );
-
-        if ($carnetExistente !== null) {
-
-            throw new InvalidArgumentException(
-                'La inscripción ya posee un carnet emitido.'
             );
         }
 
@@ -446,73 +441,28 @@ class ExamenService
                     'Debe seleccionar un resultado.'
                 )
         };
-        if (
-            $estadoTramite === EstadoTramite::APROBADO
-            && empty($datos['confirmar_aprobacion'])
-        ) {
 
-            $documentacionCompleta =
-                !empty($inscripcion['dni_aprobado'])
-                && !empty($inscripcion['foto_aprobada'])
-                && !empty($inscripcion['curso_aprobado']);
-
-            if (!$documentacionCompleta) {
-
-                throw new InvalidArgumentException(
-                    'El alumno no posee toda la documentación requerida. '
-                    . '¿Está seguro de aprobar el examen y emitir el carnet?',
-                    1001
-                );
-            }
-        }
-
-        $observaciones = trim(
-            $datos['observaciones'] ?? ''
-        );
-
-        $resultado = $this->examenRepository
-            ->guardarAdministracionInscripcion(
-                $id,
-                $estadoTramite,
-                $observaciones
+        $observaciones =
+            trim(
+                $datos['observaciones'] ?? ''
             );
+
+        $resultado =
+            $this->examenRepository
+                ->guardarAdministracionInscripcion(
+                    $id,
+                    $estadoTramite,
+                    $observaciones
+                );
 
         if (!$resultado) {
 
             return false;
         }
 
-        if ($estadoTramite === EstadoTramite::APROBADO) {
-
-            $carnet = $this->carnetService
-                ->emitirCarnet(
-                    $id
-                );
-
-            if (!$carnet['success']) {
-
-                throw new RuntimeException(
-                    $carnet['mensaje']
-                );
-            }
-
-            $estadoActualizado =
-                $this->examenRepository
-                    ->actualizarEstadoTramite(
-                        $id,
-                        EstadoTramite::CARNET_EMITIDO
-                    );
-
-            if (!$estadoActualizado) {
-
-                throw new RuntimeException(
-                    'El carnet fue emitido, pero no fue posible actualizar el estado de la inscripción.'
-                );
-            }   
-        }
-
         return true;
     }
+    
 
     /**
      * Cambia el estado de un examen.

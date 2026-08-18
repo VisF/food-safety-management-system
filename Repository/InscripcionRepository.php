@@ -703,7 +703,7 @@ class InscripcionRepository
     // Obtiene usuario id por inscripcion.
     public function obtenerUsuarioIdPorInscripcion(int $inscripcionId): ?int
     {
-        $stmt = $this->db->prepare("
+        $stmt = $this->conexion->prepare("
             SELECT usuario_id
             FROM inscripciones
             WHERE id = :id

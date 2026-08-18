@@ -22,7 +22,7 @@ class CarnetRepository
         $this->conexion = Connection::getPDO();
     }
 
-    /**
+   /**
      * Crea un nuevo carnet.
      *
      * @param array $datos
@@ -30,18 +30,44 @@ class CarnetRepository
      */
     public function crear(array $datos): ?array
     {
-        // Verificar que el número no exista.
+        /*
+        * Verificar que el número de carnet no exista.
+        */
         $stmt = $this->conexion->prepare("
             SELECT id
             FROM carnets
             WHERE numero_carnet = :numero
+            LIMIT 1
         ");
 
         $stmt->execute([
-            ':numero' => $datos['numero_carnet']
+            ':numero' =>
+                $datos['numero_carnet']
         ]);
 
         if ($stmt->fetch()) {
+
+            return null;
+        }
+
+        /*
+        * Verificar que la inscripción no tenga
+        * ya un carnet asociado.
+        */
+        $stmt = $this->conexion->prepare("
+            SELECT id
+            FROM carnets
+            WHERE inscripcion_id = :inscripcion
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':inscripcion' =>
+                $datos['id_inscripcion']
+        ]);
+
+        if ($stmt->fetch()) {
+
             return null;
         }
 
@@ -52,6 +78,8 @@ class CarnetRepository
                 numero_carnet,
                 fecha_emision,
                 fecha_vencimiento,
+                ruta_pdf,
+                vigente,
                 activo
             )
             VALUES
@@ -60,26 +88,61 @@ class CarnetRepository
                 :numero,
                 :emision,
                 :vencimiento,
+                :ruta_pdf,
+                1,
                 1
             )
         ";
 
-        $stmt = $this->conexion->prepare($sql);
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
 
         $stmt->execute([
-            ':inscripcion' => $datos['id_inscripcion'],
-            ':numero'      => $datos['numero_carnet'],
-            ':emision'     => $datos['fecha_emision'],
-            ':vencimiento' => $datos['fecha_vencimiento']
+
+            ':inscripcion' =>
+                $datos['id_inscripcion'],
+
+            ':numero' =>
+                $datos['numero_carnet'],
+
+            ':emision' =>
+                $datos['fecha_emision'],
+
+            ':vencimiento' =>
+                $datos['fecha_vencimiento'],
+
+            ':ruta_pdf' =>
+                $datos['ruta_pdf'] ?? null
         ]);
 
         return [
-            'id'               => (int) $this->conexion->lastInsertId(),
-            'id_inscripcion'   => $datos['id_inscripcion'],
-            'numero_carnet'    => $datos['numero_carnet'],
-            'fecha_emision'    => $datos['fecha_emision'],
-            'fecha_vencimiento'=> $datos['fecha_vencimiento'],
-            'activo'           => 1
+
+            'id' =>
+                (int)$this->conexion
+                    ->lastInsertId(),
+
+            'id_inscripcion' =>
+                $datos['id_inscripcion'],
+
+            'numero_carnet' =>
+                $datos['numero_carnet'],
+
+            'fecha_emision' =>
+                $datos['fecha_emision'],
+
+            'fecha_vencimiento' =>
+                $datos['fecha_vencimiento'],
+
+            'ruta_pdf' =>
+                $datos['ruta_pdf'] ?? null,
+
+            'vigente' =>
+                1,
+
+            'activo' =>
+                1
         ];
     }
     public function obtenerCarnetVigentePorUsuario(int $usuarioId): ?array
@@ -114,6 +177,156 @@ class CarnetRepository
             $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $fila ?: null;
+    }
+    /**
+     * Obtiene las inscripciones con examen aprobado
+     * que todavía no poseen un carnet emitido.
+     *
+     * @param int $estadoAprobado
+     * @return array
+     */
+    public function obtenerPendientesEmision(int $estadoAprobado): array
+    {
+        $sql = "
+            SELECT
+
+                i.id AS inscripcion_id,
+
+                i.fecha_inscripcion,
+                i.observaciones,
+
+                u.id AS usuario_id,
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+
+                e.id AS examen_id,
+                e.fecha AS fecha_examen,
+                e.hora AS hora_examen,
+
+                et.nombre AS estado
+
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            LEFT JOIN examenes e
+                ON e.id = i.examen_id
+
+            INNER JOIN estados_tramite et
+                ON et.id = i.estado_tramite_id
+
+            LEFT JOIN carnets c
+                ON c.inscripcion_id = i.id
+
+            WHERE
+                i.estado_tramite_id = :estado_aprobado
+
+                AND c.id IS NULL
+
+            ORDER BY
+                i.fecha_inscripcion DESC,
+                i.id DESC
+        ";
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+        $stmt->execute([
+            ':estado_aprobado' =>
+                $estadoAprobado
+        ]);
+
+        return $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+    }/**
+    * Obtiene la inscripción aprobada de un ciudadano
+    * que todavía no posee un carnet emitido.
+    *
+    * @param string $dni
+    * @param int $estadoAprobado
+    * @return array|null
+    */
+    public function obtenerPendienteEmisionPorDni(
+        string $dni,
+        int $estadoAprobado
+    ): ?array
+    {
+        $sql = "
+            SELECT
+
+                i.id AS inscripcion_id,
+
+                i.fecha_inscripcion,
+                i.observaciones,
+
+                u.id AS usuario_id,
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+
+                e.id AS examen_id,
+                e.fecha AS fecha_examen,
+                e.hora AS hora_examen,
+                e.ubicacion AS ubicacion_examen,
+                e.aula AS aula_examen,
+
+                et.nombre AS estado
+
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            LEFT JOIN examenes e
+                ON e.id = i.examen_id
+
+            INNER JOIN estados_tramite et
+                ON et.id = i.estado_tramite_id
+
+            LEFT JOIN carnets c
+                ON c.inscripcion_id = i.id
+
+            WHERE
+                u.dni = :dni
+
+                AND i.estado_tramite_id = :estado_aprobado
+
+                AND c.id IS NULL
+
+            ORDER BY
+                i.fecha_inscripcion DESC,
+                i.id DESC
+
+            LIMIT 1
+        ";
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+        $stmt->execute([
+
+            ':dni' =>
+                $dni,
+
+            ':estado_aprobado' =>
+                $estadoAprobado
+        ]);
+
+        $resultado =
+            $stmt->fetch(
+                PDO::FETCH_ASSOC
+            );
+
+        return $resultado ?: null;
     }
 
         /**
@@ -320,6 +533,58 @@ class CarnetRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    /**
+     * Lista los carnets activos con los datos
+     * del titular para la administración.
+     *
+     * @return array
+     */
+    public function listarActivosAdministracion(): array
+    {
+        $sql = "
+            SELECT
+
+                c.id,
+                c.inscripcion_id,
+                c.numero_carnet,
+                c.fecha_emision,
+                c.fecha_vencimiento,
+                c.ruta_pdf,
+                c.vigente,
+                c.activo,
+
+                i.usuario_id,
+
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email
+
+            FROM carnets c
+
+            INNER JOIN inscripciones i
+                ON i.id = c.inscripcion_id
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            WHERE
+                c.activo = 1
+
+            ORDER BY
+                c.fecha_emision DESC,
+                c.id DESC
+        ";
+
+        $stmt =
+            $this->conexion->query(
+                $sql
+            );
+
+        return $stmt->fetchAll(
+            PDO::FETCH_ASSOC
+        );
+    }
 
     /**
      * Obtiene todos los carnets vencidos.
@@ -471,9 +736,11 @@ class CarnetRepository
 
             WHERE u.dni = :dni
 
-            LIMIT 1
+            
 
             ORDER BY c.fecha_emision DESC
+
+            LIMIT 1
         ";
 
         $stmt = $this->conexion->prepare($sql);
@@ -518,4 +785,7 @@ class CarnetRepository
 
         return $carnet ?: null;
     }
+
+
+ 
 }

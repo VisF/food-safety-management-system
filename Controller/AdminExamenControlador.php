@@ -582,11 +582,7 @@ class AdminExamenControlador
 
                 'observaciones' => trim(
                     $_POST['observaciones'] ?? ''
-                ),
-
-                'confirmar_aprobacion' =>
-                    isset($_POST['confirmar_aprobacion'])
-                    && $_POST['confirmar_aprobacion'] === '1'
+                )
 
             ];
 
@@ -610,10 +606,8 @@ class AdminExamenControlador
                 );
 
             if ($data !== null) {
-                if ($e->getCode() === 1001) {
 
-                    $data['requiere_confirmacion'] = true;
-                }
+                
                 $data['errores'] = [
                     $e->getMessage()
                 ];
@@ -640,6 +634,84 @@ class AdminExamenControlador
 
             header(
                 'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_guardar_resultado'
+            );
+
+            exit;
+        }
+    }
+    /**
+     * Emite/carga el carnet de una inscripción
+     * cuyo examen ya fue aprobado.
+     */
+    public function emitirCarnet(int $id): void
+    {
+        try {
+
+            $this->examenService
+                ->emitirCarnet(
+                    $id
+                );
+
+            header(
+                'Location: ' .
+                '/manipulacionDeAlimentos/admin/inscripciones/' .
+                $id .
+                '?toast=carnet_emitido'
+            );
+
+            exit;
+
+        } catch (InvalidArgumentException $e) {
+
+            $data =
+                $this->examenService
+                    ->obtenerAdministracionInscripcion(
+                        $id
+                    );
+
+            if ($data !== null) {
+
+                $data['errores'] = [
+                    $e->getMessage()
+                ];
+
+                require_once __DIR__ .
+                    '/../Views/admin_inscripcion_examen.php';
+
+                $vista =
+                    new AdminInscripcionExamenVista();
+
+                $vista->mostrar(
+                    $data
+                );
+
+                return;
+            }
+
+            header(
+                'Location: ' .
+                '/manipulacionDeAlimentos/admin/examenes' .
+                '?toast=error_emitir_carnet'
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al emitir carnet',
+                'ERROR',
+                [
+                    'inscripcion_id' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            header(
+                'Location: ' .
+                '/manipulacionDeAlimentos/admin/inscripciones/' .
+                $id .
+                '?toast=error_emitir_carnet'
             );
 
             exit;

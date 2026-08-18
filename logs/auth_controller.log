@@ -165,3 +165,4 @@
 [2026-08-05 19:53:41] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":14,"email":"pruebacompletauno@test.com"}
 [2026-08-07 20:10:55] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
 [2026-08-10 19:40:58] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":6,"email":"alumno5@test.com"}
+[2026-08-11 20:04:55] [INFO] IP: ::1 | User logged in successfully | {"usuario_id":3,"email":"alumno2@test.com"}

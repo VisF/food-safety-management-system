@@ -203,9 +203,14 @@ include __DIR__ . '/header.php';
     $this->getHeader(
         $data
     );
+    $estadoInscripcion =
+    $data['inscripcion']['estado'];
+
+    $inscripcionAprobada =
+        $estadoInscripcion === 'APROBADO';
+
     $inscripcionFinalizada =
-    $data['inscripcion']['estado']
-    === 'CARNET_EMITIDO';
+        $estadoInscripcion === 'CARNET_EMITIDO';
 
 ?>
 
@@ -442,119 +447,145 @@ include __DIR__ . '/header.php';
                 </div>
 
             </section>
-            <?php if (!$inscripcionFinalizada): ?>
-                 <section class="app-vista-card">
+    <?php if ($inscripcionAprobada): ?>
 
-                <h3 class="font-title-lg mb-6">
+        <section class="app-vista-card">
 
-                    Resultado
+            <h3 class="font-title-lg mb-6">
 
-                </h3>
-                <?php if ($inscripcionFinalizada): ?>
+                Resultado
 
-                <div class="space-y-2">
+            </h3>
 
-                    <p class="text-green-700 font-semibold">
-
-                        ✅ Aprobado
-
-                    </p>
-
-                </div>
-
-                <?php else: ?>
-                <div class="space-y-4">
-
-                    <label
-                        class="flex items-center gap-3 cursor-pointer">
-
-                        <input
-                            type="radio"
-                            name="estado"
-                            value="APROBADO"
-
-                            <?php echo
-                                $data['inscripcion']['estado'] === 'APROBADO'
-                                ? 'checked'
-                                : '';
-                            ?>
-
-                        >
-
-                        <span>
-
-                            Aprobado
-
-                        </span>
-
-                    </label>
-
-                    <label
-                        class="flex items-center gap-3 cursor-pointer">
-
-                        <input
-                            type="radio"
-                            name="estado"
-                            value="DESAPROBADO"
-
-                            <?php echo
-                                $data['inscripcion']['estado'] === 'DESAPROBADO'
-                                ? 'checked'
-                                : '';
-                            ?>
-
-                        >
-
-                        <span>
-
-                            Desaprobado
-
-                        </span>
-
-                    </label>
-
-                    <?php if (
-                        $data['inscripcion']['estado']
-                        === 'INSCRIPTO_EXAMEN'
-                    ): ?>
-
-                        <p
-                            class="text-sm text-on-surface-variant">
-
-                            Estado actual:
-                            <strong>
-
-                                Inscripto al examen
-
-                            </strong>
-
-                        </p>
-
-                    <?php endif; ?>
-
-                </div>
-                <?php endif; ?>
-
-            </section>
-            <?php else: ?>
-
-            <section class="app-vista-card">
-
-                <h3 class="font-title-lg mb-6">
-
-                    Resultado
-
-                </h3>
+            <div class="space-y-3">
 
                 <p class="text-green-700 font-semibold">
 
-                    ✔ El examen ya fue aprobado y el carnet fue emitido.
+                    ✅ Examen aprobado
 
                 </p>
 
-            </section>
+                <p class="text-sm text-on-surface-variant">
 
-            <?php endif; ?>
+                    El examen fue aprobado.
+                    El carnet todavía no fue emitido.
+
+                </p>
+
+            </div>
+
+        </section>
+
+    <?php elseif ($inscripcionFinalizada): ?>
+
+        <section class="app-vista-card">
+
+            <h3 class="font-title-lg mb-6">
+
+                Resultado
+
+            </h3>
+
+            <div class="space-y-3">
+
+                <p class="text-green-700 font-semibold">
+
+                    ✅ Examen aprobado
+
+                </p>
+
+                <p class="text-green-700 font-semibold">
+
+                    ✅ Carnet emitido
+
+                </p>
+
+            </div>
+
+        </section>
+
+    <?php else: ?>
+
+        <section class="app-vista-card">
+
+            <h3 class="font-title-lg mb-6">
+
+                Resultado
+
+            </h3>
+
+            <div class="space-y-4">
+
+                <label
+                    class="flex items-center gap-3 cursor-pointer">
+
+                    <input
+                        type="radio"
+                        name="estado"
+                        value="APROBADO"
+
+                        <?php echo
+                            $estadoInscripcion === 'APROBADO'
+                            ? 'checked'
+                            : '';
+                        ?>
+                    >
+
+                    <span>
+
+                        Aprobado
+
+                    </span>
+
+                </label>
+
+                <label
+                    class="flex items-center gap-3 cursor-pointer">
+
+                    <input
+                        type="radio"
+                        name="estado"
+                        value="DESAPROBADO"
+
+                        <?php echo
+                            $estadoInscripcion === 'DESAPROBADO'
+                            ? 'checked'
+                            : '';
+                        ?>
+                    >
+
+                    <span>
+
+                        Desaprobado
+
+                    </span>
+
+                </label>
+
+                <?php if (
+                    $estadoInscripcion === 'INSCRIPTO_EXAMEN'
+                ): ?>
+
+                    <p
+                        class="text-sm text-on-surface-variant">
+
+                        Estado actual:
+
+                        <strong>
+
+                            Inscripto al examen
+
+                        </strong>
+
+                    </p>
+
+                <?php endif; ?>
+
+            </div>
+
+        </section>
+
+    <?php endif; ?>
             <section class="app-vista-card">
 
                 <h3 class="font-title-lg mb-6">
@@ -569,7 +600,10 @@ include __DIR__ . '/header.php';
                     rows="6"
                     maxlength="1000"
                     placeholder="Ingrese observaciones sobre el examen..."
-                    <?php echo $inscripcionFinalizada
+                    <?php echo (
+                        $inscripcionAprobada
+                        || $inscripcionFinalizada
+                    )
                         ? 'readonly'
                         : '';
                     ?>></textarea>
@@ -616,52 +650,6 @@ include __DIR__ . '/header.php';
 <?php endif; ?>
 
 
-<?php if (
-    !empty($data['requiere_confirmacion'])
-): ?>
-
-        <script>
-
-            document.addEventListener(
-                'DOMContentLoaded',
-                function () {
-
-                    const confirmar =
-                        confirm(
-                            'El alumno no posee toda la documentación requerida.\n\n'
-                            + '¿Está seguro de aprobar el examen y emitir el carnet?'
-                        );
-
-                    if (confirmar) {
-
-                        const formulario =
-                            document.querySelector('form');
-
-                        const input =
-                            document.createElement('input');
-
-                        input.type = 'hidden';
-
-                        input.name =
-                            'confirmar_aprobacion';
-
-                        input.value =
-                            '1';
-
-                        formulario.appendChild(
-                            input
-                        );
-
-                        formulario.submit();
-
-                    }
-
-                }
-            );
-
-        </script>
-
-        <?php endif; ?>
             <div
                 class="flex justify-end gap-4">
 
@@ -686,7 +674,25 @@ include __DIR__ . '/header.php';
 
                 </a>
 
-                <?php else: ?>
+            <?php elseif ($inscripcionAprobada): ?>
+
+            <form
+                method="post"
+                action="/manipulacionDeAlimentos/admin/inscripciones/<?= (int)$data['inscripcion']['id']; ?>/emitir-carnet"
+            >
+
+                <button
+                    type="submit"
+                    class="app-vista-button app-vista-button--primary"
+                >
+
+                    Cargar carnet
+
+                </button>
+
+            </form>
+
+            <?php else: ?>
 
                 <button
                     type="submit"
@@ -696,7 +702,7 @@ include __DIR__ . '/header.php';
 
                 </button>
 
-                <?php endif; ?>
+            <?php endif; ?>
 
             </div>
 

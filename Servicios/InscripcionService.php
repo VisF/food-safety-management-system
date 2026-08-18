@@ -59,17 +59,24 @@ class InscripcionService
         $this->carnetRepository = new CarnetRepository();
 
     }
-    // Ejecuta puede iniciar nueva inscripción.
-    public function puedeIniciarNuevaInscripcion(int $usuarioId): bool
-    {
-        $carnet =
-            $this->carnetRepository
-                ->obtenerCarnetVigentePorUsuario(
-                    $usuarioId
-                );
+        /**
+         * Determina si un usuario puede iniciar
+         * una nueva inscripción.
+         *
+         * Un carnet vigente bloquea nuevas inscripciones.
+         */
+        public function puedeIniciarNuevaInscripcion(
+            int $usuarioId
+        ): bool
+        {
+            $carnet =
+                $this->carnetRepository
+                    ->obtenerCarnetVigentePorUsuario(
+                        $usuarioId
+                    );
 
-        return $carnet === null;
-    }
+            return $carnet === null;
+        }
     // Ejecuta tiene curso activo.
     public function tieneCursoActivo(int $usuarioId): bool
     {

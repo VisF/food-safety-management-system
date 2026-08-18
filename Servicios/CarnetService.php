@@ -8,9 +8,12 @@ declare(strict_types=1);
  * con la gestión de carnets.
  */
 
+require_once __DIR__ . '/../db/Connection.php';
+
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
-require_once __DIR__ . '/../Repository/ExamenRepository.php';
+
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
+require_once __DIR__ . '/../Servicios/DocumentoService.php';
 
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
@@ -18,16 +21,16 @@ class CarnetService
 {   
     private const DIAS_RENOVACION = 30;
     private CarnetRepository $carnetRepository;
-    private ExamenRepository $examenRepository;
     private InscripcionService $inscripcionService;
+    private DocumentoService $documentoService;
     /**
      * Constructor.
      */
     public function __construct()
     {
         $this->carnetRepository = new CarnetRepository();
-        $this->examenRepository = new ExamenRepository();
         $this->inscripcionService = new InscripcionService();
+        $this->documentoService = new DocumentoService();
 
     }
 
@@ -84,6 +87,46 @@ class CarnetService
     {
         return $this->carnetRepository
             ->listarActivos();
+    }
+
+    /**
+     * Obtiene las inscripciones aprobadas
+     * que todavía no poseen carnet.
+     */
+    public function obtenerPendientesEmision(): array
+    {
+        return $this->carnetRepository
+            ->obtenerPendientesEmision(
+                EstadoTramite::APROBADO
+            );
+    }
+    /**
+     * Obtiene una inscripción aprobada pendiente de emisión
+     * buscando al ciudadano por DNI.
+     */
+    public function obtenerPendienteEmisionPorDni(string $dni): ?array
+    {
+        $dni = trim($dni);
+
+        if ($dni === '') {
+
+            return null;
+        }
+
+        return $this->carnetRepository
+            ->obtenerPendienteEmisionPorDni(
+                $dni,
+                EstadoTramite::APROBADO
+            );
+    }
+
+    /**
+     * Lista los carnets activos para administración.
+     */
+    public function listarActivosAdministracion(): array
+    {
+        return $this->carnetRepository
+            ->listarActivosAdministracion();
     }
 
     /**
@@ -151,17 +194,14 @@ class CarnetService
                 : 'No fue posible anular el carnet.'
         ];
     }
-        /**
+    /**
      * Renueva un carnet.
      *
      * @param int $idCarnet
      * @param string $fechaVencimiento
      * @return array
      */
-    public function renovarCarnet(
-        int $idCarnet,
-        string $fechaVencimiento
-    ): array
+    public function renovarCarnet(int $idCarnet,string $fechaVencimiento): array
     {
         $carnet = $this->carnetRepository
             ->obtenerPorId($idCarnet);
@@ -187,69 +227,354 @@ class CarnetService
         ];
     }
 
-    /**
-     * Emite un nuevo carnet.
+ /**
+     * Carga y emite el carnet oficial correspondiente
+     * a una inscripción con examen aprobado.
+     *
+     * APROBADO y CARNET_EMITIDO son estados diferentes.
+     *
+     * APROBADO:
+     * El alumno aprobó el examen pero todavía
+     * no se cargó el carnet oficial.
+     *
+     * CARNET_EMITIDO:
+     * El carnet oficial de DIPA ya fue cargado
+     * correctamente.
      */
-    public function emitirCarnet(int $idInscripcion): array
+    public function emitirCarnet(
+        int $idInscripcion,
+        array $datos
+    ): array
     {
-        $existente = $this->carnetRepository
-            ->obtenerPorInscripcionId(
-                $idInscripcion
+        /*
+        * Obtener la inscripción.
+        */
+        $inscripcion =
+            $this->inscripcionService
+                ->obtenerPorId(
+                    $idInscripcion
+                );
+
+        if ($inscripcion === null) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'La inscripción no existe.'
+            ];
+        }
+
+        /*
+        * Solo una inscripción APROBADA puede
+        * recibir un carnet.
+        */
+        if (
+            $inscripcion->getEstadoId()
+            !== EstadoTramite::APROBADO
+        ) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'Solo se puede cargar un carnet para una inscripción con examen aprobado.'
+            ];
+        }
+
+        /*
+        * Verificar que todavía no exista
+        * un carnet para esta inscripción.
+        */
+        $carnetExistente =
+            $this->carnetRepository
+                ->obtenerPorInscripcionId(
+                    $idInscripcion
+                );
+
+        if ($carnetExistente !== null) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'La inscripción ya posee un carnet emitido.'
+            ];
+        }
+
+        /*
+        * Verificar documentación.
+        */
+        $documentacion =
+            $this->documentoService
+                ->obtenerEstadoDocumentacion(
+                    $inscripcion->getUsuarioId()
+                );
+
+        if (
+            empty($documentacion['completo'])
+        ) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'No se puede emitir el carnet porque el alumno no posee toda la documentación requerida.'
+            ];
+        }
+
+        /*
+        * Obtener datos del carnet oficial.
+        */
+        $numeroCarnet =
+            trim(
+                $datos['numero_carnet'] ?? ''
             );
 
-        if ($existente !== null) {
+        $fechaEmision =
+            trim(
+                $datos['fecha_emision'] ?? ''
+            );
+
+        $fechaVencimiento =
+            trim(
+                $datos['fecha_vencimiento'] ?? ''
+            );
+
+        $rutaPdf =
+            trim(
+                $datos['ruta_pdf'] ?? ''
+            );
+
+        /*
+        * Validar número de carnet.
+        */
+        if ($numeroCarnet === '') {
 
             return [
                 'success' => false,
-                'mensaje' => 'La inscripción ya posee un carnet emitido.'
+
+                'mensaje' =>
+                    'Debe ingresar el número de carnet.'
             ];
         }
 
-        $fechaEmision = new DateTime();
+        /*
+        * Verificar que el número no exista.
+        */
+        $carnetPorNumero =
+            $this->carnetRepository
+                ->obtenerPorNumero(
+                    $numeroCarnet
+                );
 
-        $fechaVencimiento = (clone $fechaEmision)
-            ->modify('+3 years');
-
-        $datos = [
-
-            'id_inscripcion' => $idInscripcion,
-
-            'numero_carnet' => $this->generarNumeroCarnet(),
-
-            'fecha_emision' => $fechaEmision->format('Y-m-d'),
-
-            'fecha_vencimiento' => $fechaVencimiento->format('Y-m-d')
-
-        ];
-
-        $carnet = $this->carnetRepository
-            ->crear($datos);
-
-        if ($carnet === null) {
+        if ($carnetPorNumero !== null) {
 
             return [
                 'success' => false,
-                'mensaje' => 'No fue posible emitir el carnet.'
+
+                'mensaje' =>
+                    'El número de carnet ingresado ya existe.'
             ];
         }
 
-        $this->inscripcionService
-            ->actualizarEstadoTramite(
+        /*
+        * Validar que exista el PDF.
+        *
+        * El controlador será responsable de subir
+        * físicamente el archivo.
+        *
+        * El Service solamente recibe la ruta final.
+        */
+        if ($rutaPdf === '') {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'Debe cargar el PDF oficial del carnet.'
+            ];
+        }
+
+        /*
+        * Validar fecha de emisión.
+        */
+        $emision =
+            DateTime::createFromFormat(
+                'Y-m-d',
+                $fechaEmision
+            );
+
+        if (
+            !$emision
+            || $emision->format('Y-m-d')
+                !== $fechaEmision
+        ) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'La fecha de emisión no es válida.'
+            ];
+        }
+
+        /*
+        * Validar fecha de vencimiento.
+        */
+        $vencimiento =
+            DateTime::createFromFormat(
+                'Y-m-d',
+                $fechaVencimiento
+            );
+
+        if (
+            !$vencimiento
+            || $vencimiento->format('Y-m-d')
+                !== $fechaVencimiento
+        ) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'La fecha de vencimiento no es válida.'
+            ];
+        }
+
+        /*
+        * El vencimiento debe ser posterior
+        * a la emisión.
+        */
+        if ($vencimiento <= $emision) {
+
+            return [
+                'success' => false,
+
+                'mensaje' =>
+                    'La fecha de vencimiento debe ser posterior a la fecha de emisión.'
+            ];
+        }
+
+        /*
+        * Preparar los datos para Repository.
+        */
+        $datosCarnet = [
+
+            'id_inscripcion' =>
                 $idInscripcion,
-                EstadoTramite::CARNET_EMITIDO
-            );
 
-        return [
+            'numero_carnet' =>
+                $numeroCarnet,
 
-            'success' => true,
+            'fecha_emision' =>
+                $fechaEmision,
 
-            'mensaje' => 'Carnet emitido correctamente.',
+            'fecha_vencimiento' =>
+                $fechaVencimiento,
 
-            'carnet' => $carnet
-
+            'ruta_pdf' =>
+                $rutaPdf
         ];
+
+        /*
+        * Obtener la misma conexión PDO utilizada
+        * por los repositorios.
+        */
+        $conexion =
+            Connection::getPDO();
+
+        try {
+
+            /*
+            * Comenzar transacción.
+            */
+            $conexion->beginTransaction();
+
+            /*
+            * Crear el carnet.
+            */
+            $carnet =
+                $this->carnetRepository
+                    ->crear(
+                        $datosCarnet
+                    );
+
+            if ($carnet === null) {
+
+                $conexion->rollBack();
+
+                return [
+                    'success' => false,
+
+                    'mensaje' =>
+                        'No fue posible crear el carnet. Verifique que el número no esté duplicado.'
+                ];
+            }
+
+            /*
+            * Cambiar el estado:
+            *
+            * APROBADO
+            *
+            * a:
+            *
+            * CARNET_EMITIDO
+            */
+            $estadoActualizado =
+                $this->inscripcionService
+                    ->actualizarEstadoTramite(
+                        $idInscripcion,
+                        EstadoTramite::CARNET_EMITIDO
+                    );
+
+            if (!$estadoActualizado) {
+
+                $conexion->rollBack();
+
+                return [
+                    'success' => false,
+
+                    'mensaje' =>
+                        'No fue posible actualizar el estado de la inscripción.'
+                ];
+            }
+
+            /*
+            * Todo salió correctamente.
+            */
+            $conexion->commit();
+
+            return [
+
+                'success' =>
+                    true,
+
+                'mensaje' =>
+                    'Carnet cargado y emitido correctamente.',
+
+                'carnet' =>
+                    $carnet
+            ];
+
+        } catch (Throwable $e) {
+
+            /*
+            * Si hubo un error, deshacer tanto
+            * la creación del carnet como el
+            * cambio de estado.
+            */
+            if (
+                $conexion->inTransaction()
+            ) {
+
+                $conexion->rollBack();
+            }
+
+            throw $e;
+        }
     }
-        /**
+    /**
      * Genera un número de carnet único.
      *
      * Formato:

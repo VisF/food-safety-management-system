@@ -1,0 +1,9 @@
+[2026-08-18 19:48:45] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Call to undefined method AdminCarnetControlador::e()"}
+[2026-08-18 19:48:47] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Call to undefined method AdminCarnetControlador::e()"}
+[2026-08-18 19:49:20] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Call to undefined method AdminCarnetControlador::e()"}
+[2026-08-18 19:53:45] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Unclosed '{' on line 254"}
+[2026-08-18 19:54:42] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Unclosed '{' on line 254"}
+[2026-08-18 19:54:48] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARNETS | Datos: {"error":"Unclosed '{' on line 254"}
+[2026-08-18 20:05:18] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":12,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}
+[2026-08-18 20:05:23] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":12,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}
+[2026-08-18 20:05:25] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":11,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}

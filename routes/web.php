@@ -272,20 +272,7 @@ $router->map(
     }
 );
 
-//----------- Rutas relacionadas con la gestión de carnets ---------
-$router->map(
-    'GET',
-    '/admin/carnets',
-    function () {
 
-        require_once __DIR__.'/../Views/admin_carnets.php';
-
-        $vista = new AdminCarnetsVista();
-
-        $vista->mostrar();
-
-    }
-);
 
 //----------- Rutas relacionadas con la gestión de reportes ---------
 $router->map(
@@ -750,3 +737,72 @@ $router->map(
         );
     }
 );
+
+//----------- Rutas relacionadas con la gestión de carnets ---------
+
+/**
+ * Panel de administración de carnets.
+ *
+ * Muestra:
+ * - Inscripciones aprobadas pendientes de carnet.
+ * - Carnets ya emitidos.
+ */
+$router->map(
+    'GET',
+    '/admin/carnets',
+    function () {
+
+        require_once __DIR__ .
+            '/../Controller/AdminCarnetControlador.php';
+
+        $controller =
+            new AdminCarnetControlador();
+
+        $controller->mostrarIndex();
+    }
+);
+
+
+/**
+ * Formulario para cargar/emitar un carnet.
+ *
+ * [i:id] corresponde al ID interno de la inscripción.
+ */
+$router->map(
+    'GET',
+    '/admin/carnets/[i:id]/cargar',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/AdminCarnetControlador.php';
+
+        $controller =
+            new AdminCarnetControlador();
+
+        $controller->mostrarCarga(
+            (int)$id
+        );
+    }
+);
+
+
+/**
+ * Procesa la carga del carnet.
+ */
+$router->map(
+    'POST',
+    '/admin/carnets/[i:id]/emitir',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/AdminCarnetControlador.php';
+
+        $controller =
+            new AdminCarnetControlador();
+
+        $controller->emitirCarnet(
+            (int)$id
+        );
+    }
+);
+
