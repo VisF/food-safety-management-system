@@ -1,109 +1,371 @@
-# 🏛️ Sistema TUDAI - Gestión de Carnets de Manipuladores de Alimentos
+# Food Safety Management System
 
-**Estado Actual: ✅ Arquitectura Base Completa (Mayo 2026)**
+A full-stack web application for managing the training, registration, examination, documentation, and certification process for food handlers.
 
-Bienvenido al repositorio del Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos para la Carrera **TUDAI** (Tecnicatura Universitaria en Desarrollo de Aplicaciones Informáticas).
+The system was designed as a centralized platform to manage the complete lifecycle of food-handler certifications, providing dedicated workflows for citizens, administrators, and inspectors.
 
----
+## Overview
 
-## 📋 ¿Qué es este proyecto?
+The **Food Safety Management System** provides a centralized solution for managing food-handler training and certification processes.
 
-Un sistema web centralizado que gestiona todo el proceso de obtención y renovación de carnets de manipuladores de alimentos, complementando el sistema provincial DIPA. 
+The platform supports multiple user roles and business workflows, including course registration, document submission and validation, examination management, certification, administrative operations, and public certificate verification.
 
-**Usuarios del sistema:**
-- 👤 **Ciudadanos** - Inscribirse a cursos, cargar documentos, consultar estado
-- 👨‍💼 **Administradores** - Gestionar cursos, exámenes, usuarios, validaciones
-- 🔍 **Inspectores** - Buscar carnets por DNI, verificar vigencia
-- 🔐 **Público** - Consulta pública limitada de estado de carnet
+The project focuses on applying software architecture principles, separation of responsibilities, reusable components, database-driven business logic, and secure web development practices.
 
----
+## Key Features
 
-## 🎯 Principales Características
+### 👤 Citizen Portal
 
-✅ **Inscripción a cursos** (presencial y virtual)  
-✅ **Carga y validación de documentación**  
-✅ **Gestión de exámenes y resultados**  
-✅ **Emisión de certificados/carnets**  
-✅ **Búsqueda por DNI** para inspectores  
-✅ **Integración con sistema DIPA provincial**  
-✅ **Auditoría completa** de acciones  
-✅ **Notificaciones por email** del estado  
+* User registration and authentication
+* Profile management
+* Course registration
+* Examination registration
+* Document submission
+* Documentation status tracking
+* Examination results
+* Certification status tracking
+* Personal dashboard
+* Email notifications
 
----
+### 🛠️ Administrative Management
 
-## 🗂️ Estructura del Proyecto
+* User management
+* Role and permission management
+* Course management
+* Examination management
+* Registration management
+* Document validation
+* Examination result management
+* Certificate management
+* Administrative activity tracking
+* Reports and statistics
 
+### 🔎 Inspector Portal
+
+* Search for certificates using identification numbers
+* Certificate validity verification
+* Access to relevant certification information
+* Registration of inspection-related activity
+
+### 📄 Documentation Management
+
+The system manages the documentation required throughout the certification process.
+
+Features include:
+
+* Document uploads
+* File validation
+* Document status management
+* Approval and rejection workflows
+* Document previews and downloads
+* User-specific documentation tracking
+
+### 🎓 Courses and Examinations
+
+* Course creation and management
+* Available course dates
+* Registration management
+* Examination scheduling
+* Attendance tracking
+* Examination results
+* Eligibility validation
+
+### 🎫 Certificate Management
+
+* Certificate issuance
+* Certificate status tracking
+* Certificate validity verification
+* Public certificate consultation
+* Administrative certificate management
+
+### 🔐 Security and Auditing
+
+* Authentication and session management
+* Role-based access control
+* Request validation
+* File upload validation
+* Business-rule validation
+* Centralized logging
+* Administrative activity auditing
+
+## Architecture
+
+The application follows an MVC-based layered architecture designed to separate responsibilities between different parts of the system.
+
+```text
+                    ┌──────────────────────┐
+                    │      Web Browser     │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Routing Layer   │
+                    │    AltoRouter /      │
+                    │    Application       │
+                    │       Router         │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │     Controllers      │
+                    │  HTTP / Use Cases    │
+                    └──────────┬───────────┘
+                               │
+                               ▼
+                    ┌──────────────────────┐
+                    │      Services        │
+                    │   Business Logic     │
+                    └──────────┬───────────┘
+                               │
+                    ┌──────────┴───────────┐
+                    ▼                      ▼
+          ┌──────────────────┐   ┌──────────────────┐
+          │   Repositories   │   │      DTOs        │
+          │ Data Persistence │   │ Data Transfer    │
+          └────────┬─────────┘   └──────────────────┘
+                   │
+                   ▼
+          ┌──────────────────────┐
+          │   MySQL / MariaDB    │
+          └──────────────────────┘
 ```
-manipulaciondealimentos/
-├── .github/agents/
-│   └── tudai-developer.agent.md       🤖 Custom Agent para desarrollo
+
+Additional components such as middleware, policies, validators, jobs, helpers, and centralized configuration support the application's business and infrastructure concerns.
+
+## Project Structure
+
+```text
+food-safety-management-system/
 │
-├── Modelo/                             📦 15 Modelos OOP
-│   ├── UsuarioModelo.php
-│   ├── InscripcionModelo.php
-│   ├── ExamenModelo.php
-│   ├── DocumentoModelo.php
-│   ├── CarnetModelo.php
-│   └── ... (10 más)
+├── Controller/          # HTTP request handling and application flows
+├── Core/                # Core application components
+├── DTO/                 # Data Transfer Objects
+├── Helpers/             # Reusable helper components
+├── Jobs/                # Background or scheduled tasks
+├── Middleware/          # Request/session middleware
+├── Policy/              # Authorization and access policies
+├── Repository/          # Data access and persistence
+├── Servicios/           # Business logic and application services
+├── Validators/          # Input and business-rule validation
+├── Views/               # Server-rendered web views
 │
-├── Controller/                        🎮 16 Controladores
-│   ├── AuthControlador.php
-│   ├── InscripcionControlador.php
-│   ├── ExamenControlador.php
-│   ├── AdminControlador.php
-│   ├── InspectorControlador.php
-│   └── ... (11 más)
+├── config/              # Application configuration
+├── css/                 # Stylesheets
+├── database/            # Database scripts and resources
+├── db/                  # Database-related resources
+├── docs/                # Technical documentation
+├── js/                  # Frontend JavaScript
+├── logs/                # Application logs
+├── routes/              # Application routes
+├── tools/               # Development utilities
+├── uploads/             # Uploaded document storage
 │
-├── Views/                             👁️ 26 Vistas HTML
-│   ├── index.php (dashboard)
-│   ├── inscripcion_examen.php
-│   ├── panel_admin.php
-│   └── ... (23 más)
-│
-├── css/                                🎨 Estilos
-│   ├── base.css
-│   └── components.css
-│
-├── ARQUITECTURA_COMPLETADA.md          📚 Documentación detallada
-├── MAPEO_VISTAS_CONTROLADORES.md       🔗 Integración vistas
-├── VERIFICACION_FINAL.md               ✅ Verificación de componentes
-└── RESUMEN_PROYECTO.md                 📖 Resumen ejecutivo
+├── .env.example         # Environment configuration template
+├── .htaccess            # Apache configuration
+├── index.php            # Application entry point
+├── AltoRouter.php       # Routing library
+└── Router.php           # Application router
 ```
 
----
+## Technology Stack
 
-## 📊 Estadísticas
+### Backend
 
-| Métrica | Cantidad | Estado |
-|---|---|---|
-| **Modelos** | 15 | ✅ Completo |
-| **Controladores** | 16 | ✅ Completo |
-| **Vistas** | 26 | ⏳ Integración |
-| **Métodos** | 262 | ✅ Implementados |
-| **Líneas de Código** | ~6,000+ | ✅ Base |
-| **TODO (BD)** | ~300+ | ⏳ Próximo |
+* PHP
+* Object-Oriented Programming
+* MVC Architecture
+* Layered Architecture
+* AltoRouter
+* REST-oriented application design
+* Session-based authentication
 
----
+### Database
 
-## 🚀 Quick Start
+* MySQL / MariaDB
+* Relational database design
+* SQL
+* Repository-based data access
 
-### 1. Entender la Arquitectura
+### Frontend
+
+* HTML5
+* CSS3
+* JavaScript
+* Responsive Web Design
+
+### Development Practices
+
+* DTOs
+* Repository Pattern
+* Service Layer
+* Middleware
+* Role-Based Access Control
+* Input Validation
+* Centralized Logging
+* Exception Handling
+* Separation of Concerns
+* SOLID principles
+* Clean Code practices
+
+## Main Application Workflows
+
+### Course Registration
+
+```text
+User
+  ↓
+Available Courses
+  ↓
+Course Registration
+  ↓
+Registration Validation
+  ↓
+Confirmation
+```
+
+### Documentation Submission
+
+```text
+User
+  ↓
+Document Upload
+  ↓
+File Validation
+  ↓
+Document Storage
+  ↓
+Administrative Review
+  ↓
+Approved / Rejected
+```
+
+### Examination Process
+
+```text
+Course / Eligibility
+        ↓
+Examination Registration
+        ↓
+Attendance
+        ↓
+Examination
+        ↓
+Result
+        ↓
+Certification Process
+```
+
+### Certificate Verification
+
+```text
+Identification Number
+        ↓
+Certificate Search
+        ↓
+Validity Verification
+        ↓
+Certificate Status
+```
+
+## Configuration
+
+The application uses environment-based configuration.
+
+Create a local `.env` file based on the provided template:
+
 ```bash
-# Comienza aquí para entender el proyecto completo:
-📖 Lee: RESUMEN_PROYECTO.md
-# Documentación del proyecto
-
-Toda la documentación del proyecto está centralizada en la carpeta `docs/`.
-
-Archivos principales:
-
-- `docs/ARQUITECTURA_COMPLETADA.md` — detalle técnico de la arquitectura
-- `docs/MAPEO_VISTAS_CONTROLADORES.md` — cómo integrar vistas con controladores
-- `docs/RESUMEN_PROYECTO.md` — resumen ejecutivo y estado
-- `docs/VERIFICACION_FINAL.md` — verificación final de componentes
-- `docs/README_PROJECT.md` — README completo del proyecto (versión larga)
-
-Para comenzar, abre `docs/RESUMEN_PROYECTO.md`.
-# (Disponible en VS Code al escribir @)
-
+cp .env.example .env
 ```
+
+Then configure the required database and application settings according to your local environment.
+
+> Never commit real credentials or sensitive environment variables to the repository.
+
+## Running Locally
+
+### Requirements
+
+* PHP 8.2+
+* Apache
+* MySQL or MariaDB
+* Git
+* XAMPP, WAMP, or another compatible PHP development environment
+
+### Installation
+
+Clone the repository:
+
+```bash
+git clone https://github.com/VisF/food-safety-management-system.git
+```
+
+Move the project into your local web server directory, for example:
+
+```text
+xampp/htdocs/food-safety-management-system
+```
+
+Configure the environment:
+
+```text
+.env.example → .env
+```
+
+Create and configure the database using the SQL resources provided in the `database/` directory.
+
+Then start Apache and MySQL/MariaDB from your local development environment and access the application through your configured local URL.
+
+## Documentation
+
+Additional technical documentation is available in the [`docs`](./docs) directory.
+
+The documentation includes information about:
+
+* Application architecture
+* View/controller mapping
+* Project structure
+* Database design
+* Technical verification
+* Development decisions
+
+## Project Goals
+
+The project was developed with a strong focus on software engineering practices rather than only implementing individual features.
+
+The main goals are:
+
+* Build a maintainable MVC application
+* Separate presentation, business logic, and persistence concerns
+* Centralize validation and authorization rules
+* Provide clear boundaries between application layers
+* Implement reusable and testable components
+* Manage complex business workflows
+* Maintain an auditable record of important system operations
+* Provide a responsive and accessible user interface
+
+## Current Status
+
+The project is under active development.
+
+The core application architecture and main business workflows are implemented, while additional work continues on integration, testing, refinement, and deployment-related concerns.
+
+## Future Improvements
+
+Planned improvements include:
+
+* Expanded automated testing
+* Further UI/UX improvements
+* Additional integration testing
+* Production deployment configuration
+* Further database and query optimization
+* Expanded external-system integrations
+* Additional monitoring and operational tooling
+
+## Author
+
+**Facundo Vis**
+
+Full Stack Developer focused on Java, Spring Boot, software architecture, REST APIs, databases, and modern web development.
+
+* GitHub: https://github.com/VisF
+* LinkedIn: https://www.linkedin.com/in/facundo-vis/
