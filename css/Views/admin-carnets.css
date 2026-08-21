@@ -653,6 +653,164 @@
 }
 
 
+/* =========================================================
+   PAGINACIÓN DE CARNETS
+   ========================================================= */
+
+.admin-carnets__paginacion {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 1.5rem;
+    padding: 0.25rem 0;
+}
+
+
+/*
+ * Contenedor de los números.
+ */
+.admin-carnets__paginas {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+}
+
+
+/*
+ * Botones Anterior / Siguiente.
+ *
+ * Sobrescribimos el comportamiento general de
+ * app-vista-button para que no ocupen todo el ancho.
+ */
+.admin-carnets__paginacion
+.app-vista-button {
+    width: auto;
+    min-width: 0;
+    flex: 0 0 auto;
+}
+
+
+/*
+ * Números de página.
+ */
+.admin-carnets__pagina {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 2.5rem;
+    height: 2.5rem;
+
+    border-radius: 0.75rem;
+
+    border: 1px solid
+        var(--color-border, #d7e0ea);
+
+    background:
+        var(--color-surface, #ffffff);
+
+    color:
+        var(--color-primary, #005596);
+
+    font-size: 0.95rem;
+    font-weight: 600;
+
+    text-decoration: none;
+
+    transition:
+        background-color 0.2s ease,
+        color 0.2s ease,
+        border-color 0.2s ease,
+        transform 0.2s ease;
+}
+
+
+/*
+ * Hover.
+ */
+.admin-carnets__pagina:hover {
+    background:
+        var(--color-primary, #005596);
+
+    color: #ffffff;
+
+    border-color:
+        var(--color-primary, #005596);
+
+    transform: translateY(-1px);
+}
+
+
+/*
+ * Página actual.
+ */
+.admin-carnets__pagina--activa {
+    background:
+        var(--color-primary, #005596);
+
+    color: #ffffff;
+
+    border-color:
+        var(--color-primary, #005596);
+
+    box-shadow:
+        0 4px 12px
+        rgba(0, 85, 150, 0.18);
+}
+
+
+/*
+ * Evita que el hover de la página activa
+ * cambie innecesariamente su apariencia.
+ */
+.admin-carnets__pagina--activa:hover {
+    background:
+        var(--color-primary, #005596);
+
+    color: #ffffff;
+
+    border-color:
+        var(--color-primary, #005596);
+}
+
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .admin-carnets__paginacion {
+        gap: 0.5rem;
+        margin-top: 1.25rem;
+    }
+
+
+    .admin-carnets__paginas {
+        gap: 0.3rem;
+    }
+
+
+    .admin-carnets__pagina {
+        width: 2.25rem;
+        height: 2.25rem;
+
+        border-radius: 0.65rem;
+
+        font-size: 0.9rem;
+    }
+
+
+    .admin-carnets__paginacion
+    .app-vista-button {
+        padding-left: 0.75rem;
+        padding-right: 0.75rem;
+    }
+}
+
+
 /* ============================================================
    RESPONSIVE — TABLET
    ============================================================ */

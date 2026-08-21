@@ -1,0 +1,7 @@
+[2026-08-19 19:41:50] [ERROR] Error al mostrar documentación administrativa {"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_documentos.php' (include_path='C:\\xampp\\php\\PEAR')"}
+[2026-08-19 19:41:52] [ERROR] Error al mostrar documentación administrativa {"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_documentos.php' (include_path='C:\\xampp\\php\\PEAR')"}
+[2026-08-21 19:39:54] [ERROR] Archivo de documento no encontrado {"id_documento":19,"ruta":"C:\\xampp\\htdocs\\manipulacionDeAlimentos\\uploads\\foto12.jpg"}
+[2026-08-21 21:31:15] [INFO] Documento aprobado {"id_documento":20}
+[2026-08-21 21:32:06] [INFO] Documento aprobado {"id_documento":17}
+[2026-08-21 21:32:34] [INFO] Documento rechazado {"id_documento":15,"observaciones":"Feo"}
+[2026-08-21 22:45:14] [ERROR] Archivo de documento no encontrado {"id_documento":13,"ruta":"C:\\xampp\\htdocs\\manipulacionDeAlimentos\\uploads\\moodle8.pdf"}

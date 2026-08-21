@@ -384,4 +384,309 @@ class DocumentoRepository
 
         return $documento ?: null;
     }
+
+    /**
+     * Obtiene la documentación para el panel administrativo.
+     *
+     * Sin DNI:
+     * - Obtiene ciudadanos que tienen al menos un documento pendiente.
+     * - Devuelve todos los documentos de esos ciudadanos.
+     * - Permite paginar por ciudadano.
+     *
+     * Con DNI:
+     * - Obtiene todos los documentos del ciudadano buscado.
+     * - No aplica paginación.
+     *
+     * @param string|null $dni
+     * @param int $limite
+     * @param int $offset
+     * @return array
+     */
+    public function obtenerDocumentacionAdministracion(?string $dni = null,int $limite = 10,int $offset = 0): array {
+
+        /*
+        * Los valores de paginación solamente
+        * se utilizan para el listado general.
+        */
+        $limite =
+            max(
+                1,
+                $limite
+            );
+
+        $offset =
+            max(
+                0,
+                $offset
+            );
+
+
+        /*
+        * --------------------------------------------------
+        * BÚSQUEDA POR DNI
+        * --------------------------------------------------
+        *
+        * Si se busca un ciudadano concreto,
+        * devolvemos toda su documentación.
+        *
+        * No aplicamos LIMIT/OFFSET porque el resultado
+        * corresponde a un único ciudadano.
+        */
+        if (
+            $dni !== null
+            && $dni !== ''
+        ) {
+
+            $sql = "
+                SELECT
+                    d.id,
+                    d.usuario_id,
+                    d.tipo_documento,
+                    d.nombre_original,
+                    d.ruta_archivo,
+                    d.estado,
+                    d.observaciones,
+                    d.fecha_subida,
+                    d.fecha_revision,
+
+                    u.nombre,
+                    u.apellido,
+                    u.dni,
+                    u.email,
+                    u.telefono,
+                    u.domicilio
+
+                FROM documentos d
+
+                INNER JOIN usuarios u
+                    ON u.id = d.usuario_id
+
+                WHERE u.dni = :dni
+
+                ORDER BY
+                    u.apellido ASC,
+                    u.nombre ASC,
+                    d.fecha_subida DESC
+            ";
+
+
+            $stmt =
+                $this->conexion->prepare(
+                    $sql
+                );
+
+
+            $stmt->bindValue(
+                ':dni',
+                $dni,
+                \PDO::PARAM_STR
+            );
+
+
+            $stmt->execute();
+
+
+            return $stmt->fetchAll(
+                \PDO::FETCH_ASSOC
+            );
+        }
+
+
+        /*
+        * --------------------------------------------------
+        * LISTADO GENERAL
+        * --------------------------------------------------
+        *
+        * Necesitamos primero obtener los usuarios que
+        * corresponden a la página solicitada.
+        *
+        * Después obtenemos TODOS los documentos de esos
+        * usuarios.
+        *
+        * Esto es importante porque LIMIT aplicado
+        * directamente sobre documentos rompería la
+        * agrupación por ciudadano.
+        */
+        $sql = "
+            SELECT
+                u.id
+
+            FROM usuarios u
+
+            WHERE EXISTS (
+                SELECT 1
+
+                FROM documentos dp
+
+                WHERE dp.usuario_id = u.id
+
+                AND dp.estado = 'pendiente'
+            )
+
+            ORDER BY
+                u.apellido ASC,
+                u.nombre ASC,
+                u.id ASC
+
+            LIMIT :limite
+            OFFSET :offset
+        ";
+
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+
+        $stmt->bindValue(
+            ':limite',
+            $limite,
+            \PDO::PARAM_INT
+        );
+
+
+        $stmt->bindValue(
+            ':offset',
+            $offset,
+            \PDO::PARAM_INT
+        );
+
+
+        $stmt->execute();
+
+
+        $usuarios =
+            $stmt->fetchAll(
+                \PDO::FETCH_COLUMN
+            );
+
+
+        /*
+        * Si no hay usuarios en esta página,
+        * no necesitamos realizar una segunda consulta.
+        */
+        if (empty($usuarios)) {
+            return [];
+        }
+
+
+        /*
+        * --------------------------------------------------
+        * OBTENER DOCUMENTACIÓN DE LOS USUARIOS
+        * --------------------------------------------------
+        */
+
+        $placeholders =
+            implode(
+                ',',
+                array_fill(
+                    0,
+                    count($usuarios),
+                    '?'
+                )
+            );
+
+
+        $sql = "
+            SELECT
+                d.id,
+                d.usuario_id,
+                d.tipo_documento,
+                d.nombre_original,
+                d.ruta_archivo,
+                d.estado,
+                d.observaciones,
+                d.fecha_subida,
+                d.fecha_revision,
+
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+                u.telefono,
+                u.domicilio
+
+            FROM documentos d
+
+            INNER JOIN usuarios u
+                ON u.id = d.usuario_id
+
+            WHERE d.usuario_id IN (
+                $placeholders
+            )
+
+            ORDER BY
+                u.apellido ASC,
+                u.nombre ASC,
+                d.fecha_subida DESC
+        ";
+
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+
+        foreach (
+            $usuarios
+            as $indice => $usuarioId
+        ) {
+
+            $stmt->bindValue(
+                $indice + 1,
+                (int)$usuarioId,
+                \PDO::PARAM_INT
+            );
+        }
+
+
+        $stmt->execute();
+
+
+        return $stmt->fetchAll(
+            \PDO::FETCH_ASSOC
+        );
+    }
+
+    /**
+    * Cuenta la cantidad de ciudadanos que tienen
+    * al menos un documento pendiente.
+    *
+    * Se utiliza para calcular la paginación
+    * del panel administrativo.
+    *
+    * @return int
+    */
+    public function contarCiudadanosDocumentacionAdministracion(): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+
+            FROM usuarios u
+
+            WHERE EXISTS (
+                SELECT 1
+
+                FROM documentos d
+
+                WHERE d.usuario_id = u.id
+
+                AND d.estado = 'pendiente'
+            )
+        ";
+
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+
+        $stmt->execute();
+
+
+        return (int)$stmt->fetchColumn();
+    }
 }

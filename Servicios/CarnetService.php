@@ -92,14 +92,139 @@ class CarnetService
     /**
      * Obtiene las inscripciones aprobadas
      * que todavía no poseen carnet.
+     *
+     * Permite paginar los resultados.
+     *
+     * @param int $pagina
+     * @param int $limite
+     * @return array
      */
-    public function obtenerPendientesEmision(): array
+    public function obtenerPendientesEmision(int $pagina = 1,int $limite = 10): array
     {
+        $pagina =
+            max(
+                1,
+                $pagina
+            );
+
+        $limite =
+            max(
+                1,
+                $limite
+            );
+
+        $offset =
+            ($pagina - 1)
+            * $limite;
+
+
+        /*
+        * Obtiene únicamente los pendientes
+        * correspondientes a la página solicitada.
+        */
+        $pendientes =
+            $this->carnetRepository
+                ->obtenerPendientesEmision(
+                    EstadoTramite::APROBADO,
+                    $limite,
+                    $offset
+                );
+
+
+        /*
+        * Obtiene la cantidad total de pendientes.
+        */
+        $total =
+            $this->carnetRepository
+                ->contarPendientesEmision(
+                    EstadoTramite::APROBADO
+                );
+
+
+        /*
+        * Calcula la cantidad total de páginas.
+        */
+        $totalPaginas =
+            $total > 0
+                ? (int)ceil(
+                    $total / $limite
+                )
+                : 1;
+
+
+        /*
+        * Si se solicita una página que ya no existe,
+        * volvemos a la última página disponible.
+        */
+        if (
+            $pagina > $totalPaginas
+            && $total > 0
+        ) {
+
+            $pagina =
+                $totalPaginas;
+
+            $offset =
+                ($pagina - 1)
+                * $limite;
+
+            $pendientes =
+                $this->carnetRepository
+                    ->obtenerPendientesEmision(
+                        EstadoTramite::APROBADO,
+                        $limite,
+                        $offset
+                    );
+        }
+
+
+        return [
+
+            'pendientes' =>
+                $pendientes,
+
+            'total' =>
+                $total,
+
+            'pagina' =>
+                $pagina,
+
+            'limite' =>
+                $limite,
+
+            'total_paginas' =>
+                $totalPaginas,
+
+            'tiene_anterior' =>
+                $pagina > 1,
+
+            'tiene_siguiente' =>
+                $pagina < $totalPaginas
+        ];
+    }
+
+    /**
+     * Obtiene una inscripción pendiente de emisión
+     * por su ID de inscripción.
+     *
+     * @param int $idInscripcion
+     * @return array|null
+     */
+    public function obtenerPendienteEmisionPorId(int $idInscripcion): ?array
+    {
+        if ($idInscripcion <= 0) {
+            return null;
+        }
+
         return $this->carnetRepository
-            ->obtenerPendientesEmision(
+            ->obtenerPendienteEmisionPorId(
+                $idInscripcion,
                 EstadoTramite::APROBADO
             );
     }
+
+
+
     /**
      * Obtiene una inscripción aprobada pendiente de emisión
      * buscando al ciudadano por DNI.

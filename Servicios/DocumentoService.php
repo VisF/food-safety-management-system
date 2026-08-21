@@ -301,4 +301,296 @@ class DocumentoService
         ];
     }
 
+    /**
+     * Busca la documentación de un ciudadano por DNI.
+     */
+    public function buscarDocumentacionPorDni(string $dni): array {
+
+        $dni = trim($dni);
+
+        if ($dni === '') {
+            return [];
+        }
+
+        return $this->obtenerDocumentacionAdministracion(
+            $dni
+        );
+    }
+
+   /**
+     * Obtiene la documentación agrupada por ciudadano
+     * para el panel administrativo.
+     *
+     * Sin DNI:
+     * - Obtiene ciudadanos con al menos un documento pendiente.
+     * - Aplica paginación.
+     *
+     * Con DNI:
+     * - Obtiene únicamente la documentación
+     *   del ciudadano buscado.
+     * - No aplica paginación.
+     *
+     * @param string|null $dni
+     * @param int $pagina
+     * @param int $limite
+     * @return array
+     */
+    public function obtenerDocumentacionAdministracion(?string $dni = null,int $pagina = 1,int $limite = 10): array {
+
+        /*
+        * Normalizamos los valores de paginación.
+        */
+        $pagina =
+            max(
+                1,
+                $pagina
+            );
+
+        $limite =
+            max(
+                1,
+                $limite
+            );
+
+
+        /*
+        * ==================================================
+        * BÚSQUEDA POR DNI
+        * ==================================================
+        *
+        * La búsqueda devuelve un único ciudadano.
+        *
+        * No necesitamos paginación.
+        */
+        if (
+            $dni !== null
+            && trim($dni) !== ''
+        ) {
+
+            $documentos =
+                $this->documentoRepository
+                    ->obtenerDocumentacionAdministracion(
+                        trim($dni)
+                    );
+
+
+            $usuarios =
+                $this->agruparDocumentacion(
+                    $documentos
+                );
+
+
+            return [
+                'usuarios' =>
+                    $usuarios,
+
+                'total' =>
+                    count($usuarios),
+
+                'pagina' =>
+                    1,
+
+                'limite' =>
+                    $limite,
+
+                'total_paginas' =>
+                    count($usuarios) > 0
+                        ? 1
+                        : 0,
+
+                'tiene_anterior' =>
+                    false,
+
+                'tiene_siguiente' =>
+                    false,
+
+                'busqueda' =>
+                    trim($dni)
+            ];
+        }
+
+
+        /*
+        * ==================================================
+        * LISTADO GENERAL
+        * ==================================================
+        */
+
+        $total =
+            $this->documentoRepository
+                ->contarCiudadanosDocumentacionAdministracion();
+
+
+        /*
+        * Calculamos la cantidad de páginas.
+        */
+        $totalPaginas =
+            $total > 0
+                ? (int)ceil(
+                    $total / $limite
+                )
+                : 0;
+
+
+        /*
+        * Si la página solicitada supera
+        * la cantidad disponible, utilizamos
+        * la última página válida.
+        */
+        if (
+            $totalPaginas > 0
+            && $pagina > $totalPaginas
+        ) {
+
+            $pagina =
+                $totalPaginas;
+        }
+
+
+        /*
+        * Calculamos el offset.
+        */
+        $offset =
+            ($pagina - 1) * $limite;
+
+
+        /*
+        * Obtenemos los documentos correspondientes
+        * a los ciudadanos de esta página.
+        */
+        $documentos =
+            $this->documentoRepository
+                ->obtenerDocumentacionAdministracion(
+                    null,
+                    $limite,
+                    $offset
+                );
+
+
+        /*
+        * Agrupamos los documentos por ciudadano.
+        */
+        $usuarios =
+            $this->agruparDocumentacion(
+                $documentos
+            );
+
+
+        return [
+
+            'usuarios' =>
+                $usuarios,
+
+            'total' =>
+                $total,
+
+            'pagina' =>
+                $pagina,
+
+            'limite' =>
+                $limite,
+
+            'total_paginas' =>
+                $totalPaginas,
+
+            'tiene_anterior' =>
+                $pagina > 1,
+
+            'tiene_siguiente' =>
+                $pagina < $totalPaginas,
+
+            'busqueda' =>
+                null
+        ];
+    }
+
+    /**
+     * Agrupa los documentos por ciudadano.
+     *
+     * @param array $documentos
+     * @return array
+     */
+    private function agruparDocumentacion(array $documentos): array {
+
+        $usuarios = [];
+
+
+        foreach (
+            $documentos
+            as $documento
+        ) {
+
+            $usuarioId =
+                (int)$documento['usuario_id'];
+
+
+            if (
+                !isset(
+                    $usuarios[$usuarioId]
+                )
+            ) {
+
+                $usuarios[$usuarioId] = [
+
+                    'usuario_id' =>
+                        $usuarioId,
+
+                    'nombre' =>
+                        $documento['nombre'],
+
+                    'apellido' =>
+                        $documento['apellido'],
+
+                    'dni' =>
+                        $documento['dni'],
+
+                    'email' =>
+                        $documento['email'],
+
+                    'telefono' =>
+                        $documento['telefono'],
+
+                    'domicilio' =>
+                        $documento['domicilio'],
+
+                    'documentos' =>
+                        []
+                ];
+            }
+
+
+            $usuarios[$usuarioId]['documentos'][] = [
+
+                'id' =>
+                    (int)$documento['id'],
+
+                'tipo_documento' =>
+                    $documento['tipo_documento'],
+
+                'nombre_original' =>
+                    $documento['nombre_original'],
+
+                'ruta_archivo' =>
+                    $documento['ruta_archivo'],
+
+                'estado' =>
+                    $documento['estado'],
+
+                'observaciones' =>
+                    $documento['observaciones'],
+
+                'fecha_subida' =>
+                    $documento['fecha_subida'],
+
+                'fecha_revision' =>
+                    $documento['fecha_revision']
+            ];
+        }
+
+
+        return array_values(
+            $usuarios
+        );
+    }
+
 }

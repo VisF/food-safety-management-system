@@ -67,12 +67,151 @@ class AdminCarnetControlador
         );
     }
 
+
+    /**
+     * Construye el rango de páginas que se mostrará
+     * en la paginación administrativa.
+     *
+     * Mantiene siempre:
+     * - Primera página.
+     * - Última página.
+     * - Dos páginas anteriores a la actual.
+     * - Página actual.
+     * - Dos páginas posteriores a la actual.
+     *
+     * Cuando existe un salto entre páginas,
+     * agrega un separador "...".
+     *
+     * Ejemplo:
+     *
+     * 1 ... 11 12 13 14 15 ... 50
+     *
+     * @param int $pagina
+     * @param int $totalPaginas
+     * @return array
+     */
+    private function construirPaginacion(int $pagina,int $totalPaginas): array {
+
+        if ($totalPaginas <= 0) {
+            return [];
+        }
+
+
+        /*
+        * Si la página solicitada está fuera
+        * del rango válido, la ajustamos.
+        */
+        $pagina =
+            max(
+                1,
+                min(
+                    $pagina,
+                    $totalPaginas
+                )
+            );
+
+
+        /*
+        * Si hay pocas páginas,
+        * mostramos todas.
+        */
+        if ($totalPaginas <= 7) {
+
+            return range(
+                1,
+                $totalPaginas
+            );
+        }
+
+
+        /*
+        * Dos páginas antes y dos después
+        * de la página actual.
+        */
+        $inicio =
+            max(
+                2,
+                $pagina - 2
+            );
+
+        $fin =
+            min(
+                $totalPaginas - 1,
+                $pagina + 2
+            );
+
+
+        $paginas = [];
+
+
+        /*
+        * Primera página.
+        */
+        $paginas[] = 1;
+
+
+        /*
+        * Separador inicial.
+        */
+        if ($inicio > 2) {
+
+            $paginas[] = '...';
+        }
+
+
+        /*
+        * Páginas cercanas a la actual.
+        */
+        for (
+            $i = $inicio;
+            $i <= $fin;
+            $i++
+        ) {
+
+            $paginas[] = $i;
+        }
+
+
+        /*
+        * Separador final.
+        */
+        if (
+            $fin < $totalPaginas - 1
+        ) {
+
+            $paginas[] = '...';
+        }
+
+
+        /*
+        * Última página.
+        */
+        $paginas[] =
+            $totalPaginas;
+
+
+        return $paginas;
+    }
+    
+    
     /**
      * Muestra el panel administrativo de carnets.
+     *
+     * Incluye:
+     * - Búsqueda por DNI.
+     * - Pendientes de emisión paginados.
+     * - Carnets ya emitidos.
+     * - Paginación inteligente.
      */
     public function mostrarIndex(): void
     {
         try {
+
+            /*
+            * ==============================================
+            * BÚSQUEDA POR DNI
+            * ==============================================
+            */
 
             $busqueda =
                 trim(
@@ -85,10 +224,11 @@ class AdminCarnetControlador
             $errores =
                 [];
 
+
             /*
             * Si se ingresó un DNI,
-            * buscamos una inscripción aprobada
-            * pendiente de emisión.
+            * buscamos independientemente de la
+            * paginación de pendientes.
             */
             if ($busqueda !== '') {
 
@@ -99,37 +239,192 @@ class AdminCarnetControlador
                         );
             }
 
-            $pendientes =
+
+            /*
+            * ==============================================
+            * PAGINACIÓN DE PENDIENTES
+            * ==============================================
+            */
+
+            $pagina =
+                filter_input(
+                    INPUT_GET,
+                    'pagina',
+                    FILTER_VALIDATE_INT
+                );
+
+            if (
+                $pagina === false
+                || $pagina === null
+                || $pagina < 1
+            ) {
+
+                $pagina = 1;
+            }
+
+
+            $limite =
+                filter_input(
+                    INPUT_GET,
+                    'limite',
+                    FILTER_VALIDATE_INT
+                );
+
+            if (
+                $limite === false
+                || $limite === null
+                || $limite < 1
+            ) {
+
+                $limite = 10;
+            }
+
+
+            /*
+            * ==============================================
+            * OBTENER PENDIENTES
+            * ==============================================
+            */
+
+            $paginacion =
                 $this->carnetService
-                    ->obtenerPendientesEmision();
+                    ->obtenerPendientesEmision(
+                        $pagina,
+                        $limite
+                    );
+
+
+            /*
+            * ==============================================
+            * DATOS PRINCIPALES
+            * ==============================================
+            */
+
+            $pendientes =
+                $paginacion['pendientes']
+                ?? [];
 
             $carnets =
                 $this->carnetService
                     ->listarActivosAdministracion();
+
+
+            /*
+            * ==============================================
+            * DATOS DE PAGINACIÓN
+            * ==============================================
+            */
+
+            $paginaActual =
+                (int)(
+                    $paginacion['pagina']
+                    ?? $pagina
+                );
+
+            $totalPaginas =
+                (int)(
+                    $paginacion['total_paginas']
+                    ?? 1
+                );
+
+
+            /*
+            * Construimos solamente las páginas
+            * que deben aparecer visualmente.
+            */
+            $paginas =
+                $this->construirPaginacion(
+                    $paginaActual,
+                    $totalPaginas
+                );
+
+
+            /*
+            * ==============================================
+            * DATOS PARA LA VISTA
+            * ==============================================
+            */
 
             $data = [
 
                 'page_title' =>
                     'Gestión de Carnets',
 
+
+                /*
+                * Pendientes de la página actual.
+                */
                 'pendientes' =>
                     $pendientes,
 
+
+                /*
+                * Carnets ya emitidos.
+                */
                 'carnets' =>
                     $carnets,
 
+
+                /*
+                * Resultado de búsqueda por DNI.
+                */
                 'resultado' =>
                     $resultado,
 
+
+                /*
+                * DNI ingresado.
+                */
                 'busqueda' =>
                     $busqueda,
 
+
+                /*
+                * Paginación.
+                */
+                'pagina' =>
+                    $paginaActual,
+
+                'limite' =>
+                    (int)(
+                        $paginacion['limite']
+                        ?? $limite
+                    ),
+
+                'total_pendientes' =>
+                    (int)(
+                        $paginacion['total']
+                        ?? 0
+                    ),
+
+                'total_paginas' =>
+                    $totalPaginas,
+
+                'paginas' =>
+                    $paginas,
+
+                'tiene_anterior' =>
+                    $paginacion['tiene_anterior']
+                    ?? false,
+
+                'tiene_siguiente' =>
+                    $paginacion['tiene_siguiente']
+                    ?? false,
+
+
+                /*
+                * Estado de carga.
+                */
                 'modo_carga' =>
                     false,
 
                 'inscripcion' =>
                     null,
 
+
+                /*
+                * Formulario vacío.
+                */
                 'formulario' => [
 
                     'numero_carnet' =>
@@ -142,19 +437,33 @@ class AdminCarnetControlador
                         ''
                 ],
 
+
+                /*
+                * Errores.
+                */
                 'errores' =>
                     $errores
             ];
 
+
+            /*
+            * ==============================================
+            * VISTA
+            * ==============================================
+            */
+
             require_once __DIR__ .
                 '/../Views/admin_carnets.php';
+
 
             $vista =
                 new AdminCarnetsVista();
 
+
             $vista->mostrar(
                 $data
             );
+
 
         } catch (Throwable $e) {
 
@@ -166,6 +475,7 @@ class AdminCarnetControlador
                 ]
             );
 
+
             header(
                 'Location: /manipulacionDeAlimentos/admin?toast=error_carnets'
             );
@@ -176,46 +486,159 @@ class AdminCarnetControlador
 
    /**
      * Muestra el formulario para cargar un carnet.
+     *
+     * Mantiene el contexto desde el que se accedió:
+     * - Búsqueda por DNI.
+     * - Listado paginado de pendientes.
      */
-    public function mostrarCarga(int $idInscripcion): void
+    public function mostrarCarga(
+        int $idInscripcion
+    ): void
     {
         try {
 
-            $pendientes =
-                $this->carnetService
-                    ->obtenerPendientesEmision();
+            /*
+            * ==============================================
+            * CONTEXTO DE NAVEGACIÓN
+            * ==============================================
+            */
+
+            $pagina =
+                filter_input(
+                    INPUT_GET,
+                    'pagina',
+                    FILTER_VALIDATE_INT
+                );
+            $limite =
+                filter_input(
+                    INPUT_GET,
+                    'limite',
+                    FILTER_VALIDATE_INT
+                );
+
+            if (
+                $limite === false
+                || $limite === null
+                || $limite < 1
+            ) {
+
+                $limite = 10;
+            }
+
+            if (
+                $pagina === false
+                || $pagina === null
+                || $pagina < 1
+            ) {
+
+                $pagina = 1;
+            }
+
+
+            $busqueda =
+                trim(
+                    $_GET['dni'] ?? ''
+                );
+
+
+            $origen =
+                $_GET['origen']
+                ?? 'pendientes';
+
+
+            /*
+            * ==============================================
+            * BUSCAR LA INSCRIPCIÓN
+            * ==============================================
+            */
 
             $inscripcion = null;
 
-            foreach (
-                $pendientes
-                as
-                $pendiente
+
+            /*
+            * Si venimos de una búsqueda por DNI,
+            * usamos el resultado de esa búsqueda.
+            */
+            if (
+                $origen === 'busqueda'
+                && $busqueda !== ''
             ) {
 
+                $resultado =
+                    $this->carnetService
+                        ->obtenerPendienteEmisionPorDni(
+                            $busqueda
+                        );
+
+
                 if (
-                    (int)(
-                        $pendiente['inscripcion_id']
+                    $resultado !== null
+                    && !empty($resultado)
+                    && (int)(
+                        $resultado['inscripcion_id']
+                        ?? $resultado['id']
                         ?? 0
                     ) === $idInscripcion
                 ) {
 
                     $inscripcion =
-                        $pendiente;
-
-                    break;
+                        $resultado;
                 }
             }
 
 
             /*
-            * Si no encontramos la inscripción entre
-            * las pendientes, no permitimos la carga.
+            * Si no encontramos la inscripción mediante
+            * la búsqueda, la obtenemos directamente por ID.
             */
             if ($inscripcion === null) {
 
+                $inscripcion =
+                    $this->carnetService
+                        ->obtenerPendienteEmisionPorId(
+                            $idInscripcion
+                        );
+            }
+
+
+            /*
+            * La inscripción ya no está disponible.
+            */
+            if ($inscripcion === null) {
+
+                $url =
+                    BASE_URL .
+                    '/admin/carnets';
+
+
+                $parametros = [];
+
+
+                if ($pagina > 1) {
+
+                    $parametros['pagina'] =
+                        $pagina;
+                }
+
+
+                if ($busqueda !== '') {
+
+                    $parametros['dni'] =
+                        $busqueda;
+                }
+
+
+                $parametros['toast'] =
+                    'inscripcion_no_disponible';
+
+
                 header(
-                    'Location: /manipulacionDeAlimentos/admin/carnets?toast=inscripcion_no_disponible'
+                    'Location: '
+                    . $url
+                    . '?'
+                    . http_build_query(
+                        $parametros
+                    )
                 );
 
                 exit;
@@ -223,88 +646,130 @@ class AdminCarnetControlador
 
 
             /*
-            * Determinamos desde dónde se solicitó
-            * la carga del carnet.
+            * ==============================================
+            * RECARGAR PENDIENTES DE LA PÁGINA ACTUAL
+            * ==============================================
             *
-            * - busqueda  → vino desde el buscador por DNI.
-            * - pendientes → vino desde la lista de pendientes.
+            * Esto es fundamental.
+            *
+            * El formulario de carga de los pendientes
+            * se muestra dentro del foreach de la vista.
+            *
+            * Por eso necesitamos volver a cargar los
+            * pendientes de la página desde la que hicimos
+            * clic.
             */
-            $origenCarga =
-                trim(
-                    $_GET['origen']
-                    ?? 'pendientes'
-                );
 
-            if (
-                !in_array(
-                    $origenCarga,
-                    [
-                        'busqueda',
-                        'pendientes'
-                    ],
-                    true
-                )
-            ) {
+            $paginacion =
+                $this->carnetService
+                    ->obtenerPendientesEmision(
+                        $pagina,
+                        $limite
+                    );
 
-                $origenCarga =
-                    'pendientes';
-            }
+
+            $pendientes =
+                $paginacion['pendientes']
+                ?? [];
 
 
             /*
-            * Conservamos el DNI buscado cuando
-            * la carga comenzó desde el buscador.
+            * ==============================================
+            * DATOS PARA LA VISTA
+            * ==============================================
             */
-            $busqueda =
-                trim(
-                    $_GET['dni']
-                    ?? ''
-                );
-
-
-            /*
-            * Si venimos desde el buscador, el resultado
-            * debe seguir apareciendo en esa sección.
-            */
-            $resultado =
-                null;
-
-            if (
-                $origenCarga === 'busqueda'
-            ) {
-
-                $resultado =
-                    $inscripcion;
-            }
-
 
             $data = [
 
                 'page_title' =>
-                    'Gestión de Carnets',
+                    'Cargar carnet',
 
+
+                /*
+                * Pendientes de la página actual.
+                */
                 'pendientes' =>
                     $pendientes,
 
+
+                /*
+                * Carnets ya emitidos.
+                */
                 'carnets' =>
                     $this->carnetService
                         ->listarActivosAdministracion(),
 
-                'resultado' =>
-                    $resultado,
 
+                /*
+                * Resultado de búsqueda.
+                */
+                'resultado' =>
+                    $origen === 'busqueda'
+                        ? $inscripcion
+                        : null,
+
+
+                /*
+                * DNI conservado.
+                */
                 'busqueda' =>
                     $busqueda,
 
+
+                /*
+                * Activamos modo carga.
+                */
                 'modo_carga' =>
                     true,
 
-                'origen_carga' =>
-                    $origenCarga,
 
+                /*
+                * Inscripción seleccionada.
+                */
                 'inscripcion' =>
                     $inscripcion,
 
+
+                /*
+                * Datos de paginación.
+                */
+                'pagina' =>
+                    $paginacion['pagina']
+                    ?? $pagina,
+
+                'limite' =>
+                    $paginacion['limite']
+                    ?? 10,
+
+                'total_pendientes' =>
+                    $paginacion['total']
+                    ?? 0,
+
+                'total_paginas' =>
+                    $paginacion['total_paginas']
+                    ?? 1,
+
+                'tiene_anterior' =>
+                    $paginacion['tiene_anterior']
+                    ?? false,
+
+                'tiene_siguiente' =>
+                    $paginacion['tiene_siguiente']
+                    ?? false,
+
+
+                /*
+                * Origen de la carga.
+                *
+                * La vista utiliza origen_carga.
+                */
+                'origen_carga' =>
+                    $origen,
+
+
+                /*
+                * Formulario vacío.
+                */
                 'formulario' => [
 
                     'numero_carnet' =>
@@ -317,10 +782,20 @@ class AdminCarnetControlador
                         ''
                 ],
 
+
+                /*
+                * Errores.
+                */
                 'errores' =>
                     []
             ];
 
+
+            /*
+            * ==============================================
+            * VISTA
+            * ==============================================
+            */
 
             require_once __DIR__ .
                 '/../Views/admin_carnets.php';
@@ -350,7 +825,10 @@ class AdminCarnetControlador
 
 
             header(
-                'Location: /manipulacionDeAlimentos/admin/carnets?toast=error_cargar_carnet'
+                'Location: '
+                . BASE_URL
+                . '/admin/carnets'
+                . '?toast=error_cargar_carnet'
             );
 
             exit;

@@ -182,11 +182,21 @@ class CarnetRepository
      * Obtiene las inscripciones con examen aprobado
      * que todavía no poseen un carnet emitido.
      *
+     * Permite paginar los resultados.
+     *
      * @param int $estadoAprobado
+     * @param int $limite
+     * @param int $offset
      * @return array
      */
-    public function obtenerPendientesEmision(int $estadoAprobado): array
+    public function obtenerPendientesEmision(int $estadoAprobado,int $limite = 10,int $offset = 0): array
     {
+        /*
+        * Evitamos valores inválidos.
+        */
+        $limite = max(1, $limite);
+        $offset = max(0, $offset);
+
         $sql = "
             SELECT
 
@@ -229,22 +239,81 @@ class CarnetRepository
             ORDER BY
                 i.fecha_inscripcion DESC,
                 i.id DESC
+
+            LIMIT :limite
+            OFFSET :offset
         ";
 
         $stmt =
-            $this->conexion->prepare(
-                $sql
-            );
+            $this->conexion->prepare($sql);
 
-        $stmt->execute([
-            ':estado_aprobado' =>
-                $estadoAprobado
-        ]);
+        $stmt->bindValue(
+            ':estado_aprobado',
+            $estadoAprobado,
+            PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':limite',
+            $limite,
+            PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':offset',
+            $offset,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
 
         return $stmt->fetchAll(
             PDO::FETCH_ASSOC
         );
-    }/**
+    }
+    /**
+     * Cuenta las inscripciones con examen aprobado
+     * que todavía no poseen un carnet emitido.
+     *
+     * Se utiliza para calcular la cantidad
+     * de páginas de la administración.
+     *
+     * @param int $estadoAprobado
+     * @return int
+     */
+    public function contarPendientesEmision(int $estadoAprobado): int
+    {
+        $sql = "
+            SELECT COUNT(*)
+
+            FROM inscripciones i
+
+            LEFT JOIN carnets c
+                ON c.inscripcion_id = i.id
+
+            WHERE
+                i.estado_tramite_id = :estado_aprobado
+
+                AND c.id IS NULL
+        ";
+
+        $stmt =
+            $this->conexion->prepare($sql);
+
+        $stmt->bindValue(
+            ':estado_aprobado',
+            $estadoAprobado,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
+
+        return (int)$stmt->fetchColumn();
+    }
+
+
+
+    /**
     * Obtiene la inscripción aprobada de un ciudadano
     * que todavía no posee un carnet emitido.
     *
@@ -605,6 +674,84 @@ class CarnetRepository
 
         return $stmt->fetchAll(PDO::FETCH_ASSOC);
     }
+    /**
+     * Obtiene una inscripción aprobada pendiente
+     * de emisión de carnet por su ID.
+     *
+     * @param int $idInscripcion
+     * @param int $estadoAprobado
+     * @return array|null
+     */
+    public function obtenerPendienteEmisionPorId(int $idInscripcion,int $estadoAprobado): ?array
+    {
+        $sql = "
+            SELECT
+
+                i.id AS inscripcion_id,
+
+                i.fecha_inscripcion,
+                i.observaciones,
+
+                u.id AS usuario_id,
+                u.nombre,
+                u.apellido,
+                u.dni,
+                u.email,
+
+                e.id AS examen_id,
+                e.fecha AS fecha_examen,
+                e.hora AS hora_examen,
+
+                et.nombre AS estado
+
+            FROM inscripciones i
+
+            INNER JOIN usuarios u
+                ON u.id = i.usuario_id
+
+            LEFT JOIN examenes e
+                ON e.id = i.examen_id
+
+            INNER JOIN estados_tramite et
+                ON et.id = i.estado_tramite_id
+
+            LEFT JOIN carnets c
+                ON c.inscripcion_id = i.id
+
+            WHERE
+                i.id = :id_inscripcion
+
+                AND i.estado_tramite_id =
+                    :estado_aprobado
+
+                AND c.id IS NULL
+
+            LIMIT 1
+        ";
+
+        $stmt =
+            $this->conexion->prepare(
+                $sql
+            );
+
+        $stmt->execute([
+            ':id_inscripcion' =>
+                $idInscripcion,
+
+            ':estado_aprobado' =>
+                $estadoAprobado
+        ]);
+
+        $resultado =
+            $stmt->fetch(
+                PDO::FETCH_ASSOC
+            );
+
+        return $resultado ?: null;
+    }
+
+
+
     /**
      * Obtiene el último carnet emitido para un usuario.
      */

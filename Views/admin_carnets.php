@@ -283,9 +283,12 @@ include __DIR__ .
                 $inscripcion['dni']
                 ?? ''
             );
+
+        
     ?>
 
         <section
+            id="formulario-carnet-<?= $idInscripcion ?>"
             class="app-vista-card admin-carnets__carga"
         >
 
@@ -791,6 +794,41 @@ include __DIR__ .
             $data['busqueda']
             ?? '';
 
+        $paginaActual =
+            (int)(
+                $data['pagina']
+                ?? 1
+            );
+            $limite =
+                (int)(
+                    $data['limite']
+                    ?? 10
+                );
+
+        $totalPaginas =
+            (int)(
+                $data['total_paginas']
+                ?? 1
+            );
+
+        $totalPendientes =
+            (int)(
+                $data['total_pendientes']
+                ?? 0
+            );
+
+        $tieneAnterior =
+            !empty(
+                $data['tiene_anterior']
+            );
+
+        $tieneSiguiente =
+            !empty(
+                $data['tiene_siguiente']
+            );
+
+
+    
         ?>
 
 
@@ -1284,9 +1322,9 @@ include __DIR__ .
                             class="app-chip app-chip--warning"
                         >
 
-                            <?= count($pendientes); ?>
+                            <?= $totalPendientes; ?>
 
-                            pendiente<?= count($pendientes) === 1
+                            pendiente<?= $totalPendientes === 1
                                 ? ''
                                 : 's'; ?>
 
@@ -1467,13 +1505,13 @@ include __DIR__ .
                                             $idInscripcion > 0
                                         ): ?>
 
-                                            <a
-                                                    href="<?= $this->getRoute(
-                                                        'cargar',
-                                                        $idInscripcion
-                                                    ); ?>#carnet-<?= $idInscripcion ?>"
-                                                    class="app-vista-button app-vista-button--primary"
-                                                >
+                                        <a 
+                                            href="<?= $this->getRoute( 
+                                                'cargar', 
+                                                $idInscripcion 
+                                            ); ?>?origen=pendientes&pagina=<?= $paginaActual ?>&limite=<?= $limite ?>#carnet-<?= $idInscripcion ?>"
+                                            class="app-vista-button app-vista-button--primary"
+                                        >
 
                                                 <span
                                                     class="material-symbols-outlined"
@@ -1528,6 +1566,115 @@ include __DIR__ .
                             <?php endforeach; ?>
 
                         </div>
+                        
+
+                        <!-- =================================================
+                             PAGINACIÓN
+                             ================================================= -->
+
+                        <?php if ($totalPaginas > 1): ?>
+
+                            <nav
+                                class="admin-carnets__paginacion"
+                                aria-label="Paginación de carnets pendientes"
+                            >
+
+                                <?php if ($tieneAnterior): ?>
+
+                                    <a
+                                        href="<?= $this->getRoute(
+                                            'carnets'
+                                        ); ?>?pagina=<?= $paginaActual - 1 ?>&limite=<?= $limite ?>"
+                                        class="app-vista-button
+                                               app-vista-button--secondary"
+                                    >
+
+                                        <span
+                                            class="material-symbols-outlined"
+                                        >
+                                            chevron_left
+                                        </span>
+
+                                        Anterior
+
+                                    </a>
+
+                                <?php endif; ?>
+
+
+                                <div
+                                    class="admin-carnets__paginas"
+                                >
+
+                                    <?php foreach (
+                                        ($data['paginas'] ?? [])
+                                        as
+                                        $pagina
+                                    ): ?>
+
+                                        <?php if ($pagina === '...'): ?>
+
+                                            <span
+                                                class="admin-carnets__pagina"
+                                                aria-hidden="true"
+                                            >
+
+                                                ...
+
+                                            </span>
+
+                                        <?php else: ?>
+
+                                            <a
+                                                href="<?= $this->getRoute(
+                                                    'carnets'
+                                                ); ?>?pagina=<?= (int)$pagina ?>&limite=<?= $limite ?>"
+                                                class="admin-carnets__pagina
+                                                    <?= (int)$pagina === $paginaActual
+                                                        ? 'admin-carnets__pagina--activa'
+                                                        : '' ?>"
+                                                aria-label="Página <?= (int)$pagina ?>"
+                                                <?= (int)$pagina === $paginaActual
+                                                    ? 'aria-current="page"'
+                                                    : '' ?>
+                                            >
+
+                                                <?= (int)$pagina ?>
+
+                                            </a>
+
+                                        <?php endif; ?>
+
+                                    <?php endforeach; ?>
+
+                                </div>
+
+
+                                <?php if ($tieneSiguiente): ?>
+
+                                    <a
+                                        href="<?= $this->getRoute(
+                                            'carnets'
+                                        ); ?>?pagina=<?= $paginaActual + 1 ?>&limite=<?= $limite ?>"
+                                        class="app-vista-button
+                                               app-vista-button--secondary"
+                                    >
+
+                                        Siguiente
+
+                                        <span
+                                            class="material-symbols-outlined"
+                                        >
+                                            chevron_right
+                                        </span>
+
+                                    </a>
+
+                                <?php endif; ?>
+
+                            </nav>
+
+                        <?php endif; ?>
 
                     <?php else: ?>
 
