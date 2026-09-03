@@ -29,8 +29,7 @@ $routes = [
 	'subida-documentacion' => 'vistas/subida_documentacion.php',
 	'subida_documentacion' => 'vistas/subida_documentacion.php',
 
-	'carnet-emitido' => 'vistas/carnet_emitido.php',
-	'carnet_emitido' => 'vistas/carnet_emitido.php',
+
 
 	'usuario-aprobado' => 'vistas/usuario_aprobado.php',
 	'usuario_aprobado' => 'vistas/usuario_aprobado.php',

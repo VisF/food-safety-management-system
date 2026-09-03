@@ -5,9 +5,11 @@
  * Entradas: puede recibir datos vía GET 'data' para sobreescribir valores por defecto.
  * Nota: Usar métodos `e()` para escapar salida al renderizar nombres/valores.
  */
-class PanelAdminVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class PanelAdminVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
     /*TODO:
         Datos temporales para desarrollo
         Eliminar cuando panel_admin reciba datos
@@ -100,15 +102,7 @@ class PanelAdminVista
         <?php
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-        ?>
-        </body>
-        </html>
-        <?php
-    }
-
+    
     private function getIncomingData(): array
     {
         if (!isset($_GET['data'])) {
@@ -119,10 +113,7 @@ class PanelAdminVista
         return is_array($decodedData) ? $decodedData : [];
     }
 
-    private function e(mixed $value): string
-    {
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    }
+
 
     private function cardStyleClass(string $style): string
     {
@@ -139,31 +130,7 @@ class PanelAdminVista
         return $this->getRoute('actividad_reciente');
     }
 
-    private function getRoute(string $route): string
-    {
-        return match ($route) {
-
-            'admin' => '/manipulacionDeAlimentos/admin',
-
-            'nuevo' =>
-                '/manipulacionDeAlimentos/admin/examenes/nuevo',
-
-            'admin_examenes' => '/manipulacionDeAlimentos/admin/examenes',
-
-            'admin_documentos' => '/manipulacionDeAlimentos/admin/documentos',
-
-            'admin_usuarios' => '/manipulacionDeAlimentos/admin/usuarios',
-
-            'admin_carnets' => '/manipulacionDeAlimentos/admin/carnets',
-
-            'admin_reportes' => '/manipulacionDeAlimentos/admin/reportes',
-
-            'actividad_reciente' => '/manipulacionDeAlimentos/admin/actividad',
-
-            default => '#'
-        };
-    }
-
+    
     public function mostrar(array $panelAdminData = []): void
         {
             if (empty($panelAdminData)) {

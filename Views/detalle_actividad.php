@@ -6,7 +6,10 @@ declare(strict_types=1);
  * Entradas: puede recibir datos vía GET 'data' con la actividad a mostrar.
  * Nota: mantener el marcado HTML limpio y escapar cualquier texto dinámico.
  */
-class DetalleActividadVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class DetalleActividadVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

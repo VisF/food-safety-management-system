@@ -19,10 +19,12 @@ declare(strict_types=1);
  * La vista concentra todas las operaciones
  * administrativas de documentación.
  */
-class AdminDocumentosVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class AdminDocumentosVista extends BaseVista
 {
-    private string $baseURL =
-        '/ManipulacionDeAlimentos/';
+
 
 
     /**
@@ -181,87 +183,6 @@ include __DIR__ .
 
     }
 
-
-    /**
-     * Construye el pie de página común.
-     */
-    private function getFooter(): void
-    {
-
-        include __DIR__ .
-            '/footer.php';
-
-?>
-
-</body>
-
-</html>
-
-<?php
-
-    }
-
-
-    /**
-     * Escapa valores para salida HTML.
-     */
-    private function e(
-        mixed $valor
-    ): string {
-
-        return htmlspecialchars(
-            (string) $valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
-
-
-    /**
-     * Obtiene las rutas utilizadas
-     * por la vista.
-     */
-    private function getRoute(
-        string $route,
-        ?int $id = null
-    ): string {
-
-        return match ($route) {
-
-            'admin' =>
-                $this->baseURL .
-                'admin',
-
-            'documentos' =>
-                $this->baseURL .
-                'admin/documentos',
-
-            'buscar' =>
-                $this->baseURL .
-                'admin/documentos/buscar',
-
-            'aprobar' =>
-                $this->baseURL .
-                'admin/documentos/' .
-                $id .
-                '/aprobar',
-
-            'rechazar' =>
-                $this->baseURL .
-                'admin/documentos/' .
-                $id .
-                '/rechazar',
-
-            'descargar' =>
-                $this->baseURL .
-                'admin/documentos/' .
-                $id .
-                '/descargar',
-
-            default =>
-                '#',
-        };
-    }
 
 
     /**
@@ -466,7 +387,7 @@ include __DIR__ .
                 action="<?php
                     echo $this->e(
                         $this->getRoute(
-                            'buscar'
+                            'buscar_documentos'
                         )
                     );
                 ?>"
@@ -958,7 +879,7 @@ include __DIR__ .
                             href="<?php
                                 echo $this->e(
                                     $this->getRoute(
-                                        'descargar',
+                                        'descargar_documento',
                                         (int)$documento['id']
                                     )
                                 );
@@ -990,7 +911,7 @@ include __DIR__ .
                             action="<?php
                                 echo $this->e(
                                     $this->getRoute(
-                                        'aprobar',
+                                        'aprobar_documento',
                                         (int)$documento['id']
                                     )
                                 );
@@ -1065,7 +986,7 @@ include __DIR__ .
                             action="<?php
                                 echo $this->e(
                                     $this->getRoute(
-                                        'rechazar',
+                                        'rechazar_documento',
                                         (int)$documento['id']
                                     )
                                 );
@@ -1697,7 +1618,7 @@ include __DIR__ .
                                     href="<?php
                                         echo $this->e(
                                             $this->getRoute(
-                                                'descargar',
+                                                'descargar_documento',
                                                 (int)$documento['id']
                                             )
                                         );
@@ -1729,7 +1650,7 @@ include __DIR__ .
                                     action="<?php
                                         echo $this->e(
                                             $this->getRoute(
-                                                'aprobar',
+                                                'aprobar_documento',
                                                 (int)$documento['id']
                                             )
                                         );
@@ -1805,7 +1726,7 @@ include __DIR__ .
                                     action="<?php
                                         echo $this->e(
                                             $this->getRoute(
-                                                'rechazar',
+                                                'rechazar_documento',
                                                 (int)$documento['id']
                                             )
                                         );
@@ -1905,7 +1826,7 @@ include __DIR__ .
                         href="<?php
                             echo $this->e(
                                 $this->getRoute(
-                                    'documentos'
+                                    'admin_documentos'
                                 )
                                 . '?pagina='
                                 . ($pagina - 1)
@@ -1937,55 +1858,57 @@ include __DIR__ .
                     class="admin-documentos-pagination-controls"
                 >
 
-                    <?php
+                    <?php foreach (
+                            $data['paginas']
+                            ?? []
+                            as $numeroPagina
+                        ): ?>
 
-                    /*
-                     * Mostramos todas las páginas.
-                     *
-                     * Más adelante, si el número de páginas
-                     * crece demasiado, podemos limitar el
-                     * rango mostrado.
-                     */
-                    for (
-                        $i = 1;
-                        $i <= $totalPaginas;
-                        $i++
-                    ):
+                            <?php if ($numeroPagina === '...'): ?>
 
-                    ?>
+                                <span
+                                    class="admin-documentos-pagination-page"
+                                    aria-hidden="true"
+                                >
+                                    ...
+                                </span>
 
-                        <a
-                            href="<?php
-                                echo $this->e(
-                                    $this->getRoute(
-                                        'documentos'
-                                    )
-                                    . '?pagina='
-                                    . $i
-                                    . '&limite='
-                                    . $limite
-                                );
-                            ?>"
-                            class="
-                                admin-documentos-pagination-page
-                                <?php
-                                if (
-                                    $i === $pagina
-                                ) {
-                                    echo
-                                        'admin-documentos-pagination-page--active';
-                                }
-                                ?>
-                            "
-                        >
+                            <?php else: ?>
 
-                            <?php
-                            echo $i;
-                            ?>
+                                <a
+                                    href="<?php
+                                        echo $this->e(
+                                            $this->getRoute(
+                                                'admin_documentos'
+                                            )
+                                            . '?pagina='
+                                            . (int)$numeroPagina
+                                            . '&limite='
+                                            . $limite
+                                        );
+                                    ?>"
+                                    class="
+                                        admin-documentos-pagination-page
+                                        <?php
+                                        if (
+                                            (int)$numeroPagina === $pagina
+                                        ) {
+                                            echo
+                                                'admin-documentos-pagination-page--active';
+                                        }
+                                        ?>
+                                    "
+                                >
 
-                        </a>
+                                    <?php
+                                    echo (int)$numeroPagina;
+                                    ?>
 
-                    <?php endfor; ?>
+                                </a>
+
+                            <?php endif; ?>
+
+                        <?php endforeach; ?>
 
                 </div>
 
@@ -1996,7 +1919,7 @@ include __DIR__ .
                         href="<?php
                             echo $this->e(
                                 $this->getRoute(
-                                    'documentos'
+                                    'admin_documentos'
                                 )
                                 . '?pagina='
                                 . ($pagina + 1)
@@ -2139,7 +2062,7 @@ include __DIR__ .
             </div>
 
         </section>
-                </section>
+
 
     </main>
 
@@ -2147,5 +2070,14 @@ include __DIR__ .
 
         $this->getFooter();
 
+?>
+
+</body>
+
+</html>
+
+<?php
+
     }
+
 }

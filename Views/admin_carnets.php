@@ -14,10 +14,12 @@ declare(strict_types=1);
  * - Mostrar formulario para cargar un carnet.
  * - Mostrar carnets emitidos.
  */
-class AdminCarnetsVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class AdminCarnetsVista extends BaseVista
 {
-    private string $baseURL =
-        '/manipulacionDeAlimentos/';
+
 
     /**
      * Genera el encabezado de la página.
@@ -176,78 +178,11 @@ $page_title =
 include __DIR__ .
     '/header.php';
 
-    }
-
-
-    /**
-     * Genera el pie de página.
-     */
-    private function getFooter(): void
-    {
-        include __DIR__ .
-            '/footer.php';
-
-?>
-
-</body>
-
-</html>
-
-<?php
 
     }
 
 
-    /**
-     * Escapa valores para HTML.
-     */
-    private function e(
-        mixed $valor
-    ): string
-    {
-        return htmlspecialchars(
-            (string) $valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
 
-
-    /**
-     * Obtiene las rutas utilizadas
-     * por la vista.
-     */
-    private function getRoute(
-        string $route,
-        ?int $id = null
-    ): string
-    {
-        return match ($route) {
-
-            'admin' =>
-                $this->baseURL
-                . 'admin',
-
-            'carnets' =>
-                $this->baseURL
-                . 'admin/carnets',
-
-            'cargar' =>
-                $this->baseURL
-                . 'admin/carnets/'
-                . $id
-                . '/cargar',
-
-            'emitir' =>
-                $this->baseURL
-                . 'admin/carnets/'
-                . $id
-                . '/emitir',
-
-            default =>
-                '#',
-        };
-    }
     /**
      * Muestra el formulario para cargar el carnet
      * de una inscripción aprobada.
@@ -388,7 +323,7 @@ include __DIR__ .
             <form
                 method="POST"
                 action="<?= $this->getRoute(
-                    'emitir',
+                    'emitir_carnet',
                     $idInscripcion
                 ); ?>"
                 enctype="multipart/form-data"
@@ -641,7 +576,7 @@ include __DIR__ .
 
                     <a
                         href="<?= $this->getRoute(
-                            'carnets'
+                            'admin_carnets'
                         ); ?>"
                         class="app-vista-button
                             app-vista-button--secondary"
@@ -966,7 +901,7 @@ include __DIR__ .
                     <form
                         method="GET"
                         action="<?= $this->getRoute(
-                            'carnets'
+                            'admin_carnets'
                         ); ?>"
                         class="admin-carnets__busqueda-form"
                     >
@@ -1196,7 +1131,7 @@ include __DIR__ .
                                     ): ?>
                                         <a
                                             href="<?= $this->getRoute(
-                                                'cargar',
+                                                'cargar_carnet',
                                                 $idInscripcionBusqueda
                                             ); ?>?origen=busqueda&dni=<?= urlencode(
                                                 (string)(
@@ -1390,6 +1325,11 @@ include __DIR__ .
                                     ]
                                     ?? null;
 
+                                $documentacionCompleta =
+                                    !empty(
+                                        $pendiente['documentacion_completa']
+                                    );
+
                                 ?>
 
 
@@ -1477,14 +1417,14 @@ include __DIR__ .
                                         </div>
 
 
+                                        <div class="admin-carnets__pendiente-estados">
+
                                         <span
                                             class="app-chip
-                                                   app-chip--success"
+                                                app-chip--success"
                                         >
 
-                                            <span
-                                                class="material-symbols-outlined"
-                                            >
+                                            <span class="material-symbols-outlined">
 
                                                 check_circle
 
@@ -1494,6 +1434,52 @@ include __DIR__ .
 
                                         </span>
 
+
+                                        <?php if ($documentacionCompleta): ?>
+
+                                            <span
+                                                class="app-chip
+                                                    app-chip--success"
+                                            >
+
+                                                <span class="material-symbols-outlined">
+
+                                                    verified
+
+                                                </span>
+
+                                                Documentación completa
+
+                                            </span>
+
+                                        <?php else: ?>
+
+                                            <a
+                                                href="<?= $this->e(
+                                                    $this->getRoute(
+                                                        'buscar_documentos'
+                                                    )
+                                                    . '?dni='
+                                                    . urlencode($dni)
+                                                ); ?>"
+                                                class="app-vista-button
+                                                    app-vista-button--secondary"
+                                            >
+
+                                                <span class="material-symbols-outlined">
+
+                                                    description
+
+                                                </span>
+
+                                                Documentación incompleta
+
+                                            </a>
+
+                                        <?php endif; ?>
+
+                                    </div>
+
                                     </div>
 
 
@@ -1502,40 +1488,65 @@ include __DIR__ .
                                     >
 
                                         <?php if (
-                                            $idInscripcion > 0
-                                        ): ?>
+                                                $idInscripcion > 0
+                                                && $documentacionCompleta
+                                            ): ?>
 
-                                        <a 
-                                            href="<?= $this->getRoute( 
-                                                'cargar', 
-                                                $idInscripcion 
-                                            ); ?>?origen=pendientes&pagina=<?= $paginaActual ?>&limite=<?= $limite ?>#carnet-<?= $idInscripcion ?>"
-                                            class="app-vista-button app-vista-button--primary"
-                                        >
-
-                                                <span
-                                                    class="material-symbols-outlined"
+                                                <a
+                                                    href="<?= $this->getRoute(
+                                                        'cargar_carnet',
+                                                        $idInscripcion
+                                                    ); ?>?origen=pendientes&pagina=<?= $paginaActual ?>&limite=<?= $limite ?>#carnet-<?= $idInscripcion ?>"
+                                                    class="app-vista-button app-vista-button--primary"
                                                 >
 
-                                                    upload_file
+                                                    <span class="material-symbols-outlined">
+
+                                                        upload_file
+
+                                                    </span>
+
+                                                    Cargar carnet
+
+                                                </a>
+
+                                            <?php elseif (
+                                                $idInscripcion > 0
+                                            ): ?>
+
+                                                <a
+                                                    href="<?= $this->e(
+                                                        $this->getRoute(
+                                                            'buscar_documentos'
+                                                        )
+                                                        . '?dni='
+                                                        . urlencode($dni)
+                                                    ); ?>"
+                                                    class="app-vista-button
+                                                        app-vista-button--secondary"
+                                                >
+
+                                                    <span class="material-symbols-outlined">
+
+                                                        fact_check
+
+                                                    </span>
+
+                                                    Revisar documentación
+
+                                                </a>
+
+                                            <?php else: ?>
+
+                                                <span
+                                                    class="admin-carnets__accion-error"
+                                                >
+
+                                                    Inscripción no válida
 
                                                 </span>
 
-                                                Cargar carnet
-
-                                            </a>
-
-                                        <?php else: ?>
-
-                                            <span
-                                                class="admin-carnets__accion-error"
-                                            >
-
-                                                Inscripción no válida
-
-                                            </span>
-
-                                        <?php endif; ?>
+                                            <?php endif; ?>
 
                                     </div>
 
@@ -1583,7 +1594,7 @@ include __DIR__ .
 
                                     <a
                                         href="<?= $this->getRoute(
-                                            'carnets'
+                                            'admin_carnets'
                                         ); ?>?pagina=<?= $paginaActual - 1 ?>&limite=<?= $limite ?>"
                                         class="app-vista-button
                                                app-vista-button--secondary"
@@ -1627,7 +1638,7 @@ include __DIR__ .
 
                                             <a
                                                 href="<?= $this->getRoute(
-                                                    'carnets'
+                                                    'cargar_carnet'
                                                 ); ?>?pagina=<?= (int)$pagina ?>&limite=<?= $limite ?>"
                                                 class="admin-carnets__pagina
                                                     <?= (int)$pagina === $paginaActual
@@ -1654,7 +1665,7 @@ include __DIR__ .
 
                                     <a
                                         href="<?= $this->getRoute(
-                                            'carnets'
+                                            'admin_carnet'
                                         ); ?>?pagina=<?= $paginaActual + 1 ?>&limite=<?= $limite ?>"
                                         class="app-vista-button
                                                app-vista-button--secondary"
@@ -1878,6 +1889,11 @@ include __DIR__ .
                                                     'ruta_pdf'
                                                 ]
                                                 ?? '';
+                                            $idCarnet =
+                                                (int)(
+                                                    $carnet['id']
+                                                    ?? 0
+                                                );
 
                                             ?>
 
@@ -2016,19 +2032,19 @@ include __DIR__ .
                                                 >
 
                                                     <?php if (
-                                                        !empty(
-                                                            $rutaPdf
-                                                        )
+                                                        !empty($rutaPdf)
+                                                        && $idCarnet > 0
                                                     ): ?>
 
                                                         <a
-                                                            href="<?= $this->e(
-                                                                $rutaPdf
+                                                            href="<?= $this->getRoute(
+                                                                'descargar_carnet_admin',
+                                                                $idCarnet
                                                             ); ?>"
                                                             target="_blank"
                                                             rel="noopener noreferrer"
                                                             class="app-vista-button
-                                                                   app-vista-button--secondary"
+                                                                app-vista-button--secondary"
                                                         >
 
                                                             <span
@@ -2117,6 +2133,14 @@ include __DIR__ .
 <?php
 
         $this->getFooter();
+
+?>
+
+</body>
+
+</html>
+
+<?php
 
     }
 

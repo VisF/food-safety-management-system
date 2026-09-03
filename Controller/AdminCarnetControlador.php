@@ -1222,6 +1222,172 @@ class AdminCarnetControlador
     }
 
     /**
+     * Descarga el PDF oficial de un carnet.
+     */
+    public function descargarCarnet(int $idCarnet): void
+    {
+        try {
+
+            if ($idCarnet <= 0) {
+
+                http_response_code(404);
+
+                exit(
+                    'Carnet no encontrado.'
+                );
+            }
+
+            $carnet =
+                $this->carnetService
+                    ->obtenerPorId(
+                        $idCarnet
+                    );
+
+            if ($carnet === null) {
+
+                http_response_code(404);
+
+                exit(
+                    'Carnet no encontrado.'
+                );
+            }
+
+            $rutaPdf =
+                trim(
+                    (string)(
+                        $carnet['ruta_pdf']
+                        ?? ''
+                    )
+                );
+
+            if ($rutaPdf === '') {
+
+                http_response_code(404);
+
+                exit(
+                    'El carnet no tiene un PDF asociado.'
+                );
+            }
+
+            /*
+            * La ruta almacenada en BD es relativa:
+            *
+            * uploads/carnets/archivo.pdf
+            *
+            * La convertimos a una ruta física
+            * dentro de la aplicación.
+            */
+            $rutaFisica =
+                dirname(__DIR__)
+                . DIRECTORY_SEPARATOR
+                . str_replace(
+                    [
+                        '/',
+                        '\\'
+                    ],
+                    DIRECTORY_SEPARATOR,
+                    $rutaPdf
+                );
+
+            /*
+            * Evitar que una ruta manipulada
+            * salga del directorio de la aplicación.
+            */
+            $baseAplicacion =
+                realpath(
+                    dirname(__DIR__)
+                );
+
+            $archivoReal =
+                realpath(
+                    $rutaFisica
+                );
+
+            if (
+                $baseAplicacion === false
+                || $archivoReal === false
+                || !is_file($archivoReal)
+                || strpos(
+                    $archivoReal,
+                    $baseAplicacion
+                        . DIRECTORY_SEPARATOR
+                ) !== 0
+            ) {
+
+                http_response_code(404);
+
+                exit(
+                    'El archivo del carnet no está disponible.'
+                );
+            }
+
+            /*
+            * Nombre con el que se descarga.
+            */
+            $numeroCarnet =
+                trim(
+                    (string)(
+                        $carnet['numero_carnet']
+                        ?? $idCarnet
+                    )
+                );
+
+            $nombreDescarga =
+                'carnet_'
+                . preg_replace(
+                    '/[^A-Za-z0-9_-]/',
+                    '_',
+                    $numeroCarnet
+                )
+                . '.pdf';
+
+            header(
+                'Content-Type: application/pdf'
+            );
+
+            header(
+                'Content-Disposition: inline; filename="'
+                . $nombreDescarga
+                . '"'
+            );
+
+            header(
+                'Content-Length: '
+                . (string)filesize($archivoReal)
+            );
+
+            header(
+                'X-Content-Type-Options: nosniff'
+            );
+
+            readfile(
+                $archivoReal
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            $this->registrarLog(
+                'ERROR_DESCARGAR_CARNET',
+                [
+                    'id_carnet' =>
+                        $idCarnet,
+
+                    'error' =>
+                        $e->getMessage()
+                ]
+            );
+
+            http_response_code(500);
+
+            exit(
+                'No fue posible descargar el carnet.'
+            );
+        }
+    }
+
+    /**
      * Obtiene una inscripción pendiente de emisión
      * por su ID interno.
      */

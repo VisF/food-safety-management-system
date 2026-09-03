@@ -1,6 +1,7 @@
 <?php
+declare(strict_types=1);
 
-require_once __DIR__ . '/../Services/ConsultaPublicaService.php';
+require_once __DIR__ . '/../Servicios/ConsultaPublicaService.php';
 require_once __DIR__ . '/../Views/consulta_publica.php';
 
 class ConsultaPublicaControlador
@@ -9,79 +10,262 @@ class ConsultaPublicaControlador
 
     public function __construct()
     {
-        $this->consultaPublicaService = new ConsultaPublicaService();
+        $this->consultaPublicaService =
+            new ConsultaPublicaService();
     }
 
+    /**
+     * Muestra la consulta pública de carnets.
+     */
     public function mostrar(): void
     {
-        $dni = trim($_GET['dni'] ?? '');
+        $dni =
+            trim(
+                (string)($_GET['dni'] ?? '')
+            );
 
-        $data = $this->consultaPublicaService->consultarPorDni($dni);
+        $data =
+            $this->consultaPublicaService
+                ->consultarPorDni($dni);
 
-        $_GET['data'] = json_encode($data);
+        $vista =
+            new ConsultaPublicaVista();
 
-        $vista = new ConsultaPublicaVista();
-        $vista->mostrar();
+        $vista->mostrar(
+            $data
+        );
     }
 
+    /**
+     * Descarga el PDF oficial del carnet.
+     */
+    public function descargarCarnet(int $idCarnet): void{
 
 
-    public function descargarCarnet(): void
-    {
-        $idCarnet = (int)($_GET['id'] ?? 0);
+        $archivo =
+            $this->consultaPublicaService
+                ->descargarCarnet(
+                    $idCarnet
+                );
 
-        $archivo = $this->consultaPublicaService->descargarCarnet($idCarnet);
+        if ($archivo === null) {
 
-        if (!$archivo) {
             http_response_code(404);
-            exit('Carnet no encontrado.');
-        }
-        //RUTA DEL ARCHIVO PDF A REVISAR
-        //BUSCA ACÁ
-        $ruta = __DIR__ . '/../../uploads/' . $archivo['ruta_pdf'];
 
-        if (!file_exists($ruta)) {
+            exit(
+                'Carnet no encontrado.'
+            );
+        }
+
+        $rutaPdf =
+            trim(
+                (string)(
+                    $archivo['ruta_pdf']
+                    ?? ''
+                )
+            );
+
+        if ($rutaPdf === '') {
+
             http_response_code(404);
-            exit('El archivo no existe.');
+
+            exit(
+                'El archivo del carnet no está disponible.'
+            );
         }
 
-        header('Content-Type: application/pdf');
-        header('Content-Disposition: attachment; filename="' . $archivo['nombre_archivo'] . '"');
-        header('Content-Length: ' . filesize($ruta));
+        /*
+         * La ruta almacenada en la base de datos
+         * debe ser relativa al proyecto.
+         */
+        $rutaPdf =
+            ltrim(
+                $rutaPdf,
+                '/\\'
+            );
+
+        $ruta =
+            dirname(__DIR__) .
+            DIRECTORY_SEPARATOR .
+            str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                $rutaPdf
+            );
+
+        if (
+            !is_file($ruta)
+            || !is_readable($ruta)
+        ) {
+
+            http_response_code(404);
+
+            exit(
+                'El archivo del carnet no existe.'
+            );
+        }
+
+        $nombreArchivo =
+            basename(
+                (string)(
+                    $archivo['nombre_archivo']
+                    ?? 'carnet.pdf'
+                )
+            );
+
+        header(
+            'Content-Type: application/pdf'
+        );
+
+        header(
+            'Content-Disposition: attachment; filename="' .
+            $nombreArchivo .
+            '"'
+        );
+
+        header(
+            'Content-Length: ' .
+            filesize($ruta)
+        );
+
+        header(
+            'Cache-Control: private, no-cache'
+        );
 
         readfile($ruta);
+
         exit;
     }
 
-    public function descargarFoto(): void
+    /**
+     * Descarga la foto asociada al carnet.
+     */
+    public function descargarFoto(int $idCarnet): void
+    
     {
-        $idCarnet = (int)($_GET['id'] ?? 0);
+        $idCarnet =
+            (int)($_GET['id'] ?? 0);
 
-        $foto = $this->consultaPublicaService->descargarFotoPorCarnet($idCarnet);
+        $foto =
+            $this->consultaPublicaService
+                ->descargarFotoPorCarnet(
+                    $idCarnet
+                );
 
-        if (!$foto) {
+        if ($foto === null) {
+
             http_response_code(404);
-            exit('Foto no encontrada.');
+
+            exit(
+                'Foto no encontrada.'
+            );
         }
 
-        //RUTA DEL ARCHIVO FOTO CARNET A REVISAR
-        //BUSCA ACÁ
+        $rutaFoto =
+            trim(
+                (string)(
+                    $foto['ruta_archivo']
+                    ?? ''
+                )
+            );
 
+        if ($rutaFoto === '') {
 
-        $ruta = __DIR__ . '/../../' . $foto['ruta_archivo'];
-
-        if (!file_exists($ruta)) {
             http_response_code(404);
-            exit('El archivo no existe.');
+
+            exit(
+                'La foto del carnet no está disponible.'
+            );
         }
 
-        header('Content-Type: ' . $foto['tipo_mime']);
-        header('Content-Disposition: attachment; filename="' . $foto['nombre_original'] . '"');
-        header('Content-Length: ' . filesize($ruta));
+        $rutaFoto =
+            ltrim(
+                $rutaFoto,
+                '/\\'
+            );
+
+        $ruta =
+            dirname(__DIR__) .
+            DIRECTORY_SEPARATOR .
+            str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                $rutaFoto
+            );
+
+        if (
+            !is_file($ruta)
+            || !is_readable($ruta)
+        ) {
+
+            http_response_code(404);
+
+            exit(
+                'El archivo de la foto no existe.'
+            );
+        }
+
+        /*
+         * La tabla documentos no tiene tipo_mime,
+         * por lo que determinamos el MIME mediante
+         * la extensión real del archivo.
+         */
+        $extension =
+            strtolower(
+                pathinfo(
+                    $ruta,
+                    PATHINFO_EXTENSION
+                )
+            );
+
+        $mimeTypes = [
+
+            'jpg' =>
+                'image/jpeg',
+
+            'jpeg' =>
+                'image/jpeg',
+
+            'png' =>
+                'image/png',
+
+            'webp' =>
+                'image/webp'
+        ];
+
+        $mime =
+            $mimeTypes[$extension]
+            ?? 'application/octet-stream';
+
+        $nombreArchivo =
+            basename(
+                (string)(
+                    $foto['nombre_original']
+                    ?? 'foto_carnet'
+                )
+            );
+
+        header(
+            'Content-Type: ' . $mime
+        );
+
+        header(
+            'Content-Disposition: attachment; filename="' .
+            $nombreArchivo .
+            '"'
+        );
+
+        header(
+            'Content-Length: ' .
+            filesize($ruta)
+        );
+
+        header(
+            'Cache-Control: private, no-cache'
+        );
 
         readfile($ruta);
+
         exit;
     }
-
-
 }

@@ -82,95 +82,122 @@ class ExamenControlador
         $this->inscripcionService = new InscripcionService();
 
     }
-    // Ejecuta guardar.
-    public function guardar(): void
+   /**
+     * Guarda un nuevo examen.
+     *
+     * Recibe los datos del formulario y delega la creación
+     * al servicio correspondiente.
+     */
+   public function guardar(): array
     {
+        $fecha = trim(
+            (string)($_POST['fecha'] ?? '')
+        );
 
+        $hora = trim(
+            (string)($_POST['hora'] ?? '')
+        );
 
-        $fecha = trim($_POST['fecha'] ?? '');
-        $hora = trim($_POST['hora'] ?? '');
-        $cupos = (int)($_POST['cupos'] ?? 0);
-        $ubicacion = trim($_POST['ubicacion'] ?? '');
-        $aula = trim($_POST['aula'] ?? '');
+        $cupos = (int)(
+            $_POST['cupos'] ?? 0
+        );
 
-        $errores = [];
+        $ubicacion = trim(
+            (string)($_POST['ubicacion'] ?? '')
+        );
+
+        $aula = trim(
+            (string)($_POST['aula'] ?? '')
+        );
+
+        $datos = [
+            'fecha' => $fecha,
+            'hora' => $hora,
+            'cupos' => $cupos,
+            'ubicacion' => $ubicacion,
+            'aula' => $aula,
+        ];
 
         if ($fecha === '') {
-            $errores[] = 'Debe indicar una fecha.';
+            return [
+                'success' => false,
+                'message' => 'Debe indicar una fecha.',
+                'data' => $datos,
+            ];
         }
 
         if ($hora === '') {
-            $errores[] = 'Debe indicar una hora.';
-        }
-
-        if ($cupos <= 0) {
-            $errores[] = 'Los cupos deben ser mayores a cero.';
+            return [
+                'success' => false,
+                'message' => 'Debe indicar un horario.',
+                'data' => $datos,
+            ];
         }
 
         if ($ubicacion === '') {
-            $errores[] = 'Debe indicar una ubicación.';
+            return [
+                'success' => false,
+                'message' => 'Debe indicar una ubicación.',
+                'data' => $datos,
+            ];
         }
 
         if ($aula === '') {
-            $errores[] = 'Debe indicar un aula.';
+            return [
+                'success' => false,
+                'message' => 'Debe indicar un aula.',
+                'data' => $datos,
+            ];
         }
 
-        if (!empty($errores)) {
+        if ($cupos <= 0) {
+            return [
+                'success' => false,
+                'message' =>
+                    'La cantidad de cupos debe ser mayor a cero.',
+                'data' => $datos,
+            ];
+        }
 
-            $data = [
-                'error' => implode(' ', $errores),
-                'fecha_display' => $_POST['fecha_display'] ?? '',
-                'hora' => $hora,
-                'cupos' => (string)$cupos,
-                'ubicacion' => $ubicacion,
-                'aula' => $aula
+        try {
+
+            $idExamen =
+                $this->examenService
+                    ->crearExamen($datos);
+
+            return [
+                'success' => true,
+                'message' =>
+                    'Fecha de examen creada correctamente.',
+                'id' => $idExamen,
+                'data' => $datos,
             ];
 
-            header(
-                'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
-                urlencode(json_encode($data))
-            );
-            exit;
-        }
+        } catch (\InvalidArgumentException $e) {
 
-        $resultado =
-            $this->examenService
-                ->crearExamen([
-                    'fecha' => $fecha,
-                    'hora' => $hora,
-                    'ubicacion' => $ubicacion,
-                    'aula' => $aula,
-                    'cupos' => $cupos
-                ]);
-
-        if ($resultado <= 0){
-
-            $data = [
-                'error' => 'No fue posible crear el examen.',
-                'fecha_display' => $_POST['fecha_display'] ?? '',
-                'hora' => $hora,
-                'cupos' => (string)$cupos,
-                'ubicacion' => $ubicacion,
-                'aula' => $aula
+            return [
+                'success' => false,
+                'message' => $e->getMessage(),
+                'data' => $datos,
             ];
 
-            header(
-                'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
-                urlencode(json_encode($data))
+        } catch (\Throwable $e) {
+
+            $this->registrarLog(
+                'ERROR_GUARDAR_EXAMEN',
+                [
+                    'error' => $e->getMessage(),
+                    'datos' => $datos,
+                ]
             );
-            exit;
+
+            return [
+                'success' => false,
+                'message' =>
+                    'Ocurrió un error al crear el examen.',
+                'data' => $datos,
+            ];
         }
-
-        $data = [
-            'success' => true,
-            'message' => 'Fecha de examen creada correctamente.'
-        ];
-
-        header(
-            'Location: ' . self::BASE_PATH . '/crear_examen?data=' .
-            urlencode(json_encode($data))
-        );
-        exit;
     }
 
 

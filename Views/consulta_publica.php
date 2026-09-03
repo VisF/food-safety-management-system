@@ -1,6 +1,9 @@
 <?php
 
-class ConsultaPublicaVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class ConsultaPublicaVista extends BaseVista
 {
     private function getDefaultData(): array
     {
@@ -18,40 +21,9 @@ class ConsultaPublicaVista
         ];
     }
 
-    private function getRoute(string $route): string
-    {
-        return match ($route) {
+    
 
-            'consulta_publica' =>
-                '/manipulacionDeAlimentos/consulta-publica',
 
-            'descargar_foto' =>
-                '/manipulacionDeAlimentos/consulta-publica/foto',
-
-            'descargar_carnet' =>
-                '/manipulacionDeAlimentos/consulta-publica/carnet',
-
-            default => '#'
-        };
-    }
-
-    private function e(mixed $value): string
-    {
-        return htmlspecialchars((string)$value, ENT_QUOTES, 'UTF-8');
-    }
-
-    private function getIncomingData(): array
-    {
-        if (!isset($_GET['data'])) {
-            return [];
-        }
-
-        $decodedData = json_decode((string)$_GET['data'], true);
-
-        return is_array($decodedData)
-            ? $decodedData
-            : [];
-    }
 
     private function getHeader(array $consultaData): void
     {
@@ -110,20 +82,13 @@ class ConsultaPublicaVista
     <body class="tema-ciudadano">
 
     <?php
-    $page_title = 'Consulta Pública';
-    include __DIR__ . '/header.php';
-    }
+    $page_title =
+        $consultaData['page_title']
+        ?? 'Consulta Pública';
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-    ?>
+    include __DIR__ .
+        '/header.php';
 
-    </body>
-
-    </html>
-
-    <?php
         }
 
         private function renderHero(): void
@@ -201,18 +166,19 @@ class ConsultaPublicaVista
     <?php
         }
 
-        public function mostrar(array $consultaData = []): void
-        {
-            if (empty($consultaData)) {
+    public function mostrar(array $consultaData = []): void
+    {
+        if (
+            empty($consultaData)
+        ) {
 
-                $consultaData = array_replace_recursive(
-                    $this->getDefaultData(),
-                    $this->getIncomingData()
-                );
+            $consultaData =
+                $this->getDefaultData();
+        }
 
-            }
-
-            $this->getHeader($consultaData);
+        $this->getHeader(
+            $consultaData
+        );
 
     ?>
 
@@ -225,13 +191,14 @@ class ConsultaPublicaVista
             <?php $this->renderFormulario($consultaData); ?>
 
             <?php
-            if (
-                !empty($consultaData['resultado']['consultado'])
-                && $consultaData['resultado']['consultado']
-            ) {
-                $this->renderResultado($consultaData['resultado']);
-            }
-            ?>
+                if (
+                    isset($consultaData['resultado']['encontrado'])
+                ) {
+                    $this->renderResultado(
+                        $consultaData['resultado']
+                    );
+                }
+                ?>
 
         </div>
 
@@ -240,8 +207,15 @@ class ConsultaPublicaVista
     <?php
 
         $this->getFooter();
-    }
+    
+    ?>
 
+    </body>
+
+    </html>
+
+    <?php
+    }
        private function renderResultado(array $resultado): void
     {
         if (!$resultado['encontrado']) {
@@ -351,7 +325,12 @@ class ConsultaPublicaVista
 
             <a
                 class="app-vista-button app-vista-button--primary"
-                href="<?= $this->getRoute('descargar_carnet'); ?>?id=<?= urlencode($resultado['id_carnet']); ?>">
+                href="<?= $this->e(
+                    $this->getRoute(
+                        'descargar_carnet',
+                        (int)$resultado['id_carnet']
+                    )
+                ); ?>">
 
                 <span class="material-symbols-outlined">
                     picture_as_pdf
@@ -363,7 +342,12 @@ class ConsultaPublicaVista
 
             <a
                 class="app-vista-button app-vista-button--secondary"
-                href="<?= $this->getRoute('descargar_foto'); ?>?id=<?= urlencode($resultado['id_carnet']); ?>">
+                href="<?= $this->e(
+                    $this->getRoute(
+                        'descargar_foto',
+                        (int)$resultado['id_carnet']
+                    )
+                ); ?>">
 
                 <span class="material-symbols-outlined">
                     image
@@ -409,8 +393,12 @@ class ConsultaPublicaVista
 
     </section>
 
+
     <?php
         }
 
     }
+
+
+
 

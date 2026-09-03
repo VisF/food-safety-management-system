@@ -595,3 +595,32 @@
 [2026-08-18 21:22:10] [INFO] Index page visited | {"usuario_id":null}
 [2026-08-19 19:41:47] [INFO] Index page visited | {"usuario_id":null}
 [2026-08-19 19:42:51] [INFO] Index page visited | {"usuario_id":null}
+[2026-09-01 19:47:18] [INFO] Index page visited | {"usuario_id":null}
+[2026-09-01 20:32:27] [INFO] Public consultation page accessed | {"query_dni":false}
+[2026-09-01 20:33:25] [INFO] Public consultation page accessed | {"query_dni":true}
+[2026-09-01 20:33:30] [INFO] Public consultation page accessed | {"query_dni":true}
+[2026-09-01 20:37:30] [INFO] Public consultation page accessed | {"query_dni":true}
+[2026-09-01 20:47:29] [INFO] Index page visited | {"usuario_id":null}
+[2026-09-02 19:28:28] [INFO] Index page visited | {"usuario_id":null}
+[2026-09-02 19:30:20] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 19:36:32] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 19:37:18] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 19:47:06] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 20:40:51] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 20:57:00] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 20:59:52] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 20:59:57] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:00:42] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:01:06] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:02:18] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:02:21] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:02:58] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:05:29] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-02 21:07:44] [INFO] Index page visited | {"usuario_id":14}
+[2026-09-03 20:16:17] [INFO] Index page visited | {"usuario_id":null}
+[2026-09-03 20:17:38] [INFO] Index page visited | {"usuario_id":1}
+[2026-09-03 20:27:56] [INFO] Index page visited | {"usuario_id":1}
+[2026-09-03 20:30:02] [INFO] Index page visited | {"usuario_id":1}
+[2026-09-03 20:32:11] [INFO] Index page visited | {"usuario_id":1}
+[2026-09-03 20:34:24] [INFO] Index page visited | {"usuario_id":1}
+[2026-09-03 20:45:31] [INFO] Index page visited | {"usuario_id":1}

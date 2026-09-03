@@ -10,9 +10,12 @@
  * Seguridad:
  *  - Mantener la lógica de validación/almacenamiento fuera de la vista; evitar mostrar rutas de filesystem o nombres reales.
  */
-class SubidaDocumentacionVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class SubidaDocumentacionVista extends BaseVista
 {
-  private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
   private function getDefaultData(): array
   {
@@ -63,19 +66,8 @@ class SubidaDocumentacionVista
     <?php
   }
 
-  private function getFooter(): void
-  {
-    include __DIR__ . '/footer.php';
-    ?>
-    </body>
-    </html>
-    <?php
-  }
 
-  private function e(mixed $value): string
-  {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-  }
+
 
   public function mostrar(array $documentos = []): void
 {

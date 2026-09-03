@@ -5,9 +5,12 @@
  * Entradas: valores por defecto en `getDefaultData()`; el controlador puede pasar datos reales.
  * Nota: ofrecer rutas claras para descargar comprobantes o ver estado del trámite.
  */
-class UsuarioAprobadoVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class UsuarioAprobadoVista extends BaseVista
 {
-  private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
   private function getDefaultData(): array
   {
@@ -65,19 +68,7 @@ class UsuarioAprobadoVista
     <?php
   }
 
-  private function getFooter(): void
-  {
-    include __DIR__ . '/footer.php';
-    ?>
-    </body>
-    </html>
-    <?php
-  }
 
-  private function e(mixed $value): string
-  {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-  }
 
   public function mostrar(): void
   {

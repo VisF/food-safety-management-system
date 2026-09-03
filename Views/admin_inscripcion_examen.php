@@ -16,9 +16,11 @@ declare(strict_types=1);
  * - Permitir aprobar o desaprobar.
  * - Registrar observaciones.
  */
-class AdminInscripcionExamenVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class AdminInscripcionExamenVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
 
     private function getHeader(array $data): void
     {
@@ -107,48 +109,7 @@ include __DIR__ . '/header.php';
 
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-
-?>
-
-</body>
-
-</html>
-
-<?php
-
-    }
-
-    private function e(
-        mixed $valor
-    ): string
-    {
-        return htmlspecialchars(
-            (string) $valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
-
-    private function getRoute(
-        string $route,
-        int $id = 0
-    ): string
-    {
-        return match ($route) {
-
-            'guardar' =>
-                '/manipulacionDeAlimentos/admin/inscripciones/' . $id,
-
-            'volver' =>
-                '/manipulacionDeAlimentos/admin/examenes',
-
-            default =>
-                '#'
-        };
-    }
+    
     public function mostrar(
     array $data = []
 ): void
@@ -235,8 +196,9 @@ include __DIR__ . '/header.php';
         </section>
 
         <form
+            id="form-inscripcion"
             action="<?php echo $this->getRoute(
-                'guardar',
+                'guardar_inscripcion',
                 (int)$data['inscripcion']['id']
             ); ?>"
             method="post"
@@ -650,52 +612,70 @@ include __DIR__ . '/header.php';
 <?php endif; ?>
 
 
-            <div
-                class="flex justify-end gap-4">
+          </form>
+
+
+        <div class="flex justify-end gap-4">
+
+            <a
+                href="<?php
+                    echo $this->getRoute(
+                        'detalle_examen',
+                        (int)$data['examen']['id']
+                    );
+                ?>"
+                class="app-vista-button app-vista-button--secondary">
+
+                Cancelar
+
+            </a>
+
+
+            <?php if ($inscripcionFinalizada): ?>
 
                 <a
                     href="<?php
                         echo $this->getRoute(
-                            'volver'
+                            'carnet',
+                            (int)$data['inscripcion']['id']
                         );
                     ?>"
-                    class="app-vista-button app-vista-button--secondary">
-
-                    Cancelar
-
-                </a>
-                <?php if ($inscripcionFinalizada): ?>
-
-                <a
-                    href="..."
                     class="app-vista-button app-vista-button--primary">
 
                     Ver carnet
 
                 </a>
 
+
             <?php elseif ($inscripcionAprobada): ?>
 
-            <form
-                method="post"
-                action="/manipulacionDeAlimentos/admin/inscripciones/<?= (int)$data['inscripcion']['id']; ?>/emitir-carnet"
-            >
-
-                <button
-                    type="submit"
-                    class="app-vista-button app-vista-button--primary"
+                <form
+                    method="post"
+                    action="<?php
+                        echo $this->getRoute(
+                            'emision_carnet',
+                            (int)$data['inscripcion']['id']
+                        );
+                    ?>"
                 >
 
-                    Cargar carnet
+                    <button
+                        type="submit"
+                        class="app-vista-button app-vista-button--primary"
+                    >
 
-                </button>
+                        Cargar carnet
 
-            </form>
+                    </button>
+
+                </form>
+
 
             <?php else: ?>
 
                 <button
                     type="submit"
+                    form="form-inscripcion"
                     class="app-vista-button app-vista-button--primary">
 
                     Guardar
@@ -704,16 +684,21 @@ include __DIR__ . '/header.php';
 
             <?php endif; ?>
 
-            </div>
+        </div>
 
-        </form>
 
-    </div>
-
-</main>
 <?php
 
-    $this->getFooter();
-}
+        $this->getFooter();
+
+?>
+
+</body>
+
+</html>
+
+<?php
+
+    }
 
 }

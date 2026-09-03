@@ -1,7 +1,7 @@
 <?php
 
-require_once __DIR__ . '/../Repositories/CarnetRepository.php';
-require_once __DIR__ . '/../Repositories/DocumentoRepository.php';
+require_once __DIR__ . '/../Repository/CarnetRepository.php';
+require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 
 class ConsultaPublicaService
 {

@@ -16,9 +16,12 @@ declare(strict_types=1);
  * - Servir como pantalla principal de administración
  *   del examen.
  */
-class ExamenDetalleVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class ExamenDetalleVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
     private function getHeader(array $data): void
     {
@@ -103,48 +106,10 @@ $page_title = $data['page_title'];
 
 include __DIR__ . '/header.php';
 
-    }
-
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-
-?>
-
-</body>
-
-</html>
-
-<?php
 
     }
 
-    private function e(mixed $valor): string
-    {
-        return htmlspecialchars(
-            (string) $valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
-
-    private function getRoute(string $route,int $id = 0): string
-    {
-        return match ($route) {
-
-            'listar' =>
-                '/manipulacionDeAlimentos/admin/examenes',
-
-            'editar' =>
-                '/manipulacionDeAlimentos/admin/examenes/' . $id . '/editar',
-
-            'administrar_inscripto' =>
-                '/manipulacionDeAlimentos/admin/inscripciones/' . $id,
-
-            default =>
-                '#',
-        };
-    }
+    
 
     public function mostrar(array $data = []): void
 {
@@ -356,7 +321,7 @@ include __DIR__ . '/header.php';
                 </h3>
 
                 <a
-                    href="<?php echo $this->getRoute('editar', (int)$examen['id']); ?>"
+                    href="<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>"
                     class="app-vista-button app-vista-button--primary">
 
                     Editar examen
@@ -445,7 +410,7 @@ include __DIR__ . '/header.php';
 
                             <a
                                 href="<?php echo $this->getRoute(
-                                    'administrar_inscripto',
+                                    'administrar_inscripcion',
                                     (int) $inscripto['inscripcion_id']
                                 ); ?>"
                                 class="app-vista-button app-vista-button--secondary">
@@ -473,7 +438,7 @@ include __DIR__ . '/header.php';
         <div class="flex justify-end">
 
             <a
-                href="<?php echo $this->getRoute('listar'); ?>"
+                href="<?php echo $this->getRoute('admin_examenes'); ?>"
                 class="app-vista-button app-vista-button--secondary">
 
                 Volver al listado
@@ -485,10 +450,18 @@ include __DIR__ . '/header.php';
     </div>
 
 </main>
+<?php
+
+        $this->getFooter();
+
+?>
+
+</body>
+
+</html>
 
 <?php
 
-    $this->getFooter();
-}
+    }
 
 }

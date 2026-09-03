@@ -1,6 +1,9 @@
 <?php
 declare(strict_types=1);
-class SolicitarRevisionVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class SolicitarRevisionVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

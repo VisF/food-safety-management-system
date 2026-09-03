@@ -15,9 +15,11 @@ declare(strict_types=1);
  * - Acceder a edición.
  * - Activar / desactivar exámenes.
  */
-class ExamenAdminVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class ExamenAdminVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
 
     private function getHeader(array $data): void
     {
@@ -94,54 +96,9 @@ $page_title = 'Gestión de Exámenes';
 
 include __DIR__ . '/header.php';
 
+
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-
-?>
-</body>
-
-</html>
-<?php
-    }
-
-    private function e(mixed $valor): string
-    {
-        return htmlspecialchars(
-            (string) $valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
-
-    private function getRoute(string $route, ?int $id = null): string
-    {
-        return match ($route) {
-
-            'admin' =>
-                '/manipulacionDeAlimentos/admin',
-
-            'nuevo' =>
-                '/manipulacionDeAlimentos/admin/examenes/nuevo',
-
-            'detalle' =>
-                '/manipulacionDeAlimentos/admin/examenes/' . $id,
-
-            'editar' =>
-                '/manipulacionDeAlimentos/admin/examenes/' . $id . '/editar',
-
-            'activar' =>
-                '/manipulacionDeAlimentos/admin/examenes/' . $id . '/activar',
-
-            'desactivar' =>
-                '/manipulacionDeAlimentos/admin/examenes/' . $id . '/desactivar',
-
-            default =>
-                '#',
-        };
-    }
     public function mostrar(array $data = []): void
     {
         
@@ -193,7 +150,7 @@ include __DIR__ . '/header.php';
                 <div class="examen-admin__herramientas">
 
                     <form
-                        action="<?php echo $this->getRoute('admin'); ?>/examenes"
+                        action="<?php echo $this->getRoute('admin_examenes'); ?>"
                         method="get">
 
                         <label for="orden">
@@ -226,7 +183,7 @@ include __DIR__ . '/header.php';
                     </form>
 
                     <a
-                        href="<?php echo $this->getRoute('nuevo'); ?>"
+                        href="<?php echo $this->getRoute('crear_examen'); ?>"
                         class="app-vista-button app-vista-button--primary">
 
                         <span class="material-symbols-outlined">
@@ -344,7 +301,7 @@ include __DIR__ . '/header.php';
 
                                     <a
                                         class="app-vista-button app-vista-button--secondary"
-                                        href="<?php echo $this->getRoute('detalle', (int)$examen['id']); ?>">
+                                        href="<?php echo $this->getRoute('detalle_examen', (int)$examen['id']); ?>">
 
                                         Ver
 
@@ -352,7 +309,7 @@ include __DIR__ . '/header.php';
 
                                     <a
                                         class="app-vista-button app-vista-button--primary"
-                                        href="<?php echo $this->getRoute('editar', (int)$examen['id']); ?>">
+                                        href="<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>">
 
                                         Editar
 
@@ -361,7 +318,7 @@ include __DIR__ . '/header.php';
 <?php if (($examen['estado'] ?? '') === 'ACTIVO'): ?>
 
                                     <form
-                                        action="<?php echo $this->getRoute('desactivar', (int)$examen['id']); ?>"
+                                        action="<?php echo $this->getRoute('desactivar_examen', (int)$examen['id']); ?>"
                                         method="post">
 
                                         <button
@@ -377,7 +334,7 @@ include __DIR__ . '/header.php';
 <?php else: ?>
 
                                     <form
-                                        action="<?php echo $this->getRoute('activar', (int)$examen['id']); ?>"
+                                        action="<?php echo $this->getRoute('activar_examen', (int)$examen['id']); ?>"
                                         method="post">
 
                                         <button
@@ -489,7 +446,7 @@ include __DIR__ . '/header.php';
 
                 <a
                     class="app-vista-button app-vista-button--secondary"
-                    href="<?php echo $this->getRoute('detalle',(int)$examen['id']); ?>">
+                    href="<?php echo $this->getRoute('detalle_examen',(int)$examen['id']); ?>">
 
                     Ver
 
@@ -497,7 +454,7 @@ include __DIR__ . '/header.php';
 
                 <a
                     class="app-vista-button app-vista-button--primary"
-                    href="<?php echo $this->getRoute('editar',(int)$examen['id']); ?>">
+                    href="<?php echo $this->getRoute('editar_examen',(int)$examen['id']); ?>">
 
                     Editar
 
@@ -507,7 +464,7 @@ include __DIR__ . '/header.php';
 
                 <form
                     method="post"
-                    action="<?php echo $this->getRoute('desactivar',(int)$examen['id']); ?>">
+                    action="<?php echo $this->getRoute('desactivar_examen',(int)$examen['id']); ?>">
 
                     <button
                         class="app-vista-button app-vista-button--danger"
@@ -523,7 +480,7 @@ include __DIR__ . '/header.php';
 
                 <form
                     method="post"
-                    action="<?php echo $this->getRoute('activar',(int)$examen['id']); ?>">
+                    action="<?php echo $this->getRoute('activar_examen',(int)$examen['id']); ?>">
 
                     <button
                         class="app-vista-button app-vista-button--success"
@@ -550,9 +507,18 @@ include __DIR__ . '/header.php';
                 </div>
 
     </main>
-
 <?php
 
         $this->getFooter();
+
+?>
+
+</body>
+
+</html>
+
+<?php
+
     }
+
 }

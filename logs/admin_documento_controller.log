@@ -5,3 +5,4 @@
 [2026-08-21 21:32:06] [INFO] Documento aprobado {"id_documento":17}
 [2026-08-21 21:32:34] [INFO] Documento rechazado {"id_documento":15,"observaciones":"Feo"}
 [2026-08-21 22:45:14] [ERROR] Archivo de documento no encontrado {"id_documento":13,"ruta":"C:\\xampp\\htdocs\\manipulacionDeAlimentos\\uploads\\moodle8.pdf"}
+[2026-09-01 22:43:39] [ERROR] Archivo de documento no encontrado {"id_documento":18,"ruta":"C:\\xampp\\htdocs\\manipulacionDeAlimentos\\uploads\\dni12.pdf"}

@@ -8,9 +8,12 @@
  *  - Llamar a endpoints server-side para reservar cupo real (ACID-friendly) antes de confirmar inscripción.
  *  - No confiar en `capacity` renderizado en cliente; usar siempre verificación en el controlador.
  */
-class InscripcionExamenVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class InscripcionExamenVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
     private function getDefaultData(): array
     {
@@ -90,15 +93,7 @@ class InscripcionExamenVista
         <?php
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-        ?>
-        </body>
-        </html>
-        <?php
-    }
-
+    
     private function getIncomingData(): array
     {
         if (!isset($_GET['data'])) {
@@ -109,10 +104,6 @@ class InscripcionExamenVista
         return is_array($decodedData) ? $decodedData : [];
     }
 
-    private function e(mixed $value): string
-    {
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    }
 
     private function statusStyle(int $state): string
     {

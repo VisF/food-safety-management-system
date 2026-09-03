@@ -196,11 +196,11 @@ class UsuarioRepository
             return null;
         }
 
-        $usuario['roles'] = $this->obtenerRoles(
-            (int)$usuario['id']
-        );
+    $usuario['roles'] = $this->obtenerRoles(
+        (int)$usuario['id']
+    );
 
-        return $usuario;
+    return $usuario;
     }
 
     /**
@@ -528,13 +528,15 @@ class UsuarioRepository
         /**
      * Obtener todos los roles de un usuario.
      */
+
+    /**
+     * Obtener los nombres de todos los roles de un usuario.
+     */
     public function obtenerRoles(int $usuarioId): array
     {
         $sql = "
             SELECT
-                r.id,
-                r.nombre,
-                r.descripcion
+                r.nombre
             FROM roles r
             INNER JOIN usuario_roles ur
                 ON ur.rol_id = r.id
@@ -543,10 +545,16 @@ class UsuarioRepository
         ";
 
         $stmt = $this->conexion->prepare($sql);
-        $stmt->bindValue(':usuario', $usuarioId, \PDO::PARAM_INT);
+
+        $stmt->bindValue(
+            ':usuario',
+            $usuarioId,
+            \PDO::PARAM_INT
+        );
+
         $stmt->execute();
 
-        return $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        return $stmt->fetchAll(\PDO::FETCH_COLUMN);
     }
 
     /**

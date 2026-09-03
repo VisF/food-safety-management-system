@@ -9,7 +9,10 @@ declare(strict_types=1);
  *  - El controlador debe normalizar y validar la estructura `tramite` antes de inyectarla.
  *  - Escapar con `htmlspecialchars` (como ya hace la vista) para prevenir XSS.
  */
-class DetalleTramiteVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class DetalleTramiteVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

@@ -365,8 +365,7 @@ class DocumentoRepository
                 id,
                 usuario_id,
                 ruta_archivo,
-                nombre_original,
-                tipo_mime
+                nombre_original
             FROM documentos
             WHERE usuario_id = :usuario_id
             AND tipo_documento = 'foto_carnet'
@@ -374,13 +373,15 @@ class DocumentoRepository
             LIMIT 1
         ";
 
-        $stmt = $this->conexion->prepare($sql);
+        $stmt =
+            $this->conexion->prepare($sql);
 
         $stmt->execute([
             ':usuario_id' => $usuarioId
         ]);
 
-        $documento = $stmt->fetch(PDO::FETCH_ASSOC);
+        $documento =
+            $stmt->fetch(PDO::FETCH_ASSOC);
 
         return $documento ?: null;
     }

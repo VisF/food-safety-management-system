@@ -5,9 +5,12 @@
  * Entradas: datos por defecto en `getDefaultData()` o vía GET 'data'.
  * Nota: ofrecer acciones claras (corregir, solicitar revisión) y no exponer información sensible.
  */
-class UsuarioRechazadoVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class UsuarioRechazadoVista extends BaseVista
 {
-  private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
   private function getDefaultData(): array
   {
@@ -63,19 +66,7 @@ class UsuarioRechazadoVista
     <?php
   }
 
-  private function getFooter(): void
-  {
-    include __DIR__ . '/footer.php';
-    ?>
-    </body>
-    </html>
-    <?php
-  }
 
-  private function e(mixed $value): string
-  {
-    return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-  }
 
   public function mostrar(): void
   {

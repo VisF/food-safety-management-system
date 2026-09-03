@@ -8,46 +8,28 @@ declare(strict_types=1);
  *  - Validar fecha/hora en backend (timezone-aware) y comprobar colisiones/recursos.
  *  - Escapar cualquier texto de salida; el formulario no debe hacer decisiones de negocio.
  */
-class CrearExamenVista
-{
-    private function e(mixed $value): string
-    {
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    }
 
-    private function getRoute(string $route): string
-    {
-        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-        if (preg_match('#/vistas$#', $basePath) === 1) {
-            $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
-        }
+require_once __DIR__ . '/BaseVista.php';
 
-        return $basePath . '/' . rawurlencode($route);
-    }
+class CrearExamenVista extends BaseVista
+{ 
+    
 
-    private function getIncomingData(): array
-    {
-        if (!isset($_GET['data'])) {
-            return [];
-        }
 
-        $decodedData = json_decode((string) $_GET['data'], true);
-        return is_array($decodedData) ? $decodedData : [];
-    }
 
-    public function mostrar(): void
+    public function mostrar(array $datos = []): void
     {
         $data = array_replace_recursive([
-            'page_title' => 'Crear fecha de examen - App Ciudadana',
-            'error' => '',
-            'success' => false,
-            'message' => '',
-            'fecha_display' => '',
-            'hora' => '',
-            'ubicacion' => '',
-            'aula' => '',
-            'cupos' => '',
-        ], $this->getIncomingData());
+                'page_title' => 'Crear fecha de examen - App Ciudadana',
+                'error' => '',
+                'success' => false,
+                'message' => '',
+                'fecha_display' => '',
+                'hora' => '',
+                'ubicacion' => '',
+                'aula' => '',
+                'cupos' => '',
+            ], $datos);
 
         $page_title = $data['page_title'];
         include __DIR__ . '/header.php';
@@ -83,7 +65,11 @@ class CrearExamenVista
                 <?php endif; ?>
 
                 <section class="app-vista-card crear-examen-vista__card">
-                    <form class="crear-examen-vista__form" action="<?php echo $this->getRoute('crear_examen_guardar'); ?>" method="post">
+                    <form
+                            class="crear-examen-vista__form"
+                            action="<?php echo $this->getRoute('guardar_examen_nuevo'); ?>"
+                            method="post"
+                        >
                         <div class="crear-examen-vista__field">
                             <label class="crear-examen-vista__label" for="fecha_display">Fecha</label>
                             <input class="crear-examen-vista__input" id="fecha_display" name="fecha_display" type="text" value="<?php echo $this->e($data['fecha_display']); ?>" inputmode="numeric" autocomplete="off" placeholder="dd/mm/aaaa" pattern="\d{2}/\d{2}/\d{4}" required />
@@ -129,49 +115,10 @@ class CrearExamenVista
                 </section>
             </div>
         </main>
-        <script>
-        (function () {
-            const displayInput = document.getElementById('fecha_display');
-            const hiddenInput = document.getElementById('fecha');
-            const form = displayInput ? displayInput.form : null;
-
-            const parseDisplayDate = (value) => {
-                const match = /^([0-9]{2})\/([0-9]{2})\/([0-9]{4})$/.exec((value || '').trim());
-                if (!match) {
-                    return '';
-                }
-
-                return `${match[3]}-${match[2]}-${match[1]}`;
-            };
-
-            const syncHiddenDate = () => {
-                if (!displayInput || !hiddenInput) {
-                    return;
-                }
-
-                hiddenInput.value = parseDisplayDate(displayInput.value);
-            };
-
-            if (displayInput && hiddenInput) {
-                syncHiddenDate();
-                displayInput.addEventListener('input', syncHiddenDate);
-                displayInput.addEventListener('blur', syncHiddenDate);
-
-                if (form) {
-                    form.addEventListener('submit', function (event) {
-                        syncHiddenDate();
-                        if (!hiddenInput.value) {
-                            event.preventDefault();
-                            displayInput.setCustomValidity('Usá el formato dd/mm/aaaa.');
-                            displayInput.reportValidity();
-                        } else {
-                            displayInput.setCustomValidity('');
-                        }
-                    });
-                }
-            }
-        })();
-        </script>
+       <script
+            src="<?= $this->baseURL ?>js/crear_examen.js"
+            defer
+        ></script>
         <?php
         include __DIR__ . '/footer.php';
     }

@@ -7,3 +7,7 @@
 [2026-08-18 20:05:18] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":12,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}
 [2026-08-18 20:05:23] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":12,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}
 [2026-08-18 20:05:25] Usuario: anonimo | Evento: ERROR_MOSTRAR_CARGA_CARNET | Datos: {"id_inscripcion":11,"error":"Failed opening required 'C:\\xampp\\htdocs\\manipulacionDeAlimentos\\Controller\/..\/Views\/admin_cargar_carnet.php' (include_path='C:\\xampp\\php\\PEAR')"}
+[2026-09-02 20:06:49] Usuario: anonimo | Evento: ERROR_CARGAR_CARNET | Datos: {"id_inscripcion":12,"error":"No se puede emitir el carnet porque el alumno no posee toda la documentación requerida."}
+[2026-09-02 20:17:25] Usuario: anonimo | Evento: CARNET_CARGADO | Datos: {"id_inscripcion":12,"numero_carnet":"CAR-001-00000001"}
+[2026-09-02 20:30:34] Usuario: anonimo | Evento: CARNET_CARGADO | Datos: {"id_inscripcion":7,"numero_carnet":"CAR-001-00000002"}
+[2026-09-02 21:02:53] Usuario: anonimo | Evento: CARNET_CARGADO | Datos: {"id_inscripcion":16,"numero_carnet":"CAR-001-00000003"}

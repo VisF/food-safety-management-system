@@ -10,7 +10,10 @@ declare(strict_types=1);
  * Seguridad:
  *  - No confiar en datos de disponibilidad enviados por el cliente; siempre validar en servidor.
  */
-class DetalleExamenVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class DetalleExamenVista extends BaseVista
 {
     public static function mostrar(): void
     {

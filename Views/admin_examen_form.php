@@ -13,9 +13,12 @@ declare(strict_types=1);
  * - Precargar datos cuando corresponda.
  * - Mostrar errores de validación.
  */
-class ExamenFormVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class ExamenFormVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
+
 
     private function getHeader(array $data): void
     {
@@ -74,42 +77,9 @@ class ExamenFormVista
 $page_title = $data['page_title'];
 
 include __DIR__ . '/header.php';
+
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-
-?>
-</body>
-
-</html>
-<?php
-    }
-
-    private function e(mixed $valor): string
-    {
-        return htmlspecialchars(
-            (string)$valor,
-            ENT_QUOTES,
-            'UTF-8'
-        );
-    }
-
-    private function getRoute(string $route): string
-    {
-        return match ($route) {
-
-            'listar' =>
-                '/manipulacionDeAlimentos/admin/examenes',
-
-            'guardar' =>
-                '/manipulacionDeAlimentos/admin/examenes',
-
-            default =>
-                '#',
-        };
-    }
         public function mostrar(array $data = []): void
     {
         if (empty($data)) {
@@ -168,8 +138,13 @@ include __DIR__ . '/header.php';
 
             <form
                 action="<?php echo $data['modo'] === 'editar'
-                    ? '/manipulacionDeAlimentos/admin/examenes/' . (int) $examen['id']
-                    : $this->getRoute('guardar'); ?>"
+                    ? $this->getRoute(
+                        'guardar_examen',
+                        (int)$examen['id']
+                    )
+                    : $this->getRoute(
+                        'guardar_examen_nuevo'
+                    ); ?>"
                 method="post"
                 class="space-y-6">
 
@@ -305,7 +280,7 @@ include __DIR__ . '/header.php';
                 <div class="flex justify-end gap-4 pt-4">
 
                     <a
-                        href="<?php echo $this->getRoute('listar'); ?>"
+                        href="<?php echo $this->getRoute('admin_examenes'); ?>"
                         class="app-vista-button app-vista-button--secondary">
 
                         Cancelar
@@ -343,5 +318,15 @@ include __DIR__ . '/header.php';
 <?php
 
         $this->getFooter();
+
+?>
+
+</body>
+
+</html>
+
+<?php
+
     }
+
 }

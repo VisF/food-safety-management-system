@@ -6,7 +6,10 @@ declare(strict_types=1);
  * Entradas: puede recibir valores por GET 'data' para inicializar campos.
  * Nota: el procesamiento real debe hacerse en el controlador; escapar entradas antes de mostrar.
  */
-class CrearRespuestaAdminVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class CrearRespuestaAdminVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

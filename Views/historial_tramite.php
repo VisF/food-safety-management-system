@@ -6,7 +6,10 @@ declare(strict_types=1);
  * Entradas: GET 'data' con clave 'items' (array) opcional.
  * Nota: paginar en backend si hay muchos registros.
  */
-class HistorialTramiteVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class HistorialTramiteVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

@@ -1,7 +1,34 @@
 <?php
 
 declare(strict_types=1);
+/* ==========================================================
+   MIDDLEWARES
+========================================================== */
 
+require_once __DIR__ .
+    '/../Middleware/AuthMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/RoleMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/CsrfMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/AuditMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/MaintenanceMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/GuestMiddleware.php';
+
+use App\Middleware\AuthMiddleware;
+use App\Middleware\RoleMiddleware;
+use App\Middleware\CsrfMiddleware;
+use App\Middleware\AuditMiddleware;
+use App\Middleware\MaintenanceMiddleware;
+use App\Middleware\GuestMiddleware;
 
 /* ==========================================================
    INICIO
@@ -376,7 +403,6 @@ $router->map(
 /* ==========================================================
    EXÁMENES — CIUDADANO
 ========================================================== */
-
 /**
  * Confirmación de inscripción a examen.
  */
@@ -388,20 +414,27 @@ $router->map(
         require_once __DIR__ .
             '/../Servicios/ExamenService.php';
 
+        require_once __DIR__ .
+            '/../Views/confirmar_inscripcion_examen.php';
+
+
         $idExamen =
             (int)(
                 $_GET['id']
                 ?? 0
             );
 
+
         $examenService =
             new ExamenService();
+
 
         $examen =
             $examenService
                 ->obtenerExamen(
                     $idExamen
                 );
+
 
         if (
             $examen === null
@@ -414,25 +447,29 @@ $router->map(
             );
         }
 
-        $_GET['data'] =
-            json_encode(
-                [
-                    'examId' =>
-                        $examen['id'],
 
-                    'examName' =>
-                        'Examen de Manipulación de Alimentos'
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
+        $data = [
 
-        require_once __DIR__ .
-            '/../Views/confirmar_inscripcion_examen.php';
+            'page_title' =>
+                'Confirmar inscripción',
 
-        ConfirmarInscripcionExamenVista::mostrar();
+            'examId' =>
+                (int)$examen['id'],
+
+            'examName' =>
+                'Examen de Manipulación de Alimentos'
+        ];
+
+
+        $vista =
+            new ConfirmarInscripcionExamenVista();
+
+
+        $vista->mostrar(
+            $data
+        );
     }
 );
-
 
 /**
  * Procesar inscripción a examen.
@@ -625,48 +662,66 @@ $router->map(
     }
 );
 
-
 /* ==========================================================
    CONSULTA PÚBLICA DE CARNETS
 ========================================================== */
 
 /**
- * Consulta pública de carnets.
+ * Consulta pública de carnets por DNI.
  */
 $router->map(
     'GET',
     '/consulta-publica',
     function () {
 
-        $_GET['data'] =
-            json_encode(
-                [
-                    'page_title' =>
-                        'Consulta Pública de Carnets',
+        require_once __DIR__ .
+            '/../Controller/ConsultaPublicaControlador.php';
 
-                    'formulario' => [
+        $controlador =
+            new ConsultaPublicaControlador();
 
-                        'dni' =>
-                            ''
-                    ],
+        $controlador->mostrar();
+    }
+);
 
-                    'resultado' => [
-
-                        'encontrado' =>
-                            false
-                    ]
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
-
+/**
+ * Descargar carnet desde la consulta pública.
+ */
+$router->map(
+    'GET',
+    '/consulta-publica/carnet/[i:id]/descargar',
+    function ($id) {
 
         require_once __DIR__ .
-            '/../Views/consulta_publica.php';
+            '/../Controller/ConsultaPublicaControlador.php';
 
-        $vista =
-            new ConsultaPublicaVista();
+        $controlador =
+            new ConsultaPublicaControlador();
 
-        $vista->mostrar();
+        $controlador->descargarCarnet(
+                    (int)$id
+                );
+    }
+);
+
+
+/**
+ * Descargar foto de carnet desde la consulta pública.
+ */
+$router->map(
+    'GET',
+    '/consulta-publica/carnet/[i:id]/foto',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/ConsultaPublicaControlador.php';
+
+        $controlador =
+            new ConsultaPublicaControlador();
+
+        $controlador->descargarFoto(
+                    (int)$id
+                );
     }
 );
 
@@ -735,40 +790,17 @@ $router->map(
         $vista->mostrar();
     }
 );
-
-
 /* ==========================================================
-   CARNET — CIUDADANO
+   CARNET — CIUDADANO AUTENTICADO
 ========================================================== */
 
 /**
- * Consulta el carnet correspondiente
- * a una inscripción.
+ * Descargar el carnet del ciudadano autenticado.
  */
 $router->map(
     'GET',
-    '/carnet',
+    '/carnet/descargar',
     function () {
-
-        $idInscripcion =
-            (int)(
-                $_GET['id']
-                ?? 0
-            );
-
-        if (
-            $idInscripcion <= 0
-        ) {
-
-            header(
-                'Location: ' .
-                BASE_URL .
-                '/?toast=carnet_no_disponible'
-            );
-
-            exit;
-        }
-
 
         require_once __DIR__ .
             '/../Controller/CarnetControlador.php';
@@ -776,49 +808,10 @@ $router->map(
         $controller =
             new CarnetControlador();
 
-        $carnet =
-            $controller
-                ->obtenerCarnetPorInscripcion(
-                    $idInscripcion
-                );
-
-
-        if (
-            $carnet === null
-        ) {
-
-            header(
-                'Location: ' .
-                BASE_URL .
-                '/?toast=carnet_no_disponible'
-            );
-
-            exit;
-        }
-
-
-        $_GET['data'] =
-            json_encode(
-                [
-                    'page_title' =>
-                        'Mi Carnet',
-
-                    'carnet' =>
-                        $carnet
-                ],
-                JSON_UNESCAPED_UNICODE
-            );
-
-
-        require_once __DIR__ .
-            '/../Views/carnet.php';
-
-        $vista =
-            new CarnetVista();
-
-        $vista->mostrar();
+        $controller->descargarCarnet();
     }
 );
+
 
 
 /* ==========================================================
@@ -961,25 +954,103 @@ $router->map(
 
 /**
  * Crear un examen.
+ *
+ * POST /admin/examenes
  */
 $router->map(
     'POST',
-    '/admin/examenes/nuevo',
+    '/admin/examenes',
     function () {
 
+        AuthMiddleware::handle();
+
+        RoleMiddleware::handle([
+            'admin'
+        ]);
+
         require_once __DIR__ .
-            '/../Controller/AdminExamenControlador.php';
+            '/../Controller/ExamenControlador.php';
+
+        require_once __DIR__ .
+            '/../Views/admin_examen_form.php';
 
         $controller =
-            new AdminExamenControlador();
+            new ExamenControlador();
 
-        $controller->crearExamen(
-            $_POST
-        );
+        $resultado =
+            $controller->guardar();
+
+        if (
+            !empty(
+                $resultado['success']
+            )
+        ) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/admin/examenes?toast=examen_creado'
+            );
+
+            exit;
+        }
+
+        $datosFormulario =
+            $resultado['data']
+            ?? [];
+
+        $errores = [];
+
+        if (
+            !empty(
+                $resultado['message']
+            )
+        ) {
+            $errores[] =
+                $resultado['message'];
+        }
+
+        $vista =
+            new ExamenFormVista();
+
+        $vista->mostrar([
+
+            'page_title' =>
+                'Nuevo Examen',
+
+            'modo' =>
+                'crear',
+
+            'examen' => [
+
+                'fecha' =>
+                    $datosFormulario['fecha']
+                    ?? '',
+
+                'hora' =>
+                    $datosFormulario['hora']
+                    ?? '',
+
+                'ubicacion' =>
+                    $datosFormulario['ubicacion']
+                    ?? '',
+
+                'aula' =>
+                    $datosFormulario['aula']
+                    ?? '',
+
+                'cupos' =>
+                    $datosFormulario['cupos']
+                    ?? ''
+
+            ],
+
+            'errores' =>
+                $errores
+
+        ]);
     }
 );
-
-
 /**
  * Detalle administrativo de un examen.
  */
@@ -1198,6 +1269,26 @@ $router->map(
             new AdminCarnetControlador();
 
         $controller->emitirCarnet(
+            (int)$id
+        );
+    }
+);
+
+/**
+ * Descargar/visualizar el PDF de un carnet emitido.
+ */
+$router->map(
+    'GET',
+    '/admin/carnets/[i:id]/descargar',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/AdminCarnetControlador.php';
+
+        $controller =
+            new AdminCarnetControlador();
+
+        $controller->descargarCarnet(
             (int)$id
         );
     }

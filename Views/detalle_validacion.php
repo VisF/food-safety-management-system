@@ -6,7 +6,10 @@ declare(strict_types=1);
  * Entradas: GET 'data' con clave 'validation' (array) opcional.
  * Nota: Evitar exponer información sensible en la interfaz pública.
  */
-class DetalleValidacionVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class DetalleValidacionVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

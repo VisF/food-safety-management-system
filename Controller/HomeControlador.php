@@ -15,7 +15,6 @@ declare(strict_types=1);
  * - Vistas:
  *   - vistas/index.php              (página principal del sitio)
  *   - vistas/dashboard.php          (panel de control para usuarios autenticados)
- *   - vistas/consulta_publica.php   (búsqueda pública por DNI)
  */
 require_once __DIR__ . '/../helpers/AuthHelper.php';
 require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
@@ -28,6 +27,7 @@ require_once __DIR__ . '/../Servicios/ExamenService.php';
 require_once __DIR__ . '/../Servicios/UsuarioService.php';
 require_once __DIR__ . '/../Servicios/CarnetService.php';
 require_once __DIR__ . '/../Servicios/AdminService.php';
+
 
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
@@ -51,6 +51,7 @@ class HomeControlador
     private CarnetService $carnetService;
 
     private AdminService $adminService;
+
 
     public function __construct()
     {
@@ -83,6 +84,7 @@ class HomeControlador
 
         $this->adminService =
             new AdminService();
+
     }
 
     /**
@@ -758,51 +760,8 @@ class HomeControlador
     }
 
 
-    /**
-     * Mostrar página de consulta pública por DNI
-     * 
-     * VISTA A LLAMAR: vistas/consulta_publica.php
-     * 
-     * @return array Array con datos para la vista:
-     *   [
-     *     'title' => 'Consultar Estado del Carnet',
-     *     'resultado' => array|null (si hay búsqueda realizada)
-     *   ]
-     */
-    public function mostrarConsultaPublica(): array
-    {
-        $result = null;
-        $dni = $_REQUEST['dni'] ?? null;
-        if ($dni) {
-            $dni = trim((string)$dni);
-            $consulta = $this->consultarCarnetPorDNI($dni);
-            if ($consulta['success']) $result = $consulta['carnet'];
-            else $result = ['error' => $consulta['error'] ?? 'No se encontró información'];
-        }
 
-        $this->log('Public consultation page accessed', 'INFO', ['query_dni' => isset($dni)]);
 
-        return [
-            'title' => 'Consultar Estado del Carnet',
-            'resultado' => $result
-        ];
-    }
-
-    /**
-     * Buscar estado de carnet por DNI (consulta pública)
-     * 
-     * @param string $dni DNI a consultar (formato: XX.XXX.XXX)
-     * @return array Array con resultado:
-     *   [
-     *     'success' => bool,
-     *     'carnet' => ['estado' => '...', 'vigencia' => '...', ...] | null,
-     *     'error' => string | null
-     *   ]
-     */
-   public function consultarCarnetPorDNI(string $dni): array
-    {
-        return $this->carnetService->consultarPublicoPorDNI($dni);
-    }
 
     public function obtenerEstadisticas(): array
     {

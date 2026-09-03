@@ -14,7 +14,6 @@ $currentRoute = match ($currentFile) {
    'panel_inspector.php' => 'mensajes',
    'panel_admin.php', 'actividad_reciente.php' => 'actividad_reciente',
    'inscripcion_examen.php',
-   'carnet_emitido.php',
    'usuario_aprobado.php',
    'usuario_rechazado.php' => 'servicios',
    'subida_documentacion.php' => 'contactos',

@@ -6,7 +6,10 @@ declare(strict_types=1);
  * Entradas: GET 'data' con 'reason'.
  * Nota: incluir instrucciones claras para el siguiente paso (reintento/revisión).
  */
-class MotivoRechazoVista
+
+require_once __DIR__ . '/BaseVista.php';
+
+class MotivoRechazoVista extends BaseVista
 {
 	public static function mostrar(): void
 	{

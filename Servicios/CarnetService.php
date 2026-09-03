@@ -130,6 +130,13 @@ class CarnetService
                     $offset
                 );
 
+                
+
+        //LLAMADA AL METODO PRIVADO
+        $pendientes =
+            $this->agregarEstadoDocumentacion(
+                $pendientes
+            );
 
         /*
         * Obtiene la cantidad total de pendientes.
@@ -175,6 +182,10 @@ class CarnetService
                         $limite,
                         $offset
                     );
+            $pendientes =
+                $this->agregarEstadoDocumentacion(
+                    $pendientes
+                );
         }
 
 
@@ -832,6 +843,9 @@ class CarnetService
         }
 
         return [
+            
+            'id' =>
+                (int)$carnet['id'],
 
             'numero_carnet' =>
                 $carnet['numero_carnet'],
@@ -895,5 +909,35 @@ class CarnetService
                 ->obtenerUltimoCarnetUsuario(
                     $usuarioId
                 );
+    }
+
+    private function agregarEstadoDocumentacion(array $pendientes): array
+    {
+        foreach ($pendientes as &$pendiente) {
+
+            $usuarioId =
+                (int)($pendiente['usuario_id'] ?? 0);
+
+            if ($usuarioId <= 0) {
+
+                $pendiente['documentacion_completa'] =
+                    false;
+
+                continue;
+            }
+
+            $documentacion =
+                $this->documentoService
+                    ->obtenerEstadoDocumentacion(
+                        $usuarioId
+                    );
+
+            $pendiente['documentacion_completa'] =
+                !empty($documentacion['completo']);
+        }
+
+        unset($pendiente);
+
+        return $pendientes;
     }
 }

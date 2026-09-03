@@ -15,9 +15,11 @@
  */
 
 
-class InicioVista
+require_once __DIR__ . '/BaseVista.php';
+
+class InicioVista extends BaseVista
 {
-    private string $baseURL = '/ManipulacionDeAlimentos/';
+
     
 
 
@@ -53,20 +55,7 @@ class InicioVista
         <?php
     }
 
-    private function getFooter(): void
-    {
-        include __DIR__ . '/footer.php';
-        ?>
-        </body>
-        </html>
-        <?php
-    }
-
-
-    private function e(mixed $value): string
-    {
-        return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
-    }
+    
 
     private function getDocumentCardClass(string $state): string
     {
@@ -110,15 +99,7 @@ class InicioVista
         return $available === 1 ? 'CUPOS DISPONIBLES' : 'SIN CUPOS';
     }
 
-    private function getRoute(string $route): string
-    {
-        $basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-        if (preg_match('#/vistas$#', $basePath) === 1) {
-            $basePath = (string) preg_replace('#/vistas$#', '', $basePath);
-        }
 
-        return $basePath . '/' . rawurlencode($route);
-    }
 
     public function mostrar(array $inicioData): void
     {
@@ -321,10 +302,7 @@ class InicioVista
 
         </p>
 
-        <?php if (
-                $inicioData['tramite']['estado']
-                === 'CARNET_EMITIDO'
-            ): ?>
+        <?php if (!empty($inicioData['carnet_vigente'])): ?>
 
                 <p class="home-tramite__accion">
 
@@ -339,6 +317,8 @@ class InicioVista
                 </p>
 
             <?php else: ?>
+
+
 
                 <p class="home-tramite__accion">
 
@@ -367,16 +347,13 @@ class InicioVista
 
             ?>
 
-            <?php if (
-                    $inicioData['tramite']['estado']
-                    === 'CARNET_EMITIDO'
-                ): ?>
+            <?php if (!empty($inicioData['carnet_vigente'])): ?>
 
-                    <a
-                        class="app-vista-button app-vista-button--primary home-tramite__boton"
-                        href="/manipulacionDeAlimentos/carnet"
-                        role="button"
-                    >
+                        <a
+                            class="app-vista-button app-vista-button--primary home-tramite__boton"
+                            href="<?= $this->getRoute('descargar_carnet_ciudadano'); ?>"
+                            role="button"
+                        >
 
                         <span class="material-symbols-outlined">
 
