@@ -95,6 +95,18 @@ abstract class BaseVista
             'documentacion' =>
                 $this->baseURL
                 . 'subida_documentacion',
+                
+            /**
+             * Descargar documento del ciudadano.
+             *
+             * GET /documentos/{id}/descargar
+             */
+            'descargar_documento_ciudadano' =>
+                $this->baseURL .
+                'documentos/' .
+                $id .
+                '/descargar',
+
 
 
             /**

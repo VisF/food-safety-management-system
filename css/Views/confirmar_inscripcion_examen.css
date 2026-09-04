@@ -1,0 +1,28 @@
+.confirmar-inscripcion__icono {
+    width: 72px;
+    height: 72px;
+    margin: 0 auto 1.5rem auto;
+    border-radius: 50%;
+    background: linear-gradient(
+        135deg,
+        #005596 0%,
+        #3a5f94 100%
+    );
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 2rem;
+    font-weight: bold;
+}
+
+.confirmar-inscripcion__texto {
+    margin-top: 1rem;
+    margin-bottom: 2rem;
+}
+
+.confirmar-inscripcion__acciones {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 require_once __DIR__ . '/../Servicios/ConsultaPublicaService.php';
@@ -21,7 +22,9 @@ class ConsultaPublicaControlador
     {
         $dni =
             trim(
-                (string)($_GET['dni'] ?? '')
+                (string)(
+                    $_GET['dni'] ?? ''
+                )
             );
 
         $data =
@@ -39,8 +42,18 @@ class ConsultaPublicaControlador
     /**
      * Descarga el PDF oficial del carnet.
      */
-    public function descargarCarnet(int $idCarnet): void{
+    public function descargarCarnet(
+        int $idCarnet
+    ): void {
 
+        if ($idCarnet <= 0) {
+
+            http_response_code(404);
+
+            exit(
+                'Carnet no encontrado.'
+            );
+        }
 
         $archivo =
             $this->consultaPublicaService
@@ -74,27 +87,41 @@ class ConsultaPublicaControlador
             );
         }
 
-        /*
-         * La ruta almacenada en la base de datos
-         * debe ser relativa al proyecto.
-         */
-        $rutaPdf =
+        $rutaRelativa =
             ltrim(
                 $rutaPdf,
                 '/\\'
             );
 
         $ruta =
-            dirname(__DIR__) .
-            DIRECTORY_SEPARATOR .
-            str_replace(
-                '/',
-                DIRECTORY_SEPARATOR,
-                $rutaPdf
+            realpath(
+                dirname(__DIR__) .
+                DIRECTORY_SEPARATOR .
+                str_replace(
+                    '/',
+                    DIRECTORY_SEPARATOR,
+                    $rutaRelativa
+                )
+            );
+
+        $directorioCarnets =
+            realpath(
+                dirname(__DIR__) .
+                DIRECTORY_SEPARATOR .
+                'uploads' .
+                DIRECTORY_SEPARATOR .
+                'carnets'
             );
 
         if (
-            !is_file($ruta)
+            $ruta === false
+            || $directorioCarnets === false
+            || strpos(
+                $ruta,
+                $directorioCarnets .
+                DIRECTORY_SEPARATOR
+            ) !== 0
+            || !is_file($ruta)
             || !is_readable($ruta)
         ) {
 
@@ -132,7 +159,9 @@ class ConsultaPublicaControlador
             'Cache-Control: private, no-cache'
         );
 
-        readfile($ruta);
+        readfile(
+            $ruta
+        );
 
         exit;
     }
@@ -140,11 +169,18 @@ class ConsultaPublicaControlador
     /**
      * Descarga la foto asociada al carnet.
      */
-    public function descargarFoto(int $idCarnet): void
-    
-    {
-        $idCarnet =
-            (int)($_GET['id'] ?? 0);
+    public function descargarFoto(
+        int $idCarnet
+    ): void {
+
+        if ($idCarnet <= 0) {
+
+            http_response_code(404);
+
+            exit(
+                'Foto no encontrada.'
+            );
+        }
 
         $foto =
             $this->consultaPublicaService
@@ -178,23 +214,41 @@ class ConsultaPublicaControlador
             );
         }
 
-        $rutaFoto =
+        $rutaRelativa =
             ltrim(
                 $rutaFoto,
                 '/\\'
             );
 
         $ruta =
-            dirname(__DIR__) .
-            DIRECTORY_SEPARATOR .
-            str_replace(
-                '/',
-                DIRECTORY_SEPARATOR,
-                $rutaFoto
+            realpath(
+                dirname(__DIR__) .
+                DIRECTORY_SEPARATOR .
+                str_replace(
+                    '/',
+                    DIRECTORY_SEPARATOR,
+                    $rutaRelativa
+                )
+            );
+
+        $directorioDocumentos =
+            realpath(
+                dirname(__DIR__) .
+                DIRECTORY_SEPARATOR .
+                'uploads' .
+                DIRECTORY_SEPARATOR .
+                'documentos'
             );
 
         if (
-            !is_file($ruta)
+            $ruta === false
+            || $directorioDocumentos === false
+            || strpos(
+                $ruta,
+                $directorioDocumentos .
+                DIRECTORY_SEPARATOR
+            ) !== 0
+            || !is_file($ruta)
             || !is_readable($ruta)
         ) {
 
@@ -219,18 +273,10 @@ class ConsultaPublicaControlador
             );
 
         $mimeTypes = [
-
-            'jpg' =>
-                'image/jpeg',
-
-            'jpeg' =>
-                'image/jpeg',
-
-            'png' =>
-                'image/png',
-
-            'webp' =>
-                'image/webp'
+            'jpg' => 'image/jpeg',
+            'jpeg' => 'image/jpeg',
+            'png' => 'image/png',
+            'webp' => 'image/webp'
         ];
 
         $mime =
@@ -264,7 +310,9 @@ class ConsultaPublicaControlador
             'Cache-Control: private, no-cache'
         );
 
-        readfile($ruta);
+        readfile(
+            $ruta
+        );
 
         exit;
     }

@@ -331,6 +331,40 @@ class DocumentoRepository
 
         return $documento ?: null;
     }
+    /**
+     * Obtener un documento perteneciente a un usuario.
+     *
+     * Se utiliza para permitir que el ciudadano
+     * acceda únicamente a sus propios documentos.
+     */
+    public function descargarDocumentoPorUsuario(
+        int $documentoId,
+        int $usuarioId
+    ): ?array {
+
+        $stmt = $this->conexion->prepare("
+            SELECT
+                id,
+                nombre_original,
+                ruta_archivo,
+                tipo_documento,
+                usuario_id
+            FROM documentos
+            WHERE id = :id
+            AND usuario_id = :usuario_id
+            LIMIT 1
+        ");
+
+        $stmt->execute([
+            ':id' => $documentoId,
+            ':usuario_id' => $usuarioId
+        ]);
+
+        $documento =
+            $stmt->fetch(\PDO::FETCH_ASSOC);
+
+        return $documento ?: null;
+    }
 
         /**
      * Obtener un documento por usuario y tipo.

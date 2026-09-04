@@ -1,327 +1,491 @@
 <?php
+
 /**
- * Vista: Subida de documentación
- * Propósito: Mostrar lista de documentos requeridos y botones para subir/corregir archivos.
- * Estructura esperada (`getDefaultData()`):
- *  - documents: array[{icon, title, description, status, status_icon, status_class}]
- * Implementación técnica:
- *  - El loop `foreach ($data['documents'] as $document)` renderiza cada tarjeta usando `e()` para escapar.
- *  - Los botones de acción deben apuntar a rutas gestionadas por `Router.php` donde el controlador valida y almacena archivos.
- * Seguridad:
- *  - Mantener la lógica de validación/almacenamiento fuera de la vista; evitar mostrar rutas de filesystem o nombres reales.
+ * Vista: Subida de documentación.
+ *
+ * Propósito:
+ * Mostrar la documentación requerida por el ciudadano
+ * y permitir cargar o corregir los archivos correspondientes.
  */
 
 require_once __DIR__ . '/BaseVista.php';
 
 class SubidaDocumentacionVista extends BaseVista
 {
-
-
-  private function getDefaultData(): array
-  {
-    return [
-      'page_title' => 'Subida de documentación - App Ciudadana',
-      'hero_title' => 'Subida de documentación',
-      'hero_text' => 'Complete los campos requeridos para avanzar con su trámite municipal.',
-      'info_title' => 'Formatos aceptados',
-      'info_text' => 'Solo se permiten archivos en formato JPG, PNG y PDF. Peso máximo: 5MB.',
-      'documents_title' => 'Documentación requerida',
-      'documents' => [],
-      'footer_button' => 'Enviar documentación',
-      'footer_note' => 'Usted será notificado una vez que los documentos sean validados.',
-    ];
-  }
-
-  private function getHeader(array $data): void
-  {
-    $assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-    if (preg_match('#/vistas$#', $assetBase) === 1) {
-      $assetBase = (string) preg_replace('#/vistas$#', '', $assetBase);
-    }
-    if ($assetBase === '') {
-      $assetBase = '';
-    }
-    ?>
-    <!DOCTYPE html>
-    <html class="light" lang="es">
-     <head>
-      <meta charset="utf-8"/>
-      <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-      <title>
-       <?php echo $this->e($data['page_title']); ?>
-      </title>
-      <script src="<?php echo $assetBase; ?>/js/tailwind-config.js">
-      </script>
-      <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
-      </script>
-      <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-      <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
-      <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-      <link href="<?php echo $assetBase; ?>/css/base.css" rel="stylesheet"/>
-      <link href="<?php echo $assetBase; ?>/css/components.css" rel="stylesheet"/>
-      <link href="<?php echo $assetBase; ?>/css/ui.css" rel="stylesheet"/>
-     </head>
-     <body class="bg-background text-on-background min-h-screen pb-24 tema-ciudadano">
-    <?php include __DIR__ . '/header.php'; ?>
-    <?php
-  }
-
-
-
-
-  public function mostrar(array $documentos = []): void
-{
-    $data = $this->getDefaultData();
-
-    $tiposRequeridos = [
+    /**
+     * Configuración de los documentos requeridos.
+     */
+    private const TIPOS_REQUERIDOS = [
         'dni' => [
             'icon' => 'badge',
             'title' => 'DNI frente y dorso',
-            'description' => 'Ambos lados en una misma imagen o PDF.'
+            'description' =>
+                'Ambos lados en una misma imagen o PDF.'
         ],
 
         'foto_carnet' => [
             'icon' => 'account_circle',
             'title' => 'Foto carnet',
-            'description' => 'Fondo blanco, frente despejado.'
+            'description' =>
+                'Fondo blanco, frente despejado.'
         ],
 
         'moodle' => [
             'icon' => 'school',
             'title' => 'Certificado Moodle',
-            'description' => 'Constancia de aprobación del curso.'
+            'description' =>
+                'Constancia de aprobación del curso.'
         ]
     ];
 
-    $data['documents'] = [];
+    /**
+     * Datos por defecto de la vista.
+     */
+    private function getDefaultData(): array
+    {
+        return [
+            'page_title' =>
+                'Subida de documentación - App Ciudadana',
 
-    foreach ($tiposRequeridos as $tipo => $config) {
+            'hero_title' =>
+                'Subida de documentación',
 
-        $documentoEncontrado = null;
+            'hero_text' =>
+                'Complete los campos requeridos para avanzar con su trámite municipal.',
 
-        foreach ($documentos as $doc) {
+            'info_title' =>
+                'Formatos aceptados',
 
-            if (
-                strtolower(
-                    $doc->getTipoDocumento()
-                ) === $tipo
-            ) {
-                $documentoEncontrado = $doc;
-                break;
-            }
-        }
+            'info_text' =>
+                'Solo se permiten archivos en formato JPG, PNG y PDF. Peso máximo: 5MB.',
 
-        $estado = $documentoEncontrado
-            ? $documentoEncontrado->getEstado()
-            : 'pendiente';
+            'documents_title' =>
+                'Documentación requerida',
 
-        $data['documents'][] = [
-            'tipo' => $tipo,
-            'icon' => $config['icon'],
-            'title' => $config['title'],
-            'description' => $config['description'],
+            'documents' => [],
 
-            'status' => match ($estado) {
-                'aprobado' => 'Aprobado',
-                'rechazado' => 'Rechazado',
-                default => 'Pendiente'
-            },
+            'footer_button' =>
+                'Enviar documentación',
 
-            'status_icon' => match ($estado) {
-                'aprobado' => 'check_circle',
-                'rechazado' => 'cancel',
-                default => 'pending'
-            },
-
-            'status_class' => match ($estado) {
-                'aprobado' => 'bg-green-100 text-green-700',
-                'rechazado' => 'bg-red-100 text-red-700',
-                default => 'bg-amber-100 text-amber-700'
-            },
-
-            'estado' => $estado,
-            'documento' => $documentoEncontrado
+            'footer_note' =>
+                'Usted será notificado una vez que los documentos sean validados.'
         ];
     }
 
-    $this->getHeader($data);
-    ?>
+    /**
+     * Muestra la documentación del ciudadano.
+     */
+    public function mostrar(array $documentos = []): void
+    {
+        $data =
+            $this->getDefaultData();
 
+        $data['documents'] =
+            $this->prepararDocumentos(
+                $documentos
+            );
 
-      <main class="contenido-principal contenido-principal--estrecho subida-documentacion">
-       <section class="subida-documentacion__hero">
-        <h2 class="app-vista-section-title">
-         <?php echo $this->e($data['hero_title']); ?>
-        </h2>
-        <p class="app-vista-section-subtitle subida-documentacion__hero-texto">
-         <?php echo $this->e($data['hero_text']); ?>
-        </p>
-       </section>
+        include __DIR__ . '/header.php';
+        ?>
 
-       <article class="app-vista-card app-vista-card--surface subida-documentacion__info">
+        <link
+            rel="stylesheet"
+            href="<?= $this->baseURL; ?>css/Views/subida-documentacion.css"
+        >
 
-            <span
-                class="material-symbols-outlined subida-documentacion__info-icono"
-                data-icon="info"
+        <main
+            class="contenido-principal contenido-principal--estrecho subida-documentacion"
+        >
+
+            <section
+                class="subida-documentacion__hero"
             >
-                info
-            </span>
 
-            <div class="subida-documentacion__info-contenido">
+                <h2 class="app-vista-section-title">
+                    <?= $this->e(
+                        $data['hero_title']
+                    ); ?>
+                </h2>
 
-                <p class="subida-documentacion__info-titulo">
-                    <?php echo $this->e($data['info_title']); ?>
+                <p
+                    class="app-vista-section-subtitle subida-documentacion__hero-texto"
+                >
+                    <?= $this->e(
+                        $data['hero_text']
+                    ); ?>
                 </p>
 
-                <p class="subida-documentacion__info-texto">
-                    <?php echo $this->e($data['info_text']); ?>
+            </section>
+
+
+            <article
+                class="app-vista-card app-vista-card--surface subida-documentacion__info"
+            >
+
+                <span
+                    class="material-symbols-outlined subida-documentacion__info-icono"
+                    data-icon="info"
+                    aria-hidden="true"
+                >
+                    info
+                </span>
+
+                <div
+                    class="subida-documentacion__info-contenido"
+                >
+
+                    <p
+                        class="subida-documentacion__info-titulo"
+                    >
+                        <?= $this->e(
+                            $data['info_title']
+                        ); ?>
+                    </p>
+
+                    <p
+                        class="subida-documentacion__info-texto"
+                    >
+                        <?= $this->e(
+                            $data['info_text']
+                        ); ?>
+                    </p>
+
+                </div>
+
+            </article>
+
+
+            <section
+                class="subida-documentacion__documentos"
+            >
+
+                <h3
+                    class="subida-documentacion__documentos-titulo"
+                >
+                    <?= $this->e(
+                        $data['documents_title']
+                    ); ?>
+                </h3>
+
+
+                <?php foreach (
+                    $data['documents']
+                    as $document
+                ): ?>
+
+                    <?php
+                    $documento =
+                        $document['documento'];
+
+                    $observaciones =
+                        $documento
+                            ? $documento->getObservaciones()
+                            : null;
+                    ?>
+
+                    <article
+                        class="app-vista-card documento-card"
+                    >
+
+                        <div
+                            class="documento-card__header"
+                        >
+
+                            <div
+                                class="documento-card__icono"
+                            >
+
+                                <span
+                                    class="material-symbols-outlined documento-card__icono-simbolo"
+                                    data-icon="<?= $this->e(
+                                        $document['icon']
+                                    ); ?>"
+                                    aria-hidden="true"
+                                >
+                                    <?= $this->e(
+                                        $document['icon']
+                                    ); ?>
+                                </span>
+
+                            </div>
+
+
+                            <div
+                                class="documento-card__contenido"
+                            >
+
+                                <h4
+                                    class="documento-card__titulo"
+                                >
+                                    <?= $this->e(
+                                        $document['title']
+                                    ); ?>
+                                </h4>
+
+                                <p
+                                    class="documento-card__descripcion"
+                                >
+                                    <?= $this->e(
+                                        $document['description']
+                                    ); ?>
+                                </p>
+
+
+                                <?php if ($documento): ?>
+
+
+                                    <p class="documento-card__archivo">
+
+                                        Archivo:
+
+                                        <a
+                                            href="<?= $this->getRoute(
+                                                'descargar_documento_ciudadano',
+                                                $documento->getId()
+                                            ); ?>"
+                                            class="documento-card__archivo-enlace"
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                        >
+                                            <?= $this->e(
+                                                $documento->getNombreOriginal()
+                                            ); ?>
+                                        </a>
+
+                                    </p>
+
+                                <?php endif; ?>
+
+
+
+                                <?php if (
+                                    !empty($observaciones)
+                                ): ?>
+
+                                    <p
+                                        class="documento-card__observacion"
+                                    >
+                                        <strong>
+                                            Observación:
+                                        </strong>
+
+                                        <?= $this->e(
+                                            $observaciones
+                                        ); ?>
+                                    </p>
+
+                                <?php endif; ?>
+
+                            </div>
+
+                        </div>
+
+
+                        <div
+                            class="documento-card__footer"
+                        >
+
+                            <span
+                                class="app-vista-chip documento-card__estado
+                                <?= $document['status_icon'] === 'check_circle'
+                                    ? 'app-vista-chip--vigente'
+                                    : ''; ?>"
+                            >
+
+                                <span
+                                    class="material-symbols-outlined documento-card__estado-icono
+                                    <?= $document['status_icon'] !== 'pending'
+                                        ? 'icono-relleno'
+                                        : ''; ?>"
+                                    data-icon="<?= $this->e(
+                                        $document['status_icon']
+                                    ); ?>"
+                                    aria-hidden="true"
+                                >
+                                    <?= $this->e(
+                                        $document['status_icon']
+                                    ); ?>
+                                </span>
+
+                                <?= $this->e(
+                                    $document['status']
+                                ); ?>
+
+                            </span>
+
+
+                            <?php if (
+                                $document['estado']
+                                !== 'aprobado'
+                            ): ?>
+
+                                <form
+                                    method="POST"
+                                    action="<?= $this->baseURL; ?>documentos/subir"
+                                    enctype="multipart/form-data"
+                                    class="documento-card__form"
+                                >
+
+                                    <input
+                                        type="hidden"
+                                        name="tipo_documento"
+                                        value="<?= $this->e(
+                                            $document['tipo']
+                                        ); ?>"
+                                    >
+
+                                    <input
+                                        type="file"
+                                        name="archivo"
+                                        id="archivo_<?= $this->e(
+                                            $document['tipo']
+                                        ); ?>"
+                                        class="documento-card__archivo-input"
+                                        accept=".pdf,.jpg,.jpeg,.png"
+                                    >
+
+                                    <label
+                                        for="archivo_<?= $this->e(
+                                            $document['tipo']
+                                        ); ?>"
+                                        class="app-vista-button app-vista-button--primary documento-card__boton"
+                                    >
+                                        Subir archivo
+                                    </label>
+
+                                </form>
+
+                            <?php else: ?>
+
+                                <button
+                                    type="button"
+                                    class="app-vista-button app-vista-button--secondary documento-card__boton"
+                                    disabled
+                                >
+                                    Documento aprobado
+                                </button>
+
+                            <?php endif; ?>
+
+                        </div>
+
+                    </article>
+
+                <?php endforeach; ?>
+
+            </section>
+
+
+            <section
+                class="subida-documentacion__footer"
+            >
+
+                <button
+                    type="button"
+                    class="app-vista-button app-vista-button--primary"
+                >
+                    <?= $this->e(
+                        $data['footer_button']
+                    ); ?>
+                </button>
+
+                <p
+                    class="subida-documentacion__footer-nota"
+                >
+                    <?= $this->e(
+                        $data['footer_note']
+                    ); ?>
                 </p>
 
-            </div>
+            </section>
 
-        </article>
+        </main>
 
-       <section class="subida-documentacion__documentos">
-        <h3 class="subida-documentacion__documentos-titulo">
-         <?php echo $this->e($data['documents_title']); ?>
-        </h3>
+        <script
+            src="<?= $this->baseURL; ?>js/subida-documentacion.js"
+            defer
+        ></script>
 
-        <?php // Itera documentos requeridos; evitar pasar objetos grandes a la vista y escapar todas las propiedades.
-        foreach ($data['documents'] as $document): ?>
-        <article class="app-vista-card documento-card">
-         <div class="documento-card__header">
-          <div class="documento-card__icono">
-           <span class="material-symbols-outlined" data-icon="<?php echo $this->e($document['icon']); ?>" style="font-size: 22px;">
-        <?php echo $this->e($document['icon']); ?>
-           </span>
-          </div>
-          <div class="documento-card__contenido">
-            <h4 class="documento-card__titulo">
-        <?php echo $this->e($document['title']); ?>
-           </h4>
-           <p class="documento-card__descripcion">
-        <?php echo $this->e($document['description']); ?>
-           </p>
-           <?php if ($document['documento']): ?>
-            <p class="documento-card__archivo">
-                Archivo:
-                <?php echo $this->e(
-                    $document['documento']->getNombreOriginal()
-                ); ?>
-            </p>
-            <?php endif; ?>
-            <?php
-            $observaciones =
-                $document['documento']
-                    ? $document['documento']->getObservaciones()
-                    : null;
-            ?>
 
-            <?php if (!empty($observaciones)): ?>
+        <?php
+        $this->getFooter();
+    }
 
-            <p class="documento-card__observacion" >
-                <strong>Observación:</strong>
-                <?= $this->e($observaciones) ?>
-            </p>
+    /**
+     * Prepara los documentos requeridos para la presentación.
+     *
+     * Esta lógica se mantiene temporalmente en la vista
+     * para no alterar todavía el contrato existente.
+     */
+    private function prepararDocumentos(
+        array $documentos
+    ): array {
 
-            <?php endif; ?>
-          </div>
-         </div>
+        $documentosVista = [];
 
-         <div class="documento-card__footer">
+        foreach (
+            self::TIPOS_REQUERIDOS
+            as $tipo => $config
+        ) {
 
-          <span class="app-vista-chip 
-          <?php echo ((string) $document['status_icon'] === 'check_circle') ? 'app-vista-chip--vigente' : ''; ?>"
-           style="font-size: 0.84rem;">
+            $documentoEncontrado = null;
 
-           <span class="material-symbols-outlined 
-           <?php echo ((string) $document['status_icon'] === 'pending') ? '' : 'icono-relleno'; ?>"
-            data-icon="
-            <?php echo $this->e($document['status_icon']); ?>" 
-            style="font-size: 18px;">
+            foreach ($documentos as $documento) {
 
-        <?php echo $this->e($document['status_icon']); ?>
-           </span>
-           <?php echo $this->e($document['status']); ?>
-          </span>
-            <?php if ($document['estado'] !== 'aprobado'): ?>
+                if (
+                    strtolower(
+                        $documento->getTipoDocumento()
+                    ) === $tipo
+                ) {
+                    $documentoEncontrado =
+                        $documento;
 
-          <form
-              method="POST"
-              action="<?= BASE_URL ?>/documentos/subir"
-              enctype="multipart/form-data"
-          >
+                    break;
+                }
+            }
 
-              <input
-                  type="hidden"
-                  name="tipo_documento"
-                  value="<?= $this->e($document['tipo']) ?>"
-              >
+            $estado =
+                $documentoEncontrado
+                    ? $documentoEncontrado->getEstado()
+                    : 'pendiente';
 
-              <input
-                  type="file"
-                  name="archivo"
-                  id="archivo_<?= $this->e($document['tipo']) ?>"
-                  style="display:none;"
-                  accept=".pdf,.jpg,.jpeg,.png"
-              >
+            $documentosVista[] = [
 
-              <button type="button" class="app-vista-button app-vista-button--primary documento-card__boton"
-                      onclick="
-                      document
-                          .getElementById(
-                              'archivo_<?= $this->e($document['tipo']) ?>'
-                          )
-                          .click();
-                  "
-              >
-                  Subir archivo
-              </button>
+                'tipo' =>
+                    $tipo,
 
-          </form>
+                'icon' =>
+                    $config['icon'],
 
-          <?php else: ?>
+                'title' =>
+                    $config['title'],
 
-          <button
-              type="button"
-              class="app-vista-button app-vista-button--secondary documento-card__boton"
-              disabled
-          >
-              Documento aprobado
-          </button>
+                'description' =>
+                    $config['description'],
 
-          <?php endif; ?>
-         </div>
-        </article>
-        <?php endforeach; ?>
-       </section>
+                'status' =>
+                    match ($estado) {
+                        'aprobado' => 'Aprobado',
+                        'rechazado' => 'Rechazado',
+                        default => 'Pendiente'
+                    },
 
-       <section class="subida-documentacion__footer">
-        <button class="app-vista-button app-vista-button--primary">
-         <?php echo $this->e($data['footer_button']); ?>
-        </button>
-        <p class="subida-documentacion__footer-nota">
-         <?php echo $this->e($data['footer_note']); ?>
-        </p>
-       </section>
-      </main>
-      <!-- BottomNavBar -->
-<script>
-document.querySelectorAll('input[type="file"]').forEach(input => {
+                'status_icon' =>
+                    match ($estado) {
+                        'aprobado' => 'check_circle',
+                        'rechazado' => 'cancel',
+                        default => 'pending'
+                    },
 
-    input.addEventListener('change', function () {
+                'estado' =>
+                    $estado,
 
-        if (this.files.length > 0) {
-            this.form.submit();
+                'documento' =>
+                    $documentoEncontrado
+
+            ];
         }
 
-    });
-
-});
-</script>
-    <?php
-    $this->getFooter();
-  }
+        return $documentosVista;
+    }
 }
-
-

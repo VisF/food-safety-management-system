@@ -4,3 +4,7 @@
 [2026-07-27 17:27:27] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"foto_carnet_tarjeta_1785166047_6a6778df98bbb.png"}
 [2026-07-27 17:27:31] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
 [2026-07-27 17:27:31] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"moodle_tarjeta_1785166051_6a6778e3e4607.png"}
+[2026-09-04 19:58:13] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
+[2026-09-04 19:58:13] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"foto_carnet_CARNET-EJEMPLO_1788544693_6a9b06b569cca.pdf"}
+[2026-09-04 20:07:13] Usuario: anonimo | Evento: CLAMAV_NO_DISPONIBLE | Datos: {"error":"Unable to find the socket transport \"unix\" - did you forget to enable it when you configured PHP?"}
+[2026-09-04 20:07:13] Usuario: anonimo | Evento: ARCHIVO_GUARDADO | Datos: {"archivo":"moodle_CARNET-EJEMPLO_1788545233_6a9b08d198bba.pdf"}

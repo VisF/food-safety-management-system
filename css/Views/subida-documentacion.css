@@ -1,0 +1,23 @@
+.documento-card__icono-simbolo {
+    font-size: 22px;
+}
+
+.documento-card__estado {
+    font-size: 0.84rem;
+}
+
+.documento-card__estado-icono {
+    font-size: 18px;
+}
+
+.documento-card__archivo-input {
+    display: none !important;
+}
+
+.documento-card__form {
+    margin: 0;
+}
+
+.documento-card__boton {
+    cursor: pointer;
+}

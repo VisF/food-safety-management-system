@@ -346,6 +346,29 @@ $router->map(
         $controlador->procesarSubida();
     }
 );
+/**
+ * Descargar documento del ciudadano.
+ *
+ * GET /documentos/{id}/descargar
+ */
+$router->map(
+    'GET',
+    '/documentos/[i:id]/descargar',
+    function ($id) {
+
+        $id = (int)$id;
+
+        require_once __DIR__ .
+            '/../Controller/DocumentoControlador.php';
+
+        $controller =
+            new DocumentoControlador();
+
+        $controller->descargarDocumento(
+            $id
+        );
+    }
+);
 
 /* ==========================================================
    PANEL DE ADMINISTRACIÓN

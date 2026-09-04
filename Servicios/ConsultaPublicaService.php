@@ -14,6 +14,7 @@ class ConsultaPublicaService
         $this->documentoRepository = new DocumentoRepository();
     }
 
+
     public function consultarPorDni(string $dni): array
     {
         $data = [
@@ -24,6 +25,7 @@ class ConsultaPublicaService
             ],
 
             'resultado' => [
+                'consultado' => false,
                 'encontrado' => false
             ]
         ];
@@ -38,31 +40,59 @@ class ConsultaPublicaService
             return $data;
         }
 
-        $carnet = $this->carnetRepository->obtenerCarnetPublicoPorDni($dni);
+        $data['resultado']['consultado'] = true;
+
+        $carnet =
+            $this->carnetRepository
+                ->obtenerCarnetPublicoPorDni($dni);
 
         if (!$carnet) {
             return $data;
         }
 
-        $foto = $this->documentoRepository->obtenerFotoCarnet($carnet['usuario_id']);
+        $foto =
+            $this->documentoRepository
+                ->obtenerFotoCarnet(
+                    $carnet['usuario_id']
+                );
 
         $data['resultado'] = [
-                        'encontrado'         => true,
-                        'id_carnet'          => $carnet['id_carnet'],
-                        'nombre'             => $carnet['nombre'],
-                        'apellido'           => $carnet['apellido'],
-                        'dni'                => $carnet['dni'],
-                        'numero_carnet'      => $carnet['numero_carnet'],
-                        'fecha_emision'      => $carnet['fecha_emision'],
-                        'fecha_vencimiento'  => $carnet['fecha_vencimiento'],
-                        'vigente'            => $carnet['vigente'],
-                        'ruta_pdf'           => $carnet['ruta_pdf'],
-                        'foto_carnet'        => $foto['ruta_archivo'] ?? null
-                    ];
+            'consultado' => true,
+            'encontrado' => true,
+
+            'id_carnet' =>
+                $carnet['id_carnet'],
+
+            'nombre' =>
+                $carnet['nombre'],
+
+            'apellido' =>
+                $carnet['apellido'],
+
+            'dni' =>
+                $carnet['dni'],
+
+            'numero_carnet' =>
+                $carnet['numero_carnet'],
+
+            'fecha_emision' =>
+                $carnet['fecha_emision'],
+
+            'fecha_vencimiento' =>
+                $carnet['fecha_vencimiento'],
+
+            'vigente' =>
+                $carnet['vigente'],
+
+            'ruta_pdf' =>
+                $carnet['ruta_pdf'],
+
+            'foto_carnet' =>
+                $foto['ruta_archivo'] ?? null
+        ];
 
         return $data;
     }
-
     public function descargarFotoPorCarnet(int $idCarnet): ?array
     {
         if ($idCarnet <= 0) {

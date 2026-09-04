@@ -191,13 +191,33 @@ class DocumentoService
         ];
     }
 
-    // Descarga documento.
+    /**
+     * Obtener información de un documento para su descarga.
+     */
     public function descargarDocumento(int $id): ?array
     {
         return
             $this->documentoRepository
                 ->descargarDocumento($id);
     }
+
+    /**
+     * Obtener información de un documento perteneciente
+     * al usuario indicado.
+     */
+    public function descargarDocumentoPorUsuario(
+        int $documentoId,
+        int $usuarioId
+    ): ?array {
+
+        return
+            $this->documentoRepository
+                ->descargarDocumentoPorUsuario(
+                    $documentoId,
+                    $usuarioId
+                );
+    }
+    
 
     // Elimina documento.
     public function eliminarDocumento(int $id): array

@@ -51,3 +51,5 @@
 [2026-07-29 18:13:56] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":15}
 [2026-08-04 19:30:56] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":16,"usuario_id":14}
 [2026-08-04 19:30:56] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":16}
+[2026-09-04 20:07:43] Usuario: anonimo | Evento: INSCRIPCION_CREADA | Datos: {"id":18,"usuario_id":4}
+[2026-09-04 20:07:43] Usuario: anonimo | Evento: INSCRIPCION_EXAMEN_CONFIRMADA | Datos: {"id_inscripcion":18}
