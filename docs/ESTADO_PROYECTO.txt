@@ -69,7 +69,6 @@
     Estimado: 20 horas
   
   FASE 6: Integración Completa
-    [ ] Conectar Router.php
     [ ] Autenticación real
     [ ] SMTP para emails
     [ ] Integración DIPA

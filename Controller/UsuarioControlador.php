@@ -30,6 +30,7 @@ declare(strict_types=1);
  * - asignarRol($id_usuario, $id_rol) -> Retorna array con resultado
  * - obtenerRolesUsuario($id)         -> Retorna array de roles
  */
+require_once __DIR__ . '/../Servicios/UsuarioService.php';
 
 class UsuarioControlador
 {
@@ -584,6 +585,271 @@ class UsuarioControlador
                 'activos' => 0,
                 'inactivos' => 0
             ];
+        }
+    }
+        /**
+     * Mostrar perfil del usuario autenticado.
+     */
+    public function mostrarPerfil(): void
+    {
+        $usuarioId =
+            (int)(
+                $_SESSION['usuario_id']
+                ?? 0
+            );
+
+        if ($usuarioId <= 0) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/login'
+            );
+
+            exit;
+        }
+
+        try {
+
+            $usuario =
+                $this->usuarioService
+                    ->obtenerPorId(
+                        $usuarioId
+                    );
+
+            if (!$usuario) {
+
+                http_response_code(404);
+
+                echo 'Usuario no encontrado.';
+
+                return;
+            }
+
+            require_once __DIR__ .
+                '/../Views/perfil.php';
+
+            $vista =
+                new PerfilVista();
+
+            $vista->mostrar([
+                'page_title' =>
+                    'Mi perfil',
+
+                'usuario' =>
+                    $usuario->toArray(),
+
+                'error' =>
+                    $_SESSION['perfil_error']
+                    ?? null,
+
+                'success' =>
+                    $_SESSION['perfil_success']
+                    ?? null
+            ]);
+
+            unset(
+                $_SESSION['perfil_error'],
+                $_SESSION['perfil_success']
+            );
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_MOSTRAR_PERFIL',
+                'ERROR',
+                [
+                    'usuario_id' =>
+                        $usuarioId,
+
+                    'error' =>
+                        $e->getMessage()
+                ]
+            );
+
+            http_response_code(500);
+
+            echo 'No se pudo cargar el perfil.';
+        }
+    }
+
+
+    /**
+     * Actualizar datos del perfil del usuario autenticado.
+     */
+    public function actualizarPerfil(): void
+    {
+        $usuarioId =
+            (int)(
+                $_SESSION['usuario_id']
+                ?? 0
+            );
+
+        if ($usuarioId <= 0) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/login'
+            );
+
+            exit;
+        }
+
+        try {
+
+            $datos = [
+
+                'nombre' =>
+                    trim(
+                        (string)(
+                            $_POST['nombre']
+                            ?? ''
+                        )
+                    ),
+
+                'apellido' =>
+                    trim(
+                        (string)(
+                            $_POST['apellido']
+                            ?? ''
+                        )
+                    ),
+
+                'email' =>
+                    trim(
+                        (string)(
+                            $_POST['email']
+                            ?? ''
+                        )
+                    ),
+
+                'telefono' =>
+                    trim(
+                        (string)(
+                            $_POST['telefono']
+                            ?? ''
+                        )
+                    ),
+
+                'domicilio' =>
+                    trim(
+                        (string)(
+                            $_POST['domicilio']
+                            ?? ''
+                        )
+                    )
+            ];
+
+
+            if (
+                $datos['nombre'] === ''
+                ||
+                $datos['apellido'] === ''
+                ||
+                $datos['email'] === ''
+            ) {
+
+                $_SESSION['perfil_error'] =
+                    'Nombre, apellido y email son obligatorios.';
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/perfil'
+                );
+
+                exit;
+            }
+
+
+            if (
+                !filter_var(
+                    $datos['email'],
+                    FILTER_VALIDATE_EMAIL
+                )
+            ) {
+
+                $_SESSION['perfil_error'] =
+                    'El email ingresado no es válido.';
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/perfil'
+                );
+
+                exit;
+            }
+
+
+            $usuario =
+                $this->usuarioService
+                    ->actualizar(
+                        $usuarioId,
+                        $datos
+                    );
+
+
+            if (!$usuario) {
+
+                $_SESSION['perfil_error'] =
+                    'No se pudieron actualizar los datos.';
+
+                header(
+                    'Location: ' .
+                    BASE_URL .
+                    '/perfil'
+                );
+
+                exit;
+            }
+
+
+            $_SESSION['perfil_success'] =
+                'Los datos del perfil fueron actualizados correctamente.';
+
+            $this->log(
+                'PERFIL_ACTUALIZADO',
+                'INFO',
+                [
+                    'usuario_id' =>
+                        $usuarioId
+                ]
+            );
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/perfil'
+            );
+
+            exit;
+
+        } catch (\Throwable $e) {
+
+            $this->log(
+                'ERROR_ACTUALIZAR_PERFIL',
+                'ERROR',
+                [
+                    'usuario_id' =>
+                        $usuarioId,
+
+                    'error' =>
+                        $e->getMessage()
+                ]
+            );
+
+            $_SESSION['perfil_error'] =
+                $e->getMessage();
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/perfil'
+            );
+
+            exit;
         }
     }
 }

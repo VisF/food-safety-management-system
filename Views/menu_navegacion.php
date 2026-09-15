@@ -1,590 +1,641 @@
 <?php
 
+declare(strict_types=1);
+
 /**
  * Menú principal de navegación.
  *
- * Responsabilidad:
- * - Mostrar las opciones de navegación correspondientes
- *   al rol del usuario autenticado.
- * - Mantener una única estructura de navegación
- *   para usuarios, inspectores y administradores.
- *
- * Roles contemplados:
- * - usuario
- * - inspector
- * - admin
- *
- * El cierre de sesión se muestra:
- * - Dentro del menú en dispositivos móviles.
- * - Como acción independiente en desktop.
- */
-
-
-/*
- * ==========================================================
- * DATOS DE SESIÓN
- * ==========================================================
+ * El menú se incluye desde header.php, por lo que debe
+ * funcionar independientemente de la vista actual.
  */
 
 $usuarioLogueado =
-    !empty(
-        $_SESSION['usuario_id']
-    );
+    !empty($_SESSION['usuario_id']);
 
 
-$rolUsuario =
-    (string)(
-        $_SESSION['usuario_roles']
-        ?? 'usuario'
-    );
+$rolesSesion =
+    $_SESSION['usuario_roles'] ?? [];
 
 
-/*
- * ==========================================================
- * DATOS DE NAVEGACIÓN
- * ==========================================================
- */
-
-$menuActual =
-    basename(
-        parse_url(
-            $_SERVER['REQUEST_URI'] ?? '/',
-            PHP_URL_PATH
-        )
-    );
+if (!is_array($rolesSesion)) {
+    $rolesSesion = [$rolesSesion];
+}
 
 
-/*
- * ==========================================================
- * FUNCIÓN AUXILIAR
- * ==========================================================
- */
+$rolesSesion = array_map(
+    static fn($rol): string => strtolower(trim((string)$rol)),
+    $rolesSesion
+);
+
 
 /**
- * Determina si una ruta corresponde
- * a la página actualmente visitada.
+ * Determina el rol principal del usuario.
  *
- * @param string $ruta
- * @return bool
+ * Prioridad:
+ * admin > inspector > usuario
  */
-function menuRutaActiva(
+$rolPrincipal = null;
+
+if (in_array('admin', $rolesSesion, true)) {
+
+    $rolPrincipal = 'admin';
+
+} elseif (
+    in_array('inspector', $rolesSesion, true)
+) {
+
+    $rolPrincipal = 'inspector';
+
+} elseif (
+    in_array('usuario', $rolesSesion, true)
+) {
+
+    $rolPrincipal = 'usuario';
+}
+
+
+/**
+ * URL base segura para las rutas del menú.
+ */
+$menuBaseUrl =
+    rtrim(BASE_URL, '/') . '/';
+
+
+/**
+ * Construye una URL del sistema.
+ *
+ * Se utiliza para que los enlaces funcionen
+ * independientemente de la vista desde la que
+ * se abra el menú.
+ */
+$menuUrl = static function (
+    string $ruta = '',
+    string $fragmento = ''
+) use ($menuBaseUrl): string {
+
+    $ruta = ltrim($ruta, '/');
+
+    $url =
+        $menuBaseUrl . $ruta;
+
+    if ($fragmento !== '') {
+
+        $url .= '#' .
+            ltrim($fragmento, '#');
+    }
+
+    return $url;
+};
+
+
+/**
+ * Detecta la ruta actual para marcar el enlace activo.
+ */
+$uriActual =
+    parse_url(
+        $_SERVER['REQUEST_URI'] ?? '/',
+        PHP_URL_PATH
+    );
+
+$uriActual =
+    '/' . ltrim(
+        (string)$uriActual,
+        '/'
+    );
+
+
+$menuRutaActiva = static function (
     string $ruta
-): bool {
+) use ($uriActual): bool {
 
-    $rutaActual =
-        parse_url(
-            $_SERVER['REQUEST_URI'] ?? '/',
-            PHP_URL_PATH
-        );
+    $ruta = '/' . ltrim($ruta, '/');
 
-
-    /*
-     * Eliminamos la BASE_URL de la
-     * comparación cuando corresponde.
-     */
-    $baseUrl =
-        defined('BASE_URL')
-            ? rtrim(
-                BASE_URL,
-                '/'
-            )
-            : '';
-
-
-    if (
-        $baseUrl !== ''
-        &&
-        str_starts_with(
-            $rutaActual,
-            $baseUrl
-        )
-    ) {
-
-        $rutaActual =
-            substr(
-                $rutaActual,
-                strlen($baseUrl)
-            );
+    if ($ruta !== '/' && str_ends_with($ruta, '/')) {
+        $ruta = rtrim($ruta, '/');
     }
 
-
-    /*
-     * Normalizamos las barras.
-     */
-    $rutaActual =
-        '/' .
-        trim(
-            $rutaActual,
-            '/'
-        );
-
-
-    $ruta =
-        '/' .
-        trim(
-            $ruta,
-            '/'
-        );
-
-
-    /*
-     * La página de inicio es un caso especial.
-     */
     if ($ruta === '/') {
-
-        return $rutaActual === '/';
+        return $uriActual === '/';
     }
 
-
-    /*
-     * Una ruta se considera activa si:
-     *
-     * - coincide exactamente;
-     * - o la URL actual es una subruta.
-     *
-     * Ejemplo:
-     *
-     * /admin/examenes
-     * /admin/examenes/nuevo
-     * /admin/examenes/12
-     *
-     * marcarán "Exámenes" como activo.
-     */
-    return
-        $rutaActual === $ruta
-        ||
-        str_starts_with(
-            $rutaActual,
+    return $uriActual === $ruta
+        || str_starts_with(
+            $uriActual,
             $ruta . '/'
         );
-}
+};
 
-
-/**
- * Escapa una URL para utilizarla
- * correctamente dentro de HTML.
- *
- * @param string $ruta
- * @return string
- */
-function menuUrl(string $ruta): string {
-
-    return htmlspecialchars(
-        BASE_URL . $ruta,
-        ENT_QUOTES,
-        'UTF-8'
-    );
-}
 
 ?>
 
-
-<nav
+<div
     id="menu-navegacion"
     class="menu-navegacion"
-    aria-label="Navegación principal"
+    aria-hidden="true"
 >
 
     <div
-        class="menu-navegacion__contenido"
+        class="menu-navegacion__overlay"
+        data-menu-cerrar
+        aria-hidden="true"
+    ></div>
+
+
+    <aside
+        class="menu-navegacion__panel"
+        aria-label="Menú de navegación"
     >
 
-        <!--
-        ==================================================
-        NAVEGACIÓN CIUDADANO
-        ==================================================
-        -->
+        <header class="menu-navegacion__header">
 
-        <?php if (
-            $usuarioLogueado
-            && $rolUsuario === 'usuario'
-        ): ?>
-
-            <div
-                class="menu-navegacion__grupo"
-            >
+            <div class="menu-navegacion__titulo">
 
                 <span
-                    class="menu-navegacion__titulo"
+                    class="material-symbols-outlined"
+                    aria-hidden="true"
                 >
-                    Mi cuenta
+                    menu
                 </span>
 
-
-                <a
-                    href="<?= menuUrl('/perfil'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/perfil')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        person
-                    </span>
-
-                    <span>
-                        Mis Datos
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="<?= menuUrl('/subida_documentacion'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/subida_documentacion')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        description
-                    </span>
-
-                    <span>
-                        Documentación
-                    </span>
-
-                </a>
-
-
-                <!--
-                 * Ruta planificada.
-                 * Todavía no implementada.
-                 -->
-                <a
-                    href="<?= menuUrl('/examen'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        assignment
-                    </span>
-
-                    <span>
-                        Examen
-                    </span>
-
-                </a>
-
-
-                <!--
-                 * Ruta planificada.
-                 * Todavía no implementada.
-                 -->
-                <a
-                    href="<?= menuUrl('/carnet'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        badge
-                    </span>
-
-                    <span>
-                        Carnet
-                    </span>
-
-                </a>
+                <span>
+                    Menú
+                </span>
 
             </div>
 
-        <?php endif; ?>
 
-
-        <!--
-        ==================================================
-        NAVEGACIÓN INSPECTOR
-        ==================================================
-        -->
-
-        <?php if (
-            $usuarioLogueado
-            && $rolUsuario === 'inspector'
-        ): ?>
-
-            <div
-                class="menu-navegacion__grupo"
-            >
-
-                <span
-                    class="menu-navegacion__titulo"
-                >
-                    Gestión
-                </span>
-
-
-                <!--
-                 * Ruta planificada.
-                 * Permitirá buscar ciudadanos
-                 * y consultar su documentación
-                 * y carnet.
-                 -->
-                <a
-                    href="<?= menuUrl('/inspector/ciudadanos'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        person_search
-                    </span>
-
-                    <span>
-                        Búsqueda de Ciudadanos
-                    </span>
-
-                </a>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!--
-        ==================================================
-        NAVEGACIÓN ADMINISTRADOR
-        ==================================================
-        -->
-
-        <?php if (
-            $usuarioLogueado
-            && $rolUsuario === 'admin'
-        ): ?>
-
-            <div
-                class="menu-navegacion__grupo"
-            >
-
-                <span
-                    class="menu-navegacion__titulo"
-                >
-                    Administración
-                </span>
-
-
-                <a
-                    href="<?= menuUrl('/'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        home
-                    </span>
-
-                    <span>
-                        Inicio
-                    </span>
-
-                </a>
-
-
-                <!--
-                 * Ruta planificada.
-                 -->
-                <a
-                    href="<?= menuUrl('/admin/usuarios'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        group
-                    </span>
-
-                    <span>
-                        Ciudadanos
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="<?= menuUrl('/admin/documentos'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/admin/documentos')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        description
-                    </span>
-
-                    <span>
-                        Documentación
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="<?= menuUrl('/admin/examenes'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/admin/examenes')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        assignment
-                    </span>
-
-                    <span>
-                        Exámenes
-                    </span>
-
-                </a>
-
-
-                <a
-                    href="<?= menuUrl('/admin/carnets'); ?>"
-                    class="
-                        menu-navegacion__enlace
-                        <?= menuRutaActiva('/admin/carnets')
-                            ? 'menu-navegacion__enlace--activo'
-                            : '' ?>
-                    "
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        badge
-                    </span>
-
-                    <span>
-                        Carnets
-                    </span>
-
-                </a>
-
-
-                <!--
-                 * Ruta planificada.
-                 -->
-                <a
-                    href="<?= menuUrl('/admin/actividad'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        history
-                    </span>
-
-                    <span>
-                        Actividad Reciente
-                    </span>
-
-                </a>
-
-
-                <!--
-                 * Ruta planificada.
-                 -->
-                <a
-                    href="<?= menuUrl('/admin/reportes'); ?>"
-                    class="menu-navegacion__enlace"
-                >
-
-                    <span
-                        class="material-symbols-outlined"
-                        aria-hidden="true"
-                    >
-                        analytics
-                    </span>
-
-                    <span>
-                        Reportes
-                    </span>
-
-                </a>
-
-            </div>
-
-        <?php endif; ?>
-
-
-        <!--
-        ==================================================
-        CERRAR SESIÓN — MOBILE
-        ==================================================
-        -->
-
-        <?php if ($usuarioLogueado): ?>
-
-            <div
-                class="menu-navegacion__separador"
-            ></div>
-
-
-            <a
-                href="<?= menuUrl('/logout'); ?>"
-                class="
-                    menu-navegacion__enlace
-                    menu-navegacion__enlace--salir
-                    menu-navegacion__solo-mobile
-                "
+            <button
+                type="button"
+                class="menu-navegacion__cerrar"
+                data-menu-cerrar
+                aria-label="Cerrar menú"
             >
 
                 <span
                     class="material-symbols-outlined"
                     aria-hidden="true"
                 >
-                    logout
+                    close
                 </span>
 
-                <span>
-                    Cerrar sesión
-                </span>
+            </button>
 
-            </a>
+        </header>
 
-        <?php endif; ?>
 
-    </div>
+        <nav class="menu-navegacion__contenido">
 
-</nav>
+
+            <?php if ($usuarioLogueado): ?>
+
+
+                <?php if ($rolPrincipal === 'usuario'): ?>
+
+                    <!-- =================================================
+                         CIUDADANO
+                         ================================================= -->
+                    <div class="menu-navegacion__grupo">
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl(''),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                home
+                            </span>
+
+                            <span>
+                                Inicio
+                            </span>
+
+                        </a>
+
+                    </div>
+                    <div class="menu-navegacion__grupo">
+
+                        <p class="menu-navegacion__grupo-titulo">
+                            Mi cuenta
+                        </p>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('perfil'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/perfil')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                person
+                            </span>
+
+                            <span>
+                                Mi perfil
+                            </span>
+
+                        </a>
+
+                    </div>
+
+
+                    <div class="menu-navegacion__grupo">
+
+                        <p class="menu-navegacion__grupo-titulo">
+                            Mi trámite
+                        </p>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('documentacion'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/documentacion')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                description
+                            </span>
+
+                            <span>
+                                Documentación
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('', 'cursos-disponibles'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                school
+                            </span>
+
+                            <span>
+                                Inscripciones
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('', 'proximos-examenes'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                assignment
+                            </span>
+
+                            <span>
+                                Exámenes
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('', 'carnet-vigente'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                badge
+                            </span>
+
+                            <span>
+                                Mi carnet
+                            </span>
+
+                        </a>
+
+                    </div>
+
+
+                <?php elseif ($rolPrincipal === 'inspector'): ?>
+
+                    <!-- =================================================
+                         INSPECTOR
+                         ================================================= -->
+
+                    <div class="menu-navegacion__grupo">
+
+                        <p class="menu-navegacion__grupo-titulo">
+                            Inspección
+                        </p>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('consulta-publica'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/consulta-publica')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                fact_check
+                            </span>
+
+                            <span>
+                                Consulta pública
+                            </span>
+
+                        </a>
+
+                    </div>
+
+
+                <?php elseif ($rolPrincipal === 'admin'): ?>
+
+                    <!-- =================================================
+                         ADMINISTRADOR
+                         ================================================= -->
+
+                    <div class="menu-navegacion__grupo">
+
+                        <p class="menu-navegacion__grupo-titulo">
+                            Administración
+                        </p>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                dashboard
+                            </span>
+
+                            <span>
+                                Inicio
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin/documentos'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/documentos')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                description
+                            </span>
+
+                            <span>
+                                Documentación
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin/examenes'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/examenes')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                assignment
+                            </span>
+
+                            <span>
+                                Exámenes
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin/carnets'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/carnets')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                badge
+                            </span>
+
+                            <span>
+                                Carnets
+                            </span>
+
+                        </a>
+
+
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin/actividad'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/actividad')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                history
+                            </span>
+
+                            <span>
+                                Actividad
+                            </span>
+
+                        </a>
+
+                    </div>
+
+                <?php endif; ?>
+
+
+                <!-- =====================================================
+                     SESIÓN
+                     ===================================================== -->
+
+                <div class="menu-navegacion__grupo menu-navegacion__grupo--sesion">
+
+                    <a
+                        href="<?= htmlspecialchars(
+                            $menuUrl('logout'),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>"
+                        class="menu-navegacion__enlace menu-navegacion__enlace--logout"
+                    >
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            logout
+                        </span>
+
+                        <span>
+                            Cerrar sesión
+                        </span>
+
+                    </a>
+
+                </div>
+
+
+            <?php else: ?>
+
+                <!-- =====================================================
+                     USUARIO NO AUTENTICADO
+                     ===================================================== -->
+
+                <div class="menu-navegacion__grupo">
+
+                    <p class="menu-navegacion__grupo-titulo">
+                        Cuenta
+                    </p>
+
+
+                    <a
+                        href="<?= htmlspecialchars(
+                            $menuUrl('login'),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>"
+                        class="menu-navegacion__enlace"
+                    >
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            login
+                        </span>
+
+                        <span>
+                            Iniciar sesión
+                        </span>
+
+                    </a>
+
+
+                    <a
+                        href="<?= htmlspecialchars(
+                            $menuUrl('registro'),
+                            ENT_QUOTES,
+                            'UTF-8'
+                        ) ?>"
+                        class="menu-navegacion__enlace"
+                    >
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            person_add
+                        </span>
+
+                        <span>
+                            Registrarme
+                        </span>
+
+                    </a>
+
+                </div>
+
+            <?php endif; ?>
+
+
+        </nav>
+
+    </aside>
+
+</div>

@@ -16,7 +16,7 @@ $currentRoute = match ($currentFile) {
    'inscripcion_examen.php',
    'usuario_aprobado.php',
    'usuario_rechazado.php' => 'servicios',
-   'subida_documentacion.php' => 'contactos',
+   'documentacion.php' => 'contactos',
    default => 'inicio',
 };
 

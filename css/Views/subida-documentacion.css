@@ -1,5 +1,253 @@
+/* =========================================================
+   SUBIDA DE DOCUMENTACIÓN
+   ========================================================= */
+
+.subida-documentacion {
+    display: grid;
+    gap: 18px;
+}
+
+/* =========================================================
+   HERO
+   ========================================================= */
+
+.subida-documentacion__hero {
+    display: grid;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.subida-documentacion__hero-texto {
+    margin: 0;
+    max-width: 34ch;
+}
+
+/* =========================================================
+   INFORMACIÓN
+   ========================================================= */
+
+.subida-documentacion__info {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+}
+
+.subida-documentacion__info-icono {
+    flex: 0 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--gov-primary-800);
+    font-size: 21px;
+}
+
+.subida-documentacion__info-contenido {
+    display: grid;
+    gap: 4px;
+    flex: 1;
+    min-width: 0;
+}
+
+.subida-documentacion__info-titulo {
+    margin: 0;
+    color: var(--gov-primary-800);
+    font-size: 1rem;
+    font-weight: 700;
+}
+
+.subida-documentacion__info-texto {
+    margin: 0;
+    color: var(--gov-text-soft);
+    font-size: 0.96rem;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   PROGRESO
+   ========================================================= */
+
+.subida-documentacion__progreso {
+    display: grid;
+    gap: 8px;
+    padding: 16px;
+}
+
+.subida-documentacion__progreso-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+}
+
+.subida-documentacion__progreso-label {
+    margin: 0;
+    color: var(--gov-text);
+    font-size: 0.9rem;
+    font-weight: 700;
+}
+
+.subida-documentacion__progreso-porcentaje {
+    color: var(--gov-primary-800);
+    font-size: 0.9rem;
+    font-weight: 800;
+}
+
+.subida-documentacion__progreso-barra {
+    width: 100%;
+    height: 9px;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--gov-border);
+}
+
+.subida-documentacion__progreso-fill {
+    height: 100%;
+    width: 0;
+    border-radius: inherit;
+    background: linear-gradient(
+        90deg,
+        var(--gov-primary-700),
+        var(--gov-primary-500)
+    );
+    transition: width 180ms ease;
+}
+
+.subida-documentacion__progreso--0
+.subida-documentacion__progreso-fill {
+    width: 0%;
+}
+
+.subida-documentacion__progreso--33
+.subida-documentacion__progreso-fill {
+    width: 33.33%;
+}
+
+.subida-documentacion__progreso--66
+.subida-documentacion__progreso-fill {
+    width: 66.66%;
+}
+
+.subida-documentacion__progreso--100
+.subida-documentacion__progreso-fill {
+    width: 100%;
+}
+
+.subida-documentacion__progreso-texto {
+    margin: 0;
+    color: var(--gov-text-soft);
+    font-size: 0.82rem;
+}
+
+/* =========================================================
+   DOCUMENTOS
+   ========================================================= */
+
+.subida-documentacion__documentos {
+    display: grid;
+    gap: 12px;
+}
+
+.subida-documentacion__documentos-titulo {
+    margin: 4px 0 0;
+    color: var(--gov-text);
+    font-size: 1.06rem;
+    font-weight: 700;
+}
+
+/* =========================================================
+   TARJETA DE DOCUMENTO
+   ========================================================= */
+
+.documento-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    padding: 20px;
+}
+
+.documento-card__header {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+}
+
+.documento-card__icono {
+    width: 42px;
+    height: 42px;
+    border-radius: 12px;
+    background: #e9f2fb;
+    color: var(--gov-primary-800);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex: 0 0 auto;
+}
+
 .documento-card__icono-simbolo {
     font-size: 22px;
+}
+
+.documento-card__contenido {
+    display: grid;
+    gap: 4px;
+    min-width: 0;
+    flex: 1;
+}
+
+.documento-card__titulo {
+    margin: 0;
+    color: var(--gov-text);
+    font-size: 1.08rem;
+    font-weight: 700;
+    line-height: 1.25;
+}
+
+.documento-card__descripcion {
+    margin: 0;
+    color: var(--gov-text-soft);
+    font-size: 0.95rem;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   ARCHIVO
+   ========================================================= */
+
+.documento-card__archivo {
+    margin: 4px 0 0;
+    color: var(--gov-primary-800);
+    font-size: 0.82rem;
+    word-break: break-word;
+}
+
+.documento-card__archivo-enlace {
+    color: inherit;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.documento-card__archivo-enlace:hover {
+    text-decoration: underline;
+}
+
+.documento-card__observacion {
+    margin: 6px 0 0;
+    color: #b42318;
+    font-size: 0.85rem;
+    line-height: 1.4;
+}
+
+/* =========================================================
+   PIE DE TARJETA
+   ========================================================= */
+
+.documento-card__footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
 }
 
 .documento-card__estado {
@@ -10,14 +258,93 @@
     font-size: 18px;
 }
 
-.documento-card__archivo-input {
-    display: none !important;
-}
-
 .documento-card__form {
     margin: 0;
+    display: flex;
+    align-items: center;
+}
+
+.documento-card__archivo-input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
 }
 
 .documento-card__boton {
-    cursor: pointer;
+    width: auto !important;
+    min-width: 220px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 14px;
+    font-size: 0.86rem;
+}
+
+.documento-card__boton:disabled {
+    cursor: default;
+    opacity: 0.7;
+}
+
+/* =========================================================
+   FOOTER DE LA VISTA
+   ========================================================= */
+
+.subida-documentacion__footer {
+    padding-bottom: 10px;
+    display: grid;
+    gap: 12px;
+}
+
+.subida-documentacion__footer-nota {
+    margin: 0;
+    text-align: center;
+    color: #6a778a;
+    font-size: 0.84rem;
+    line-height: 1.45;
+}
+
+/* =========================================================
+   RESPONSIVE
+   ========================================================= */
+
+@media (max-width: 767.98px) {
+
+    .subida-documentacion__info {
+        align-items: flex-start;
+    }
+
+    .documento-card {
+        padding: 18px;
+    }
+
+    .documento-card__header {
+        align-items: flex-start;
+    }
+
+    .documento-card__icono {
+        width: 40px;
+        height: 40px;
+    }
+
+    .documento-card__titulo {
+        font-size: 1rem;
+    }
+
+    .documento-card__footer {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .documento-card__form {
+        width: 100%;
+    }
+
+    .documento-card__boton {
+        width: 100% !important;
+    }
 }

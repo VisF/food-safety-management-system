@@ -1,149 +1,152 @@
 <?php
+
 declare(strict_types=1);
+
 /**
  * Vista: detalle_examen.php
- * Propósito: Mostrar información de un examen y opciones para inscribirse.
- * Estructura esperada para `exam`:
- *  - nombre:string, fecha:string, lugar:string, id:int
- * Flujo técnico:
- *  - El enlace de inscripción apunta a `/manipulacionDeAlimentos/confirmar_inscripcion_examen&data=`; el controlador debe validar cupos y permisos.
- * Seguridad:
- *  - No confiar en datos de disponibilidad enviados por el cliente; siempre validar en servidor.
+ *
+ * Propósito:
+ * Mostrar al ciudadano la información de un examen
+ * y permitirle iniciar el proceso de inscripción.
+ *
+ * Responsabilidades:
+ * - Mostrar datos preparados por el Service.
+ * - Generar rutas mediante BaseVista.
+ * - Escapar valores dinámicos.
+ *
+ * No realiza:
+ * - Validaciones de negocio.
+ * - Consultas a base de datos.
+ * - Lectura de $_GET['data'].
  */
 
 require_once __DIR__ . '/BaseVista.php';
 
 class DetalleExamenVista extends BaseVista
 {
-    public static function mostrar(): void
+    public function mostrar(array $data = []): void
     {
-        $defaults = [
-            'title' => 'Detalle del examen',
-            'exam' => []
-        ];
-        $data = $defaults;
-        // Decodifica y fusiona `data` (JSON) pasada por GET; no usar para decisiones de negocio sin verificación.
-        if (isset($_GET['data'])) {
-            $incoming = json_decode($_GET['data'], true);
-            if (is_array($incoming)) $data = array_replace_recursive($defaults, $incoming);
+        if (empty($data)) {
+            $data = [
+                'page_title' => 'Detalle del examen',
+                'examen' => [
+                    'id' => 0,
+                    'nombre' => 'Examen de Manipulación de Alimentos',
+                    'fecha' => '',
+                    'hora' => '',
+                    'lugar' => '',
+                    'cupos' => 0,
+                    'estado' => ''
+                ]
+            ];
         }
+
+        $examen = $data['examen'] ?? [];
+
         include __DIR__ . '/header.php';
         ?>
+
+        <link
+            rel="stylesheet"
+            href="<?= $this->baseURL; ?>css/Views/detalle-examen.css"
+        >
+
         <main class="contenido-principal contenido-principal--ancho">
 
-            <div class="w-full max-w-4xl mx-auto space-y-6">
+            <div class="detalle-examen">
 
-                <section class="space-y-1">
-                    <p class="text-sm text-on-surface-variant">
+                <section class="detalle-examen__intro">
+
+                    <p class="detalle-examen__eyebrow">
                         Próximo examen
                     </p>
 
-                    <h1 class="font-headline-lg text-headline-lg text-primary">
-                        <?php echo htmlspecialchars($data['exam']['nombre'] ?? 'Examen'); ?>
+                    <h1 class="font-headline-lg text-primary">
+                        <?= $this->e(
+                            $examen['nombre']
+                            ?? 'Examen de Manipulación de Alimentos'
+                        ); ?>
                     </h1>
+
                 </section>
 
-                <section
-                    class="app-vista-card overflow-hidden relative"
-                    style="
-                        background: linear-gradient(
-                            135deg,
-                            #005596 0%,
-                            #3a5f94 100%
-                        );
-                        background-size: cover;
-                        background-position: center;
-                        min-height: 128px;
-                    "
-                >
 
-                    <div
-                        style="
-                            position:relative;
-                            z-index:1;
-                            padding:1rem 1.25rem;
-                            min-height:130px;
-                            color:white;
-                        "
-                    >
+                <section class="app-vista-card detalle-examen__hero">
 
-                        <div
-                            style="
-                                display:grid;
-                                grid-template-columns:1fr auto;
-                                gap:20px;
-                                align-items:center;
-                            "
-                        >
+                    <div class="detalle-examen__hero-contenido">
 
-                            <div>
+                        <div class="detalle-examen__principal">
 
-                                <div
-                                    style="
-                                        display:inline-block;
-                                        background:rgba(255,255,255,.15);
-                                        border-radius:999px;
-                                        padding:.4rem .8rem;
-                                        font-size:.75rem;
-                                        font-weight:600;
-                                        margin-bottom:.75rem;
-                                    "
+                            <span class="detalle-examen__estado">
+                                <?= $this->e(
+                                    $examen['estado'] ?? ''
+                                ); ?>
+                            </span>
+
+                            <h2 class="detalle-examen__nombre">
+                                <?= $this->e(
+                                    $examen['nombre']
+                                    ?? 'Examen de Manipulación de Alimentos'
+                                ); ?>
+                            </h2>
+
+                            <p class="detalle-examen__lugar">
+
+                                <span
+                                    class="material-symbols-outlined"
+                                    aria-hidden="true"
                                 >
-                                    <?php echo htmlspecialchars($data['exam']['estado'] ?? ''); ?>
-                                </div>
+                                    location_on
+                                </span>
 
-                                <h2
-                                    style="
-                                        margin:0;
-                                        font-size:2rem;
-                                        font-weight:700;
-                                        line-height:1;
-                                    "
-                                >
-                                    <?php echo htmlspecialchars($data['exam']['nombre'] ?? ''); ?>
-                                </h2>
+                                <span>
+                                    <?= $this->e(
+                                        $examen['lugar'] ?? ''
+                                    ); ?>
+                                </span>
 
-                                <div
-                                    style="
-                                        margin-top:.5rem;
-                                        font-size:1rem;
-                                    "
+                            </p>
+
+                        </div>
+
+
+                        <div class="detalle-examen__fecha">
+
+                            <div class="detalle-examen__fecha-valor">
+                                <?= $this->e(
+                                    $examen['fecha'] ?? ''
+                                ); ?>
+                            </div>
+
+                            <div class="detalle-examen__hora">
+
+                                <span
+                                    class="material-symbols-outlined"
+                                    aria-hidden="true"
                                 >
-                                    <?php echo htmlspecialchars($data['exam']['lugar'] ?? ''); ?>
-                                </div>
+                                    schedule
+                                </span>
+
+                                <?= $this->e(
+                                    $examen['hora'] ?? ''
+                                ); ?>
+                                hs
 
                             </div>
 
-                            <div style="text-align:right; min-width:120px;">
+                            <div class="detalle-examen__cupos">
 
-                                <div
-                                    style="
-                                        font-size:1.5rem;
-                                        font-weight:700;
-                                        line-height:1.2;
-                                    "
+                                <span
+                                    class="material-symbols-outlined"
+                                    aria-hidden="true"
                                 >
-                                    <?php echo htmlspecialchars($data['exam']['fecha'] ?? ''); ?>
-                                </div>
+                                    groups
+                                </span>
 
-                                <div
-                                    style="
-                                        margin-top:.75rem;
-                                        font-size:1.1rem;
-                                        font-weight:600;
-                                    "
-                                >
-                                    <?php echo htmlspecialchars($data['exam']['hora'] ?? ''); ?> hs
-                                </div>
-
-                                <div
-                                    style="
-                                        margin-top:.25rem;
-                                        font-size:.95rem;
-                                    "
-                                >
-                                    Cupos: <?php echo htmlspecialchars((string)($data['exam']['cupos'] ?? '0')); ?>
-                                </div>
+                                Cupos disponibles:
+                                <?= $this->e(
+                                    (string)($examen['cupos'] ?? 0)
+                                ); ?>
 
                             </div>
 
@@ -153,34 +156,104 @@ class DetalleExamenVista extends BaseVista
 
                 </section>
 
-                <section class="app-vista-card">
 
-                    <h3 class="font-semibold text-lg mb-4">
+                <section class="app-vista-card detalle-examen__informacion">
+
+                    <h2 class="detalle-examen__informacion-titulo">
                         Información importante
-                    </h3>
+                    </h2>
 
-                    <ul class="space-y-2 text-on-surface-variant text-sm">
-                        <li>• Presentarse 15 minutos antes del horario indicado.</li>
-                        <li>• Llevar DNI físico.</li>
-                        <li>• La inscripción será validada por el sistema.</li>
-                        <li>• Los cupos son limitados.</li>
+                    <ul class="detalle-examen__lista">
+
+                        <li>
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                schedule
+                            </span>
+
+                            Presentarse 15 minutos antes del horario indicado.
+                        </li>
+
+                        <li>
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                badge
+                            </span>
+
+                            Llevar DNI físico.
+                        </li>
+
+                        <li>
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                verified
+                            </span>
+
+                            La inscripción será validada por el sistema.
+                        </li>
+
+                        <li>
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                groups
+                            </span>
+
+                            Los cupos son limitados.
+                        </li>
+
                     </ul>
 
                 </section>
 
-                <div class="space-y-3">
+
+                <div class="detalle-examen__acciones">
+
+                    <form
+                        action="<?= $this->getRoute('confirmar_inscripcion'); ?>"
+                        method="post"
+                        class="detalle-examen__form-inscripcion"
+                    >
+                    <?= $this->getCsrfInput() ?>
+                        <input
+                            type="hidden"
+                            name="id_examen"
+                            value="<?= (int)($examen['id'] ?? 0); ?>"
+                        >
+
+                        <button
+                            type="submit"
+                            class="app-vista-button app-vista-button--primary"
+                        >
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                how_to_reg
+                            </span>
+
+                            Inscribirme al examen
+                        </button>
+                    </form>
 
                     <a
-                        href="/manipulacionDeAlimentos/confirmar_inscripcion_examen?id=<?= (int)$data['exam']['id'] ?>"
-                        class="app-vista-button app-vista-button--primary w-full text-center"
+                        href="<?= $this->getRoute('inicio'); ?>"
+                        class="app-vista-button app-vista-button--secondary"
                     >
-                        Inscribirme al examen
-                    </a>
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            arrow_back
+                        </span>
 
-                    <a
-                        href="/manipulacionDeAlimentos/"
-                        class="app-vista-button app-vista-button--secondary w-full text-center"
-                    >
                         Volver
                     </a>
 
@@ -189,9 +262,9 @@ class DetalleExamenVista extends BaseVista
             </div>
 
         </main>
+
         <?php
-        include __DIR__ . '/footer.php';
+
+        $this->getFooter();
     }
 }
-
-

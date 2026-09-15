@@ -1,0 +1,31 @@
+# Variables de entorno
+.env
+config/.env
+
+# Logs
+logs/
+*.log
+
+# Archivos subidos por usuarios
+uploads/
+
+# Entorno virtual Python
+.venv/
+venv/
+env/
+
+# IDEs
+.vscode/
+.idea/
+*.iml
+
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Archivos temporales
+*.tmp
+*.temp
+*.bak
+*.swp

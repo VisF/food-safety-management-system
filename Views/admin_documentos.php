@@ -394,6 +394,7 @@ include __DIR__ .
                 method="GET"
                 class="admin-documentos-search-form"
             >
+            <?= $this->getCsrfInput() ?>
 
                 <div
                     class="admin-documentos-search-field"
@@ -918,6 +919,7 @@ include __DIR__ .
                             ?>"
                             method="POST"
                         >
+                        <?= $this->getCsrfInput() ?>
 
                             <button
                                 type="submit"
@@ -993,6 +995,7 @@ include __DIR__ .
                             ?>"
                             method="POST"
                         >
+                        <?= $this->getCsrfInput() ?>
 
                             <label
                                 for="observaciones-<?php
@@ -1657,6 +1660,7 @@ include __DIR__ .
                                     ?>"
                                     method="POST"
                                 >
+                                <?= $this->getCsrfInput() ?>
 
                                     <button
                                         type="submit"
@@ -1733,6 +1737,7 @@ include __DIR__ .
                                     ?>"
                                     method="POST"
                                 >
+                                <?= $this->getCsrfInput() ?>
 
                                     <label
                                         for="observaciones-listado-<?php

@@ -203,7 +203,7 @@ include __DIR__ . '/header.php';
             ); ?>"
             method="post"
             class="space-y-8">
-
+            <?= $this->getCsrfInput() ?>
             <section class="app-vista-card">
 
                 <h3 class="font-title-lg mb-6">
@@ -658,6 +658,7 @@ include __DIR__ . '/header.php';
                         );
                     ?>"
                 >
+                <?= $this->getCsrfInput() ?>
 
                     <button
                         type="submit"

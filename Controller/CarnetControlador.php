@@ -1,16 +1,10 @@
 <?php
+
 declare(strict_types=1);
-
-
-/**
- * CarnetControlador - Controlador del sistema.
- *
- * Define la l?gica principal del m?dulo y sus operaciones p?blicas.
- */
 
 /**
  * CarnetControlador
- * Gestión de emisión, consulta y anulación de carnets.
+ * Gestión de funcionalidades del carnet para el ciudadano.
  */
 
 class CarnetControlador
@@ -20,7 +14,6 @@ class CarnetControlador
     private const LOG_FILE =
         __DIR__ . '/../logs/carnet_controller.log';
 
-    // Inicializa las dependencias de la clase.
     public function __construct()
     {
         require_once __DIR__ . '/../db/Connection.php';
@@ -28,33 +21,29 @@ class CarnetControlador
 
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
-        $this->carnetService =
-            new CarnetService();
+        $this->carnetService = new CarnetService();
     }
 
-    // Registra log.
     private function registrarLog(
         string $evento,
         array $datos = []
-    ): void
-    {
+    ): void {
         $timestamp = date('Y-m-d H:i:s');
 
         $usuario =
-            $_SESSION['user_id']
+            $_SESSION['usuario_id']
             ?? 'anonimo';
 
-        $mensaje =
-            sprintf(
-                "[%s] Usuario: %s | Evento: %s | Datos: %s\n",
-                $timestamp,
-                $usuario,
-                $evento,
-                json_encode(
-                    $datos,
-                    JSON_UNESCAPED_UNICODE
-                )
-            );
+        $mensaje = sprintf(
+            "[%s] Usuario: %s | Evento: %s | Datos: %s\n",
+            $timestamp,
+            $usuario,
+            $evento,
+            json_encode(
+                $datos,
+                JSON_UNESCAPED_UNICODE
+            )
+        );
 
         @file_put_contents(
             self::LOG_FILE,
@@ -64,176 +53,17 @@ class CarnetControlador
     }
 
     /**
-     * Emitir carnet
-     */
-    public function emitirCarnet(
-        int $idInscripcion
-    ): array
-    {
-        try {
-
-            $resultado =
-                $this->carnetService
-                    ->emitirCarnet(
-                        $idInscripcion
-                    );
-
-            $this->registrarLog(
-                'CARNET_EMITIDO',
-                [
-                    'id_inscripcion' =>
-                        $idInscripcion,
-                    'resultado' =>
-                        $resultado
-                ]
-            );
-
-            return $resultado;
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_EMITIR_CARNET',
-                [
-                    'id_inscripcion' =>
-                        $idInscripcion,
-                    'error' =>
-                        $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'mensaje' =>
-                    $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Obtener carnet por inscripción
-     */
-    public function obtenerCarnetPorInscripcion(int $idInscripcion): ?array
-    {
-        try {
-
-            return $this->carnetService
-                ->obtenerPorInscripcionId(
-                    $idInscripcion
-                );
-
-        } catch (Throwable $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_CARNET',
-                [
-                    'id_inscripcion' => $idInscripcion,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return null;
-        }
-    }
-
-    /**
-     * Obtener carnet por número
-     */
-    public function obtenerPorNumero(string $numeroCarnet): ?array
-    {
-        try {
-
-            return $this->carnetService
-                ->obtenerPorNumero(
-                    $numeroCarnet
-                );
-
-        } catch (Throwable $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_CARNET_NUMERO',
-                [
-                    'numero_carnet' => $numeroCarnet,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return null;
-        }
-    }
-
-    /**
-     * Anular carnet
-     */
-    public function anularCarnet(int $idCarnet): array
-    {
-        try {
-
-            $resultado = $this->carnetService
-                ->anularCarnet($idCarnet);
-
-            $this->registrarLog(
-                'CARNET_ANULADO',
-                [
-                    'id_carnet' => $idCarnet
-                ]
-            );
-
-            return $resultado;
-
-        } catch (Throwable $e) {
-
-            $this->registrarLog(
-                'ERROR_ANULAR_CARNET',
-                [
-                    'id_carnet' => $idCarnet,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'mensaje' => $e->getMessage()
-            ];
-        }
-    }
-
-    /**
-     * Listar carnets activos
-     */
-    public function listarActivos(): array
-    {
-        try {
-
-            return $this->carnetService
-                ->listarActivos();
-
-        } catch (Throwable $e) {
-
-            $this->registrarLog(
-                'ERROR_LISTAR_CARNETS',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [];
-        }
-    }
-
-    /**
      * Descarga el carnet del usuario autenticado.
      */
     public function descargarCarnet(): void
     {
         $usuarioId =
-            (int)(
+            (int) (
                 $_SESSION['usuario_id']
                 ?? 0
             );
 
         if ($usuarioId <= 0) {
-
             http_response_code(403);
 
             exit(
@@ -242,7 +72,6 @@ class CarnetControlador
         }
 
         try {
-
             $carnet =
                 $this->carnetService
                     ->obtenerUltimoCarnetUsuario(
@@ -254,7 +83,6 @@ class CarnetControlador
                 ||
                 empty($carnet['ruta_pdf'])
             ) {
-
                 http_response_code(404);
 
                 exit(
@@ -264,19 +92,21 @@ class CarnetControlador
 
             $rutaRelativa =
                 ltrim(
-                    (string)$carnet['ruta_pdf'],
+                    (string) $carnet['ruta_pdf'],
                     '/\\'
                 );
 
             $rutaArchivo =
                 realpath(
-                    __DIR__ . '/../' .
+                    __DIR__ .
+                    '/../' .
                     $rutaRelativa
                 );
 
             $directorioCarnets =
                 realpath(
-                    __DIR__ . '/../uploads/carnets'
+                    __DIR__ .
+                    '/../uploads/carnets'
                 );
 
             if (
@@ -286,14 +116,14 @@ class CarnetControlador
                 ||
                 strpos(
                     $rutaArchivo,
-                    $directorioCarnets . DIRECTORY_SEPARATOR
+                    $directorioCarnets .
+                    DIRECTORY_SEPARATOR
                 ) !== 0
                 ||
                 !is_file($rutaArchivo)
                 ||
                 !is_readable($rutaArchivo)
             ) {
-
                 $this->registrarLog(
                     'PDF_CARNET_NO_DISPONIBLE',
                     [
@@ -316,7 +146,7 @@ class CarnetControlador
                 preg_replace(
                     '/[^a-zA-Z0-9_-]/',
                     '_',
-                    (string)(
+                    (string) (
                         $carnet['numero_carnet']
                         ?? $carnet['id']
                     )
@@ -360,14 +190,10 @@ class CarnetControlador
                 'Expires: 0'
             );
 
-            readfile(
-                $rutaArchivo
-            );
+            readfile($rutaArchivo);
 
             exit;
-
         } catch (Throwable $e) {
-
             $this->registrarLog(
                 'ERROR_DESCARGAR_CARNET',
                 [

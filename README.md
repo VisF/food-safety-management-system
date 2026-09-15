@@ -164,7 +164,6 @@ food-safety-management-system/
 ├── .htaccess            # Apache configuration
 ├── index.php            # Application entry point
 ├── AltoRouter.php       # Routing library
-└── Router.php           # Application router
 ```
 
 ## Technology Stack

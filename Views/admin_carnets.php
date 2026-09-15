@@ -328,7 +328,9 @@ include __DIR__ .
                 ); ?>"
                 enctype="multipart/form-data"
                 class="admin-carnets__form"
-            >
+            >   
+
+            <?= $this->getCsrfInput() ?>
 
                 <div class="admin-carnets__form-grid">
 

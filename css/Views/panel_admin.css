@@ -1,0 +1,432 @@
+/* =========================================================
+   PANEL ADMINISTRATIVO
+   ========================================================= */
+
+.panel-admin {
+    width: 100%;
+    max-width: 1180px;
+    margin: 0 auto;
+    padding: 2rem 0 3rem;
+}
+
+
+/* =========================================================
+   CABECERA
+   ========================================================= */
+
+.panel-admin__cabecera {
+    margin-bottom: 2rem;
+}
+
+.panel-admin__etiqueta {
+    margin: 0 0 0.35rem;
+    color: var(--on-surface-variant, #666);
+    font-size: 0.82rem;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+}
+
+.panel-admin__titulo {
+    margin: 0;
+    color: var(--primary, #1a73e8);
+    font-size: clamp(1.7rem, 4vw, 2.35rem);
+    line-height: 1.15;
+    font-weight: 700;
+}
+
+.panel-admin__descripcion {
+    max-width: 700px;
+    margin: 0.5rem 0 0;
+    color: var(--on-surface-variant, #666);
+    font-size: 0.95rem;
+    line-height: 1.5;
+}
+
+
+/* =========================================================
+   ESTADÍSTICAS
+   ========================================================= */
+
+.panel-admin__estadisticas {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.panel-admin-stat {
+    min-width: 0;
+    padding: 1.25rem;
+    border: 1px solid var(--outline-variant, #ddd);
+    border-radius: 14px;
+    background: var(--surface, #fff);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+}
+
+.panel-admin-stat__etiqueta {
+    margin: 0 0 0.8rem;
+    color: var(--on-surface-variant, #666);
+    font-size: 0.76rem;
+    font-weight: 700;
+    letter-spacing: 0.035em;
+}
+
+.panel-admin-stat__fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+}
+
+.panel-admin-stat__numero {
+    color: var(--on-surface, #222);
+    font-size: clamp(1.6rem, 3vw, 2rem);
+    line-height: 1;
+    font-weight: 700;
+}
+
+.panel-admin-stat__icono {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    border-radius: 10px;
+    font-size: 23px;
+}
+
+.panel-admin-stat--primary .panel-admin-stat__icono {
+    background: var(--primary-container, #e8f0fe);
+    color: var(--primary, #1a73e8);
+}
+
+.panel-admin-stat--secondary .panel-admin-stat__icono {
+    background: var(--secondary-container, #eee8f7);
+    color: var(--secondary, #675080);
+}
+
+.panel-admin-stat--success .panel-admin-stat__icono {
+    background: #eaf7ee;
+    color: #216e39;
+}
+
+.panel-admin-stat--danger .panel-admin-stat__icono {
+    background: #fdecec;
+    color: #a52828;
+}
+
+
+/* =========================================================
+   SECCIONES
+   ========================================================= */
+
+.panel-admin__seccion {
+    margin-bottom: 1.5rem;
+}
+
+.panel-admin__seccion-cabecera {
+    margin-bottom: 1rem;
+}
+
+.panel-admin__seccion-titulo {
+    margin: 0;
+    color: var(--on-surface, #222);
+    font-size: 1.25rem;
+    line-height: 1.3;
+    font-weight: 700;
+}
+
+.panel-admin__seccion-descripcion {
+    margin: 0.35rem 0 0;
+    color: var(--on-surface-variant, #666);
+    font-size: 0.9rem;
+    line-height: 1.45;
+}
+
+
+/* =========================================================
+   ACCIONES RÁPIDAS
+   ========================================================= */
+
+.panel-admin__acciones {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0.85rem;
+}
+
+.panel-admin__accion {
+    min-height: 56px;
+    box-sizing: border-box;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.7rem;
+    padding: 0.85rem 1rem;
+    text-align: left;
+    line-height: 1.3;
+}
+
+.panel-admin__accion .material-symbols-outlined {
+    flex: 0 0 auto;
+    font-size: 21px;
+}
+
+
+/* =========================================================
+   ACTIVIDAD
+   ========================================================= */
+
+.panel-admin__actividad {
+    overflow: hidden;
+    margin-top: 1.5rem;
+    border: 1px solid var(--outline-variant, #ddd);
+    border-radius: 16px;
+    background: var(--surface, #fff);
+    box-shadow: 0 2px 8px rgb(0 0 0 / 5%);
+}
+
+.panel-admin__actividad-cabecera {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--outline-variant, #ddd);
+}
+
+.panel-admin__ver-todas {
+    flex: 0 0 auto;
+    color: var(--primary, #1a73e8);
+    font-size: 0.88rem;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.panel-admin__ver-todas:hover {
+    text-decoration: underline;
+}
+
+.panel-admin__lista {
+    width: 100%;
+}
+
+.panel-admin__actividad-fila {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--outline-variant, #eee);
+}
+
+.panel-admin__actividad-fila:last-child {
+    border-bottom: 0;
+}
+
+.panel-admin__actividad-persona {
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+}
+
+.panel-admin__avatar {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--surface-container, #f3f3f3);
+    color: var(--on-surface-variant, #666);
+}
+
+.panel-admin__avatar .material-symbols-outlined {
+    font-size: 21px;
+}
+
+.panel-admin__nombre {
+    overflow: hidden;
+    margin: 0;
+    color: var(--on-surface, #222);
+    font-size: 0.95rem;
+    font-weight: 600;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.panel-admin__dni {
+    margin: 0.2rem 0 0;
+    color: var(--on-surface-variant, #777);
+    font-size: 0.8rem;
+}
+
+.panel-admin__estado {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.3rem;
+    flex: 0 0 auto;
+}
+
+.panel-admin__estado-label {
+    color: var(--on-surface-variant, #777);
+    font-size: 0.72rem;
+}
+
+.panel-admin__estado-chip {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 28px;
+    padding: 0.25rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    white-space: nowrap;
+}
+
+.panel-admin__estado-chip--pendiente {
+    background: #fff4dc;
+    color: #8a5a00;
+}
+
+.panel-admin__estado-chip--aprobado {
+    background: #eaf7ee;
+    color: #216e39;
+}
+
+.panel-admin__estado-chip--rechazado {
+    background: #fdecec;
+    color: #a52828;
+}
+
+.panel-admin__estado-chip--inscripto-examen {
+    background: #e8f0fe;
+    color: #1a5bb8;
+}
+
+
+/* =========================================================
+   SIN ACTIVIDAD
+   ========================================================= */
+
+.panel-admin__vacio {
+    display: flex;
+    min-height: 150px;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 1.5rem;
+    color: var(--on-surface-variant, #777);
+    text-align: center;
+}
+
+.panel-admin__vacio .material-symbols-outlined {
+    font-size: 32px;
+}
+
+.panel-admin__vacio p {
+    margin: 0;
+    font-size: 0.9rem;
+}
+
+
+/* =========================================================
+   TABLET
+   ========================================================= */
+
+@media (max-width: 900px) {
+
+    .panel-admin__estadisticas {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .panel-admin__acciones {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
+
+    .panel-admin {
+        padding-top: 1.25rem;
+        padding-bottom: 2rem;
+    }
+
+    .panel-admin__estadisticas {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .panel-admin-stat {
+        padding: 1rem;
+    }
+
+    .panel-admin__acciones {
+        grid-template-columns: 1fr;
+    }
+
+    .panel-admin__accion {
+        width: 100%;
+        min-height: 52px;
+    }
+
+    .panel-admin__actividad-cabecera {
+        align-items: flex-start;
+        padding: 1rem;
+    }
+
+    .panel-admin__actividad-fila {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .panel-admin__actividad-persona {
+        width: 100%;
+    }
+
+    .panel-admin__estado {
+        width: 100%;
+        align-items: flex-start;
+    }
+
+    .panel-admin__estado-label {
+        font-size: 0.7rem;
+    }
+
+}
+
+
+/* =========================================================
+   MOBILE PEQUEÑO
+   ========================================================= */
+
+@media (max-width: 420px) {
+
+    .panel-admin__titulo {
+        font-size: 1.65rem;
+    }
+
+    .panel-admin__descripcion {
+        font-size: 0.88rem;
+    }
+
+    .panel-admin-stat__numero {
+        font-size: 1.6rem;
+    }
+
+}

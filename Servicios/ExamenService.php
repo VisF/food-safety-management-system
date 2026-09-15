@@ -100,6 +100,65 @@ class ExamenService
         return $this->examenRepository
             ->obtenerExamen($id);
     }
+    /**
+     * Obtener los datos necesarios para mostrar
+     * el detalle de un examen al ciudadano.
+     */
+    public function obtenerDetalleCiudadano(int $id): ?array
+    {
+        $examen = $this->obtenerExamen($id);
+
+        if ($examen === null) {
+            return null;
+        }
+
+        $cupos = (int)($examen['cupos'] ?? 0);
+
+        $lugar = trim(
+            (string)($examen['ubicacion'] ?? '')
+        );
+
+        $aula = trim(
+            (string)($examen['aula'] ?? '')
+        );
+
+        if ($aula !== '') {
+            $lugar .= ' - ' . $aula;
+        }
+
+        return [
+            'page_title' => 'Detalle del examen',
+
+            'examen' => [
+                'id' => (int)$examen['id'],
+
+                'nombre' =>
+                    'Examen de Manipulación de Alimentos',
+
+                'fecha' =>
+                    date(
+                        'd/m/Y',
+                        strtotime($examen['fecha'])
+                    ),
+
+                'hora' =>
+                    substr(
+                        (string)$examen['hora'],
+                        0,
+                        5
+                    ),
+
+                'lugar' => $lugar,
+
+                'cupos' => $cupos,
+
+                'estado' =>
+                    $cupos > 0
+                        ? 'CUPOS DISPONIBLES'
+                        : 'SIN CUPOS'
+            ]
+        ];
+    }
 
     /**
      * Obtener próximos exámenes.

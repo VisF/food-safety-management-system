@@ -91,7 +91,7 @@ class ConfirmarInscripcionExamenVista extends BaseVista
                             ); ?>"
                             method="post"
                         >
-
+                        <?= $this->getCsrfInput() ?>
                             <input
                                 type="hidden"
                                 name="id_examen"

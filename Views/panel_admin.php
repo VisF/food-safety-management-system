@@ -1,325 +1,541 @@
 <?php
+
+declare(strict_types=1);
+
 /**
- * Vista: panel_admin.php
- * Propósito: Panel administrativo con métricas y actividad reciente.
- * Entradas: puede recibir datos vía GET 'data' para sobreescribir valores por defecto.
- * Nota: Usar métodos `e()` para escapar salida al renderizar nombres/valores.
+ * Vista: Panel administrativo.
+ *
+ * Los datos son preparados por AdminDashboardControlador
+ * y AdminService.
  */
 
 require_once __DIR__ . '/BaseVista.php';
 
 class PanelAdminVista extends BaseVista
 {
-    /*TODO:
-        Datos temporales para desarrollo
-        Eliminar cuando panel_admin reciba datos
-        Desde adminControlador::obtenerEstadisticas()
-    */
-    private function getDefaultData(): array
-    {
-        return [
-            'page_title' => 'Panel Administrativo - App Ciudadana',
-            'stats' => [
-                [
-                    'label' => 'TOTAL INSCRIPTOS',
-                    'value' => '1,240',
-                    'icon' => 'groups',
-                    'style' => 'primary',
-                ],
-                [
-                    'label' => 'APROBADOS',
-                    'value' => '850',
-                    'icon' => 'check_circle',
-                    'style' => 'success',
-                ],
-                [
-                    'label' => 'RECHAZADOS',
-                    'value' => '120',
-                    'icon' => 'cancel',
-                    'style' => 'danger',
-                ],
-                [
-                    'label' => 'CARNETS EMITIDOS',
-                    'value' => '730',
-                    'icon' => 'badge',
-                    'style' => 'secondary',
-                ],
-            ],
-            'activities' => [
-                [
-                    'nombre' => 'Juan Perez',
-                    'dni' => '35.849.201',
-                    'estado' => 'PENDIENTE',
-                    'estado_class' => 'pendiente',
-                ],
-                [
-                    'nombre' => 'Maria Garcia',
-                    'dni' => '27.482.910',
-                    'estado' => 'PAGADO',
-                    'estado_class' => 'pagado',
-                ],
-                [
-                    'nombre' => 'Carlos Rodriguez',
-                    'dni' => '31.902.115',
-                    'estado' => 'RECHAZADO',
-                    'estado_class' => 'rechazado',
-                ],
-            ],
-        ];
-    }
-
-    private function getHeader(array $panelAdminData): void
-    {
-        $assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\');
-        if (preg_match('#/vistas$#', $assetBase) === 1) {
-            $assetBase = (string) preg_replace('#/vistas$#', '', $assetBase);
-        }
-        if ($assetBase === '') {
-            $assetBase = '';
-        }
-        ?>
-        <!DOCTYPE html>
-        <html class="light" lang="es">
-         <head>
-          <meta charset="utf-8"/>
-          <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-          <title>
-           <?php echo $this->e($panelAdminData['page_title']); ?>
-          </title>
-          <script src="<?php echo $assetBase; ?>/js/tailwind-config.js">
-          </script>
-          <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
-          </script>
-          <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
-          <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&amp;display=swap" rel="stylesheet"/>
-          <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/base.css" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/components.css" rel="stylesheet"/>
-          <link href="<?php echo $assetBase; ?>/css/ui.css" rel="stylesheet"/>
-         </head>
-         <body class="bg-background text-on-surface pb-24 md:pb-0 md:pt-20 tema-ciudadano">
-        <?php $page_title = 'Panel Administrativo'; include __DIR__ . '/header.php'; ?>
-        <?php
-    }
-
-    
-    private function getIncomingData(): array
-    {
-        if (!isset($_GET['data'])) {
-            return [];
-        }
-
-        $decodedData = json_decode((string) $_GET['data'], true);
-        return is_array($decodedData) ? $decodedData : [];
-    }
-
-
-
-    private function cardStyleClass(string $style): string
+    /**
+     * Devuelve la clase visual correspondiente
+     * al estilo de una tarjeta estadística.
+     */
+    private function getStatCardClass(string $style): string
     {
         return match ($style) {
-            'success' => 'panel-admin-card--success',
-            'danger' => 'panel-admin-card--danger',
-            'secondary' => 'panel-admin-card--secondary',
-            default => 'panel-admin-card--primary',
+            'success' =>
+                'panel-admin-stat panel-admin-stat--success',
+
+            'danger' =>
+                'panel-admin-stat panel-admin-stat--danger',
+
+            'secondary' =>
+                'panel-admin-stat panel-admin-stat--secondary',
+
+            default =>
+                'panel-admin-stat panel-admin-stat--primary',
         };
     }
 
-    private function activityLink(): string
-    {
-        return $this->getRoute('actividad_reciente');
-    }
-
-    
+    /**
+     * Renderiza el dashboard administrativo.
+     */
     public function mostrar(array $panelAdminData = []): void
-        {
-            if (empty($panelAdminData)) {
-                $panelAdminData = array_replace_recursive(
-                    $this->getDefaultData(),
-                    $this->getIncomingData()
-                );
-            }
+    {
+        $pageTitle =
+            (string)(
+                $panelAdminData['page_title']
+                ?? 'Panel Administrativo'
+            );
 
-            $activityLimitedRows = array_slice(
-                (array)$panelAdminData['activities'],
+        $stats =
+            (array)(
+                $panelAdminData['stats']
+                ?? []
+            );
+
+        $activities =
+            array_slice(
+                (array)(
+                    $panelAdminData['activities']
+                    ?? []
+                ),
                 0,
                 5
             );
 
-            $this->getHeader($panelAdminData);
         ?>
 
-          <!-- TopAppBar Shell -->
-          <main class="contenido-principal contenido-principal--ancho">
-           <div class="space-y-8 max-w-[430px] mx-auto md:max-w-none">
-            <section class="space-y-1 px-1">
-             <h2 class="font-headline-lg text-headline-lg text-primary">
-              Panel Administrativo
-             </h2>
-             <p class="font-body-md text-body-md text-on-surface-variant">
-              Control de emisión de carnets para manipulación de alimentos.
-             </p>
+<!DOCTYPE html>
+
+<html
+    class="light"
+    lang="es"
+>
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        <?= $this->e($pageTitle) ?>
+    </title>
+
+    <link
+        rel="stylesheet"
+        href="<?= $this->e(
+            $this->baseURL . 'css/app.css'
+        ) ?>"
+    >
+
+    <link
+        rel="stylesheet"
+        href="<?= $this->e(
+            $this->baseURL . 'css/Views/panel_admin.css'
+        ) ?>"
+    >
+
+</head>
+
+<body
+    class="bg-background min-h-screen text-on-surface pb-24 tema-ciudadano"
+>
+
+<?php
+
+$page_title = $pageTitle;
+
+include __DIR__ . '/header.php';
+
+?>
+
+
+<main class="contenido-principal contenido-principal--ancho">
+
+    <div class="panel-admin">
+
+
+        <!-- =====================================================
+             CABECERA
+             ===================================================== -->
+
+        <section class="panel-admin__cabecera">
+
+            <p class="panel-admin__etiqueta">
+                Administración
+            </p>
+
+            <h1 class="panel-admin__titulo">
+                Panel Administrativo
+            </h1>
+
+            <p class="panel-admin__descripcion">
+                Control de emisión de carnets para manipulación
+                de alimentos.
+            </p>
+
+        </section>
+
+
+        <!-- =====================================================
+             ESTADÍSTICAS
+             ===================================================== -->
+
+        <?php if (!empty($stats)): ?>
+
+            <section
+                class="panel-admin__estadisticas"
+                aria-label="Estadísticas"
+            >
+
+                <?php foreach ($stats as $stat): ?>
+
+                    <?php
+                    $style =
+                        (string)(
+                            $stat['style']
+                            ?? 'primary'
+                        );
+
+                    $label =
+                        (string)(
+                            $stat['label']
+                            ?? ''
+                        );
+
+                    $value =
+                        (string)(
+                            $stat['value']
+                            ?? '0'
+                        );
+
+                    $icon =
+                        (string)(
+                            $stat['icon']
+                            ?? 'analytics'
+                        );
+                    ?>
+
+                    <article
+                        class="<?= $this->e(
+                            $this->getStatCardClass($style)
+                        ) ?>"
+                    >
+
+                        <p class="panel-admin-stat__etiqueta">
+                            <?= $this->e($label) ?>
+                        </p>
+
+                        <div class="panel-admin-stat__fila">
+
+                            <span
+                                class="panel-admin-stat__numero"
+                            >
+                                <?= $this->e($value) ?>
+                            </span>
+
+                            <span
+                                class="material-symbols-outlined panel-admin-stat__icono"
+                                aria-hidden="true"
+                            >
+                                <?= $this->e($icon) ?>
+                            </span>
+
+                        </div>
+
+                    </article>
+
+                <?php endforeach; ?>
+
             </section>
-            <section class="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
-        <?php // Itera métricas 'stats' para mostrar cards; asegurar estructura esperada en el controlador.
-        foreach ($panelAdminData['stats'] as $stat): ?>
-             <article class="panel-admin-card <?php echo $this->cardStyleClass((string) $stat['style']); ?> app-vista-card">
-              <p class="panel-admin-card__etiqueta">
-               <?php echo $this->e($stat['label']); ?>
-              </p>
-              <div class="panel-admin-card__fila">
-               <span class="panel-admin-card__numero panel-admin-card__numero--<?php echo $this->e($stat['style']); ?>">
-                <?php echo $this->e($stat['value']); ?>
-               </span>
-               <span class="material-symbols-outlined panel-admin-card__icono" data-icon="<?php echo $this->e($stat['icon']); ?>">
-                <?php echo $this->e($stat['icon']); ?>
-               </span>
-              </div>
-             </article>
-        <?php endforeach; ?>
-            </section>
-            <section class="space-y-4">
-             <h3 class="font-headline-md text-headline-md text-on-surface">
-              Acciones Rápidas
-             </h3>
-             
-                <div class="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-3">
 
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('nuevo'); ?>">
+        <?php endif; ?>
 
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            calendar_today
-                        </span>
 
-                        <span class="panel-admin-action__texto">
-                            Crear fecha de examen
-                        </span>
+        <!-- =====================================================
+             ACCIONES RÁPIDAS
+             ===================================================== -->
 
-                    </a>
+        <section class="panel-admin__seccion">
 
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('admin_examenes'); ?>">
+            <div class="panel-admin__seccion-cabecera">
 
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            event_note
-                        </span>
-
-                        <span class="panel-admin-action__texto">
-                            Gestionar exámenes
-                        </span>
-
-                    </a>
-
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('admin_documentos'); ?>">
-
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            fact_check
-                        </span>
-
-                        <span class="panel-admin-action__texto">
-                            Gestionar documentación
-                        </span>
-
-                    </a>
-
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('admin_usuarios'); ?>">
-
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            group
-                        </span>
-
-                        <span class="panel-admin-action__texto">
-                            Administrar usuarios
-                        </span>
-
-                    </a>
-
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('admin_carnets'); ?>">
-
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            badge
-                        </span>
-
-                        <span class="panel-admin-action__texto">
-                            Gestionar carnets
-                        </span>
-
-                    </a>
-
-                    <a class="panel-admin-action app-vista-button app-vista-button--primary panel-admin-link"
-                    href="<?php echo $this->getRoute('admin_reportes'); ?>">
-
-                        <span class="material-symbols-outlined panel-admin-action__icono">
-                            analytics
-                        </span>
-
-                        <span class="panel-admin-action__texto">
-                            Reportes
-                        </span>
-
-                    </a>
-
-                </div>
-
-            </section>
-            <section class="panel-admin-actividad app-vista-card">
-             <div class="panel-admin-actividad__encabezado">
-              <h3 class="font-headline-md text-headline-md text-on-surface">
-               Actividad Reciente
-              </h3>
-              <a class="panel-admin-actividad__enlace" href="<?php echo $this->activityLink(); ?>" role="button">
-               Ver todos
-              </a>
-             </div>
-             <div class="divide-y divide-surface-container-high">
-        <?php // Itera actividades recientes (limitadas). No iterar colecciones sin límites desde la vista.
-        foreach ($activityLimitedRows as $activity): ?>
-              <article class="panel-admin-fila">
-               <div class="panel-admin-fila__izquierda">
-                <div class="panel-admin-fila__avatar">
-                 <span class="material-symbols-outlined panel-admin-fila__icono" data-icon="person">
-                  person
-                 </span>
-                </div>
                 <div>
-                 <p class="panel-admin-fila__nombre">
-                  <?php echo $this->e($activity['nombre']); ?>
-                 </p>
-                 <p class="panel-admin-fila__dni">
-                  DNI <?php echo $this->e($activity['dni']); ?>
-                 </p>
-                </div>
-               </div>
-               <div class="panel-admin-fila__derecha">
-                <div class="panel-admin-fila__estado-box">
-                 <span class="panel-admin-fila__estado-label">
-                  Estado de trámite
-                 </span>
-                 <span class="panel-admin-fila__estado panel-admin-fila__estado--<?php echo $this->e($activity['estado_class']); ?>">
-                  <?php echo $this->e($activity['estado']); ?>
-                 </span>
-                </div>
-                <button aria-label="Ver detalle" class="panel-admin-fila__boton" type="button">
-                 <span class="material-symbols-outlined panel-admin-fila__chevron" data-icon="chevron_right">
-                  chevron_right
-                 </span>
-                </button>
-               </div>
-              </article>
-        <?php endforeach; ?>
-             </div>
-            </section>
-           </div>
-          </main>
-          <!-- Bottom Navigation Bar -->
 
-        <?php
-        $this->getFooter();
+                    <h2 class="panel-admin__seccion-titulo">
+                        Acciones rápidas
+                    </h2>
+
+                    <p class="panel-admin__seccion-descripcion">
+                        Accesos directos a las principales funciones
+                        administrativas.
+                    </p>
+
+                </div>
+
+            </div>
+
+
+            <div class="panel-admin__acciones">
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('crear_examen')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        calendar_today
+                    </span>
+
+                    <span>
+                        Crear fecha de examen
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_examenes')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        event_note
+                    </span>
+
+                    <span>
+                        Gestionar exámenes
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_documentos')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        fact_check
+                    </span>
+
+                    <span>
+                        Gestionar documentación
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_usuarios')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        group
+                    </span>
+
+                    <span>
+                        Administrar usuarios
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_carnets')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        badge
+                    </span>
+
+                    <span>
+                        Gestionar carnets
+                    </span>
+
+                </a>
+
+
+                <a
+                    class="panel-admin__accion app-vista-button app-vista-button--primary"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_reportes')
+                    ) ?>"
+                >
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        analytics
+                    </span>
+
+                    <span>
+                        Reportes
+                    </span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+
+        <!-- =====================================================
+             ACTIVIDAD RECIENTE
+             ===================================================== -->
+
+        <section class="panel-admin__actividad">
+
+            <div class="panel-admin__actividad-cabecera">
+
+                <div>
+
+                    <h2 class="panel-admin__seccion-titulo">
+                        Actividad reciente
+                    </h2>
+
+                    <p class="panel-admin__seccion-descripcion">
+                        Últimas inscripciones registradas.
+                    </p>
+
+                </div>
+
+                <a
+                    class="panel-admin__ver-todas"
+                    href="<?= $this->e(
+                        $this->getRoute('admin_actividad')
+                    ) ?>"
+                >
+                    Ver todos
+                </a>
+
+            </div>
+
+
+            <?php if (!empty($activities)): ?>
+
+                <div class="panel-admin__lista">
+
+                    <?php foreach ($activities as $activity): ?>
+
+                        <?php
+                        $nombre =
+                            (string)(
+                                $activity['nombre']
+                                ?? ''
+                            );
+
+                        $dni =
+                            (string)(
+                                $activity['dni']
+                                ?? ''
+                            );
+
+                        $estado =
+                            (string)(
+                                $activity['estado']
+                                ?? 'SIN ESTADO'
+                            );
+
+                        $estadoClass =
+                            strtolower(
+                                trim(
+                                    (string)(
+                                        $activity['estado_class']
+                                        ?? ''
+                                    )
+                                )
+                            );
+
+                        $estadoClass =
+                            preg_replace(
+                                '/[^a-z0-9_-]+/',
+                                '-',
+                                $estadoClass
+                            );
+                        ?>
+
+                        <article class="panel-admin__actividad-fila">
+
+                            <div class="panel-admin__actividad-persona">
+
+                                <div class="panel-admin__avatar">
+
+                                    <span
+                                        class="material-symbols-outlined"
+                                        aria-hidden="true"
+                                    >
+                                        person
+                                    </span>
+
+                                </div>
+
+
+                                <div>
+
+                                    <p class="panel-admin__nombre">
+                                        <?= $this->e($nombre) ?>
+                                    </p>
+
+                                    <p class="panel-admin__dni">
+                                        DNI <?= $this->e($dni) ?>
+                                    </p>
+
+                                </div>
+
+                            </div>
+
+
+                            <div class="panel-admin__estado">
+
+                                <span class="panel-admin__estado-label">
+                                    Estado de trámite
+                                </span>
+
+                                <span
+                                    class="<?= $this->e(
+                                        'panel-admin__estado-chip panel-admin__estado-chip--'
+                                        . $estadoClass
+                                    ) ?>"
+                                >
+                                    <?= $this->e($estado) ?>
+                                </span>
+
+                            </div>
+
+                        </article>
+
+                    <?php endforeach; ?>
+
+                </div>
+
+            <?php else: ?>
+
+                <div class="panel-admin__vacio">
+
+                    <span
+                        class="material-symbols-outlined"
+                        aria-hidden="true"
+                    >
+                        history
+                    </span>
+
+                    <p>
+                        No hay actividad reciente.
+                    </p>
+
+                </div>
+
+            <?php endif; ?>
+
+        </section>
+
+
+    </div>
+
+</main>
+
+
+<?php
+
+$this->getFooter();
+
+?>
+
+</body>
+
+</html>
+
+<?php
     }
 }
-
-

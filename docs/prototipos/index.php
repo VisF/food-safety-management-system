@@ -25,9 +25,11 @@ $routes = [
 	'actividad-reciente' => 'vistas/actividad_reciente.php',
 	'actividad_reciente' => 'vistas/actividad_reciente.php',
 
-	'contactos' => 'vistas/subida_documentacion.php',
-	'subida-documentacion' => 'vistas/subida_documentacion.php',
-	'subida_documentacion' => 'vistas/subida_documentacion.php',
+	'contactos' => 'vistas/documentacion.php',
+	'documentacion' => 'vistas/documentacion.php',
+
+	'documentacion' => 'vistas/documentacion.php',
+	'documentacion' => 'vistas/documentacion.php',
 
 
 
@@ -54,13 +56,13 @@ $routePayloads = [
 			[
 				'label' => 'Subir DNI',
 				'icon' => 'badge',
-				'route' => 'subida_documentacion',
+				'route' => 'documentacion',
 				'state' => 1,
 			],
 			[
 				'label' => 'Foto Carnet',
 				'icon' => 'add_a_photo',
-				'route' => 'subida_documentacion',
+				'route' => 'documentacion',
 				'state' => 0,
 			],
 		],

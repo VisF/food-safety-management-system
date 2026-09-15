@@ -28,13 +28,6 @@ require_once __DIR__ . '/../Servicios/UsuarioService.php';
  *   - vistas/login_error.php        (mostrar errores de autenticación)
  *   - vistas/registro_exitoso.php   (confirmar registro)
  *
- * - Rutas sugeridas en Router.php:
- *   - r=login           -> AuthControlador::mostrarLogin()
- *   - r=login_post      -> AuthControlador::procesarLogin($_POST)
- *   - r=registro        -> AuthControlador::mostrarRegistro()
- *   - r=registro_post   -> AuthControlador::procesarRegistro($_POST)
- *   - r=perfil          -> AuthControlador::mostrarPerfil()
- *   - r=logout          -> AuthControlador::procesarLogout()
  */
 
 class AuthControlador
@@ -179,6 +172,7 @@ class AuthControlador
             'email' => $datos['email'] ?? '',
             'dni' => $datos['dni'] ?? '',
         ];
+
         $old =
             $_SESSION['registro_old']
             ?? [];
@@ -189,7 +183,12 @@ class AuthControlador
             $datosVista,
             $old
         );
-        $this->renderView(self::VIEW_REGISTRO, $datosVista);
+
+        require_once __DIR__ . '/../Views/registro.php';
+
+        $vista = new RegistroVista();
+
+        $vista->mostrar($datosVista);
     }
 
     // Muestra perfil.
@@ -560,40 +559,6 @@ class AuthControlador
         ];
     }
 
-    // Ejecuta renovar sesion.
-    public function renovarSesion(): array
-    {
-        if (!$this->estaAutenticado()) {
-            return ['success' => false, 'error' => 'No hay sesión activa'];
-        }
-
-        $_SESSION['last_activity'] = time();
-        $this->log('Session renewed', 'INFO', ['usuario_id' => $_SESSION['usuario_id']]);
-
-        return [
-            'success' => true,
-            'message' => 'Sesión renovada',
-            'sesion_info' => $this->obtenerInfoSesion(),
-        ];
-    }
-
-    // Valida rol.
-    public function validarRol(string $rolRequerido): bool
-    {
-        if (!$this->estaAutenticado()) {
-            return false;
-        }
-
-        $rolActual = (string) ($_SESSION['usuario_roles'] ?? '');
-
-        $rolesValidos = match ($rolRequerido) {
-            'admin' => ['admin'],
-            'inspector' => ['admin', 'inspector'],
-            'usuario' => ['admin', 'inspector', 'usuario'],
-            default => [],
-        };
-
-        return in_array($rolActual, $rolesValidos, true);
-    }
+    
     
 }

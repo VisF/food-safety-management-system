@@ -13,6 +13,7 @@ declare(strict_types=1);
  * - Proporcionar la URL base.
  * - Generar rutas.
  * - Escapar valores para HTML.
+ * - Generar campos CSRF para formularios.
  * - Cargar el footer común.
  */
 abstract class BaseVista
@@ -25,16 +26,33 @@ abstract class BaseVista
 
 
     /**
+     * Genera el campo oculto CSRF
+     * para formularios POST.
+     *
+     * Las vistas no necesitan conocer
+     * directamente el middleware CSRF.
+     */
+    protected function getCsrfInput(): string
+    {
+        $token =
+            \App\Middleware\CsrfMiddleware::generateToken();
+
+        return
+            '<input type="hidden" name="csrf_token" value="' .
+            $this->e($token) .
+            '">';
+    }
+
+
+    /**
      * Escapa un valor para utilizarlo
      * de forma segura dentro de HTML.
      *
      * @param mixed $valor
-     * @return string
      */
     protected function e(
         mixed $valor
-    ): string
-    {
+    ): string {
         return htmlspecialchars(
             (string)$valor,
             ENT_QUOTES,
@@ -53,20 +71,16 @@ abstract class BaseVista
      *
      * @param string $route
      * @param int|null $id
-     * @return string
      */
     protected function getRoute(
         string $route,
         ?int $id = null
-    ): string
-    {
+    ): string {
         return match ($route) {
 
-            /*
-             * ==========================================
-             * GENERALES — CIUDADANO
-             * ==========================================
-             */
+            /* ==================================================
+               CIUDADANO
+            ================================================== */
 
             /**
              * Página principal.
@@ -78,78 +92,58 @@ abstract class BaseVista
 
 
             /**
-             * Perfil / datos del ciudadano.
+             * Perfil del ciudadano.
              *
              * GET /perfil
              */
             'perfil' =>
-                $this->baseURL
-                . 'perfil',
+                $this->baseURL .
+                'perfil',
+
+
+            /**
+             * Actualizar perfil.
+             *
+             * POST /perfil/actualizar
+             */
+            'perfil_actualizar' =>
+                $this->baseURL .
+                'perfil/actualizar',
 
 
             /**
              * Documentación del ciudadano.
              *
-             * GET /subida_documentacion
+             * GET /documentacion
              */
             'documentacion' =>
-                $this->baseURL
-                . 'subida_documentacion',
-                
+                $this->baseURL .
+                'documentacion',
+
+
             /**
-             * Descargar documento del ciudadano.
+             * Descargar documento propio.
              *
              * GET /documentos/{id}/descargar
              */
             'descargar_documento_ciudadano' =>
                 $this->baseURL .
                 'documentos/' .
-                $id .
+                (int)$id .
                 '/descargar',
 
 
-
             /**
-             * Carnet correspondiente a una inscripción.
+             * Detalle de un examen.
              *
-             * GET /carnet?id={id}
-             */
-            'carnet' =>
-                $this->baseURL
-                . 'carnet'
-                . (
-                    $id !== null
-                        ? '?id=' . $id
-                        : ''
-                ),
-
-
-            /**
-             * Detalle de un examen para el ciudadano.
-             *
-             * GET /detalle_examen?id={id}
+             * GET /detalle_examen/{id}
              */
             'detalle_examen' =>
-                $this->baseURL
-                . 'detalle_examen'
-                . (
+                $this->baseURL .
+                'detalle_examen' .
+                (
                     $id !== null
-                        ? '?id=' . $id
-                        : ''
-                ),
-
-
-            /**
-             * Confirmación de inscripción a examen.
-             *
-             * GET /confirmar_inscripcion_examen?id={id}
-             */
-            'confirmar_examen' =>
-                $this->baseURL
-                . 'confirmar_inscripcion_examen'
-                . (
-                    $id !== null
-                        ? '?id=' . $id
+                        ? '/' . (int)$id
                         : ''
                 ),
 
@@ -160,8 +154,8 @@ abstract class BaseVista
              * POST /inscripcion/confirmar
              */
             'confirmar_inscripcion' =>
-                $this->baseURL
-                . 'inscripcion/confirmar',
+                $this->baseURL .
+                'inscripcion/confirmar',
 
 
             /**
@@ -170,8 +164,8 @@ abstract class BaseVista
              * GET /inscripciones
              */
             'inscripciones' =>
-                $this->baseURL
-                . 'inscripciones',
+                $this->baseURL .
+                'inscripciones',
 
 
             /**
@@ -180,8 +174,8 @@ abstract class BaseVista
              * POST /curso/inscribirse
              */
             'guardar_inscripcion_curso' =>
-                $this->baseURL
-                . 'curso/inscribirse',
+                $this->baseURL .
+                'curso/inscribirse',
 
 
             /**
@@ -190,15 +184,23 @@ abstract class BaseVista
              * POST /documentos/subir
              */
             'guardar_documento' =>
-                $this->baseURL
-                . 'documentos/subir',
+                $this->baseURL .
+                'documentos/subir',
 
 
-            /*
-             * ==========================================
-             * ADMINISTRACIÓN — GENERAL
-             * ==========================================
+            /**
+             * Descargar carnet del ciudadano autenticado.
+             *
+             * GET /carnet/descargar
              */
+            'descargar_carnet_ciudadano' =>
+                $this->baseURL .
+                'carnet/descargar',
+
+
+            /* ==================================================
+               ADMINISTRACIÓN — GENERAL
+            ================================================== */
 
             /**
              * Panel principal de administración.
@@ -206,8 +208,8 @@ abstract class BaseVista
              * GET /admin
              */
             'admin' =>
-                $this->baseURL
-                . 'admin',
+                $this->baseURL .
+                'admin',
 
 
             /**
@@ -216,35 +218,13 @@ abstract class BaseVista
              * GET /admin/actividad
              */
             'admin_actividad' =>
-                $this->baseURL
-                . 'admin/actividad',
+                $this->baseURL .
+                'admin/actividad',
 
 
-            /**
-             * Gestión administrativa de usuarios.
-             *
-             * Ruta planificada.
-             */
-            'admin_usuarios' =>
-                $this->baseURL
-                . 'admin/usuarios',
-
-
-            /**
-             * Reportes administrativos.
-             *
-             * Ruta planificada.
-             */
-            'admin_reportes' =>
-                $this->baseURL
-                . 'admin/reportes',
-
-
-            /*
-             * ==========================================
-             * ADMINISTRACIÓN — DOCUMENTACIÓN
-             * ==========================================
-             */
+            /* ==================================================
+               ADMINISTRACIÓN — DOCUMENTACIÓN
+            ================================================== */
 
             /**
              * Panel administrativo de documentación.
@@ -252,8 +232,8 @@ abstract class BaseVista
              * GET /admin/documentos
              */
             'admin_documentos' =>
-                $this->baseURL
-                . 'admin/documentos',
+                $this->baseURL .
+                'admin/documentos',
 
 
             /**
@@ -262,8 +242,8 @@ abstract class BaseVista
              * GET /admin/documentos/buscar
              */
             'buscar_documentos' =>
-                $this->baseURL
-                . 'admin/documentos/buscar',
+                $this->baseURL .
+                'admin/documentos/buscar',
 
 
             /**
@@ -272,10 +252,10 @@ abstract class BaseVista
              * POST /admin/documentos/{id}/aprobar
              */
             'aprobar_documento' =>
-                $this->baseURL
-                . 'admin/documentos/'
-                . $id
-                . '/aprobar',
+                $this->baseURL .
+                'admin/documentos/' .
+                (int)$id .
+                '/aprobar',
 
 
             /**
@@ -284,10 +264,10 @@ abstract class BaseVista
              * POST /admin/documentos/{id}/rechazar
              */
             'rechazar_documento' =>
-                $this->baseURL
-                . 'admin/documentos/'
-                . $id
-                . '/rechazar',
+                $this->baseURL .
+                'admin/documentos/' .
+                (int)$id .
+                '/rechazar',
 
 
             /**
@@ -296,27 +276,15 @@ abstract class BaseVista
              * GET /admin/documentos/{id}/descargar
              */
             'descargar_documento' =>
-                $this->baseURL
-                . 'admin/documentos/'
-                . $id
-                . '/descargar',
-
-
-            /**
-             * Descargar documento propio del ciudadano.
-             *
-             * GET /documentos/{id}/descargar
-             */
-            'descargar_carnet_ciudadano' =>
                 $this->baseURL .
-                'carnet/descargar',
+                'admin/documentos/' .
+                (int)$id .
+                '/descargar',
 
 
-            /*
-             * ==========================================
-             * ADMINISTRACIÓN — EXÁMENES
-             * ==========================================
-             */
+            /* ==================================================
+               ADMINISTRACIÓN — EXÁMENES
+            ================================================== */
 
             /**
              * Listado administrativo de exámenes.
@@ -324,28 +292,29 @@ abstract class BaseVista
              * GET /admin/examenes
              */
             'admin_examenes' =>
-                $this->baseURL
-                . 'admin/examenes',
+                $this->baseURL .
+                'admin/examenes',
 
 
             /**
              * Crear un examen.
              *
-             * GET/POST /admin/examenes/nuevo
+             * GET /admin/examenes/nuevo
              */
             'crear_examen' =>
-                $this->baseURL
-                . 'admin/examenes/nuevo',
+                $this->baseURL .
+                'admin/examenes/nuevo',
 
-                
+
             /**
              * Guardar un examen nuevo.
              *
              * POST /admin/examenes
              */
             'guardar_examen_nuevo' =>
-                $this->baseURL
-                . 'admin/examenes',
+                $this->baseURL .
+                'admin/examenes',
+
 
             /**
              * Editar un examen.
@@ -353,10 +322,10 @@ abstract class BaseVista
              * GET /admin/examenes/{id}/editar
              */
             'editar_examen' =>
-                $this->baseURL
-                . 'admin/examenes/'
-                . $id
-                . '/editar',
+                $this->baseURL .
+                'admin/examenes/' .
+                (int)$id .
+                '/editar',
 
 
             /**
@@ -365,9 +334,9 @@ abstract class BaseVista
              * POST /admin/examenes/{id}
              */
             'guardar_examen' =>
-                $this->baseURL
-                . 'admin/examenes/'
-                . $id,
+                $this->baseURL .
+                'admin/examenes/' .
+                (int)$id,
 
 
             /**
@@ -376,9 +345,9 @@ abstract class BaseVista
              * GET /admin/examenes/{id}
              */
             'detalle_examen_admin' =>
-                $this->baseURL
-                . 'admin/examenes/'
-                . $id,
+                $this->baseURL .
+                'admin/examenes/' .
+                (int)$id,
 
 
             /**
@@ -387,10 +356,10 @@ abstract class BaseVista
              * POST /admin/examenes/{id}/activar
              */
             'activar_examen' =>
-                $this->baseURL
-                . 'admin/examenes/'
-                . $id
-                . '/activar',
+                $this->baseURL .
+                'admin/examenes/' .
+                (int)$id .
+                '/activar',
 
 
             /**
@@ -399,10 +368,10 @@ abstract class BaseVista
              * POST /admin/examenes/{id}/desactivar
              */
             'desactivar_examen' =>
-                $this->baseURL
-                . 'admin/examenes/'
-                . $id
-                . '/desactivar',
+                $this->baseURL .
+                'admin/examenes/' .
+                (int)$id .
+                '/desactivar',
 
 
             /**
@@ -411,9 +380,9 @@ abstract class BaseVista
              * GET /admin/inscripciones/{id}
              */
             'administrar_inscripcion' =>
-                $this->baseURL
-                . 'admin/inscripciones/'
-                . $id,
+                $this->baseURL .
+                'admin/inscripciones/' .
+                (int)$id,
 
 
             /**
@@ -422,16 +391,14 @@ abstract class BaseVista
              * POST /admin/inscripciones/{id}
              */
             'guardar_inscripcion' =>
-                $this->baseURL
-                . 'admin/inscripciones/'
-                . $id,
+                $this->baseURL .
+                'admin/inscripciones/' .
+                (int)$id,
 
 
-            /*
-             * ==========================================
-             * ADMINISTRACIÓN — CARNETS
-             * ==========================================
-             */
+            /* ==================================================
+               ADMINISTRACIÓN — CARNETS
+            ================================================== */
 
             /**
              * Panel administrativo de carnets.
@@ -439,8 +406,8 @@ abstract class BaseVista
              * GET /admin/carnets
              */
             'admin_carnets' =>
-                $this->baseURL
-                . 'admin/carnets',
+                $this->baseURL .
+                'admin/carnets',
 
 
             /**
@@ -449,10 +416,10 @@ abstract class BaseVista
              * GET /admin/carnets/{id}/cargar
              */
             'cargar_carnet' =>
-                $this->baseURL
-                . 'admin/carnets/'
-                . $id
-                . '/cargar',
+                $this->baseURL .
+                'admin/carnets/' .
+                (int)$id .
+                '/cargar',
 
 
             /**
@@ -461,10 +428,10 @@ abstract class BaseVista
              * POST /admin/carnets/{id}/emitir
              */
             'emitir_carnet' =>
-                $this->baseURL
-                . 'admin/carnets/'
-                . $id
-                . '/emitir',
+                $this->baseURL .
+                'admin/carnets/' .
+                (int)$id .
+                '/emitir',
 
 
             /**
@@ -473,64 +440,77 @@ abstract class BaseVista
              * POST /admin/carnets/{id}/anular
              */
             'anular_carnet' =>
-                $this->baseURL
-                . 'admin/carnets/'
-                . $id
-                . '/anular',
+                $this->baseURL .
+                'admin/carnets/' .
+                (int)$id .
+                '/anular',
 
+
+            /**
+             * Descargar carnet desde administración.
+             *
+             * GET /admin/carnets/{id}/descargar
+             */
             'descargar_carnet_admin' =>
                 $this->baseURL .
                 'admin/carnets/' .
-                $id .
+                (int)$id .
                 '/descargar',
-            /*
-             * ==========================================
-             * CONSULTA PÚBLICA
-             * ==========================================
-             */
 
+
+            /* ==================================================
+               CONSULTA PÚBLICA
+            ================================================== */
+
+            /**
+             * Consulta pública de carnets.
+             *
+             * GET /consulta-publica
+             */
             'consulta_publica' =>
                 $this->baseURL .
                 'consulta-publica',
 
+
+            /**
+             * Descargar carnet desde consulta pública.
+             *
+             * GET /consulta-publica/carnet/{id}/descargar
+             */
             'descargar_carnet' =>
                 $this->baseURL .
                 'consulta-publica/carnet/' .
-                $id .
+                (int)$id .
                 '/descargar',
 
+
+            /**
+             * Descargar foto del carnet desde
+             * consulta pública.
+             *
+             * GET /consulta-publica/carnet/{id}/foto
+             */
             'descargar_foto' =>
                 $this->baseURL .
                 'consulta-publica/carnet/' .
-                $id .
+                (int)$id .
                 '/foto',
-            
 
 
-            /*
-             * ==========================================
-             * INSPECTOR
-             * ==========================================
-             *
-             * Ruta planificada.
-             */
+            /* ==================================================
+               AUTENTICACIÓN
+            ================================================== */
 
             /**
-             * Búsqueda de ciudadanos para inspector.
+             * Registro.
              *
-             * Ruta planificada:
-             * GET /inspector/ciudadanos
+             * GET /registro
+             * POST /registro
              */
-            'inspector_ciudadanos' =>
-                $this->baseURL
-                . 'inspector/ciudadanos',
+            'registro' =>
+                $this->baseURL .
+                'registro',
 
-
-            /*
-             * ==========================================
-             * AUTENTICACIÓN
-             * ==========================================
-             */
 
             /**
              * Iniciar sesión.
@@ -538,8 +518,8 @@ abstract class BaseVista
              * GET /login
              */
             'login' =>
-                $this->baseURL
-                . 'login',
+                $this->baseURL .
+                'login',
 
 
             /**
@@ -548,15 +528,13 @@ abstract class BaseVista
              * GET /logout
              */
             'logout' =>
-                $this->baseURL
-                . 'logout',
+                $this->baseURL .
+                'logout',
 
 
-            /*
-             * ==========================================
-             * RUTA DESCONOCIDA
-             * ==========================================
-             */
+            /* ==================================================
+               RUTA DESCONOCIDA
+            ================================================== */
 
             default =>
                 '#',
@@ -573,6 +551,3 @@ abstract class BaseVista
             '/footer.php';
     }
 }
-
-
-

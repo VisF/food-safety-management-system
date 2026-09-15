@@ -91,62 +91,6 @@ class AdminDashboardControlador
         }
     }
 
-    // Obtiene estadisticas.
-    public function obtenerEstadisticas(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerCardsDashboard();
-    }
-
-    // Obtiene actividad reciente.
-    public function obtenerActividadReciente(
-        int $limite = 10
-    ): array
-    {
-        return $this
-            ->adminService
-            ->obtenerActividadReciente();
-    }
-
-    // Obtiene indicadores.
-    public function obtenerIndicadores(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerIndicadores();
-    }
-
-    // Obtiene resumen general.
-    public function obtenerResumenGeneral(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerResumenGeneral();
-    }
-
-    // Obtiene ultimos usuarios.
-    public function obtenerUltimosUsuarios(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerUltimosUsuarios();
-    }
-
-    // Obtiene ultimos carnets.
-    public function obtenerUltimosCarnets(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerUltimosCarnets();
-    }
-
-    // Obtiene ultimos examenes.
-    public function obtenerUltimosExamenes(): array
-    {
-        return $this
-            ->adminService
-            ->obtenerUltimosExamenes();
-    }
+   
 
 }

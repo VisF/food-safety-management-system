@@ -20,7 +20,7 @@ require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Servicios/ExamenService.php';
 
 
-require_once __DIR__ . '/ValidacionControlador.php';
+
 
 class InscripcionControlador
 {
@@ -28,17 +28,10 @@ class InscripcionControlador
 
     private ?inscripcionService $inscripcionService = null;
     private ?ExamenService $examenService = null;
-    private ValidacionControlador $validacionControlador;
     private ?DocumentoService $documentoService = null;
     private ?CursoService $cursoService = null;
 
 
-    // Ejecuta pdo.
-    private function pdo(): \PDO
-    {
-        require_once __DIR__ . '/../db/Connection.php';
-        return Connection::getPDO();
-    }
 
     // Inicializa las dependencias de la clase.
     public function __construct()
@@ -46,7 +39,6 @@ class InscripcionControlador
         @mkdir(dirname(self::LOG_FILE), 0755, true);
         $this->inscripcionService = new inscripcionService();
         $this->examenService = new ExamenService();
-        $this->validacionControlador = new ValidacionControlador();
         $this->documentoService = new DocumentoService();
         $this->cursoService = new CursoService();
  
@@ -115,176 +107,9 @@ class InscripcionControlador
         }
     }
 
-    // Valida inscripcion.
-    public function validarInscripcion(int $id): array
-    {
-        try {
+   
 
-            return
-                $this->inscripcionService
-                    ->validarInscripcion($id);
 
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_VALIDAR_INSCRIPCION',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'valido' => false,
-                'motivos_rechazo' => [
-                    $e->getMessage()
-                ],
-                'puede_inscribirse' => false
-            ];
-        }
-    }
-
-    // Obtiene inscripciones por usuario.
-    public function obtenerInscripcionesPorUsuario(int $usuarioId): array
-    {
-        try {
-
-            return $this->inscripcionService
-                ->obtenerPorUsuario($usuarioId);
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_INSCRIPCIONES_POR_USUARIO',
-                [
-                    'usuario_id' => $usuarioId,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [];
-        }
-    }
-
-    // Obtiene inscripcion.
-    public function obtenerInscripcion(int $id): ?InscripcionDTO
-    {
-        try {
-
-            return $this->inscripcionService
-                ->obtenerPorId($id);
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_INSCRIPCION',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return null;
-        }
-    }
-
-    // Obtiene inscripciones activas.
-    public function obtenerInscripcionesActivas(int $usuarioId): array
-    {
-        try {
-
-            return $this->inscripcionService
-                ->obtenerActivas($usuarioId);
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_INSCRIPCIONES_ACTIVAS',
-                [
-                    'usuario_id' => $usuarioId,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [];
-        }
-    }
-
-    // Ejecuta cancelar inscripcion.
-    public function cancelarInscripcion(int $id, string $motivo = ''): array
-    {
-        try {
-
-            $inscripcion =
-                $this->inscripcionService
-                    ->obtenerPorId($id);
-
-            if ($inscripcion === null) {
-
-                return [
-                    'success' => false,
-                    'mensaje' => 'Inscripción no encontrada'
-                ];
-            }
-
-            if (
-                $inscripcion->getEstadoId()
-                ===
-                EstadoTramite::APROBADO
-            ) {
-
-                return [
-                    'success' => false,
-                    'mensaje' =>
-                        'No puede cancelarse una inscripción finalizada'
-                ];
-            }
-
-            $ok =
-                $this->inscripcionService
-                    ->cancelar(
-                        $id,
-                        $motivo
-                    );
-
-            if (!$ok) {
-
-                return [
-                    'success' => false,
-                    'mensaje' =>
-                        'No se pudo cancelar la inscripción'
-                ];
-            }
-
-            $this->registrarLog(
-                'INSCRIPCION_CANCELADA',
-                [
-                    'id' => $id
-                ]
-            );
-
-            return [
-                'success' => true,
-                'mensaje' =>
-                    'Inscripción cancelada correctamente'
-            ];
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_CANCELAR_INSCRIPCION',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'mensaje' => $e->getMessage()
-            ];
-        }
-    }
 
     // Obtiene cursos disponibles.
     public function obtenerCursosDisponibles(): array
@@ -307,83 +132,6 @@ class InscripcionControlador
         }
     }
 
-    // Obtiene examenes disponibles.
-    public function obtenerExamenesDisponibles(): array
-    {
-        try {
-
-            $examenes =
-                $this->examenService
-                    ->obtenerProximos(100);
-
-            $resultado = [];
-
-            foreach ($examenes as $row) {
-
-                $fecha = new \DateTimeImmutable(
-                    $row['fecha']
-                );
-
-                $hora = $row['hora']
-                    ? substr($row['hora'], 0, 5)
-                    : '';
-
-                $resultado[] = [
-
-                    'id' => (int)$row['id'],
-
-                    'month' =>
-                        strtoupper(
-                            $fecha->format('M')
-                        ),
-
-                    'day' =>
-                        $fecha->format('d'),
-
-                    'title' =>
-                        $row['ubicacion']
-                        ?: 'Examen',
-
-                    'capacity' =>
-                        ((int)$row['cupos'] > 0)
-                            ? 1
-                            : 0,
-
-                    'capacity_label' =>
-                        ((int)$row['cupos'] > 0)
-                            ? 'CUPOS DISPONIBLES'
-                            : 'SIN CUPOS',
-
-                    'time' =>
-                        $hora !== ''
-                            ? date(
-                                'h:i A',
-                                strtotime($hora)
-                            )
-                            : '',
-
-                    'room' =>
-                        $row['ubicacion'] ?: '',
-
-                    'route' =>
-                        'inscripcion_examen'
-                ];
-            }
-
-            return $resultado;
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_EXAMENES_DISPONIBLES',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [];
-        }
-    }
 
     // Ejecuta confirmar inscripcion examen.
     public function confirmarInscripcionExamen(int $idInscripcion): array
@@ -571,45 +319,6 @@ class InscripcionControlador
     }
 
 
-
-    // Obtiene detalle inscripcion.
-    public function obtenerDetalleInscripcion(int $id): array
-    {
-        try {
-
-            $inscripcion =
-                $this->inscripcionService
-                    ->obtenerDetalleInscripcion($id);
-
-            if ($inscripcion === null) {
-
-                return [
-                    'success' => false,
-                    'inscripcion' => null
-                ];
-            }
-
-            return [
-                'success' => true,
-                'inscripcion' => $inscripcion
-            ];
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'ERROR_OBTENER_DETALLE_INSCRIPCION',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'inscripcion' => null
-            ];
-        }
-    }
 
     // Ejecuta usuario puede inscribirse examen.
     private function usuarioPuedeInscribirseExamen(int $idUsuario): array

@@ -1,86 +1,42 @@
 <?php
 
 declare(strict_types=1);
-
 /* ==========================================================
    MIDDLEWARES
 ========================================================== */
 
-require_once __DIR__ . '/../Middleware/AuthMiddleware.php';
-require_once __DIR__ . '/../Middleware/RoleMiddleware.php';
-require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';
+require_once __DIR__ .
+    '/../Middleware/AuthMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/RoleMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/CsrfMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/AuditMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/MaintenanceMiddleware.php';
+
+require_once __DIR__ .
+    '/../Middleware/GuestMiddleware.php';
 
 use App\Middleware\AuthMiddleware;
 use App\Middleware\RoleMiddleware;
 use App\Middleware\CsrfMiddleware;
-
-/* ==========================================================
-   NORMALIZACIÓN DE URLS
-========================================================== */
-
-/*
- * Todas las rutas tienen una única URL canónica sin
- * trailing slash, excepto la raíz.
- *
- * Ejemplos:
- * /admin/                  -> /admin
- * /perfil/                 -> /perfil
- * /admin/examenes/15/     -> /admin/examenes/15
- *
- * Se utiliza 308 para conservar el método HTTP.
- */
-
-$basePath = parse_url(BASE_URL, PHP_URL_PATH) ?: '/';
-$basePath = '/' . trim($basePath, '/');
-
-$requestPath = parse_url(
-    $_SERVER['REQUEST_URI'] ?? '/',
-    PHP_URL_PATH
-) ?: '/';
-
-if ($basePath !== '/' && strpos($requestPath, $basePath) === 0) {
-    $relativePath = substr(
-        $requestPath,
-        strlen($basePath)
-    );
-
-    if ($relativePath === '') {
-        $relativePath = '/';
-    }
-} else {
-    $relativePath = $requestPath;
-}
-
-if (
-    $relativePath !== '/' &&
-    substr($relativePath, -1) === '/'
-) {
-    $relativePath = rtrim(
-        $relativePath,
-        '/'
-    );
-
-    $location =
-        rtrim(BASE_URL, '/') .
-        $relativePath;
-
-    if (!empty($_SERVER['QUERY_STRING'])) {
-        $location .= '?' . $_SERVER['QUERY_STRING'];
-    }
-
-    header(
-        'Location: ' . $location,
-        true,
-        308
-    );
-
-    exit;
-}
+use App\Middleware\AuditMiddleware;
+use App\Middleware\MaintenanceMiddleware;
+use App\Middleware\GuestMiddleware;
 
 /* ==========================================================
    INICIO
 ========================================================== */
 
+/**
+ * Página principal.
+ */
 $router->map(
     'GET',
     '/',
@@ -101,7 +57,9 @@ $router->map(
         $vista =
             new InicioVista();
 
-        $vista->mostrar($datos);
+        $vista->mostrar(
+            $datos
+        );
     }
 );
 
@@ -137,8 +95,6 @@ $router->map(
     '/login',
     function () {
 
-        CsrfMiddleware::validate();
-
         require_once __DIR__ .
             '/../Controller/AuthControlador.php';
 
@@ -146,26 +102,34 @@ $router->map(
             new AuthControlador();
 
         $resultado =
-            $controller->procesarLogin($_POST);
+            $controller->procesarLogin(
+                $_POST
+            );
 
-        if (!empty($resultado['success'])) {
+        if (
+            $resultado['success']
+        ) {
 
             header(
                 'Location: ' .
-                rtrim(BASE_URL, '/') .
+                BASE_URL .
                 '/'
             );
 
             exit;
         }
 
-        $controller->mostrarLogin([
-            'error' =>
-                $resultado['error'] ?? null,
+        $controller->mostrarLogin(
+            [
+                'error' =>
+                    $resultado['error']
+                    ?? null,
 
-            'email' =>
-                $_POST['email'] ?? ''
-        ]);
+                'email' =>
+                    $_POST['email']
+                    ?? ''
+            ]
+        );
     }
 );
 
@@ -197,8 +161,6 @@ $router->map(
     '/registro',
     function () {
 
-        CsrfMiddleware::validate();
-
         require_once __DIR__ .
             '/../Controller/AuthControlador.php';
 
@@ -206,13 +168,17 @@ $router->map(
             new AuthControlador();
 
         $resultado =
-            $controller->procesarRegistro($_POST);
+            $controller->procesarRegistro(
+                $_POST
+            );
 
-        if (!empty($resultado['success'])) {
+        if (
+            $resultado['success']
+        ) {
 
             header(
                 'Location: ' .
-                rtrim(BASE_URL, '/') .
+                BASE_URL .
                 '/login?toast=' .
                 urlencode(
                     $resultado['toast']
@@ -223,23 +189,30 @@ $router->map(
             exit;
         }
 
+
         $_SESSION['registro_old'] = [
+
             'nombre' =>
-                $_POST['nombre'] ?? '',
+                $_POST['nombre']
+                ?? '',
 
             'apellido' =>
-                $_POST['apellido'] ?? '',
+                $_POST['apellido']
+                ?? '',
 
             'dni' =>
-                $_POST['dni'] ?? '',
+                $_POST['dni']
+                ?? '',
 
             'email' =>
-                $_POST['email'] ?? ''
+                $_POST['email']
+                ?? ''
         ];
+
 
         header(
             'Location: ' .
-            rtrim(BASE_URL, '/') .
+            BASE_URL .
             '/registro?toast=' .
             urlencode(
                 $resultado['toast']
@@ -302,9 +275,6 @@ $router->map(
     '/curso/inscribirse',
     function () {
 
-        AuthMiddleware::handle();
-        CsrfMiddleware::validate();
-
         require_once __DIR__ .
             '/../Controller/InscripcionControlador.php';
 
@@ -320,23 +290,18 @@ $router->map(
    DOCUMENTACIÓN — CIUDADANO
 ========================================================== */
 
-/**
- * Documentación del ciudadano.
- */
 $router->map(
     'GET',
-    '/documentacion',
+    '/subida_documentacion',
     function () {
-
-        AuthMiddleware::handle();
 
         require_once __DIR__ .
             '/../Controller/DocumentoControlador.php';
 
-        $controller =
+        $controlador =
             new DocumentoControlador();
 
-        $controller->mostrarDocumentacion();
+        $controlador->mostrarDocumentacion();
     }
 );
 
@@ -349,29 +314,26 @@ $router->map(
     '/documentos/subir',
     function () {
 
-        AuthMiddleware::handle();
-        CsrfMiddleware::validate();
-
         require_once __DIR__ .
             '/../Controller/DocumentoControlador.php';
 
-        $controller =
+        $controlador =
             new DocumentoControlador();
 
-        $controller->procesarSubida();
+        $controlador->procesarSubida();
     }
 );
-
-
 /**
- * Descargar documento propio.
+ * Descargar documento del ciudadano.
+ *
+ * GET /documentos/{id}/descargar
  */
 $router->map(
     'GET',
     '/documentos/[i:id]/descargar',
     function ($id) {
 
-        AuthMiddleware::handle();
+        $id = (int)$id;
 
         require_once __DIR__ .
             '/../Controller/DocumentoControlador.php';
@@ -380,275 +342,22 @@ $router->map(
             new DocumentoControlador();
 
         $controller->descargarDocumento(
-            (int)$id
+            $id
         );
     }
 );
 
-
 /* ==========================================================
-   PERFIL — CIUDADANO
+   PANEL DE ADMINISTRACIÓN
 ========================================================== */
 
 /**
- * Perfil del ciudadano.
- */
-$router->map(
-    'GET',
-    '/perfil',
-    function () {
-
-        AuthMiddleware::handle();
-
-        require_once __DIR__ .
-            '/../Controller/UsuarioControlador.php';
-
-        $controller =
-            new UsuarioControlador();
-
-        $controller->mostrarPerfil();
-    }
-);
-
-
-/**
- * Actualizar perfil.
- */
-$router->map(
-    'POST',
-    '/perfil/actualizar',
-    function () {
-
-        AuthMiddleware::handle();
-        CsrfMiddleware::validate();
-
-        require_once __DIR__ .
-            '/../Controller/UsuarioControlador.php';
-
-        $controller =
-            new UsuarioControlador();
-
-        $controller->actualizarPerfil();
-    }
-);
-
-
-/* ==========================================================
-   EXÁMENES — CIUDADANO
-========================================================== */
-
-/**
- * Procesar inscripción a examen.
- *
- * La vista de detalle del examen realiza directamente
- * el POST a esta ruta.
- */
-$router->map(
-    'POST',
-    '/inscripcion/confirmar',
-    function () {
-
-        AuthMiddleware::handle();
-        CsrfMiddleware::validate();
-
-        require_once __DIR__ .
-            '/../Controller/InscripcionControlador.php';
-
-        $controller =
-            new InscripcionControlador();
-
-        $resultado =
-            $controller->procesarInscripcionExamen(
-                $_POST
-            );
-
-        if (!empty($resultado['success'])) {
-
-            header(
-                'Location: ' .
-                rtrim(BASE_URL, '/') .
-                '/?toast=inscripcion_exitosa'
-            );
-
-            exit;
-        }
-
-        switch (
-            $resultado['mensaje'] ?? ''
-        ) {
-
-            case 'Debe iniciar sesión para inscribirse a un examen.':
-                $toast = 'login_requerido';
-                break;
-
-            case 'Debe completar la documentación requerida':
-                $toast = 'documentacion_incompleta';
-                break;
-
-            case 'Ya posee una inscripción activa a un examen.':
-                $toast = 'ya_inscripto';
-                break;
-
-            default:
-                $toast = 'error_inscripcion';
-                break;
-        }
-
-        header(
-            'Location: ' .
-            rtrim(BASE_URL, '/') .
-            '/?toast=' .
-            urlencode($toast)
-        );
-
-        exit;
-    }
-);
-
-
-/**
- * Detalle de un examen para el ciudadano.
- */
-$router->map(
-    'GET',
-    '/detalle_examen/[i:id]',
-    function ($id) {
-
-        require_once __DIR__ .
-            '/../Controller/ExamenControlador.php';
-
-        require_once __DIR__ .
-            '/../Views/detalle_examen.php';
-
-        $controller =
-            new ExamenControlador();
-
-        $datos =
-            $controller->obtenerDetalleCiudadano(
-                (int)$id
-            );
-
-        if ($datos === null) {
-
-            http_response_code(404);
-
-            echo 'Examen no encontrado';
-
-            return;
-        }
-
-        $vista =
-            new DetalleExamenVista();
-
-        $vista->mostrar($datos);
-    }
-);
-
-
-/* ==========================================================
-   CARNET — CIUDADANO AUTENTICADO
-========================================================== */
-
-/**
- * Descargar carnet del ciudadano autenticado.
- */
-$router->map(
-    'GET',
-    '/carnet/descargar',
-    function () {
-
-        AuthMiddleware::handle();
-
-        require_once __DIR__ .
-            '/../Controller/CarnetControlador.php';
-
-        $controller =
-            new CarnetControlador();
-
-        $controller->descargarCarnet();
-    }
-);
-
-
-/* ==========================================================
-   CONSULTA PÚBLICA DE CARNETS
-========================================================== */
-
-/**
- * Consulta pública por DNI.
- */
-$router->map(
-    'GET',
-    '/consulta-publica',
-    function () {
-
-        require_once __DIR__ .
-            '/../Controller/ConsultaPublicaControlador.php';
-
-        $controller =
-            new ConsultaPublicaControlador();
-
-        $controller->mostrar();
-    }
-);
-
-
-/**
- * Descargar carnet desde consulta pública.
- */
-$router->map(
-    'GET',
-    '/consulta-publica/carnet/[i:id]/descargar',
-    function ($id) {
-
-        require_once __DIR__ .
-            '/../Controller/ConsultaPublicaControlador.php';
-
-        $controller =
-            new ConsultaPublicaControlador();
-
-        $controller->descargarCarnet(
-            (int)$id
-        );
-    }
-);
-
-
-/**
- * Descargar foto de carnet desde consulta pública.
- */
-$router->map(
-    'GET',
-    '/consulta-publica/carnet/[i:id]/foto',
-    function ($id) {
-
-        require_once __DIR__ .
-            '/../Controller/ConsultaPublicaControlador.php';
-
-        $controller =
-            new ConsultaPublicaControlador();
-
-        $controller->descargarFoto(
-            (int)$id
-        );
-    }
-);
-
-
-/* ==========================================================
-   ADMINISTRACIÓN
-========================================================== */
-
-/**
- * Panel principal.
+ * Panel principal de administración.
  */
 $router->map(
     'GET',
     '/admin',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminDashboardControlador.php';
@@ -665,21 +374,20 @@ $router->map(
         $vista =
             new PanelAdminVista();
 
-        $vista->mostrar($datos);
+        $vista->mostrar(
+            $datos
+        );
     }
 );
 
 
 /**
- * Actividad reciente.
+ * Actividad reciente de administración.
  */
 $router->map(
     'GET',
     '/admin/actividad',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Views/actividad_reciente.php';
@@ -693,19 +401,469 @@ $router->map(
 
 
 /* ==========================================================
+   EXÁMENES — CIUDADANO
+========================================================== */
+/**
+ * Confirmación de inscripción a examen.
+ */
+$router->map(
+    'GET',
+    '/confirmar_inscripcion_examen',
+    function () {
+
+        require_once __DIR__ .
+            '/../Servicios/ExamenService.php';
+
+        require_once __DIR__ .
+            '/../Views/confirmar_inscripcion_examen.php';
+
+
+        $idExamen =
+            (int)(
+                $_GET['id']
+                ?? 0
+            );
+
+
+        $examenService =
+            new ExamenService();
+
+
+        $examen =
+            $examenService
+                ->obtenerExamen(
+                    $idExamen
+                );
+
+
+        if (
+            $examen === null
+        ) {
+
+            http_response_code(404);
+
+            exit(
+                'Examen no encontrado.'
+            );
+        }
+
+
+        $data = [
+
+            'page_title' =>
+                'Confirmar inscripción',
+
+            'examId' =>
+                (int)$examen['id'],
+
+            'examName' =>
+                'Examen de Manipulación de Alimentos'
+        ];
+
+
+        $vista =
+            new ConfirmarInscripcionExamenVista();
+
+
+        $vista->mostrar(
+            $data
+        );
+    }
+);
+
+/**
+ * Procesar inscripción a examen.
+ */
+$router->map(
+    'POST',
+    '/inscripcion/confirmar',
+    function () {
+
+        require_once __DIR__ .
+            '/../Controller/InscripcionControlador.php';
+
+        $controller =
+            new InscripcionControlador();
+
+        $resultado =
+            $controller
+                ->procesarInscripcionExamen(
+                    $_POST
+                );
+
+        if (
+            $resultado['success']
+        ) {
+
+            header(
+                'Location: ' .
+                BASE_URL .
+                '/?toast=inscripcion_exitosa'
+            );
+
+            exit;
+        }
+
+
+        switch (
+            $resultado['mensaje']
+            ?? ''
+        ) {
+
+            case
+                'Debe iniciar sesión para inscribirse a un examen.':
+
+                $toast =
+                    'login_requerido';
+
+                break;
+
+
+            case
+                'Debe completar la documentación requerida':
+
+                $toast =
+                    'documentacion_incompleta';
+
+                break;
+
+
+            case
+                'Ya posee una inscripción activa a un examen.':
+
+                $toast =
+                    'ya_inscripto';
+
+                break;
+
+
+            default:
+
+                $toast =
+                    'error_inscripcion';
+
+                break;
+        }
+
+
+        header(
+            'Location: ' .
+            BASE_URL .
+            '/?toast=' .
+            urlencode(
+                $toast
+            )
+        );
+
+        exit;
+    }
+);
+
+/**
+ * Detalle de un examen para el ciudadano.
+ */
+$router->map(
+    'GET',
+    '/detalle_examen/[i:id]',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/ExamenControlador.php';
+
+        $id = (int)$id;
+
+        $controlador =
+            new ExamenControlador();
+
+        $datos =
+            $controlador
+                ->obtenerDetalleCiudadano($id);
+
+        if ($datos === null) {
+
+            http_response_code(404);
+
+            echo 'Examen no encontrado';
+
+            return;
+        }
+
+        require_once __DIR__ .
+            '/../Views/detalle_examen.php';
+
+        $vista =
+            new DetalleExamenVista();
+
+        $vista->mostrar($datos);
+    }
+);
+
+/* ==========================================================
+   CONSULTA PÚBLICA DE CARNETS
+========================================================== */
+
+/**
+ * Consulta pública de carnets por DNI.
+ */
+$router->map(
+    'GET',
+    '/consulta-publica',
+    function () {
+
+        require_once __DIR__ .
+            '/../Controller/ConsultaPublicaControlador.php';
+
+        $controlador =
+            new ConsultaPublicaControlador();
+
+        $controlador->mostrar();
+    }
+);
+
+/**
+ * Descargar carnet desde la consulta pública.
+ */
+$router->map(
+    'GET',
+    '/consulta-publica/carnet/[i:id]/descargar',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/ConsultaPublicaControlador.php';
+
+        $controlador =
+            new ConsultaPublicaControlador();
+
+        $controlador->descargarCarnet(
+                    (int)$id
+                );
+    }
+);
+
+
+/**
+ * Descargar foto de carnet desde la consulta pública.
+ */
+$router->map(
+    'GET',
+    '/consulta-publica/carnet/[i:id]/foto',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/ConsultaPublicaControlador.php';
+
+        $controlador =
+            new ConsultaPublicaControlador();
+
+        $controlador->descargarFoto(
+                    (int)$id
+                );
+    }
+);
+
+/* ==========================================================
+   CONSULTA DE CARNET POR NÚMERO
+========================================================== */
+
+/**
+ * Consulta un carnet por número.
+ */
+$router->map(
+    'GET',
+    '/consulta-carnet',
+    function () {
+
+        $numeroCarnet =
+            trim(
+                $_GET['numero']
+                ?? ''
+            );
+
+        $resultado = null;
+
+        if ($numeroCarnet !== '') {
+
+            require_once __DIR__ .
+                '/../Controller/CarnetControlador.php';
+
+            $controller =
+                new CarnetControlador();
+
+            $resultado =
+                $controller
+                    ->obtenerPorNumero(
+                        $numeroCarnet
+                    );
+        }
+
+
+        $datos = [
+
+            'page_title' =>
+                'Consulta de Carnet',
+
+            'numero_carnet' =>
+                $numeroCarnet,
+
+            'resultado' =>
+                $resultado
+        ];
+
+
+        $_GET['data'] =
+            json_encode(
+                $datos,
+                JSON_UNESCAPED_UNICODE
+            );
+
+
+        require_once __DIR__ .
+            '/../Views/consulta_carnet.php';
+
+        $vista =
+            new ConsultaCarnetVista();
+
+        $vista->mostrar();
+    }
+);
+/* ==========================================================
+   CARNET — CIUDADANO AUTENTICADO
+========================================================== */
+
+/**
+ * Descargar el carnet del ciudadano autenticado.
+ */
+$router->map(
+    'GET',
+    '/carnet/descargar',
+    function () {
+
+        require_once __DIR__ .
+            '/../Controller/CarnetControlador.php';
+
+        $controller =
+            new CarnetControlador();
+
+        $controller->descargarCarnet();
+    }
+);
+
+
+
+/* ==========================================================
+   DESCARGA DE DOCUMENTOS — CIUDADANO
+========================================================== */
+
+/**
+ * Descargar un documento propio.
+ *
+ * La validación de pertenencia del documento
+ * debe realizarse en la capa correspondiente
+ * antes de entregar el archivo.
+ */
+$router->map(
+    'GET',
+    '/documentos/[i:id]/descargar',
+    function ($id) {
+
+        require_once __DIR__ .
+            '/../Controller/DocumentoControlador.php';
+
+        $controller =
+            new DocumentoControlador();
+
+        /*
+         * Si DocumentoControlador todavía no tiene
+         * este método, esta ruta queda pendiente de
+         * implementación.
+         */
+        if (
+            method_exists(
+                $controller,
+                'descargar'
+            )
+        ) {
+
+            $controller->descargar(
+                (int)$id
+            );
+
+            return;
+        }
+
+
+        http_response_code(501);
+
+        echo
+            'La descarga de documentos todavía no está implementada.';
+    }
+);
+
+
+/* ==========================================================
+   PERFIL / DATOS DEL CIUDADANO
+========================================================== */
+
+/**
+ * Perfil / datos del ciudadano.
+ */
+$router->map(
+    'GET',
+    '/perfil',
+    function () {
+
+        AuthMiddleware::handle();
+
+
+        require_once __DIR__ .
+            '/../Controller/UsuarioControlador.php';
+
+        $controller =
+            new UsuarioControlador();
+
+        $controller->mostrarPerfil();
+    }
+);
+
+
+/**
+ * Actualizar perfil del usuario.
+ */
+$router->map(
+    'POST',
+    '/perfil/actualizar',
+    function () {
+
+        AuthMiddleware::handle();
+
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ .
+            '/../Controller/UsuarioControlador.php';
+
+        $controller =
+            new UsuarioControlador();
+
+        $controller->actualizarPerfil();
+    }
+);
+
+
+/* ==========================================================
+   FIN DEL FLUJO CIUDADANO
+========================================================== */
+
+/* ==========================================================
    ADMINISTRACIÓN — EXÁMENES
 ========================================================== */
 
 /**
- * Listado de exámenes.
+ * Listado administrativo de exámenes.
  */
 $router->map(
     'GET',
     '/admin/examenes',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -719,15 +877,12 @@ $router->map(
 
 
 /**
- * Formulario para crear examen.
+ * Formulario para crear un examen.
  */
 $router->map(
     'GET',
     '/admin/examenes/nuevo',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -741,7 +896,9 @@ $router->map(
 
 
 /**
- * Crear examen.
+ * Crear un examen.
+ *
+ * POST /admin/examenes
  */
 $router->map(
     'POST',
@@ -749,8 +906,10 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
+
+        RoleMiddleware::handle([
+            'admin'
+        ]);
 
         require_once __DIR__ .
             '/../Controller/ExamenControlador.php';
@@ -764,11 +923,15 @@ $router->map(
         $resultado =
             $controller->guardar();
 
-        if (!empty($resultado['success'])) {
+        if (
+            !empty(
+                $resultado['success']
+            )
+        ) {
 
             header(
                 'Location: ' .
-                rtrim(BASE_URL, '/') .
+                BASE_URL .
                 '/admin/examenes?toast=examen_creado'
             );
 
@@ -776,11 +939,16 @@ $router->map(
         }
 
         $datosFormulario =
-            $resultado['data'] ?? [];
+            $resultado['data']
+            ?? [];
 
         $errores = [];
 
-        if (!empty($resultado['message'])) {
+        if (
+            !empty(
+                $resultado['message']
+            )
+        ) {
             $errores[] =
                 $resultado['message'];
         }
@@ -789,43 +957,50 @@ $router->map(
             new ExamenFormVista();
 
         $vista->mostrar([
-            'page_title' => 'Nuevo Examen',
 
-            'modo' => 'crear',
+            'page_title' =>
+                'Nuevo Examen',
+
+            'modo' =>
+                'crear',
 
             'examen' => [
+
                 'fecha' =>
-                    $datosFormulario['fecha'] ?? '',
+                    $datosFormulario['fecha']
+                    ?? '',
 
                 'hora' =>
-                    $datosFormulario['hora'] ?? '',
+                    $datosFormulario['hora']
+                    ?? '',
 
                 'ubicacion' =>
-                    $datosFormulario['ubicacion'] ?? '',
+                    $datosFormulario['ubicacion']
+                    ?? '',
 
                 'aula' =>
-                    $datosFormulario['aula'] ?? '',
+                    $datosFormulario['aula']
+                    ?? '',
 
                 'cupos' =>
-                    $datosFormulario['cupos'] ?? ''
+                    $datosFormulario['cupos']
+                    ?? ''
+
             ],
 
-            'errores' => $errores
+            'errores' =>
+                $errores
+
         ]);
     }
 );
-
-
 /**
- * Detalle administrativo de examen.
+ * Detalle administrativo de un examen.
  */
 $router->map(
     'GET',
     '/admin/examenes/[i:id]',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -841,15 +1016,12 @@ $router->map(
 
 
 /**
- * Editar examen.
+ * Formulario de edición de un examen.
  */
 $router->map(
     'GET',
     '/admin/examenes/[i:id]/editar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -865,16 +1037,12 @@ $router->map(
 
 
 /**
- * Guardar edición de examen.
+ * Guardar edición de un examen.
  */
 $router->map(
     'POST',
     '/admin/examenes/[i:id]',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -890,16 +1058,12 @@ $router->map(
 
 
 /**
- * Activar examen.
+ * Activar un examen.
  */
 $router->map(
     'POST',
     '/admin/examenes/[i:id]/activar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -915,16 +1079,12 @@ $router->map(
 
 
 /**
- * Desactivar examen.
+ * Desactivar un examen.
  */
 $router->map(
     'POST',
     '/admin/examenes/[i:id]/desactivar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -940,15 +1100,12 @@ $router->map(
 
 
 /**
- * Administrar inscripción a examen.
+ * Administración de una inscripción a examen.
  */
 $router->map(
     'GET',
     '/admin/inscripciones/[i:id]',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -964,16 +1121,12 @@ $router->map(
 
 
 /**
- * Guardar administración de inscripción.
+ * Guardar la administración de una inscripción.
  */
 $router->map(
     'POST',
     '/admin/inscripciones/[i:id]',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminExamenControlador.php';
@@ -989,19 +1142,25 @@ $router->map(
 
 
 /* ==========================================================
+   ADMINISTRACIÓN — FIN DE EXÁMENES
+========================================================== */
+
+/* ==========================================================
    ADMINISTRACIÓN — CARNETS
 ========================================================== */
 
 /**
  * Panel administrativo de carnets.
+ *
+ * Muestra:
+ * - Inscripciones aprobadas pendientes de carnet.
+ * - Carnets ya emitidos.
+ * - Búsqueda por DNI.
  */
 $router->map(
     'GET',
     '/admin/carnets',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminCarnetControlador.php';
@@ -1015,15 +1174,15 @@ $router->map(
 
 
 /**
- * Formulario para cargar carnet.
+ * Formulario para cargar un carnet.
+ *
+ * [i:id] corresponde al ID interno
+ * de la inscripción.
  */
 $router->map(
     'GET',
     '/admin/carnets/[i:id]/cargar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminCarnetControlador.php';
@@ -1039,16 +1198,12 @@ $router->map(
 
 
 /**
- * Emitir/cargar carnet.
+ * Procesar la emisión/carga de un carnet.
  */
 $router->map(
     'POST',
     '/admin/carnets/[i:id]/emitir',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminCarnetControlador.php';
@@ -1062,17 +1217,13 @@ $router->map(
     }
 );
 
-
 /**
- * Descargar carnet desde administración.
+ * Descargar/visualizar el PDF de un carnet emitido.
  */
 $router->map(
     'GET',
     '/admin/carnets/[i:id]/descargar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminCarnetControlador.php';
@@ -1087,17 +1238,17 @@ $router->map(
 );
 
 
+/* ==========================================================
+   CARNETS — CONSULTA ADMINISTRATIVA
+========================================================== */
+
 /**
- * Anular carnet.
+ * Anular un carnet.
  */
 $router->map(
     'POST',
     '/admin/carnets/[i:id]/anular',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/CarnetControlador.php';
@@ -1110,11 +1261,15 @@ $router->map(
                 (int)$id
             );
 
-        if (!empty($resultado['success'])) {
+        if (
+            !empty(
+                $resultado['success']
+            )
+        ) {
 
             header(
                 'Location: ' .
-                rtrim(BASE_URL, '/') .
+                BASE_URL .
                 '/admin/carnets?toast=carnet_anulado'
             );
 
@@ -1123,7 +1278,7 @@ $router->map(
 
         header(
             'Location: ' .
-            rtrim(BASE_URL, '/') .
+            BASE_URL .
             '/admin/carnets?toast=error_anular_carnet'
         );
 
@@ -1133,19 +1288,24 @@ $router->map(
 
 
 /* ==========================================================
+   FIN ADMINISTRACIÓN — CARNETS
+========================================================== */
+/* ==========================================================
    ADMINISTRACIÓN — DOCUMENTACIÓN
 ========================================================== */
 
 /**
  * Panel administrativo de documentación.
+ *
+ * Muestra:
+ * - Ciudadanos con documentación pendiente.
+ * - Estado de cada documento.
+ * - Acciones administrativas.
  */
 $router->map(
     'GET',
     '/admin/documentos',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminDocumentoControlador.php';
@@ -1159,15 +1319,12 @@ $router->map(
 
 
 /**
- * Buscar documentación por DNI.
+ * Buscar documentación de un ciudadano por DNI.
  */
 $router->map(
     'GET',
     '/admin/documentos/buscar',
     function () {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminDocumentoControlador.php';
@@ -1181,16 +1338,14 @@ $router->map(
 
 
 /**
- * Aprobar documento.
+ * Aprobar un documento.
+ *
+ * La observación es opcional.
  */
 $router->map(
     'POST',
     '/admin/documentos/[i:id]/aprobar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminDocumentoControlador.php';
@@ -1206,16 +1361,15 @@ $router->map(
 
 
 /**
- * Rechazar documento.
+ * Rechazar un documento.
+ *
+ * El controlador exige una observación
+ * indicando el motivo del rechazo.
  */
 $router->map(
     'POST',
     '/admin/documentos/[i:id]/rechazar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
-        CsrfMiddleware::validate();
 
         require_once __DIR__ .
             '/../Controller/AdminDocumentoControlador.php';
@@ -1231,15 +1385,13 @@ $router->map(
 
 
 /**
- * Descargar documento desde administración.
+ * Descargar un documento desde
+ * el panel administrativo.
  */
 $router->map(
     'GET',
     '/admin/documentos/[i:id]/descargar',
     function ($id) {
-
-        AuthMiddleware::handle();
-        RoleMiddleware::handle(['admin']);
 
         require_once __DIR__ .
             '/../Controller/AdminDocumentoControlador.php';
@@ -1253,10 +1405,6 @@ $router->map(
     }
 );
 
-
-/* ==========================================================
-   FIN DE RUTAS
-========================================================== */
 
 /* ==========================================================
    ADMINISTRACIÓN — USUARIOS

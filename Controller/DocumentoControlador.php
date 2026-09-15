@@ -97,51 +97,7 @@ class DocumentoControlador
             ];
         }
     }
-    /**
-     * Obtener los documentos del usuario autenticado.
-     *
-     * @return array [
-     *     'success' => bool,
-     *     'documentos' => array
-     * ]
-     */
-    public function obtenerMisDocumentos(): array
-    {
-        try {
-
-            if (empty($_SESSION['usuario_id'])) {
-
-                return [
-                    'success' => false,
-                    'documentos' => []
-                ];
-            }
-
-            $documentos = $this->documentoService
-                ->obtenerPorUsuario(
-                    (int)$_SESSION['usuario_id']
-                );
-
-            return [
-                'success' => true,
-                'documentos' => $documentos
-            ];
-
-        } catch (\Exception $e) {
-
-            $this->registrarLog(
-                'Error al obtener documentos',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'documentos' => []
-            ];
-        }
-    }
+    
 
 
 
@@ -169,7 +125,7 @@ class DocumentoControlador
                 header(
                     'Location: ' .
                     BASE_URL .
-                    '/subida_documentacion?toast=error_archivo'
+                    '/documentacion?toast=error_archivo'
                 );
 
                 exit;
@@ -186,7 +142,7 @@ class DocumentoControlador
                 header(
                     'Location: ' .
                     BASE_URL .
-                    '/subida_documentacion?toast=error_upload'
+                    '/documentacion?toast=error_upload'
                 );
 
                 exit;
@@ -205,7 +161,7 @@ class DocumentoControlador
                 header(
                     'Location: ' .
                     BASE_URL .
-                    '/subida_documentacion?toast=error_subida'
+                    '/documentacion?toast=error_subida'
                 );
 
                 exit;
@@ -250,7 +206,7 @@ class DocumentoControlador
             header(
                 'Location: ' .
                 BASE_URL .
-                '/subida_documentacion?toast=documento_subido'
+                '/documentacion?toast=documento_subido'
             );
 
             exit;
@@ -267,7 +223,7 @@ class DocumentoControlador
             header(
                 'Location: ' .
                 BASE_URL .
-                '/subida_documentacion?toast=error_subida'
+                '/documentacion?toast=error_subida'
             );
 
             exit;
@@ -455,5 +411,139 @@ class DocumentoControlador
                 'No fue posible descargar el documento.'
             );
         }
+    }
+    
+    public function mostrarDocumentacion(): void
+    {
+        $usuarioId = (int)($_SESSION['usuario_id'] ?? 0);
+
+        if ($usuarioId <= 0) {
+            header('Location: ' . BASE_URL . 'login');
+            exit;
+        }
+
+        try {
+
+            $documentos = $this->documentoService
+                ->obtenerPorUsuario($usuarioId);
+
+            $estado = $this->documentoService
+                ->obtenerEstadoDocumentacion($usuarioId);
+
+            $datos = [
+                'documents' =>
+                        $this->prepararDocumentos(
+                            $documentos
+                        ),
+                'estado' => $estado
+            ];
+
+            require_once __DIR__ . '/../Views/documentacion.php';
+
+            $vista = new SubidaDocumentacionVista();
+            $vista->mostrar($datos);
+
+        } catch (\Throwable $e) {
+
+            $this->registrarLog(
+                'Error al mostrar documentación',
+                [
+                    'usuario_id' => $usuarioId,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            http_response_code(500);
+            exit('No fue posible cargar la documentación.');
+        }
+    }
+
+
+    private function prepararDocumentos(array $documentos): array
+    {
+        $requeridos = [
+            'dni' => [
+                'icon' => 'badge',
+                'title' => 'DNI frente y dorso',
+                'description' => 'Ambos lados en una misma imagen o PDF.'
+            ],
+            'foto_carnet' => [
+                'icon' => 'account_circle',
+                'title' => 'Foto carnet',
+                'description' => 'Fondo blanco, frente despejado.'
+            ],
+            'moodle' => [
+                'icon' => 'school',
+                'title' => 'Certificado Moodle',
+                'description' => 'Constancia de aprobación del curso.'
+            ]
+        ];
+
+        $resultado = [];
+
+        foreach ($requeridos as $tipo => $config) {
+
+            $documentoEncontrado = null;
+
+            foreach ($documentos as $documento) {
+
+                if (
+                    strtolower($documento->getTipoDocumento())
+                    === strtolower($tipo)
+                ) {
+                    $documentoEncontrado = $documento;
+                    break;
+                }
+            }
+
+            if ($documentoEncontrado === null) {
+
+                $resultado[] = [
+                    'tipo' => $tipo,
+                    'icon' => $config['icon'],
+                    'title' => $config['title'],
+                    'description' => $config['description'],
+                    'documento' => null,
+                    'estado' => 'pendiente',
+                    'status' => 'Pendiente',
+                    'status_icon' => 'pending'
+                ];
+
+                continue;
+            }
+
+            $estado = $documentoEncontrado->getEstado();
+
+            switch ($estado) {
+
+                case 'aprobado':
+                    $status = 'Validado';
+                    $statusIcon = 'check_circle';
+                    break;
+
+                case 'rechazado':
+                    $status = 'Rechazado';
+                    $statusIcon = 'cancel';
+                    break;
+
+                default:
+                    $status = 'Pendiente de validación';
+                    $statusIcon = 'pending';
+                    break;
+            }
+
+            $resultado[] = [
+                'tipo' => $tipo,
+                'icon' => $config['icon'],
+                'title' => $config['title'],
+                'description' => $config['description'],
+                'documento' => $documentoEncontrado,
+                'estado' => $estado,
+                'status' => $status,
+                'status_icon' => $statusIcon
+            ];
+        }
+
+        return $resultado;
     }
 }

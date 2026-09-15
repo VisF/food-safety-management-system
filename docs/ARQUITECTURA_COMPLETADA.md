@@ -66,7 +66,7 @@ manipulaciondealimentos/
 │   ├── base.css
 │   └── components.css
 ├── js/
-├── Router.php                            # Enrutador existente
+├── AltoRouter.php                        # Enrutador existente
 └── index.php                             # Punto entrada
 ```
 
@@ -258,7 +258,6 @@ InspectorControlador.buscarPorDNI()
 ### Fase 5: Integración de Vistas
 - [ ] Crear landing page general
 - [ ] Mejorar UI/UX de vistas existentes (simple CSS)
-- [ ] Conectar Router.php con controladores
 - [ ] Validar flujos end-to-end
 
 ### Fase 6: Configuración de Servicios

@@ -320,7 +320,7 @@ include __DIR__ . '/header.php';
                                     <form
                                         action="<?php echo $this->getRoute('desactivar_examen', (int)$examen['id']); ?>"
                                         method="post">
-
+                                        <?= $this->getCsrfInput() ?>
                                         <button
                                             class="app-vista-button app-vista-button--danger"
                                             type="submit">
@@ -336,7 +336,7 @@ include __DIR__ . '/header.php';
                                     <form
                                         action="<?php echo $this->getRoute('activar_examen', (int)$examen['id']); ?>"
                                         method="post">
-
+                                        <?= $this->getCsrfInput() ?>
                                         <button
                                             class="app-vista-button app-vista-button--success"
                                             type="submit">
@@ -465,7 +465,7 @@ include __DIR__ . '/header.php';
                 <form
                     method="post"
                     action="<?php echo $this->getRoute('desactivar_examen',(int)$examen['id']); ?>">
-
+                    <?= $this->getCsrfInput() ?>
                     <button
                         class="app-vista-button app-vista-button--danger"
                         type="submit">
@@ -481,7 +481,7 @@ include __DIR__ . '/header.php';
                 <form
                     method="post"
                     action="<?php echo $this->getRoute('activar_examen',(int)$examen['id']); ?>">
-
+                    <?= $this->getCsrfInput() ?>
                     <button
                         class="app-vista-button app-vista-button--success"
                         type="submit">

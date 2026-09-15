@@ -12,13 +12,9 @@ declare(strict_types=1);
  * AdminDocumentoControlador
  *
  * Responsabilidades:
- * - Listar documentos.
- * - Obtener documento.
- * - Obtener documentos pendientes.
  * - Validar documento.
  * - Rechazar documento.
  * - Descargar documento.
- * - Eliminar documento.
  *
  * Dependencias:
  * - DocumentoService
@@ -849,113 +845,8 @@ class AdminDocumentoControlador
         }
     }
 
-    /**
-     * Listar todos los documentos.
-     */
-    public function listarDocumentos(): array
-    {
-        try {
-            $datos = $this->documentoService
-                ->listarDocumentos();
+   
 
-            return [
-                'success' => true,
-                'documentos' => $datos['documentos'],
-                'total' => $datos['total']
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al listar documentos',
-                'ERROR',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'documentos' => [],
-                'total' => 0
-            ];
-        }
-    }
-
-    /**
-     * Obtener un documento por ID.
-     */
-    public function obtenerDocumento(int $id): array
-    {
-        try {
-            $documento =
-                $this->documentoService
-                    ->obtenerDocumento($id);
-
-            if (!$documento) {
-
-                return [
-                    'success' => false,
-                    'documento' => []
-                ];
-            }
-
-            return [
-                'success' => true,
-                'documento' => $documento
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al obtener documento',
-                'ERROR',
-                [
-                    'id' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'documento' => []
-            ];
-        }
-    }
-
-    /**
-     * Obtener documentos pendientes.
-     */
-    public function obtenerPendientes(): array
-    {
-        try {
-            $datos =
-                $this->documentoService
-                    ->obtenerPendientes();
-
-            return [
-                'success' => true,
-                'documentos' => $datos['documentos'],
-                'total' => $datos['total']
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al obtener documentos pendientes',
-                'ERROR',
-                [
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'documentos' => [],
-                'total' => 0
-            ];
-        }
-    }
         /**
      * Aprobar un documento.
      */
@@ -1083,115 +974,7 @@ class AdminDocumentoControlador
             ];
         }
     }
-        /**
-     * Obtener la información necesaria para descargar un documento.
-     */
-    public function descargarDocumento(int $id): array
-    {
-        try {
+ 
 
-            $documento =
-                $this->documentoService
-                    ->descargarDocumento($id);
-            if (!$documento) {
-
-                return [
-                    'success' => false,
-                    'message' => 'Documento no encontrado',
-                    'documento' => null
-                ];
-            }
-
-            $this->log(
-                'Documento descargado',
-                'INFO',
-                [
-                    'id_documento' => $id
-                ]
-            );
-
-            return [
-                'success' => true,
-                'message' => 'Documento encontrado',
-                'documento' => $documento
-            ];
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al descargar documento',
-                'ERROR',
-                [
-                    'id_documento' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'message' => $e->getMessage(),
-                'documento' => null
-            ];
-        }
-    }
-
-    /**
-     * Eliminar un documento.
-     */
-    public function eliminarDocumento(int $id): array
-    {
-        try {
-
-            $resultado =
-                $this->documentoService
-                    ->eliminarDocumento($id);
-
-            if ($resultado['success']) {
-
-                $this->log(
-                    'Documento eliminado',
-                    'INFO',
-                    [
-                        'id_documento' => $id
-                    ]
-                );
-
-                return [
-                    'success' => true,
-                    'message' => 'Documento eliminado correctamente'
-                ];
-            }
-
-            switch ($resultado['codigo']) {
-
-                case 'DOCUMENTO_INEXISTENTE':
-                    return [
-                        'success' => false,
-                        'message' => 'Documento no encontrado'
-                    ];
-
-                default:
-                    return [
-                        'success' => false,
-                        'message' => 'No se pudo eliminar el documento'
-                    ];
-            }
-
-        } catch (Throwable $e) {
-
-            $this->log(
-                'Error al eliminar documento',
-                'ERROR',
-                [
-                    'id_documento' => $id,
-                    'error' => $e->getMessage()
-                ]
-            );
-
-            return [
-                'success' => false,
-                'message' => $e->getMessage()
-            ];
-        }
-    }
+   
 }

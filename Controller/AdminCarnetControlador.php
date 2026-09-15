@@ -20,7 +20,6 @@ class AdminCarnetControlador
      */
     public function __construct()
     {
-        require_once __DIR__ . '/../db/Connection.php';
         require_once __DIR__ . '/../Servicios/CarnetService.php';
 
         @mkdir(
@@ -45,7 +44,7 @@ class AdminCarnetControlador
             date('Y-m-d H:i:s');
 
         $usuario =
-            $_SESSION['user_id']
+            $_SESSION['usuario_id']
             ?? 'anonimo';
 
         $mensaje =
@@ -1147,11 +1146,8 @@ class AdminCarnetControlador
             /*
              * Recuperar inscripción para
              * volver a mostrar el formulario.
-             */
-            $inscripcion =
-                $this->obtenerPendiente(
-                    $idInscripcion
-                );
+             */ 
+            $inscripcion = $this->carnetService->obtenerPendienteEmisionPorId($idInscripcion);
 
             require_once __DIR__ .
                 '/../Views/admin_carnets.php';
@@ -1387,33 +1383,5 @@ class AdminCarnetControlador
         }
     }
 
-    /**
-     * Obtiene una inscripción pendiente de emisión
-     * por su ID interno.
-     */
-    private function obtenerPendiente(
-        int $idInscripcion
-    ): ?array
-    {
-        $pendientes =
-            $this->carnetService
-                ->obtenerPendientesEmision();
-
-        foreach (
-            $pendientes
-            as
-            $pendiente
-        ) {
-
-            if (
-                (int)$pendiente['inscripcion_id']
-                === $idInscripcion
-            ) {
-
-                return $pendiente;
-            }
-        }
-
-        return null;
-    }
+   
 }
