@@ -1064,6 +1064,110 @@ include __DIR__ .
 
 <?php endforeach; ?>
 
+
+    <!-- ==================================
+        ASISTENCIA
+    =================================== -->
+
+    <div
+        class="
+            admin-documentos-document-row
+            admin-documento-estado-pendiente"
+    >
+
+        <div
+            class="admin-documentos-document-info"
+        >
+
+            <div
+                class="admin-documentos-document-icon"
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    how_to_reg
+                </span>
+
+            </div>
+
+            <div>
+
+                <h4>
+                    Asistencia
+                </h4>
+
+                <p>
+                    Registro de asistencia presencial
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="
+                admin-documentos-document-status
+                admin-documento-status-pendiente
+            "
+        >
+
+            <span
+                class="material-symbols-outlined"
+            >
+                schedule
+            </span>
+
+            Pendiente
+
+        </div>
+
+
+        <div
+            class="admin-documentos-document-actions"
+        >
+
+            <button
+                type="button"
+                class="
+                    admin-documentos-btn
+                    admin-documentos-btn-success
+                "
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    check
+                </span>
+
+                Aprobar
+
+            </button>
+
+
+            <button
+                type="button"
+                class="
+                    admin-documentos-btn
+                    admin-documentos-btn-danger"
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    close
+                </span>
+
+                Desaprobar
+
+            </button>
+
+        </div>
+
+    </div>
+
             </div>
 
 <?php else: ?>
@@ -1806,6 +1910,111 @@ include __DIR__ .
                         </div>
 
 <?php endforeach; ?>
+
+    <!-- ==================================
+        ASISTENCIA
+    =================================== -->
+
+    <div
+        class="
+            admin-documentos-document-row
+            admin-documento-estado-pendiente
+        "
+    >
+
+        <div
+            class="admin-documentos-document-info"
+        >
+
+            <div
+                class="admin-documentos-document-icon"
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    how_to_reg
+                </span>
+
+            </div>
+
+            <div>
+
+                <h4>
+                    Asistencia
+                </h4>
+
+                <p>
+                    Registro de asistencia presencial
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div
+            class="
+                admin-documentos-document-status
+                admin-documento-status-pendiente
+            "
+        >
+
+            <span
+                class="material-symbols-outlined"
+            >
+                schedule
+            </span>
+
+            Pendiente
+
+        </div>
+
+
+        <div
+            class="admin-documentos-document-actions"
+        >
+
+            <button
+                type="button"
+                class="
+                    admin-documentos-btn
+                    admin-documentos-btn-success
+                "
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    check
+                </span>
+
+                Aprobar
+
+            </button>
+
+
+            <button
+                type="button"
+                class="
+                    admin-documentos-btn
+                    admin-documentos-btn-danger
+                "
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                >
+                    close
+                </span>
+
+                Desaprobar
+
+            </button>
+
+        </div>
+
+    </div>
 
                     </div>
 

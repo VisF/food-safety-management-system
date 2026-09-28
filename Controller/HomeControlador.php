@@ -102,6 +102,23 @@ class HomeControlador
                     );
         }
 
+        $estadoRecursante = [
+            'es_recursante' => false,
+            'puede_inscribirse' => false,
+            'fecha_examen' => null,
+            'fecha_limite' => null,
+            'dias_plazo' => null
+        ];
+
+        if ($usuario !== null) {
+
+            $estadoRecursante =
+                $this->inscripcionService
+                    ->obtenerEstadoRecursante(
+                        $usuario['id']
+                    );
+        }
+
         $documentos = [];
 
         if ($usuario !== null) {
@@ -265,6 +282,8 @@ class HomeControlador
 
             'mostrar_examenes' =>
                 $mostrarExamenes,
+
+            'recursante' => $estadoRecursante,
 
             'documentos_faltantes' =>
                 $accionPrincipal['faltantes'] ?? [],

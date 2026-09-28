@@ -291,6 +291,14 @@ CREATE TABLE `notificaciones` (
   CONSTRAINT `not_usuario_fk` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
+CREATE TABLE configuracion_sistema (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    clave VARCHAR(100) NOT NULL UNIQUE,
+    valor VARCHAR(255) NOT NULL,
+    descripcion VARCHAR(255) NULL
+);
+
+
 CREATE TABLE `recovery_tokens` (
   `id` BIGINT UNSIGNED NOT NULL AUTO_INCREMENT,
   `usuario_id` INT UNSIGNED NOT NULL,

@@ -20,6 +20,7 @@ declare(strict_types=1);
  * - Obtener próximos exámenes.
  */
 require_once __DIR__ . '/../Servicios/ExamenService.php';
+require_once __DIR__ . '/../Servicios/ConfiguracionService.php';
 
 
 class AdminExamenControlador
@@ -27,6 +28,7 @@ class AdminExamenControlador
     private const LOG_FILE = __DIR__ . '/../logs/admin_examen_controller.log';
     
     private ExamenService $examenService;
+    private ConfiguracionService $configuracionService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
@@ -34,6 +36,8 @@ class AdminExamenControlador
         @mkdir(dirname(self::LOG_FILE), 0755, true);
 
         $this->examenService = new ExamenService();
+
+        $this->configuracionService = new ConfiguracionService();
     }
 
 
@@ -317,6 +321,9 @@ class AdminExamenControlador
 
         }
 
+        $plazoRecursanteDias = $this->configuracionService
+            ->obtenerPlazoRecursanteDias();
+
         require_once __DIR__ . '/../Views/admin_examenes.php';
 
         $vista = new ExamenAdminVista();
@@ -324,8 +331,53 @@ class AdminExamenControlador
         $vista->mostrar([
             'page_title' => 'Gestión de Exámenes',
             'examenes' => $examenes,
-            'orden' => $orden
+            'orden' => $orden,
+            'plazo_recursante_dias' => $plazoRecursanteDias
         ]);
+    }
+
+    /**
+     * Guarda la configuración del plazo para recursantes.
+     */
+    public function guardarConfiguracionRecursante(): void
+    {
+        try {
+
+            $dias = (int)($_POST['plazo_recursante_dias'] ?? 0);
+
+            $this->configuracionService
+                ->actualizarPlazoRecursanteDias($dias);
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=configuracion_recursante_guardada'
+            );
+
+            exit;
+
+        } catch (InvalidArgumentException $e) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=configuracion_recursante_invalida'
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al actualizar configuración de recursantes',
+                'ERROR',
+                [
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=error_configuracion_recursante'
+            );
+
+            exit;
+        }
     }
 
     public function mostrarAdministracionInscripcion(int $id): void

@@ -467,34 +467,54 @@ class TramiteRepository
             INSERT INTO auditoria_acciones
             (
                 usuario_id,
-                tabla,
-                id_registro,
+                tabla_afectada,
                 accion,
                 datos_anteriores,
                 datos_nuevos,
-                fecha
+                ip,
+                user_agent
             )
             VALUES
             (
                 :usuario,
                 :tabla,
-                :registro,
                 :accion,
                 :anteriores,
                 :nuevos,
-                NOW()
+                :ip,
+                :user_agent
             )
         ";
 
         $stmt = $this->pdo->prepare($sql);
 
         return $stmt->execute([
-            ':usuario'     => $usuarioId,
-            ':tabla'       => $tabla,
-            ':registro'    => $idRegistro,
-            ':accion'      => $accion,
-            ':anteriores'  => json_encode($datosAnteriores),
-            ':nuevos'      => json_encode($datosNuevos)
+            ':usuario' =>
+                $usuarioId,
+
+            ':tabla' =>
+                $tabla,
+
+            ':accion' =>
+                $accion,
+
+            ':anteriores' =>
+                json_encode(
+                    $datosAnteriores,
+                    JSON_UNESCAPED_UNICODE
+                ),
+
+            ':nuevos' =>
+                json_encode(
+                    $datosNuevos,
+                    JSON_UNESCAPED_UNICODE
+                ),
+
+            ':ip' =>
+                $_SERVER['REMOTE_ADDR'] ?? null,
+
+            ':user_agent' =>
+                $_SERVER['HTTP_USER_AGENT'] ?? null
         ]);
     }
 

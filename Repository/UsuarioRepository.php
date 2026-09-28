@@ -335,21 +335,11 @@ class UsuarioRepository
 
             $usuarioId = (int)$this->conexion->lastInsertId();
 
-            if (!empty($datos['rol_id'])) {
-
-                $this->asignarRol(
-                    $usuarioId,
-                    (int)$datos['rol_id']
-                );
-
-            } else {
-
-                // Usuario común por defecto
-                $this->asignarRol(
-                    $usuarioId,
-                    3
-                );
-            }
+            // Todo usuario nuevo comienza obligatoriamente como ciudadano.
+            $this->asignarRol(
+                $usuarioId,
+                1
+            );
 
             $this->conexion->commit();
 

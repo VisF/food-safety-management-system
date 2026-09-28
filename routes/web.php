@@ -987,6 +987,27 @@ $router->map(
     }
 );
 
+/**
+ * Guardar configuración del plazo para recursantes.
+ */
+$router->map(
+    'POST',
+    '/admin/examenes/configuracion/recursante',
+    function () {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminExamenControlador.php';
+
+        $controller = new AdminExamenControlador();
+
+        $controller->guardarConfiguracionRecursante();
+
+        exit;
+    }
+);
+
 
 /* ==========================================================
    ADMINISTRACIÓN — CARNETS
@@ -1262,12 +1283,160 @@ $router->map(
    ADMINISTRACIÓN — USUARIOS
 ========================================================== */
 
-/*
- * Las rutas de administración de usuarios
- * se incorporarán aquí una vez que trabajemos
- * sobre el UsuarioControlador/AdminUsuarioControlador
- * real y confirmemos sus métodos.
+/**
+ * =========================================================
+ * ADMINISTRACIÓN DE USUARIOS
+ * =========================================================
  */
+
+/**
+ * Listado de usuarios.
+ */
+$router->map(
+    'GET',
+    '/admin/usuarios',
+    function () {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+
+        require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';
+        require_once __DIR__ . '/../Views/admin_usuarios.php';
+
+        $controller = new AdminUsuarioControlador();
+        $datos = $controller->gestionarUsuarios();
+
+        $vista = new AdminUsuariosVista();
+        $vista->mostrar($datos);
+    }
+);
+
+
+/**
+ * Crear usuario.
+ */
+$router->map(
+    'POST',
+    '/admin/usuarios',
+    function () {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';
+        require_once __DIR__ . '/../Views/admin_usuarios.php';
+
+        $controller = new AdminUsuarioControlador();
+
+        $resultado = $controller->crearUsuario($_POST);
+
+        $datos = $controller->gestionarUsuarios();
+
+        $datos['resultado'] = $resultado;
+
+        $vista = new AdminUsuariosVista();
+        $vista->mostrar($datos);
+    }
+);
+
+
+/**
+ * Actualizar usuario.
+ */
+$router->map(
+    'POST',
+    '/admin/usuarios/[i:id]',
+    function ($id) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';
+        require_once __DIR__ . '/../Views/admin_usuarios.php';
+
+        $controller = new AdminUsuarioControlador();
+
+        $resultado = $controller->actualizarUsuario(
+            (int)$id,
+            $_POST
+        );
+
+        $datos = $controller->gestionarUsuarios();
+
+        $datos['resultado'] = $resultado;
+
+        $vista = new AdminUsuariosVista();
+        $vista->mostrar($datos);
+    }
+);
+
+
+/**
+ * Desactivar usuario.
+ */
+$router->map(
+    'POST',
+    '/admin/usuarios/[i:id]/desactivar',
+    function ($id) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';
+
+        $controller = new AdminUsuarioControlador();
+
+        $resultado = $controller->desactivarUsuario(
+            (int)$id
+        );
+
+        /*
+         * PRG: volvemos al listado después de la operación.
+         */
+        header(
+            'Location: /manipulacionDeAlimentos/admin/usuarios'
+        );
+
+        exit;
+    }
+);
+
+/**
+ * Activar usuario.
+ */
+$router->map(
+    'POST',
+    '/admin/usuarios/[i:id]/activar',
+    function ($id) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';
+
+        $controller = new AdminUsuarioControlador();
+
+        $resultado = $controller->activarUsuario(
+            (int)$id
+        );
+
+        /*
+         * PRG: volvemos al listado después de la operación.
+         */
+        if (!empty($resultado['success'])) {
+            header(
+                'Location: /manipulacionDeAlimentos/admin/usuarios?toast=usuario_activado'
+            );
+        } else {
+            header(
+                'Location: /manipulacionDeAlimentos/admin/usuarios?toast=error_activar_usuario'
+            );
+        }
+
+        exit;
+    }
+);
+
+
 
 
 /* ==========================================================

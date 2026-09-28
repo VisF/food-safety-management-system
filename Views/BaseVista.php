@@ -395,6 +395,15 @@ abstract class BaseVista
                 'admin/inscripciones/' .
                 (int)$id,
 
+            /**
+             * Guardar configuración del plazo para recursantes.
+             *
+             * POST /admin/examenes/configuracion/recursante
+             */
+            'guardar_configuracion_recursante' =>
+                $this->baseURL .
+                'admin/examenes/configuracion/recursante',
+
 
             /* ==================================================
                ADMINISTRACIÓN — CARNETS
@@ -456,6 +465,18 @@ abstract class BaseVista
                 'admin/carnets/' .
                 (int)$id .
                 '/descargar',
+
+            /* ==================================================
+               ADMINISTRACIÓN — USUARIOS
+            ================================================== */
+            /**
+             * Gestión de usuarios.
+             *
+             * GET /admin/usuarios
+             */
+            'admin_usuarios' =>
+                $this->baseURL .
+                'admin/usuarios',
 
 
             /* ==================================================

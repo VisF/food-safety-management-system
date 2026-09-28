@@ -106,7 +106,8 @@ include __DIR__ . '/header.php';
 
             $data = [
                 'page_title' => 'Gestión de Exámenes',
-                'examenes' => []
+                'examenes' => [],
+                'plazo_recursante_dias' => 90
             ];
 
         }
@@ -130,7 +131,82 @@ include __DIR__ . '/header.php';
             </p>
 
         </section>
+        <section class="app-vista-card">
 
+            <div class="examen-admin__encabezado">
+
+                <div>
+
+                    <h3 class="font-headline-md text-headline-md text-on-surface">
+                        Configuración de recursantes
+                    </h3>
+
+                    <p class="font-body-sm text-body-sm text-on-surface-variant">
+                        Definí cuánto tiempo tiene una persona que desaprobó un examen
+                        para volver a inscribirse como recursante.
+                    </p>
+
+                </div>
+
+            </div>
+
+            <form
+                method="post"
+                action="<?php echo $this->getRoute('guardar_configuracion_recursante'); ?>"
+                class="space-y-5 mt-6">
+
+                <?= $this->getCsrfInput() ?>
+
+                <div>
+
+                    <label
+                        for="plazo_recursante_dias"
+                        class="block font-body-sm text-body-sm text-on-surface mb-2">
+
+                        Plazo para reinscripción
+
+                    </label>
+
+                    <div class="flex items-center gap-3">
+
+                        <input
+                            type="number"
+                            id="plazo_recursante_dias"
+                            name="plazo_recursante_dias"
+                            value="<?php echo $this->e(
+                                $data['plazo_recursante_dias'] ?? 90
+                            ); ?>"
+                            min="1"
+                            required
+                            class="w-full max-w-xs">
+
+                        <span class="font-body-sm text-body-sm text-on-surface-variant">
+                            días
+                        </span>
+
+                    </div>
+
+                    <p class="font-body-sm text-body-sm text-on-surface-variant mt-2">
+                        El plazo comienza a contar desde la fecha del examen desaprobado.
+                    </p>
+
+                </div>
+
+                <div>
+
+                    <button
+                        type="submit"
+                        class="app-vista-button app-vista-button--primary">
+
+                        Guardar configuración
+
+                    </button>
+
+                </div>
+
+            </form>
+
+        </section>
         <section class="app-vista-card">
 
             <div class="examen-admin__encabezado">
@@ -301,7 +377,7 @@ include __DIR__ . '/header.php';
 
                                     <a
                                         class="app-vista-button app-vista-button--secondary"
-                                        href="<?php echo $this->getRoute('detalle_examen', (int)$examen['id']); ?>">
+                                        href="<?php echo $this->getRoute('detalle_examen_admin', (int)$examen['id']); ?>">
 
                                         Ver
 

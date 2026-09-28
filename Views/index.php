@@ -118,6 +118,15 @@ class InicioVista extends BaseVista
         $mostrarExamenes =
             $inicioData['mostrar_examenes'] ?? true;
 
+        $recursante =
+            $inicioData['recursante'] ?? [
+                'es_recursante' => false,
+                'puede_inscribirse' => false,
+                'fecha_examen' => null,
+                'fecha_limite' => null,
+                'dias_plazo' => null
+            ];
+
         $porcentajeTramite =
             (int)($tramite['porcentaje'] ?? 0);
 
@@ -503,7 +512,169 @@ include __DIR__ . '/header.php';
         <?php endif; ?>
 
     </article>
+    <?php if (!empty($recursante['es_recursante'])): ?>
 
+        <!-- =====================================================
+            ESTADO DE RECURSANTE
+            ===================================================== -->
+
+        <section class="home-recursante">
+
+            <article class="app-vista-card">
+
+                <div class="home-recursante__header">
+
+                    <div>
+
+                        <p class="home-recursante__label">
+                            Situación de recursante
+                        </p>
+
+                        <h3 class="home-recursante__titulo">
+
+                            <?php if (!empty($recursante['puede_inscribirse'])): ?>
+
+                                Podés volver a rendir
+
+                            <?php else: ?>
+
+                                Plazo de recursante vencido
+
+                            <?php endif; ?>
+
+                        </h3>
+
+                    </div>
+
+                    <?php if (!empty($recursante['puede_inscribirse'])): ?>
+
+                        <span class="app-vista-chip app-vista-chip--vigente">
+                            Habilitado
+                        </span>
+
+                    <?php else: ?>
+
+                        <span class="app-vista-chip">
+                            Vencido
+                        </span>
+
+                    <?php endif; ?>
+
+                </div>
+
+
+                <?php if (!empty($recursante['fecha_examen'])): ?>
+
+                    <p class="home-recursante__dato">
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            calendar_today
+                        </span>
+
+                        <strong>
+                            Último examen desaprobado:
+                        </strong>
+
+                        <?= $this->e(
+                            date(
+                                'd/m/Y',
+                                strtotime(
+                                    $recursante['fecha_examen']
+                                )
+                            )
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
+
+
+                <?php if (!empty($recursante['fecha_limite'])): ?>
+
+                    <p class="home-recursante__dato">
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            event
+                        </span>
+
+                        <strong>
+
+                            <?php if (!empty($recursante['puede_inscribirse'])): ?>
+
+                                Podés reinscribirte hasta:
+
+                            <?php else: ?>
+
+                                El plazo finalizó el:
+
+                            <?php endif; ?>
+
+                        </strong>
+
+                        <?= $this->e(
+                            date(
+                                'd/m/Y',
+                                strtotime(
+                                    $recursante['fecha_limite']
+                                )
+                            )
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
+
+
+                <?php if (!empty($recursante['dias_plazo'])): ?>
+
+                    <p class="home-recursante__dato">
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            schedule
+                        </span>
+
+                        <strong>
+                            Plazo establecido:
+                        </strong>
+
+                        <?= (int)$recursante['dias_plazo'] ?>
+                        días
+
+                    </p>
+
+                <?php endif; ?>
+
+
+                <?php if (!empty($recursante['puede_inscribirse'])): ?>
+
+                    <p class="home-recursante__descripcion">
+                        Podés volver a rendir el examen sin repetir el curso
+                        dentro del plazo establecido.
+                    </p>
+
+                <?php else: ?>
+
+                    <p class="home-recursante__descripcion">
+                        El plazo para reinscribirte como recursante
+                        ya finalizó.
+                    </p>
+
+                <?php endif; ?>
+
+            </article>
+
+        </section>
+
+    <?php endif; ?>
 
     <!-- =====================================================
          DOCUMENTACIÓN

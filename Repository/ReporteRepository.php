@@ -112,7 +112,7 @@ class ReporteRepository
             SELECT
                 *
             FROM auditoria_acciones
-            WHERE tabla = :tabla
+            WHERE tabla_afectada = :tabla
             ORDER BY fecha DESC
         ";
 

@@ -248,6 +248,13 @@ class UsuarioService
                     $usuarioId
                 );
     }
+    public function actualizarRoles(int $usuarioId,array $roles): bool
+    {
+        return $this->usuarioRepository->actualizarRoles(
+            $usuarioId,
+            $roles
+        );
+    }
 
     // =====================================================
     // PASSWORD

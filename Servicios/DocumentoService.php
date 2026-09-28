@@ -49,6 +49,42 @@ class DocumentoService
 
         return $resultado;
     }
+
+    public function obtenerOCrearAsistencia(int $usuarioId): array 
+    {
+
+        $documento =
+            $this->documentoRepository
+                ->obtenerPorUsuarioYTipo(
+                    $usuarioId,
+                    'asistencia'
+                );
+
+        if ($documento !== null) {
+            return $documento;
+        }
+
+        $id =
+            $this->documentoRepository
+                ->crearDocumento([
+                    'usuario_id' =>
+                        $usuarioId,
+
+                    'tipo_documento' =>
+                        'asistencia',
+
+                    'nombre_original' =>
+                        'Asistencia',
+
+                    'ruta_archivo' =>
+                        ''
+                ]);
+
+        return
+            $this->documentoRepository
+                ->obtenerPorId($id)
+            ?? [];
+    }
     // Obtiene estado documentacion.
     public function obtenerEstadoDocumentacion(int $usuarioId): array
     {
@@ -399,6 +435,38 @@ class DocumentoService
                     $documentos
                 );
 
+            foreach ($usuarios as &$usuario) {
+
+                $usuarioId =
+                    (int) (
+                        $usuario['usuario_id']
+                        ?? $usuario['id']
+                        ?? 0
+                    );
+
+                if ($usuarioId > 0) {
+
+                    $asistencia =
+                        $this->obtenerOCrearAsistencia(
+                            $usuarioId
+                        );
+
+                    if (
+                        !empty($asistencia)
+                        && !array_filter(
+                            $usuario['documentos'] ?? [],
+                            fn ($documento) =>
+                                ($documento['tipo_documento'] ?? '') === 'asistencia'
+                        )
+                    ) {
+
+                        $usuario['documentos'][] =
+                            $asistencia;
+                    }
+                }
+            }
+
+            unset($usuario);
 
             return [
                 'usuarios' =>
@@ -494,7 +562,38 @@ class DocumentoService
             $this->agruparDocumentacion(
                 $documentos
             );
+        foreach ($usuarios as &$usuario) {
 
+            $usuarioId =
+                (int) (
+                    $usuario['usuario_id']
+                    ?? $usuario['id']
+                    ?? 0
+                );
+
+            if ($usuarioId > 0) {
+
+                $asistencia =
+                    $this->obtenerOCrearAsistencia(
+                        $usuarioId
+                    );
+
+                if (
+                    !empty($asistencia)
+                    && !array_filter(
+                        $usuario['documentos'] ?? [],
+                        fn ($documento) =>
+                            ($documento['tipo_documento'] ?? '') === 'asistencia'
+                    )
+                ) {
+
+                    $usuario['documentos'][] =
+                        $asistencia;
+                }
+            }
+        }
+
+        unset($usuario);
 
         return [
 

@@ -237,6 +237,63 @@ class InscripcionRepository
 
         return (int)$stmt->fetchColumn();
     }
+
+    /**
+     * Obtiene el último examen desaprobado de un usuario.
+     *
+     * Se utiliza para determinar si el usuario puede
+     * reinscribirse como recursante.
+     *
+     * La fecha de referencia es la fecha real del examen,
+     * obtenida desde la tabla examenes.
+     */
+    public function obtenerUltimoExamenDesaprobado(
+        int $usuarioId
+    ): ?array {
+
+        $sql = "
+            SELECT
+                i.id AS inscripcion_id,
+                i.examen_id,
+                e.fecha AS fecha_examen,
+                e.hora AS hora_examen,
+                r.aprobado
+            FROM resultado_examen r
+
+            INNER JOIN inscripciones i
+                ON i.id = r.inscripcion_id
+
+            INNER JOIN examenes e
+                ON e.id = i.examen_id
+
+            WHERE
+                i.usuario_id = :usuario_id
+                AND i.tipo_inscripcion_id = 2
+                AND r.aprobado = 0
+
+            ORDER BY
+                e.fecha DESC,
+                e.hora DESC
+
+            LIMIT 1
+        ";
+
+        $stmt = $this->conexion->prepare($sql);
+
+        $stmt->bindValue(
+            ':usuario_id',
+            $usuarioId,
+            PDO::PARAM_INT
+        );
+
+        $stmt->execute();
+
+        $resultado = $stmt->fetch(
+            PDO::FETCH_ASSOC
+        );
+
+        return $resultado ?: null;
+    }
     
     // Ejecuta tiene curso activo.
     public function tieneCursoActivo(int $usuarioId): bool

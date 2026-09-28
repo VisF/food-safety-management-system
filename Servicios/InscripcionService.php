@@ -37,6 +37,7 @@ require_once __DIR__ . '/../Repository/ExamenRepository.php';
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/ConfiguracionService.php';
 
 require_once __DIR__ . '/../Constant/EstadoTramite.php';
         
@@ -47,6 +48,7 @@ class InscripcionService
     private ExamenRepository $examenRepository;
     private DocumentoService $documentoService;
     private CarnetRepository $carnetRepository;
+    private ConfiguracionService $configuracionService;
 
     
 
@@ -57,6 +59,7 @@ class InscripcionService
         $this->examenRepository = new ExamenRepository();
         $this->documentoService = new DocumentoService();
         $this->carnetRepository = new CarnetRepository();
+        $this->configuracionService = new ConfiguracionService();
 
     }
         /**
@@ -213,74 +216,229 @@ class InscripcionService
             $inscripcion
         );
     }
-    // Ejecuta usuario puede inscribirse examen.
-    public function usuarioPuedeInscribirseExamen(int $usuarioId): array
-    {
-        $estado = $this->documentoService
-            ->obtenerEstadoDocumentacion($usuarioId);
 
-        $faltantes = [];
+    /**
+     * Obtiene el estado de recursante de un usuario.
+     *
+     * Un usuario es considerado recursante cuando posee
+     * un examen desaprobado y todavía se encuentra dentro
+     * del plazo configurado para volver a rendir.
+     *
+     * La fecha de referencia es la fecha real del examen.
+     */
+    public function obtenerEstadoRecursante(int $usuarioId): array {
 
-        if (!$estado['dni']) {
-            $faltantes[] = 'DNI';
+        $resultado =
+            $this->inscripcionRepository
+                ->obtenerUltimoExamenDesaprobado(
+                    $usuarioId
+                );
+
+        /*
+        * El usuario no tiene ningún examen desaprobado.
+        */
+        if ($resultado === null) {
+
+            return [
+                'es_recursante' => false,
+                'puede_inscribirse' => false,
+                'fecha_examen' => null,
+                'fecha_limite' => null,
+                'dias_plazo' => null
+            ];
         }
 
-        if (!$estado['foto']) {
-            $faltantes[] = 'Foto Carnet';
+        $diasPlazo =
+            $this->configuracionService
+                ->obtenerPlazoRecursanteDias();
+
+        try {
+
+            $fechaExamen =
+                new \DateTimeImmutable(
+                    $resultado['fecha_examen']
+                );
+
+        } catch (\Exception $e) {
+
+            return [
+                'es_recursante' => true,
+                'puede_inscribirse' => false,
+                'fecha_examen' => null,
+                'fecha_limite' => null,
+                'dias_plazo' => $diasPlazo
+            ];
         }
 
-        if (
-            !$estado['asistencia']
-            &&
-            !$estado['moodle']
-        ) {
-            $faltantes[] = 'Curso aprobado';
-        }
+        $fechaLimite =
+            $fechaExamen->modify(
+                '+' . $diasPlazo . ' days'
+            );
+
+        $hoy =
+            new \DateTimeImmutable(
+                'today'
+            );
+
+        $puedeInscribirse =
+            $hoy <= $fechaLimite;
 
         return [
-            'puede' => $estado['completo'],
-            'faltantes' => $faltantes
+            'es_recursante' => true,
+
+            'puede_inscribirse' =>
+                $puedeInscribirse,
+
+            'fecha_examen' =>
+                $fechaExamen->format('Y-m-d'),
+
+            'fecha_limite' =>
+                $fechaLimite->format('Y-m-d'),
+
+            'dias_plazo' =>
+                $diasPlazo
         ];
     }
 
-    public function confirmarInscripcionExamen(int $idInscripcion): bool
+    public function usuarioPuedeInscribirseExamen(int $usuarioId): array 
     {
-        $inscripcion =
-            $this->inscripcionRepository
-                ->obtenerPorId(
-                    $idInscripcion
+
+        $estadoDocumentacion =
+            $this->documentoService
+                ->obtenerEstadoDocumentacion(
+                    $usuarioId
                 );
 
-        if (!$inscripcion) {
+        $estadoRecursante =
+            $this->obtenerEstadoRecursante(
+                $usuarioId
+            );
 
+        $faltantes = [];
+
+        /*
+        * DNI obligatorio para rendir.
+        */
+        if (!$estadoDocumentacion['dni']) {
+            $faltantes[] = 'DNI';
+        }
+
+        /*
+        * Foto carnet obligatoria para rendir.
+        */
+        if (!$estadoDocumentacion['foto']) {
+            $faltantes[] = 'Foto Carnet';
+        }
+
+        /*
+        * Un recursante no necesita volver a
+        * aprobar el curso.
+        *
+        * Para una inscripción normal al examen,
+        * sí necesita asistencia aprobada o Moodle.
+        */
+        if (!$estadoRecursante['es_recursante']) {
+
+            if (
+                !$estadoDocumentacion['asistencia']
+                &&
+                !$estadoDocumentacion['moodle']
+            ) {
+                $faltantes[] = 'Curso aprobado';
+            }
+        }
+
+        /*
+        * La inscripción es posible cuando no falta
+        * ninguna documentación/requisito.
+        */
+        $puede = empty($faltantes);
+
+        /*
+        * Si es recursante pero el plazo ya venció,
+        * no puede utilizar esta modalidad.
+        */
+        if (
+            $estadoRecursante['es_recursante']
+            &&
+            !$estadoRecursante['puede_inscribirse']
+        ) {
+            $puede = false;
+
+            $faltantes[] =
+                'El plazo para reinscribirse como recursante ha vencido';
+        }
+
+        return [
+            'puede' => $puede,
+
+            'faltantes' => $faltantes,
+
+            'recursante' => $estadoRecursante
+        ];
+    }
+
+    public function confirmarInscripcionExamen(int $idInscripcion): bool 
+    {
+
+        $inscripcion =
+            $this->inscripcionRepository
+                ->obtenerPorId($idInscripcion);
+
+        /*
+        * La inscripción debe existir.
+        */
+        if (!$inscripcion) {
             return false;
         }
 
         $usuarioId =
             (int)$inscripcion['usuario_id'];
 
+        /*
+        * No se permite iniciar una nueva inscripción
+        * si el usuario posee un carnet vigente.
+        */
         if (
             !$this->puedeIniciarNuevaInscripcion(
                 $usuarioId
             )
         ) {
-
             return false;
         }
 
+        /*
+        * Validamos nuevamente los requisitos
+        * antes de confirmar la inscripción.
+        *
+        * Esto evita depender únicamente de las
+        * validaciones realizadas anteriormente.
+        */
+        $validacion =
+            $this->usuarioPuedeInscribirseExamen(
+                $usuarioId
+            );
+
+        if (!$validacion['puede']) {
+            return false;
+        }
+
+        /*
+        * Confirmamos la inscripción.
+        */
         if (
             !$this->inscripcionRepository
                 ->confirmarInscripcionExamen(
                     $idInscripcion
                 )
         ) {
-
             return false;
         }
 
-        if (
-            !empty($inscripcion['examen_id'])
-        ) {
+        /*
+        * Descontamos el cupo del examen.
+        */
+        if (!empty($inscripcion['examen_id'])) {
 
             $this->examenRepository
                 ->descontarCupo(

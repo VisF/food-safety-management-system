@@ -13,15 +13,13 @@ class AuditMiddleware
         array $anterior = [],
         array $nuevo = []
     ): void {
-
         try {
-
             $pdo = Database::getConnection();
 
             $sql = "
                 INSERT INTO auditoria_acciones
                 (
-                    id_usuario,
+                    usuario_id,
                     tabla_afectada,
                     accion,
                     datos_anteriores,
@@ -45,7 +43,7 @@ class AuditMiddleware
 
             $stmt->execute([
                 'usuario' =>
-                    $_SESSION['usuario_id'] ?? 0,
+                    $_SESSION['usuario_id'] ?? null,
 
                 'tabla' =>
                     $tabla,
@@ -54,20 +52,25 @@ class AuditMiddleware
                     $accion,
 
                 'anterior' =>
-                    json_encode($anterior),
+                    json_encode(
+                        $anterior,
+                        JSON_UNESCAPED_UNICODE
+                    ),
 
                 'nuevo' =>
-                    json_encode($nuevo),
+                    json_encode(
+                        $nuevo,
+                        JSON_UNESCAPED_UNICODE
+                    ),
 
                 'ip' =>
-                    $_SERVER['REMOTE_ADDR'] ?? '',
+                    $_SERVER['REMOTE_ADDR'] ?? null,
 
                 'ua' =>
-                    $_SERVER['HTTP_USER_AGENT'] ?? ''
+                    $_SERVER['HTTP_USER_AGENT'] ?? null
             ]);
 
         } catch (\Throwable $e) {
-
             error_log(
                 'Audit Error: ' .
                 $e->getMessage()
