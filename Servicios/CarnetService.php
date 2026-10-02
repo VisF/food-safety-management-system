@@ -8,8 +8,6 @@ declare(strict_types=1);
  * con la gestión de carnets.
  */
 
-require_once __DIR__ . '/../db/Connection.php';
-
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
 
 require_once __DIR__ . '/../Servicios/InscripcionService.php';
@@ -292,7 +290,17 @@ class CarnetService
             return false;
         }
 
-        return strtotime($carnet['fecha_vencimiento']) > time();
+        if (
+            $carnet['fecha_vencimiento'] === null
+            ||
+            $carnet['fecha_vencimiento'] === ''
+        ) {
+            return true;
+        }
+
+        return strtotime(
+            $carnet['fecha_vencimiento']
+        ) > time();
     }
 
     /**
@@ -557,39 +565,52 @@ class CarnetService
 
         /*
         * Validar fecha de vencimiento.
+        *
+        * Puede existir un carnet sin fecha
+        * de vencimiento.
         */
-        $vencimiento =
-            DateTime::createFromFormat(
-                'Y-m-d',
-                $fechaVencimiento
+        $sinFechaVencimiento =
+            !empty(
+                $datos['sin_fecha_vencimiento']
             );
 
-        if (
-            !$vencimiento
-            || $vencimiento->format('Y-m-d')
-                !== $fechaVencimiento
-        ) {
+        $vencimiento = null;
 
-            return [
-                'success' => false,
+        if (!$sinFechaVencimiento) {
 
-                'mensaje' =>
-                    'La fecha de vencimiento no es válida.'
-            ];
-        }
+            $vencimiento =
+                DateTime::createFromFormat(
+                    'Y-m-d',
+                    $fechaVencimiento
+                );
 
-        /*
-        * El vencimiento debe ser posterior
-        * a la emisión.
-        */
-        if ($vencimiento <= $emision) {
+            if (
+                !$vencimiento
+                || $vencimiento->format('Y-m-d')
+                    !== $fechaVencimiento
+            ) {
 
-            return [
-                'success' => false,
+                return [
+                    'success' => false,
 
-                'mensaje' =>
-                    'La fecha de vencimiento debe ser posterior a la fecha de emisión.'
-            ];
+                    'mensaje' =>
+                        'La fecha de vencimiento no es válida.'
+                ];
+            }
+
+            /*
+            * El vencimiento debe ser posterior
+            * a la emisión.
+            */
+            if ($vencimiento <= $emision) {
+
+                return [
+                    'success' => false,
+
+                    'mensaje' =>
+                        'La fecha de vencimiento debe ser posterior a la fecha de emisión.'
+                ];
+            }
         }
 
         /*
@@ -607,108 +628,42 @@ class CarnetService
                 $fechaEmision,
 
             'fecha_vencimiento' =>
-                $fechaVencimiento,
+                $sinFechaVencimiento
+                    ? null
+                    : $fechaVencimiento,
 
             'ruta_pdf' =>
                 $rutaPdf
         ];
 
         /*
-        * Obtener la misma conexión PDO utilizada
-        * por los repositorios.
+        * Crear el carnet y actualizar el estado
+        * de la inscripción dentro de una única
+        * transacción administrada por Repository.
         */
-        $conexion =
-            Connection::getPDO();
+        $carnet =
+            $this->carnetRepository
+                ->crearYActualizarEstado(
+                    $datosCarnet,
+                    EstadoTramite::CARNET_EMITIDO
+                );
 
-        try {
-
-            /*
-            * Comenzar transacción.
-            */
-            $conexion->beginTransaction();
-
-            /*
-            * Crear el carnet.
-            */
-            $carnet =
-                $this->carnetRepository
-                    ->crear(
-                        $datosCarnet
-                    );
-
-            if ($carnet === null) {
-
-                $conexion->rollBack();
-
-                return [
-                    'success' => false,
-
-                    'mensaje' =>
-                        'No fue posible crear el carnet. Verifique que el número no esté duplicado.'
-                ];
-            }
-
-            /*
-            * Cambiar el estado:
-            *
-            * APROBADO
-            *
-            * a:
-            *
-            * CARNET_EMITIDO
-            */
-            $estadoActualizado =
-                $this->inscripcionService
-                    ->actualizarEstadoTramite(
-                        $idInscripcion,
-                        EstadoTramite::CARNET_EMITIDO
-                    );
-
-            if (!$estadoActualizado) {
-
-                $conexion->rollBack();
-
-                return [
-                    'success' => false,
-
-                    'mensaje' =>
-                        'No fue posible actualizar el estado de la inscripción.'
-                ];
-            }
-
-            /*
-            * Todo salió correctamente.
-            */
-            $conexion->commit();
+        if ($carnet === null) {
 
             return [
-
-                'success' =>
-                    true,
-
+                'success' => false,
                 'mensaje' =>
-                    'Carnet cargado y emitido correctamente.',
-
-                'carnet' =>
-                    $carnet
+                    'No fue posible crear el carnet o actualizar el estado de la inscripción.'
             ];
-
-        } catch (Throwable $e) {
-
-            /*
-            * Si hubo un error, deshacer tanto
-            * la creación del carnet como el
-            * cambio de estado.
-            */
-            if (
-                $conexion->inTransaction()
-            ) {
-
-                $conexion->rollBack();
-            }
-
-            throw $e;
         }
+
+        return [
+            'success' => true,
+            'mensaje' =>
+                'Carnet cargado y emitido correctamente.',
+            'carnet' =>
+                $carnet
+        ];
     }
     /**
      * Genera un número de carnet único.
@@ -759,7 +714,13 @@ class CarnetService
         }
 
         $vigente =
-            strtotime($carnet['fecha_vencimiento']) > time();
+                $carnet['fecha_vencimiento'] === null
+                ||
+                $carnet['fecha_vencimiento'] === ''
+                ||
+                strtotime(
+                    $carnet['fecha_vencimiento']
+                ) > time();
 
         return [
             'id' => (int)$carnet['id'],
@@ -817,6 +778,43 @@ class CarnetService
         if ($carnet === null) {
 
             return null;
+        }
+        /*
+        * Carnet sin fecha de vencimiento.
+        *
+        * Se considera vigente indefinidamente
+        * y no corresponde renovación.
+        */
+        if (
+            $carnet['fecha_vencimiento'] === null
+            ||
+            $carnet['fecha_vencimiento'] === ''
+        ) {
+            return [
+                'id' =>
+                    (int)$carnet['id'],
+
+                'numero_carnet' =>
+                    $carnet['numero_carnet'],
+
+                'fecha_emision' =>
+                    $carnet['fecha_emision'],
+
+                'fecha_vencimiento' =>
+                    null,
+
+                'dias_restantes' =>
+                    null,
+
+                'estado' =>
+                    'sin_vencimiento',
+
+                'puede_renovar' =>
+                    false,
+
+                'mensaje' =>
+                    'Su carnet no posee fecha de vencimiento.'
+            ];
         }
 
         $fechaVencimiento = new DateTime(

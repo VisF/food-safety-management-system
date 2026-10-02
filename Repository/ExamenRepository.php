@@ -718,31 +718,171 @@ class ExamenRepository
         return $stmt->execute();
     }
 
-    /*
-    */
-    public function guardarAdministracionInscripcion(int $id,int $estadoTramite,string $observaciones): bool
+    /**
+     * Guarda el resultado administrativo de una inscripción.
+     *
+     * Actualiza:
+     * - resultado_examen
+     * - estado de la inscripción
+     * - observaciones de la inscripción
+     *
+     * Toda la operación se ejecuta dentro de una única transacción.
+     */
+    public function guardarAdministracionInscripcion(
+    int $id,
+    int $estadoTramite,
+    string $observaciones,
+    array $resultado
+    ): bool 
     {
         $this->conexion->beginTransaction();
 
         try {
 
-            $this->actualizarEstadoTramitePriv(
-                $id,
-                $estadoTramite
+            /*
+            * 1. Buscar si ya existe un resultado
+            *    para esta inscripción.
+            */
+            $sqlResultado = "
+                SELECT id
+                FROM resultado_examen
+                WHERE inscripcion_id = :inscripcion
+                LIMIT 1
+            ";
+
+            $stmtResultado = $this->conexion->prepare(
+                $sqlResultado
             );
 
-            $this->actualizarObservaciones(
-                $id,
-                $observaciones
-            );
+            $stmtResultado->execute([
+                ':inscripcion' =>
+                    $resultado['inscripcion_id']
+            ]);
 
+            $resultadoExistente =
+                $stmtResultado->fetch(\PDO::FETCH_ASSOC);
+
+            /*
+            * 2. Crear o actualizar el resultado.
+            */
+            if ($resultadoExistente === false) {
+
+                $sqlInsertar = "
+                    INSERT INTO resultado_examen
+                    (
+                        inscripcion_id,
+                        examen_id,
+                        nota,
+                        aprobado,
+                        fecha_resultado,
+                        observaciones
+                    )
+                    VALUES
+                    (
+                        :inscripcion,
+                        :examen,
+                        :nota,
+                        :aprobado,
+                        NOW(),
+                        :observaciones
+                    )
+                ";
+
+                $stmtInsertar =
+                    $this->conexion->prepare(
+                        $sqlInsertar
+                    );
+
+                $stmtInsertar->execute([
+                    ':inscripcion' =>
+                        $resultado['inscripcion_id'],
+
+                    ':examen' =>
+                        $resultado['id_examen'],
+
+                    ':nota' =>
+                        $resultado['nota'],
+
+                    ':aprobado' =>
+                        $resultado['aprobado'],
+
+                    ':observaciones' =>
+                        $resultado['observaciones']
+                ]);
+
+            } else {
+
+                $sqlActualizar = "
+                    UPDATE resultado_examen
+                    SET
+                        nota = :nota,
+                        aprobado = :aprobado,
+                        observaciones = :observaciones
+                    WHERE id = :id
+                ";
+
+                $stmtActualizar =
+                    $this->conexion->prepare(
+                        $sqlActualizar
+                    );
+
+                $stmtActualizar->execute([
+                    ':nota' =>
+                        $resultado['nota'],
+
+                    ':aprobado' =>
+                        $resultado['aprobado'],
+
+                    ':observaciones' =>
+                        $resultado['observaciones'],
+
+                    ':id' =>
+                        $resultadoExistente['id']
+                ]);
+            }
+
+            /*
+            * 3. Actualizar estado de la inscripción.
+            */
+            $estadoActualizado =
+                $this->actualizarEstadoTramite(
+                    $id,
+                    $estadoTramite
+                );
+
+            if (!$estadoActualizado) {
+                throw new \RuntimeException(
+                    'No se pudo actualizar el estado de la inscripción.'
+                );
+            }
+
+            /*
+            * 4. Actualizar observaciones de la inscripción.
+            */
+            $observacionesActualizadas =
+                $this->actualizarObservaciones(
+                    $id,
+                    $observaciones
+                );
+
+            if (!$observacionesActualizadas) {
+                throw new \RuntimeException(
+                    'No se pudieron actualizar las observaciones.'
+                );
+            }
+
+            /*
+            * 5. Confirmar toda la operación.
+            */
             $this->conexion->commit();
 
             return true;
 
-        } catch (Throwable $e) {
+        } catch (\Throwable $e) {
 
-            $this->conexion->rollBack();
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
 
             throw $e;
         }
@@ -778,7 +918,7 @@ class ExamenRepository
     /**
     * Actualiza el estado del trámite de una inscripción.
     */
-    private function actualizarEstadoTramitePriv(int $id,int $estadoTramite): bool
+    public function actualizarEstadoTramitePriv(int $id,int $estadoTramite): bool
     {
         $sql = "
             UPDATE inscripciones
@@ -807,7 +947,7 @@ class ExamenRepository
     /**
     * Actualiza las observaciones de una inscripción.
      */
-    private function actualizarObservaciones(int $id,string $observaciones): bool
+    public function actualizarObservaciones(int $id,string $observaciones): bool
     {
         $sql = "
             UPDATE inscripciones

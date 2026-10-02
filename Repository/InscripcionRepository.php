@@ -252,12 +252,15 @@ class InscripcionRepository
     ): ?array {
 
         $sql = "
-            SELECT
+            SELECT 
                 i.id AS inscripcion_id,
                 i.examen_id,
                 e.fecha AS fecha_examen,
                 e.hora AS hora_examen,
-                r.aprobado
+                r.aprobado,
+                r.nota,
+                r.observaciones
+                
             FROM resultado_examen r
 
             INNER JOIN inscripciones i
@@ -316,6 +319,26 @@ class InscripcionRepository
             ':pendiente' => EstadoTramite::PENDIENTE,
             ':documentacion' => EstadoTramite::DOCUMENTACION_APROBADA,
             ':inscripto' => EstadoTramite::INSCRIPTO_EXAMEN
+        ]);
+
+        return (int)$stmt->fetchColumn() > 0;
+    }
+    /**
+     * Determina si un usuario tiene un curso aprobado.
+     */
+    public function tieneCursoAprobado(int $usuarioId): bool
+    {
+        $stmt = $this->conexion->prepare("
+            SELECT COUNT(*)
+            FROM inscripciones
+            WHERE usuario_id = :usuario
+            AND tipo_inscripcion_id = 1
+            AND estado_tramite_id = :aprobado
+        ");
+
+        $stmt->execute([
+            ':usuario' => $usuarioId,
+            ':aprobado' => EstadoTramite::APROBADO
         ]);
 
         return (int)$stmt->fetchColumn() > 0;
@@ -942,6 +965,7 @@ class InscripcionRepository
                 i.usuario_id = :usuario
                 AND i.tipo_inscripcion_id = 2
                 AND i.estado_tramite_id = :inscripto
+                AND e.fecha >= CURDATE()
 
             ORDER BY e.fecha ASC, e.hora ASC
 

@@ -1,0 +1,125 @@
+/* =========================================================
+   INSCRIPTOS DE CURSO
+   ========================================================= */
+
+.curso-inscriptos__encabezado {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+    flex-wrap: wrap;
+}
+
+.curso-inscriptos__acciones {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.curso-inscriptos__tabla {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.curso-inscriptos__tabla table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.curso-inscriptos__tabla th,
+.curso-inscriptos__tabla td {
+    padding: 0.875rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.curso-inscriptos__tabla th {
+    font-weight: 600;
+    color: var(--md-sys-color-on-surface);
+    background: var(--md-sys-color-surface-container-low);
+}
+
+.curso-inscriptos__tabla td {
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.curso-inscripto__estado {
+    display: inline-flex;
+    align-items: center;
+    padding: 0.35rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.8125rem;
+    font-weight: 600;
+    background: var(--md-sys-color-secondary-container);
+    color: var(--md-sys-color-on-secondary-container);
+}
+
+.curso-inscriptos__vacio {
+    padding: 2rem;
+    text-align: center;
+    color: var(--md-sys-color-on-surface-variant);
+}
+
+.curso-inscriptos__mobile {
+    display: none;
+}
+
+.curso-inscripto-card {
+    padding: 1rem;
+    border: 1px solid var(--md-sys-color-outline-variant);
+    border-radius: 1rem;
+    background: var(--md-sys-color-surface-container-low);
+}
+
+.curso-inscripto-card + .curso-inscripto-card {
+    margin-top: 0.75rem;
+}
+
+.curso-inscripto-card__nombre {
+    font-weight: 600;
+    color: var(--md-sys-color-on-surface);
+    margin-bottom: 0.75rem;
+}
+
+.curso-inscripto-card__dato {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.4rem 0;
+    color: var(--md-sys-color-on-surface-variant);
+    font-size: 0.9rem;
+}
+
+.curso-inscripto-card__dato strong {
+    color: var(--md-sys-color-on-surface);
+}
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 768px) {
+
+    .curso-inscriptos__tabla {
+        display: none;
+    }
+
+    .curso-inscriptos__mobile {
+        display: block;
+    }
+
+    .curso-inscriptos__encabezado {
+        align-items: stretch;
+    }
+
+    .curso-inscriptos__acciones {
+        width: 100%;
+    }
+
+    .curso-inscriptos__acciones .app-vista-button {
+        flex: 1;
+        justify-content: center;
+    }
+
+}

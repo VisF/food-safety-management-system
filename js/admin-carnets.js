@@ -369,5 +369,50 @@ document.addEventListener(
             50
         );
 
+            /*
+         * ==================================================
+         * FECHA DE VENCIMIENTO DEL CARNET
+         * ==================================================
+         */
+
+        const checkboxSinVencimiento =
+            document.getElementById(
+                'sin_fecha_vencimiento'
+            );
+
+        const campoFechaVencimiento =
+            document.getElementById(
+                'fecha_vencimiento'
+            );
+
+        if (
+            checkboxSinVencimiento
+            &&
+            campoFechaVencimiento
+        ) {
+
+            function actualizarFechaVencimiento() {
+
+                const sinVencimiento =
+                    checkboxSinVencimiento.checked;
+
+                campoFechaVencimiento.disabled =
+                    sinVencimiento;
+
+                campoFechaVencimiento.required =
+                    !sinVencimiento;
+
+                if (sinVencimiento) {
+                    campoFechaVencimiento.value = '';
+                }
+            }
+
+            checkboxSinVencimiento.addEventListener(
+                'change',
+                actualizarFechaVencimiento
+            );
+
+            actualizarFechaVencimiento();
+        }
     }
 );

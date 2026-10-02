@@ -432,6 +432,75 @@
     line-height: 1.4;
 }
 
+/* ============================================================
+   OPCIÓN — CARNET SIN VENCIMIENTO
+   ============================================================ */
+.admin-carnets__checkbox {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+
+    margin-top: 10px;
+    padding: 9px 12px;
+
+    border: 1px solid #dce5ef;
+    border-radius: 10px;
+
+    background: #f7fafd;
+
+    color: #34495e;
+
+    font-size: 0.84rem;
+    font-weight: 600;
+
+    cursor: pointer;
+
+    white-space: nowrap;
+
+    transition:
+        background-color 0.2s ease,
+        border-color 0.2s ease,
+        color 0.2s ease,
+        box-shadow 0.2s ease;
+}
+
+.admin-carnets__checkbox span {
+    line-height: 1.2;
+}
+
+.admin-carnets__checkbox:hover {
+    border-color: #b8cde0;
+
+    background: #eef5fb;
+}
+
+.admin-carnets__checkbox input {
+    width: 18px;
+    height: 18px;
+
+    margin: 0;
+
+    accent-color: #005596;
+
+    cursor: pointer;
+}
+
+.admin-carnets__checkbox:has(input:checked) {
+    border-color: #005596;
+
+    background: #eef5fb;
+
+    color: #003e6f;
+
+    box-shadow:
+        0 2px 8px rgba(0, 85, 150, 0.08);
+}
+
+.admin-carnets__checkbox input:focus-visible {
+    outline: 3px solid rgba(0, 85, 150, 0.18);
+    outline-offset: 2px;
+}
+
 
 /* ============================================================
    ARCHIVO PDF
@@ -1129,6 +1198,12 @@
     .admin-carnets__vacio p {
         font-size: 0.8rem;
     }
+
+    .admin-carnets__checkbox {
+    display: flex;
+    width: 100%;
+    box-sizing: border-box;
+}
 
 }
 

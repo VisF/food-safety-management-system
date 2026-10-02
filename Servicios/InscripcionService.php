@@ -35,6 +35,7 @@ require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 require_once __DIR__ . '/../Repository/ExamenRepository.php';
 require_once __DIR__ . '/../Repository/CarnetRepository.php';
+require_once __DIR__ . '/../Repository/CursoRepository.php';
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Servicios/ConfiguracionService.php';
@@ -49,6 +50,7 @@ class InscripcionService
     private DocumentoService $documentoService;
     private CarnetRepository $carnetRepository;
     private ConfiguracionService $configuracionService;
+    private CursoRepository $cursoRepository;
 
     
 
@@ -60,6 +62,7 @@ class InscripcionService
         $this->documentoService = new DocumentoService();
         $this->carnetRepository = new CarnetRepository();
         $this->configuracionService = new ConfiguracionService();
+        $this->cursoRepository = new CursoRepository();
 
     }
         /**
@@ -86,6 +89,16 @@ class InscripcionService
         return $this->inscripcionRepository
             ->tieneCursoActivo($usuarioId);
     }
+
+    /**
+     * Determina si un usuario tiene un curso aprobado.
+     */
+    public function tieneCursoAprobado(int $usuarioId): bool
+    {
+        return $this->inscripcionRepository
+            ->tieneCursoAprobado($usuarioId);
+    }
+    
     // Obtiene por id.
     public function obtenerPorId(int $id): ?InscripcionDTO 
     {
@@ -139,9 +152,34 @@ class InscripcionService
             $inscripcion
         );
     }
-    // Crea la operaci?n correspondiente.
+    
     public function crear(array $datos): ?InscripcionDTO
     {
+        $cursoId = (int)($datos['curso_id'] ?? 0);
+
+        if ($cursoId <= 0) {
+            return null;
+        }
+
+        $curso = $this->cursoRepository->obtenerPorId($cursoId);
+
+        if (!$curso) {
+            return null;
+        }
+
+        // El curso debe estar activo.
+        if ((int)$curso['activo'] !== 1) {
+            return null;
+        }
+
+        // El curso debe comenzar hoy o en una fecha futura.
+        if (
+            empty($curso['fecha_inicio'])
+            || $curso['fecha_inicio'] < date('Y-m-d')
+        ) {
+            return null;
+        }
+
         $id = $this->inscripcionRepository->crear($datos);
 
         if (!$id) {
@@ -201,6 +239,14 @@ class InscripcionService
         return $this->inscripcionRepository
             ->contarInscriptosCurso($cursoId);
     }
+
+        // Obtiene las inscripciones de un curso.
+    public function obtenerPorCurso(int $cursoId): array
+    {
+        return $this->inscripcionRepository
+            ->obtenerPorCurso($cursoId);
+    }
+    
     // Obtiene detalle inscripcion.
     public function obtenerDetalleInscripcion(int $id): ?InscripcionDTO
     {
@@ -244,7 +290,9 @@ class InscripcionService
                 'puede_inscribirse' => false,
                 'fecha_examen' => null,
                 'fecha_limite' => null,
-                'dias_plazo' => null
+                'dias_plazo' => null,
+                'nota' => null,
+                'observaciones' => null
             ];
         }
 
@@ -266,7 +314,9 @@ class InscripcionService
                 'puede_inscribirse' => false,
                 'fecha_examen' => null,
                 'fecha_limite' => null,
-                'dias_plazo' => $diasPlazo
+                'dias_plazo' => $diasPlazo,
+                'nota' => $resultado['nota'] ?? null,
+                'observaciones' => $resultado['observaciones'] ?? null
             ];
         }
 
@@ -296,7 +346,12 @@ class InscripcionService
                 $fechaLimite->format('Y-m-d'),
 
             'dias_plazo' =>
-                $diasPlazo
+                $diasPlazo,
+            'nota' =>
+                $resultado['nota'] ?? null,
+
+            'observaciones' =>
+                $resultado['observaciones'] ?? null
         ];
     }
 
@@ -332,15 +387,26 @@ class InscripcionService
 
         /*
         * Un recursante no necesita volver a
-        * aprobar el curso.
+        * cumplir el requisito del curso.
         *
         * Para una inscripción normal al examen,
-        * sí necesita asistencia aprobada o Moodle.
+        * el requisito se cumple mediante cualquiera
+        * de estas vías:
+        *
+        * - Asistencia aprobada
+        * - Curso aprobado
+        * - Moodle aprobado
         */
         if (!$estadoRecursante['es_recursante']) {
 
+            $cursoAprobado =
+                $this->inscripcionRepository
+                    ->tieneCursoAprobado($usuarioId);
+
             if (
                 !$estadoDocumentacion['asistencia']
+                &&
+                !$cursoAprobado
                 &&
                 !$estadoDocumentacion['moodle']
             ) {
@@ -458,6 +524,45 @@ class InscripcionService
                     $estado
                 );
     }
+    public function aprobarInscripcionCurso(int $idInscripcion): bool
+    {
+        $inscripcion = $this->inscripcionRepository
+            ->obtenerPorId($idInscripcion);
+
+        if (!$inscripcion) {
+            return false;
+        }
+
+        if ((int)($inscripcion['tipo_inscripcion_id'] ?? 0) !== 1) {
+            return false;
+        }
+
+        return $this->inscripcionRepository
+            ->actualizarEstadoInscripcion(
+                $idInscripcion,
+                EstadoTramite::APROBADO
+            );
+    }
+
+    public function desaprobarInscripcionCurso(int $idInscripcion): bool
+    {
+        $inscripcion = $this->inscripcionRepository
+            ->obtenerPorId($idInscripcion);
+
+        if (!$inscripcion) {
+            return false;
+        }
+
+        if ((int)($inscripcion['tipo_inscripcion_id'] ?? 0) !== 1) {
+            return false;
+        }
+
+        return $this->inscripcionRepository
+            ->actualizarEstadoInscripcion(
+                $idInscripcion,
+                EstadoTramite::DESAPROBADO
+            );
+    }
     // Ejecuta agregar observacion.
     public function agregarObservacion(int $id, string $texto): bool
     {
@@ -493,7 +598,7 @@ class InscripcionService
     public function obtenerInscripcion(int $id): ?array
     {
         return $this->inscripcionRepository
-            ->obtenerInscripcion($id);
+            ->obtenerPorId($id);
     }
     /**
      * Validar documentación.
@@ -501,7 +606,7 @@ class InscripcionService
     public function validarDocumentacion(int $idInscripcion): array
     {
         $inscripcion = $this->inscripcionRepository
-            ->obtenerInscripcion($idInscripcion);
+            ->obtenerPorId($idInscripcion);
 
         if (!$inscripcion) {
             return [

@@ -433,7 +433,9 @@ class AdminCarnetControlador
                         '',
 
                     'fecha_vencimiento' =>
-                        ''
+                        '',
+                        
+                    'sin_fecha_vencimiento' => false
                 ],
 
 
@@ -862,7 +864,10 @@ class AdminCarnetControlador
                     trim(
                         $_POST['fecha_vencimiento']
                         ?? ''
-                    )
+                    ),
+                'sin_fecha_vencimiento' =>
+                    isset($_POST['sin_fecha_vencimiento'])
+                    && $_POST['sin_fecha_vencimiento'] === '1'
             ];
 
             /*
@@ -1176,7 +1181,10 @@ class AdminCarnetControlador
 
                     'fecha_vencimiento' =>
                         $_POST['fecha_vencimiento']
-                        ?? ''
+                        ?? '',
+                    'sin_fecha_vencimiento' =>
+                        isset($_POST['sin_fecha_vencimiento'])
+                        && $_POST['sin_fecha_vencimiento'] === '1'
                 ]
             ]);
 

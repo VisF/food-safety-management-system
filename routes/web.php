@@ -690,8 +690,239 @@ $router->map(
         $vista->mostrar();
     }
 );
+/* ==========================================================
+   ADMINISTRACIÓN — CURSOS
+========================================================== */
+
+/**
+ * Listado administrativo de cursos.
+ *
+ * GET /admin/cursos
+ */
+$router->map(
+    'GET',
+    '/admin/cursos',
+    function () {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->mostrarListado();
+    }
+);
 
 
+/**
+ * Crear un curso.
+ *
+ * GET /admin/cursos/nuevo
+ */
+$router->map(
+    'GET',
+    '/admin/cursos/nuevo',
+    function () {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->mostrarFormularioCrear();
+    }
+);
+
+
+/**
+ * Guardar un curso nuevo.
+ *
+ * POST /admin/cursos
+ */
+$router->map(
+    'POST',
+    '/admin/cursos',
+    function () {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->guardarNuevoCurso();
+    }
+);
+
+
+/**
+ * Editar un curso.
+ *
+ * GET /admin/cursos/{id}/editar
+ */
+$router->map(
+    'GET',
+    '/admin/cursos/[i:id]/editar',
+    function ($id) {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->mostrarFormularioEditar(
+            (int) $id
+        );
+    }
+);
+
+
+/**
+ * Guardar edición de un curso.
+ *
+ * POST /admin/cursos/{id}
+ */
+$router->map(
+    'POST',
+    '/admin/cursos/[i:id]',
+    function ($id) {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->guardarEdicion(
+            (int) $id
+        );
+    }
+);
+
+
+/**
+ * Activar curso.
+ *
+ * POST /admin/cursos/{id}/activar
+ */
+$router->map(
+    'POST',
+    '/admin/cursos/[i:id]/activar',
+    function ($id) {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->activarCurso(
+            (int) $id
+        );
+    }
+);
+
+
+/**
+ * Desactivar curso.
+ *
+ * POST /admin/cursos/{id}/desactivar
+ */
+$router->map(
+    'POST',
+    '/admin/cursos/[i:id]/desactivar',
+    function ($id) {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->desactivarCurso(
+            (int) $id
+        );
+    }
+);
+
+/**
+ * Ver inscriptos de un curso.
+ * GET /admin/cursos/{id}/inscriptos
+ */
+$router->map(
+    'GET',
+    '/admin/cursos/[i:id]/inscriptos',
+    function ($id) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+        $controller->mostrarInscriptos((int)$id);
+    }
+);
+
+/**
+ * Aprobar inscripción a un curso.
+ * POST /admin/cursos/{cursoId}/inscriptos/{inscripcionId}/aprobar
+ */
+$router->map(
+    'POST',
+    '/admin/cursos/[i:cursoId]/inscriptos/[i:inscripcionId]/aprobar',
+    function ($cursoId, $inscripcionId) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->aprobarInscripcion(
+            (int)$cursoId,
+            (int)$inscripcionId
+        );
+    }
+);
+
+
+/**
+ * Desaprobar inscripción a un curso.
+ * POST /admin/cursos/{cursoId}/inscriptos/{inscripcionId}/desaprobar
+ */
+$router->map(
+    'POST',
+    '/admin/cursos/[i:cursoId]/inscriptos/[i:inscripcionId]/desaprobar',
+    function ($cursoId, $inscripcionId) {
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ . '/../Controller/AdminCursoControlador.php';
+
+        $controller = new AdminCursoControlador();
+
+        $controller->desaprobarInscripcion(
+            (int)$cursoId,
+            (int)$inscripcionId
+        );
+    }
+);
 /* ==========================================================
    ADMINISTRACIÓN — EXÁMENES
 ========================================================== */

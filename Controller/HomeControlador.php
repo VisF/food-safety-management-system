@@ -23,6 +23,7 @@ require_once __DIR__ . '/../Servicios/DocumentoService.php';
 require_once __DIR__ . '/../Servicios/CursoService.php';
 require_once __DIR__ . '/../Servicios/ExamenService.php';
 require_once __DIR__ . '/../Servicios/CarnetService.php';
+require_once __DIR__ . '/../Servicios/ResultadoExamenService.php';
 
 
 
@@ -44,6 +45,8 @@ class HomeControlador
     private ExamenService $examenService;
 
     private CarnetService $carnetService;
+
+    private ResultadoExamenService $resultadoExamenService;
 
 
 
@@ -73,6 +76,8 @@ class HomeControlador
         $this->carnetService =
             new CarnetService();
 
+        $this->resultadoExamenService =
+            new ResultadoExamenService();
     }
 
     /**
@@ -92,6 +97,7 @@ class HomeControlador
             AuthHelper::usuarioActual();
 
         $inscripcion = null;
+        $resultadoExamen = null;
 
         if ($usuario !== null) {
 
@@ -100,6 +106,15 @@ class HomeControlador
                     ->obtenerUltimaPorUsuario(
                         $usuario['id']
                     );
+
+            if ($inscripcion !== null) {
+
+                $resultadoExamen =
+                    $this->resultadoExamenService
+                        ->obtenerPorInscripcion(
+                            $inscripcion->getId()
+                        );
+            }
         }
 
         $estadoRecursante = [
@@ -107,7 +122,9 @@ class HomeControlador
             'puede_inscribirse' => false,
             'fecha_examen' => null,
             'fecha_limite' => null,
-            'dias_plazo' => null
+            'dias_plazo' => null,
+            'nota' => null,
+            'observaciones' => null
         ];
 
         if ($usuario !== null) {
@@ -144,6 +161,12 @@ class HomeControlador
                 $documentos
             );
 
+        $tieneCursoAprobado =
+            $this->inscripcionService
+                ->tieneCursoAprobado(
+                    $usuario['id']
+                );
+
       $carnetVigente = null;
 
         $mostrarExamenes = true;
@@ -161,7 +184,14 @@ class HomeControlador
 
             if (
                 $carnetVigente !== null
-                && $carnetVigente['estado'] === 'vigente'
+                && in_array(
+                    $carnetVigente['estado'],
+                    [
+                        'vigente',
+                        'sin_vencimiento'
+                    ],
+                    true
+                )
             ) {
 
                 $puedeInscribirse = false;
@@ -173,8 +203,10 @@ class HomeControlador
         $cursosVista =
             $this->obtenerCursosVista(
                 $tieneMoodleAprobado,
+                $tieneCursoAprobado,
                 $inscripcion,
-                $puedeInscribirse
+                $puedeInscribirse,
+                $estadoRecursante
             );
 
         $documentosVista =
@@ -231,6 +263,9 @@ class HomeControlador
 
             'usuario' =>
                 $usuario,
+
+            'resultado_examen' =>
+                $resultadoExamen,
 
             'tramite' => [
 
@@ -335,13 +370,42 @@ class HomeControlador
      */
     private function obtenerCursosVista(
         bool $tieneMoodleAprobado,
+        bool $tieneCursoAprobado,
         $inscripcion,
-        bool $puedeInscribirse
+        bool $puedeInscribirse,
+        array $estadoRecursante
     ): array
     {
-        if ($tieneMoodleAprobado) {
+        $cursoDesaprobado =
+        $inscripcion !== null
+        &&
+        $inscripcion->getTipoInscripcionId() === 1
+        &&
+        $inscripcion->getEstadoId() === EstadoTramite::DESAPROBADO;
+
+    if ($cursoDesaprobado) {
+        // Un curso desaprobado permite volver a elegir otro curso.
+    } elseif (
+        !empty($estadoRecursante['es_recursante'])
+        && !empty($estadoRecursante['puede_inscribirse'])
+    ) {
+        return [];
+    } else {
+
+        $estadoDocumentacion =
+            $this->documentoService
+                ->obtenerEstadoDocumentacion(
+                    AuthHelper::usuarioActual()['id']
+                );
+
+        if (
+            !empty($estadoDocumentacion['asistencia'])
+            || $tieneMoodleAprobado
+            || $tieneCursoAprobado
+        ) {
             return [];
         }
+    }
 
         $cursosBD =
             $this->cursoService

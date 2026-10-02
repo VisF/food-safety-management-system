@@ -348,7 +348,7 @@ include __DIR__ . '/header.php';
                 <a
                     class="panel-admin__accion app-vista-button app-vista-button--primary"
                     href="<?= $this->e(
-                        $this->getRoute('admin_actividad')
+                        $this->getRoute('admin_cursos')
                     ) ?>"
                 >
 
@@ -356,11 +356,11 @@ include __DIR__ . '/header.php';
                         class="material-symbols-outlined"
                         aria-hidden="true"
                     >
-                        manage_history
+                        school
                     </span>
 
                     <span>
-                        Actividad del sistema
+                        Gestionar cursos
                     </span>
 
                 </a>

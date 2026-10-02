@@ -414,6 +414,10 @@ class AdminExamenControlador
                     $_POST['estado'] ?? ''
                 ),
 
+                'nota' => trim(
+                    $_POST['nota'] ?? ''
+                ),
+
                 'observaciones' => trim(
                     $_POST['observaciones'] ?? ''
                 )

@@ -40,7 +40,6 @@ class ExamenService
 {
     private ExamenRepository $examenRepository;
     private CarnetService $carnetService;
-
     // Inicializa las dependencias de la clase.
     public function __construct()
     {
@@ -449,25 +448,13 @@ class ExamenService
 
         ];
     }
-    /**
-     * Guarda el resultado de una inscripción de examen.
-     *
-     * APROBADO y CARNET_EMITIDO son estados diferentes.
-     *
-     * APROBADO:
-     * El alumno aprobó el examen, pero el carnet todavía
-     * no fue emitido/cargado.
-     */
-    public function guardarAdministracionInscripcion(int $id,array $datos): bool
+    public function guardarAdministracionInscripcion(int $id,array $datos): bool 
     {
         $inscripcion =
             $this->examenRepository
-                ->obtenerAdministracionInscripcion(
-                    $id
-                );
+                ->obtenerAdministracionInscripcion($id);
 
         if ($inscripcion === null) {
-
             throw new InvalidArgumentException(
                 'La inscripción no existe.'
             );
@@ -477,7 +464,6 @@ class ExamenService
             (int)$inscripcion['estado_tramite_id']
             === EstadoTramite::CARNET_EMITIDO
         ) {
-
             throw new InvalidArgumentException(
                 'El carnet ya fue emitido para esta inscripción.'
             );
@@ -488,7 +474,6 @@ class ExamenService
         );
 
         $estadoTramite = match ($estado) {
-
             'APROBADO' =>
                 EstadoTramite::APROBADO,
 
@@ -501,25 +486,50 @@ class ExamenService
                 )
         };
 
-        $observaciones =
-            trim(
-                $datos['observaciones'] ?? ''
+        $nota = trim(
+            (string)($datos['nota'] ?? '')
+        );
+
+        if ($nota === '') {
+            throw new InvalidArgumentException(
+                'Debe ingresar la nota del examen.'
             );
-
-        $resultado =
-            $this->examenRepository
-                ->guardarAdministracionInscripcion(
-                    $id,
-                    $estadoTramite,
-                    $observaciones
-                );
-
-        if (!$resultado) {
-
-            return false;
         }
 
-        return true;
+        if (!is_numeric($nota)) {
+            throw new InvalidArgumentException(
+                'La nota debe ser numérica.'
+            );
+        }
+
+        $observaciones = trim(
+            $datos['observaciones'] ?? ''
+        );
+
+        $resultado = [
+            'inscripcion_id' =>
+                (int)$inscripcion['inscripcion_id'],
+
+            'id_examen' =>
+                (int)$inscripcion['examen_id'],
+
+            'nota' =>
+                $nota,
+
+            'aprobado' =>
+                $estado === 'APROBADO' ? 1 : 0,
+
+            'observaciones' =>
+                $observaciones
+        ];
+
+        return $this->examenRepository
+            ->guardarAdministracionInscripcion(
+                $id,
+                $estadoTramite,
+                $observaciones,
+                $resultado
+            );
     }
     
 

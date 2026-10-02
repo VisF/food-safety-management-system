@@ -181,6 +181,33 @@ class ToastHelper
                 'mensaje' => 'No se realizaron cambios en el examen.',
                 'tipo'    => 'info'
             ],
+            'curso_sin_cupos' => [
+                'mensaje' => 'El curso seleccionado no tiene cupos disponibles.',
+                'tipo'    => 'warning'
+            ],
+            'curso_con_inscripciones' => [
+                'mensaje' => 'No se puede desactivar el curso porque tiene inscripciones activas.',
+                'tipo'    => 'warning'
+            ],
+            'inscripcion_aprobada' => [
+                'mensaje' => 'El curso fue aprobado correctamente.',
+                'tipo' => 'success'
+            ],
+
+            'error_aprobar_inscripcion' => [
+                'mensaje' => 'No fue posible aprobar el curso.',
+                'tipo' => 'error'
+            ],
+
+            'inscripcion_desaprobada' => [
+                'mensaje' => 'El curso fue desaprobado correctamente.',
+                'tipo' => 'success'
+            ],
+
+            'error_desaprobar_inscripcion' => [
+                'mensaje' => 'No fue posible desaprobar el curso.',
+                'tipo' => 'error'
+            ],
                     
             default => null
         };

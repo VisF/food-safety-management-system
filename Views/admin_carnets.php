@@ -428,6 +428,21 @@ include __DIR__ .
                             class="app-form-input"
                             required
                         >
+                    <label class="admin-carnets__checkbox">
+                        <input
+                            type="checkbox"
+                            id="sin_fecha_vencimiento"
+                            name="sin_fecha_vencimiento"
+                            value="1"
+                            <?= !empty(
+                                $formulario['sin_fecha_vencimiento']
+                            ) ? 'checked' : ''; ?>
+                        >
+
+                        <span>
+                            Sin fecha de vencimiento
+                        </span>
+                    </label>
 
                     </div>
 

@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 final class EstadoTramite
@@ -19,9 +20,12 @@ final class EstadoTramite
 
     public const CARNET_EMITIDO = 8;
 
+    public const DESAPROBADO = 9;
+
     private function __construct()
     {
     }
+
     public static function desdeNombre(string $nombre): ?int
     {
         return [
@@ -33,6 +37,8 @@ final class EstadoTramite
             'rechazado'               => self::RECHAZADO,
             'cancelado'               => self::CANCELADO,
             'carnet_emitido'          => self::CARNET_EMITIDO,
+            'desaprobado'             => self::DESAPROBADO,
+
         ][strtolower($nombre)] ?? null;
     }
 }

@@ -40,6 +40,7 @@ declare(strict_types=1);
 
  
 require_once __DIR__ . '/../db/Connection.php';
+require_once __DIR__ . '/../Constant/EstadoTramite.php';
 
 class CursoRepository
 {
@@ -59,12 +60,49 @@ class CursoRepository
     {
         $sql = "
             SELECT
-                *
-            FROM cursos
-            ORDER BY fecha_inicio DESC, nombre ASC
+                c.*,
+                (
+                    SELECT COUNT(*)
+                    FROM inscripciones i
+                    WHERE i.curso_id = c.id
+                    AND i.estado_tramite_id IN
+                    (
+                        :pendiente,
+                        :documentacion,
+                        :inscripto,
+                        :aprobado
+                    )
+                ) AS inscriptos
+            FROM cursos c
+            ORDER BY c.fecha_inicio DESC, c.nombre ASC
         ";
 
         $stmt = $this->conexion->prepare($sql);
+
+        $stmt->bindValue(
+            ':pendiente',
+            EstadoTramite::PENDIENTE,
+            \PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':documentacion',
+            EstadoTramite::DOCUMENTACION_APROBADA,
+            \PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':inscripto',
+            EstadoTramite::INSCRIPTO_EXAMEN,
+            \PDO::PARAM_INT
+        );
+
+        $stmt->bindValue(
+            ':aprobado',
+            EstadoTramite::APROBADO,
+            \PDO::PARAM_INT
+        );
+
         $stmt->execute();
 
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -97,7 +135,8 @@ class CursoRepository
                 *
             FROM cursos
             WHERE activo = 1
-            ORDER BY fecha_inicio DESC, nombre ASC
+            AND fecha_inicio >= CURDATE()
+            ORDER BY fecha_inicio ASC, nombre ASC
         ";
 
         $stmt = $this->conexion->prepare($sql);

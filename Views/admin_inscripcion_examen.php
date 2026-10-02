@@ -477,6 +477,27 @@ include __DIR__ . '/header.php';
             </h3>
 
             <div class="space-y-4">
+                <div>
+                    <label
+                        for="nota"
+                        class="app-form-label">
+                        Nota
+                    </label>
+
+                    <input
+                        type="number"
+                        id="nota"
+                        name="nota"
+                        class="app-form-input"
+                        step="0.01"
+                        min="0"
+                        max="10"
+                        required
+                        value="<?php echo $this->e(
+                            $data['inscripcion']['nota'] ?? ''
+                        ); ?>"
+                        placeholder="Ingrese la nota del examen">
+                </div>
 
                 <label
                     class="flex items-center gap-3 cursor-pointer">

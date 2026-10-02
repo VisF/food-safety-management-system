@@ -74,7 +74,8 @@ abstract class BaseVista
      */
     protected function getRoute(
         string $route,
-        ?int $id = null
+        ?int $id = null,
+        ?int $idSecundario = null
     ): string {
         return match ($route) {
 
@@ -477,8 +478,108 @@ abstract class BaseVista
             'admin_usuarios' =>
                 $this->baseURL .
                 'admin/usuarios',
+            /* ==================================================
+               ADMINISTRACIÓN — CURSOS
+            ================================================== */
+
+            /**
+             * Listado administrativo de cursos.
+             *
+             * GET /admin/cursos
+             */
+            'admin_cursos' =>
+                $this->baseURL .
+                'admin/cursos',
 
 
+            /**
+             * Crear un curso.
+             *
+             * GET /admin/cursos/nuevo
+             */
+            'crear_curso' =>
+                $this->baseURL .
+                'admin/cursos/nuevo',
+
+
+            /**
+             * Guardar un curso nuevo.
+             *
+             * POST /admin/cursos
+             */
+            'guardar_curso_nuevo' =>
+                $this->baseURL .
+                'admin/cursos',
+
+
+            /**
+             * Editar un curso.
+             *
+             * GET /admin/cursos/{id}/editar
+             */
+            'editar_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/editar',
+
+
+            /**
+             * Guardar edición de un curso.
+             *
+             * POST /admin/cursos/{id}
+             */
+            'guardar_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id,
+
+
+            /**
+             * Activar curso.
+             *
+             * POST /admin/cursos/{id}/activar
+             */
+            'activar_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/activar',
+
+
+            /**
+             * Desactivar curso.
+             *
+             * POST /admin/cursos/{id}/desactivar
+             */
+            'desactivar_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/desactivar',
+
+
+            'inscriptos_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/inscriptos',
+
+            'aprobar_inscripcion_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/inscriptos/' .
+                (int)$idSecundario .
+                '/aprobar',
+
+            'desaprobar_inscripcion_curso' =>
+                $this->baseURL .
+                'admin/cursos/' .
+                (int)$id .
+                '/inscriptos/' .
+                (int)$idSecundario .
+                '/desaprobar',
             /* ==================================================
                CONSULTA PÚBLICA
             ================================================== */

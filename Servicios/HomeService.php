@@ -115,6 +115,65 @@ class HomeService
                     100
             ];
         }
+        if (
+            $estadoTramite === EstadoTramite::APROBADO
+            &&
+            $inscripcion !== null
+            &&
+            $inscripcion->getTipoInscripcionId() === 2
+        ) {
+
+            return [
+
+                'titulo' =>
+                    'Carnet pendiente de emisión',
+
+                'faltantes' =>
+                    [],
+
+                'texto' =>
+                    'Esperando emisión del carnet',
+
+                'ruta' =>
+                    '#estado-tramite',
+
+                'completa' =>
+                    true,
+
+                'porcentaje' =>
+                    100
+            ];
+        }
+        if (
+            $estadoTramite === EstadoTramite::DESAPROBADO
+            &&
+            $inscripcion !== null
+            &&
+            $inscripcion->getTipoInscripcionId() === 1
+        ) {
+
+            return [
+
+                'titulo' =>
+                    'Curso de Manipulación de Alimentos',
+
+                'faltantes' =>
+                    [],
+
+                'texto' =>
+                    'Curso no aprobado',
+
+                'ruta' =>
+                    '#estado-tramite',
+
+                'completa' =>
+                    false,
+
+                'porcentaje' =>
+                    100
+            ];
+        }
+        
         $documentacionCompleta =
             $estadoDocumentacion['completo'];
 

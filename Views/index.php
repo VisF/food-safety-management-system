@@ -112,6 +112,13 @@ class InicioVista extends BaseVista
         $proximoExamen =
             $inicioData['proximo_examen'] ?? null;
 
+        $resultadoExamen =
+            $inicioData['resultado_examen'] ?? null;
+
+        $examenAprobado =
+            !empty($resultadoExamen)
+            && (int)($resultadoExamen['aprobado'] ?? 0) === 1;
+
         $carnetVigente =
             $inicioData['carnet_vigente'] ?? null;
 
@@ -145,6 +152,13 @@ class InicioVista extends BaseVista
         $textoAccion =
             (string)($accionPrincipal['texto'] ?? '');
 
+        ?>
+        <?php
+        $estadoCarnet =
+            (string)($carnetVigente['estado'] ?? '');
+
+        $diasRestantes =
+            (int)($carnetVigente['dias_restantes'] ?? 0);
         ?>
 
 <!DOCTYPE html>
@@ -220,14 +234,23 @@ include __DIR__ . '/header.php';
 
                 <div class="home-carnet-vigente__header">
 
-                    <h3>
-                        Carnet vigente
+                   <h3>
+                        <?= $estadoCarnet === 'vencido'
+                            ? 'Carnet vencido'
+                            : 'Carnet vigente'
+                        ?>
                     </h3>
 
                     <span
-                        class="app-vista-chip app-vista-chip--vigente"
+                        class="app-vista-chip <?= $estadoCarnet === 'vencido'
+                            ? 'app-vista-chip--vencido'
+                            : 'app-vista-chip--vigente'
+                        ?>"
                     >
-                        Vigente
+                        <?= $estadoCarnet === 'vencido'
+                            ? 'Vencido'
+                            : 'Vigente'
+                        ?>
                     </span>
 
                 </div>
@@ -290,13 +313,7 @@ include __DIR__ . '/header.php';
 
                 <?php endif; ?>
 
-                <?php
-                $estadoCarnet =
-                    (string)($carnetVigente['estado'] ?? '');
-
-                $diasRestantes =
-                    (int)($carnetVigente['dias_restantes'] ?? 0);
-                ?>
+                
 
                 <?php if ($estadoCarnet === 'vigente'): ?>
 
@@ -462,6 +479,64 @@ include __DIR__ . '/header.php';
         <?php endif; ?>
 
 
+        <?php if (
+            !empty($resultadoExamen)
+            && (int)($resultadoExamen['aprobado'] ?? 0) === 1
+        ): ?>
+
+            <div class="home-tramite__resultado">
+
+                <p class="home-tramite__accion">
+
+                    <strong>
+                        Resultado del examen:
+                    </strong>
+
+                    Aprobado
+                </p>
+
+                <?php if (
+                    isset($resultadoExamen['nota'])
+                    && $resultadoExamen['nota'] !== ''
+                ): ?>
+
+                    <p class="home-tramite__accion">
+
+                        <strong>
+                            Nota:
+                        </strong>
+
+                        <?= $this->e(
+                            (string)$resultadoExamen['nota']
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
+
+                <?php if (
+                    !empty($resultadoExamen['observaciones'])
+                ): ?>
+
+                    <p class="home-tramite__accion">
+
+                        <strong>
+                            Observaciones:
+                        </strong>
+
+                        <?= $this->e(
+                            $resultadoExamen['observaciones']
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
+
+            </div>
+
+        <?php endif; ?>
+
+
         <?php if (!empty($carnetVigente)): ?>
 
             <a
@@ -591,6 +666,58 @@ include __DIR__ . '/header.php';
 
                 <?php endif; ?>
 
+                <?php if (
+                    isset($recursante['nota'])
+                    && $recursante['nota'] !== ''
+                    && $recursante['nota'] !== null
+                ): ?>
+
+                    <p class="home-recursante__dato">
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            assignment
+                        </span>
+
+                        <strong>
+                            Resultado:
+                        </strong>
+
+                        Desaprobado -
+                        Nota:
+                        <?= $this->e(
+                            (string)$recursante['nota']
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
+                <?php if (
+                    !empty($recursante['observaciones'])
+                ): ?>
+
+                    <p class="home-recursante__dato">
+
+                        <span
+                            class="material-symbols-outlined"
+                            aria-hidden="true"
+                        >
+                            comment
+                        </span>
+
+                        <strong>
+                            Observaciones:
+                        </strong>
+
+                        <?= $this->e(
+                            $recursante['observaciones']
+                        ) ?>
+
+                    </p>
+
+                <?php endif; ?>
 
                 <?php if (!empty($recursante['fecha_limite'])): ?>
 
@@ -799,236 +926,239 @@ include __DIR__ . '/header.php';
     <!-- =====================================================
          CURSOS DISPONIBLES
          ===================================================== -->
+    <?php if (!$examenAprobado): ?>            
+        <section id="cursos-disponibles" class="home-cursos">
 
-    <section id="cursos-disponibles" class="home-cursos">
+            <div class="home-cursos__header">
 
-        <div class="home-cursos__header">
+                <h4 class="home-cursos__titulo">
+                    Cursos Disponibles
+                </h4>
 
-            <h4 class="home-cursos__titulo">
-                Cursos Disponibles
-            </h4>
-
-        </div>
-
-
-        <div class="home-cursos__grid">
-
-            <?php foreach ($cursos as $curso): ?>
-
-                <article class="app-vista-card home-curso-card">
-
-                    <div class="home-curso-card__contenido">
-
-                        <h5 class="home-curso-card__nombre">
-
-                            <?= $this->e(
-                                $curso['nombre'] ?? ''
-                            ) ?>
-
-                        </h5>
+            </div>
 
 
-                        <p class="home-curso-card__descripcion">
+            <div class="home-cursos__grid">
 
-                            <?= $this->e(
-                                $curso['descripcion'] ?? ''
-                            ) ?>
+                <?php foreach ($cursos as $curso): ?>
 
-                        </p>
+                    <article class="app-vista-card home-curso-card">
 
+                        <div class="home-curso-card__contenido">
 
-                        <div class="home-curso-card__datos">
+                            <h5 class="home-curso-card__nombre">
 
-                            <?php if (!empty($curso['fecha_inicio'])): ?>
-
-                                <p class="home-curso-card__dato">
-
-                                    <span
-                                        class="material-symbols-outlined"
-                                        aria-hidden="true"
-                                    >
-                                        calendar_today
-                                    </span>
-
-                                    <?= $this->e(
-                                        date(
-                                            'd/m/Y',
-                                            strtotime(
-                                                $curso['fecha_inicio']
-                                            )
-                                        )
-                                    ) ?>
-
-                                </p>
-
-                            <?php endif; ?>
-
-
-                            <?php if (!empty($curso['hora_inicio'])): ?>
-
-                                <p class="home-curso-card__dato">
-
-                                    <span
-                                        class="material-symbols-outlined"
-                                        aria-hidden="true"
-                                    >
-                                        schedule
-                                    </span>
-
-                                    <?= $this->e(
-                                        $curso['hora_inicio']
-                                    ) ?>
-
-                                    hs
-
-                                </p>
-
-                            <?php endif; ?>
-
-
-                            <?php if (!empty($curso['ubicacion'])): ?>
-
-                                <p class="home-curso-card__dato">
-
-                                    <span
-                                        class="material-symbols-outlined"
-                                        aria-hidden="true"
-                                    >
-                                        location_on
-                                    </span>
-
-                                    <?= $this->e(
-                                        $curso['ubicacion']
-                                    ) ?>
-
-                                </p>
-
-                            <?php endif; ?>
-
-
-                            <p class="home-curso-card__dato">
-
-                                <span
-                                    class="material-symbols-outlined"
-                                    aria-hidden="true"
-                                >
-                                    groups
-                                </span>
-
-                                <?= (int)(
-                                    $curso['cupos_disponibles'] ?? 0
+                                <?= $this->e(
+                                    $curso['nombre'] ?? ''
                                 ) ?>
 
-                                /
+                            </h5>
 
-                                <?= (int)(
-                                    $curso['cupos_totales'] ?? 0
+
+                            <p class="home-curso-card__descripcion">
+
+                                <?= $this->e(
+                                    $curso['descripcion'] ?? ''
                                 ) ?>
-
-                                cupos
 
                             </p>
 
-                        </div>
 
+                            <div class="home-curso-card__datos">
 
-                        <div class="home-curso-card__footer">
+                                <?php if (!empty($curso['fecha_inicio'])): ?>
 
-                            <span class="app-chip app-chip--info">
+                                    <p class="home-curso-card__dato">
 
-                                <?php if (
-                                    strtolower(
-                                        (string)(
-                                            $curso['modalidad'] ?? ''
-                                        )
-                                    ) === 'presencial'
-                                ): ?>
+                                        <span
+                                            class="material-symbols-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            calendar_today
+                                        </span>
 
-                                    📍 Presencial
+                                        <?= $this->e(
+                                            date(
+                                                'd/m/Y',
+                                                strtotime(
+                                                    $curso['fecha_inicio']
+                                                )
+                                            )
+                                        ) ?>
 
-                                <?php else: ?>
-
-                                    💻 Virtual
+                                    </p>
 
                                 <?php endif; ?>
 
-                            </span>
+
+                                <?php if (!empty($curso['hora_inicio'])): ?>
+
+                                    <p class="home-curso-card__dato">
+
+                                        <span
+                                            class="material-symbols-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            schedule
+                                        </span>
+
+                                        <?= $this->e(
+                                            $curso['hora_inicio']
+                                        ) ?>
+
+                                        hs
+
+                                    </p>
+
+                                <?php endif; ?>
 
 
-                            <?php if (
-                                empty($curso['inscripto'])
-                                && !empty($curso['puede_inscribirse'])
-                            ): ?>
+                                <?php if (!empty($curso['ubicacion'])): ?>
 
-                                <form
-                                    method="POST"
-                                    action="<?= $this->e(
-                                        $this->getRoute(
-                                            'guardar_inscripcion_curso'
-                                        )
-                                    ) ?>"
-                                    class="home-curso-card__form"
-                                >
-                                    
-                                    <?= $this->getCsrfInput() ?>
+                                    <p class="home-curso-card__dato">
 
-                                    <input
-                                        type="hidden"
-                                        name="curso_id"
-                                        value="<?= (int)(
-                                            $curso['id'] ?? 0
-                                        ) ?>"
+                                        <span
+                                            class="material-symbols-outlined"
+                                            aria-hidden="true"
+                                        >
+                                            location_on
+                                        </span>
+
+                                        <?= $this->e(
+                                            $curso['ubicacion']
+                                        ) ?>
+
+                                    </p>
+
+                                <?php endif; ?>
+
+
+                                <p class="home-curso-card__dato">
+
+                                    <span
+                                        class="material-symbols-outlined"
+                                        aria-hidden="true"
                                     >
+                                        groups
+                                    </span>
+
+                                    <?= (int)(
+                                        $curso['cupos_disponibles'] ?? 0
+                                    ) ?>
+
+                                    /
+
+                                    <?= (int)(
+                                        $curso['cupos_totales'] ?? 0
+                                    ) ?>
+
+                                    cupos
+
+                                </p>
+
+                            </div>
+
+
+                            <div class="home-curso-card__footer">
+
+                                <span class="app-chip app-chip--info">
+
+                                    <?php if (
+                                        strtolower(
+                                            (string)(
+                                                $curso['modalidad'] ?? ''
+                                            )
+                                        ) === 'presencial'
+                                    ): ?>
+
+                                        📍 Presencial
+
+                                    <?php else: ?>
+
+                                        💻 Virtual
+
+                                    <?php endif; ?>
+
+                                </span>
+
+
+                                <?php if (
+                                    empty($curso['inscripto'])
+                                    && !empty($curso['puede_inscribirse'])
+                                ): ?>
+
+                                    <form
+                                        method="POST"
+                                        action="<?= $this->e(
+                                            $this->getRoute(
+                                                'guardar_inscripcion_curso'
+                                            )
+                                        ) ?>"
+                                        class="home-curso-card__form"
+                                    >
+                                        
+                                        <?= $this->getCsrfInput() ?>
+
+                                        <input
+                                            type="hidden"
+                                            name="curso_id"
+                                            value="<?= (int)(
+                                                $curso['id'] ?? 0
+                                            ) ?>"
+                                        >
+
+                                        <button
+                                            type="submit"
+                                            class="app-vista-button app-vista-button--primary"
+                                        >
+                                            Inscribirme
+                                        </button>
+
+                                    </form>
+
+                                <?php elseif (!empty($curso['inscripto'])): ?>
 
                                     <button
-                                        type="submit"
-                                        class="app-vista-button app-vista-button--primary"
+                                        type="button"
+                                        class="app-vista-button app-vista-button--secondary"
+                                        disabled
                                     >
-                                        Inscribirme
+                                        Ya inscripto
                                     </button>
 
-                                </form>
+                                <?php else: ?>
 
-                            <?php elseif (!empty($curso['inscripto'])): ?>
+                                    <button
+                                        type="button"
+                                        class="app-vista-button app-vista-button--secondary"
+                                        disabled
+                                    >
+                                        Ya posee un carnet vigente
+                                    </button>
 
-                                <button
-                                    type="button"
-                                    class="app-vista-button app-vista-button--secondary"
-                                    disabled
-                                >
-                                    Ya inscripto
-                                </button>
+                                <?php endif; ?>
 
-                            <?php else: ?>
-
-                                <button
-                                    type="button"
-                                    class="app-vista-button app-vista-button--secondary"
-                                    disabled
-                                >
-                                    Ya posee un carnet vigente
-                                </button>
-
-                            <?php endif; ?>
+                            </div>
 
                         </div>
 
-                    </div>
+                    </article>
 
-                </article>
+                <?php endforeach; ?>
 
-            <?php endforeach; ?>
+            </div>
 
-        </div>
-
-    </section>
-
+        </section>
+    <?php endif; ?>                                
 
     <!-- =====================================================
          PRÓXIMO EXAMEN DEL USUARIO
          ===================================================== -->
 
-    <?php if ($proximoExamen !== null): ?>
+    <?php if (
+            !$examenAprobado
+            && $proximoExamen !== null
+        ): ?>
 
         <section class="home-proximo-examen">
 
@@ -1138,9 +1268,16 @@ include __DIR__ . '/header.php';
          ===================================================== -->
 
     <?php if (
-        $proximoExamen === null
-        && $mostrarExamenes
-    ): ?>
+    (
+        !$examenAprobado|| 
+            (
+                $carnetVigente !== null
+                && ($carnetVigente['estado'] ?? '') === 'vencido'
+            )
+            )
+            && $proximoExamen === null
+            && $mostrarExamenes
+        ): ?>
 
         <section
             id="proximos-examenes"

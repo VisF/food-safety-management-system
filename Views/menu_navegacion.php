@@ -513,11 +513,11 @@ $menuRutaActiva = static function (
 
                         <a
                             href="<?= htmlspecialchars(
-                                $menuUrl('admin/actividad'),
+                                $menuUrl('admin/cursos'),
                                 ENT_QUOTES,
                                 'UTF-8'
                             ) ?>"
-                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/actividad')
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/cursos')
                                 ? ' menu-navegacion__enlace--activo'
                                 : '' ?>"
                         >
@@ -526,11 +526,34 @@ $menuRutaActiva = static function (
                                 class="material-symbols-outlined"
                                 aria-hidden="true"
                             >
-                                history
+                                school
                             </span>
 
                             <span>
-                                Actividad
+                                Cursos
+                            </span>
+
+                        </a>
+                        <a
+                            href="<?= htmlspecialchars(
+                                $menuUrl('admin/usuarios'),
+                                ENT_QUOTES,
+                                'UTF-8'
+                            ) ?>"
+                            class="menu-navegacion__enlace<?= $menuRutaActiva('/admin/usuarios')
+                                ? ' menu-navegacion__enlace--activo'
+                                : '' ?>"
+                        >
+
+                            <span
+                                class="material-symbols-outlined"
+                                aria-hidden="true"
+                            >
+                                people
+                            </span>
+
+                            <span>
+                                Usuarios
                             </span>
 
                         </a>

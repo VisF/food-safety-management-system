@@ -145,6 +145,74 @@ class CarnetRepository
                 1
         ];
     }
+
+    /**
+     * Crea el carnet y actualiza el estado
+     * de la inscripción dentro de una única transacción.
+     *
+     * @param array $datos
+     * @param int $estadoTramite
+     * @return array|null
+     * @throws Throwable
+     */
+    public function crearYActualizarEstado(
+        array $datos,
+        int $estadoTramite
+    ): ?array {
+
+        $this->conexion->beginTransaction();
+
+        try {
+
+            /*
+            * Crear el carnet.
+            */
+            $carnet = $this->crear($datos);
+
+            if ($carnet === null) {
+
+                $this->conexion->rollBack();
+
+                return null;
+            }
+
+            /*
+            * Cambiar el estado de la inscripción.
+            */
+            $stmt = $this->conexion->prepare("
+                UPDATE inscripciones
+                SET estado_tramite_id = :estado
+                WHERE id = :id
+            ");
+
+            $estadoActualizado = $stmt->execute([
+                ':estado' => $estadoTramite,
+                ':id' => (int)$datos['id_inscripcion']
+            ]);
+
+            if (!$estadoActualizado) {
+
+                throw new RuntimeException(
+                    'No fue posible actualizar el estado de la inscripción.'
+                );
+            }
+
+            /*
+            * Confirmar ambas operaciones.
+            */
+            $this->conexion->commit();
+
+            return $carnet;
+
+        } catch (Throwable $e) {
+
+            if ($this->conexion->inTransaction()) {
+                $this->conexion->rollBack();
+            }
+
+            throw $e;
+        }
+    }
     public function obtenerCarnetVigentePorUsuario(int $usuarioId): ?array
     {
         $sql = "
@@ -161,8 +229,13 @@ class CarnetRepository
                 WHERE usuario_id = :usuario
             )
             AND activo = 1
-            AND fecha_vencimiento >= CURDATE()
-            ORDER BY fecha_vencimiento DESC
+            AND (
+                fecha_vencimiento IS NULL
+                OR fecha_vencimiento >= CURDATE()
+            )
+            ORDER BY
+                fecha_vencimiento IS NULL DESC,
+                fecha_vencimiento DESC
             LIMIT 1
         ";
 
