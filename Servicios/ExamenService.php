@@ -245,6 +245,30 @@ class ExamenService
     }
 
     /**
+     * Determina si un examen puede ser editado.
+     *
+     * Un examen solamente puede editarse mientras
+     * su fecha y hora todavía no hayan pasado.
+     */
+    public function puedeEditar(int $id): bool
+    {
+        $examen = $this->obtenerExamen($id);
+
+        if ($examen === null) {
+            return false;
+        }
+
+        $fechaHoraExamen = strtotime(
+            $examen['fecha'] . ' ' . $examen['hora']
+        );
+
+        if ($fechaHoraExamen === false) {
+            return false;
+        }
+
+        return $fechaHoraExamen >= time();
+    }
+    /**
      * Actualizar examen.
      */
     public function actualizarExamen(int $id,array $datos): bool
@@ -294,6 +318,11 @@ class ExamenService
         if ($fechaHora < time()) {
             throw new InvalidArgumentException(
                 'La fecha y hora del examen no pueden ser anteriores al momento actual.'
+            );
+        }
+        if (!$this->puedeEditar($id)) {
+            throw new InvalidArgumentException(
+                'El examen ya fue realizado y no puede editarse.'
             );
         }
 

@@ -161,11 +161,15 @@ class HomeControlador
                 $documentos
             );
 
-        $tieneCursoAprobado =
-            $this->inscripcionService
-                ->tieneCursoAprobado(
-                    $usuario['id']
-                );
+        $tieneCursoAprobado = false;
+
+        if ($usuario !== null) {
+            $tieneCursoAprobado =
+                $this->inscripcionService
+                    ->tieneCursoAprobado(
+                        $usuario['id']
+                    );
+        }
 
       $carnetVigente = null;
 
@@ -392,12 +396,17 @@ class HomeControlador
         return [];
     } else {
 
-        $estadoDocumentacion =
-            $this->documentoService
-                ->obtenerEstadoDocumentacion(
-                    AuthHelper::usuarioActual()['id']
-                );
+        $estadoDocumentacion = [
+            'asistencia' => false
+        ];
 
+        if ($usuario !== null) {
+            $estadoDocumentacion =
+                $this->documentoService
+                    ->obtenerEstadoDocumentacion(
+                        $usuario['id']
+                    );
+        }
         if (
             !empty($estadoDocumentacion['asistencia'])
             || $tieneMoodleAprobado

@@ -234,6 +234,15 @@ class AdminExamenControlador
             );
 
             exit;
+            
+        }
+        if (!$this->examenService->puedeEditar($id)) {
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/examenes?toast=examen_no_editable'
+            );
+
+            exit;
         }
 
         require_once __DIR__ . '/../Views/admin_examen_form.php';
@@ -307,19 +316,17 @@ class AdminExamenControlador
 
     public function mostrarListado(): void
     {
-        $orden = $_GET['orden'] ?? 'asc';
+        $orden = $_GET['orden'] ?? 'desc';
 
-        if ($orden === 'desc') {
+        $examenes = $this->examenService
+            ->listarExamenes();
 
-            $examenes = $this->examenService
-                ->listarExamenesProgramadosDescendente();
-
-        } else {
-
-            $examenes = $this->examenService
-                ->listarExamenesProgramadosAscendente();
-
+        foreach ($examenes as &$examen) {
+            $examen['puede_editar'] = $this->examenService->puedeEditar(
+                (int) $examen['id']
+            );
         }
+        unset($examen);
 
         $plazoRecursanteDias = $this->configuracionService
             ->obtenerPlazoRecursanteDias();

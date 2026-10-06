@@ -383,13 +383,17 @@ include __DIR__ . '/header.php';
 
                                     </a>
 
-                                    <a
-                                        class="app-vista-button app-vista-button--primary"
-                                        href="<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>">
+                                   <?php if (!empty($examen['puede_editar'])): ?>
 
-                                        Editar
+                                        <a
+                                            class="app-vista-button app-vista-button--primary"
+                                            href="<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>">
 
-                                    </a>
+                                            Editar
+
+                                        </a>
+
+                                    <?php endif; ?>
 
 <?php if (($examen['estado'] ?? '') === 'ACTIVO'): ?>
 
@@ -528,13 +532,17 @@ include __DIR__ . '/header.php';
 
                 </a>
 
-                <a
-                    class="app-vista-button app-vista-button--primary"
-                    href="<?php echo $this->getRoute('editar_examen',(int)$examen['id']); ?>">
+                <?php if (!empty($examen['puede_editar'])): ?>
 
-                    Editar
+                    <a
+                        class="app-vista-button app-vista-button--primary"
+                        href="<?php echo $this->getRoute('editar_examen',(int)$examen['id']); ?>">
 
-                </a>
+                        Editar
+
+                    </a>
+
+                <?php endif; ?>
 
     <?php if (($examen['estado'] ?? '') === 'ACTIVO'): ?>
 
