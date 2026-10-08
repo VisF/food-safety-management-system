@@ -327,6 +327,8 @@ The documentation includes information about:
 * Technical verification
 * Development decisions
 
+For the delivery-oriented documentation in Spanish, start with [`docs/README.md`](./docs/README.md). It provides separate documents for database, backend, frontend, routes, functional flows, installation and user operation.
+
 ## Project Goals
 
 The project was developed with a strong focus on software engineering practices rather than only implementing individual features.

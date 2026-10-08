@@ -238,7 +238,7 @@ abstract class BaseVista
 
 
             /**
-             * Buscar documentación por DNI.
+             * Buscar documentación por CUIL/CUIT.
              *
              * GET /admin/documentos/buscar
              */
@@ -269,7 +269,17 @@ abstract class BaseVista
                 'admin/documentos/' .
                 (int)$id .
                 '/rechazar',
-
+                
+            /**
+             * Desaprobar asistencia.
+             *
+             * POST /admin/documentos/{id}/rechazar-asistencia
+             */
+            'desaprobar_asistencia' =>
+                $this->baseURL .
+                'admin/documentos/' .
+                (int)$id .
+                '/rechazar-asistencia',
 
             /**
              * Descargar documento desde administración.

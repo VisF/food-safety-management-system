@@ -37,7 +37,7 @@ class ToastHelper
 
             'documentacion_incompleta' => [
                 'mensaje' =>
-                    'Debes tener aprobados el DNI y la foto carnet',
+                    'Debes tener aprobados la foto del dni y la foto carnet',
                 'tipo' =>
                     'warning'
             ],
@@ -97,9 +97,9 @@ class ToastHelper
                 'tipo' =>
                     'error'
             ],
-            'dni_existente' =>
+            'cuil_cuit_existente' =>
             [
-                'mensaje' => 'Ya existe un usuario con ese DNI.',
+                'mensaje' => 'Ya existe un usuario con ese CUIL/CUIT.',
                 'tipo' => 'error'
             ],
             'email_invalido' =>

@@ -264,7 +264,7 @@ class AdminUsuariosVista extends BaseVista
                             type="search"
                             id="buscar-usuarios"
                             class="admin-usuarios__search-input"
-                            placeholder="Nombre, apellido, DNI o email..."
+                            placeholder="Nombre, apellido, CUIL/CUIT o email..."
                             autocomplete="off"
                         >
 
@@ -303,7 +303,7 @@ class AdminUsuariosVista extends BaseVista
                                 </th>
 
                                 <th scope="col">
-                                    DNI
+                                    CUIL/CUIT
                                 </th>
 
                                 <th scope="col">
@@ -397,8 +397,8 @@ class AdminUsuariosVista extends BaseVista
                                     ?? ''
                                 );
 
-                                $dni = (string)(
-                                    $usuario['dni']
+                                $cuil_cuit = (string)(
+                                    $usuario['cuil_cuit']
                                     ?? ''
                                 );
 
@@ -441,7 +441,7 @@ class AdminUsuariosVista extends BaseVista
                                         strtolower(
                                             $nombreCompleto
                                             . ' '
-                                            . $dni
+                                            . $cuil_cuit
                                             . ' '
                                             . $email
                                         )
@@ -484,8 +484,9 @@ class AdminUsuariosVista extends BaseVista
                                     </td>
 
 
-                                    <td data-label="DNI">
-                                        <?= $this->e($dni); ?>
+
+                                    <td data-label="CUIL/CUIT">
+                                        <?= $this->e($cuil_cuit); ?>
                                     </td>
 
 
@@ -655,7 +656,7 @@ class AdminUsuariosVista extends BaseVista
                     </strong>
 
                     <span>
-                        Probá con otro nombre, DNI o email.
+                        Probá con otro nombre, CUIL/CUIT o email.
                     </span>
 
                 </div>
@@ -749,15 +750,15 @@ class AdminUsuariosVista extends BaseVista
 
                         <div class="admin-usuarios__campo">
 
-                            <label for="nuevo-dni">
-                                DNI
+                            <label for="nuevo-cuil-cuit">
+                                CUIL/CUIT
                             </label>
 
                             <input
                                 type="text"
-                                id="nuevo-dni"
-                                name="dni"
-                                maxlength="8"
+                                id="nuevo-cuil-cuit"
+                                name="cuil_cuit"
+                                maxlength="11"
                                 inputmode="numeric"
                                 required
                             >
@@ -933,8 +934,8 @@ class AdminUsuariosVista extends BaseVista
                                 Usuario
                             </strong>
 
-                            <span id="editar-dni-visible">
-                                DNI
+                            <span id="editar-cuil-cuit-visible">
+                                CUIL/CUIT
                             </span>
 
                         </div>
@@ -1400,8 +1401,8 @@ class AdminUsuariosVista extends BaseVista
                                 $usuario['apellido']
                                 ?? ''
                             ),
-                            'dni' => (string)(
-                                $usuario['dni']
+                            'cuil_cuit' => (string)(
+                                $usuario['cuil_cuit']
                                 ?? ''
                             ),
                             'email' => (string)(

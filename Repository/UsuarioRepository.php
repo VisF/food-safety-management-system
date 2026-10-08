@@ -36,7 +36,7 @@ class UsuarioRepository
                 u.id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
                 u.telefono,
                 u.domicilio,
@@ -104,7 +104,7 @@ class UsuarioRepository
                 u.id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
                 u.telefono,
                 u.domicilio,
@@ -204,23 +204,23 @@ class UsuarioRepository
     }
 
     /**
-     * Obtener usuario por DNI.
+     * Obtener usuario por CUIL/CUIT.
      */
-    public function obtenerPorDni(string $dni): ?array
+    public function obtenerPorCuilCuit(string $cuilCuit): ?array
     {
         $sql = "
             SELECT *
 
             FROM usuarios
 
-            WHERE dni = :dni
+            WHERE cuil_cuit = :cuil_cuit
         ";
 
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->bindValue(
-            ':dni',
-            $dni
+            ':cuil_cuit',
+            $cuilCuit
         );
 
         $stmt->execute();
@@ -299,7 +299,7 @@ class UsuarioRepository
             $sql = "
                 INSERT INTO usuarios
                 (
-                    dni,
+                    cuil_cuit,
                     nombre,
                     apellido,
                     domicilio,
@@ -310,7 +310,7 @@ class UsuarioRepository
                 )
                 VALUES
                 (
-                    :dni,
+                    :cuil_cuit,
                     :nombre,
                     :apellido,
                     :domicilio,
@@ -324,7 +324,7 @@ class UsuarioRepository
             $stmt = $this->conexion->prepare($sql);
 
             $stmt->execute([
-                ':dni' => $datos['dni'],
+                ':cuil_cuit' => $datos['cuil_cuit'],
                 ':nombre' => $datos['nombre'],
                 ':apellido' => $datos['apellido'],
                 ':domicilio' => $datos['domicilio'] ?? null,
@@ -374,15 +374,15 @@ class UsuarioRepository
             );
         }
         if (
-            isset($datos['dni'])
+            isset($datos['cuil_cuit'])
             &&
-            $this->existeDni(
-                $datos['dni'],
+            $this->existeCuilCuit(
+                $datos['cuil_cuit'],
                 $id
             )
         ) {
             throw new RuntimeException(
-                'Ya existe un usuario con ese DNI.'
+                'Ya existe un usuario con ese CUIL/CUIT.'
             );
         }
 
@@ -737,10 +737,10 @@ class UsuarioRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
     /**
-     * Verifica si un DNI ya existe.
+     * Verifica si un CUIL/CUIT ya existe.
      */
-    public function existeDni(
-        string $dni,
+    public function existeCuilCuit(
+        string $cuilCuit,
         ?int $ignorarUsuario = null
     ): bool
     {
@@ -749,7 +749,7 @@ class UsuarioRepository
 
             FROM usuarios
 
-            WHERE dni = :dni
+            WHERE cuil_cuit = :cuil_cuit
         ";
 
         if ($ignorarUsuario !== null) {
@@ -759,8 +759,8 @@ class UsuarioRepository
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->bindValue(
-            ':dni',
-            $dni
+            ':cuil_cuit',
+            $cuil_cuit
         );
 
         if ($ignorarUsuario !== null) {
@@ -782,7 +782,7 @@ class UsuarioRepository
      * - nombre
      * - apellido
      * - email
-     * - dni
+     * - cuil_cuit
      */
     public function buscar(
         string $criterio,
@@ -793,7 +793,7 @@ class UsuarioRepository
             'nombre',
             'apellido',
             'email',
-            'dni'
+            'cuil_cuit'
         ];
 
         if (!in_array($criterio, $permitidos, true)) {
@@ -807,7 +807,7 @@ class UsuarioRepository
                 u.id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
                 u.telefono,
                 u.domicilio,

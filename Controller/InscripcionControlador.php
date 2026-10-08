@@ -475,7 +475,7 @@ class InscripcionControlador
                 $this->documentoService
                     ->obtenerPorUsuario($usuarioId);
 
-            $tieneDni = false;
+            $tienedni = false;
             $tieneFoto = false;
         foreach ($documentos as $doc) {
 
@@ -490,7 +490,7 @@ class InscripcionControlador
                     ) {
 
                         case 'DNI':
-                            $tieneDni = true;
+                            $tieneCuilCuit = true;
                             break;
 
                         case 'FOTO':
@@ -500,7 +500,7 @@ class InscripcionControlador
                     }
                 }
 
-                if (!$tieneDni || !$tieneFoto) {
+                if (!$tienedni || !$tieneFoto) {
 
                     header(
                         'Location: ' .

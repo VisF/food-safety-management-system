@@ -8,7 +8,7 @@ class UsuarioDTO
         private int $id,
         private string $nombre,
         private string $apellido,
-        private string $dni,
+        private string $cuilCuit,
         private string $email,
         private ?string $telefono,
         private ?string $domicilio,
@@ -23,7 +23,7 @@ class UsuarioDTO
             (int)($data['id'] ?? 0),
             (string)($data['nombre'] ?? ''),
             (string)($data['apellido'] ?? ''),
-            (string)($data['dni'] ?? ''),
+            (string)($data['cuil_cuit'] ?? ''),
             (string)($data['email'] ?? ''),
             $data['telefono'] ?? null,
             $data['domicilio'] ?? null,
@@ -39,7 +39,7 @@ class UsuarioDTO
             'id' => $this->id,
             'nombre' => $this->nombre,
             'apellido' => $this->apellido,
-            'dni' => $this->dni,
+            'cuil_cuit' => $this->cuilCuit,
             'email' => $this->email,
             'telefono' => $this->telefono,
             'domicilio' => $this->domicilio,
@@ -105,9 +105,9 @@ class UsuarioDTO
         return $this->apellido;
     }
 
-    public function getDni(): string
+    public function getCuilCuit(): string
     {
-        return $this->dni;
+        return $this->cuilCuit;
     }
 
     public function getEmail(): string

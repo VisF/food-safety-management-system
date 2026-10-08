@@ -91,7 +91,7 @@ class AdminRepository
             SELECT
                 i.id,
                 CONCAT(u.nombre, ' ', u.apellido) AS nombre,
-                u.dni,
+                u.cuil_cuit,
                 LOWER(et.nombre) AS estado_class,
                 UPPER(REPLACE(et.nombre, '_', ' ')) AS estado
             FROM inscripciones i
@@ -135,7 +135,7 @@ class AdminRepository
                     u.id,
                     u.nombre,
                     u.apellido,
-                    u.dni,
+                    u.cuil_cuit,
                     u.email,
                     u.telefono,
                     u.activo,
@@ -184,7 +184,7 @@ class AdminRepository
                 WHERE
                     nombre LIKE :texto
                     OR apellido LIKE :texto
-                    OR dni LIKE :texto
+                    OR cuil_cuit LIKE :texto
                     OR email LIKE :texto
                 ORDER BY apellido,nombre
             ";
@@ -304,7 +304,7 @@ class AdminRepository
                     d.id,
                     d.usuario_id,
                     CONCAT(u.nombre,' ',u.apellido) AS usuario,
-                    u.dni,
+                    u.cuil_cuit,
                     d.tipo_documento,
                     d.nombre_original,
                     d.estado,
@@ -348,7 +348,7 @@ class AdminRepository
                     d.id,
                     d.usuario_id,
                     CONCAT(u.nombre,' ',u.apellido) AS usuario,
-                    u.dni,
+                    u.cuil_cuit,
                     d.tipo_documento,
                     d.nombre_original,
                     d.fecha_subida
@@ -371,7 +371,7 @@ class AdminRepository
                 SELECT
                     d.*,
                     CONCAT(u.nombre,' ',u.apellido) usuario,
-                    u.dni
+                    u.cuil_cuit
                 FROM documentos d
                 INNER JOIN usuarios u
                     ON u.id=d.usuario_id
@@ -391,7 +391,7 @@ class AdminRepository
                 SELECT
                     d.*,
                     CONCAT(u.nombre,' ',u.apellido) usuario,
-                    u.dni
+                    u.cuil_cuit
                 FROM documentos d
                 INNER JOIN usuarios u
                     ON u.id=d.usuario_id
@@ -678,7 +678,7 @@ class AdminRepository
                     c.*,
                     u.nombre,
                     u.apellido,
-                    u.dni
+                    u.cuil_cuit,
                 FROM carnets c
                 INNER JOIN inscripciones i
                     ON i.id = c.inscripcion_id
@@ -818,7 +818,7 @@ class AdminRepository
                 SELECT
                     i.id,
                     CONCAT(u.nombre,' ',u.apellido) AS usuario,
-                    u.dni,
+                    u.cuil_cuit,
                     i.fecha_inscripcion,
                     et.nombre AS estado,
                     ti.nombre AS tipo
@@ -860,7 +860,7 @@ class AdminRepository
                 SELECT
                     i.*,
                     CONCAT(u.nombre,' ',u.apellido) usuario,
-                    u.dni
+                    u.cuil_cuit
                 FROM inscripciones i
                 INNER JOIN usuarios u
                     ON u.id=i.usuario_id
@@ -898,7 +898,7 @@ class AdminRepository
         // BUSQUEDAS
         //====================================================
 
-        public function buscarPorDni(string $dni): ?array
+        public function buscarPorCuilCuit(string $cuilCuit): ?array
         {
             $stmt=$this->conexion->prepare("
                 SELECT
@@ -911,12 +911,12 @@ class AdminRepository
                     ON i.usuario_id=u.id
                 LEFT JOIN carnets c
                     ON c.inscripcion_id=i.id
-                WHERE u.dni=:dni
+                WHERE u.cuil_cuit=:cuilCuit
                 LIMIT 1
             ");
 
             $stmt->execute([
-                ':dni'=>$dni
+                ':cuilCuit'=>$cuilCuit
             ]);
 
             return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
@@ -947,7 +947,7 @@ class AdminRepository
                 WHERE
                     nombre LIKE :texto
                     OR apellido LIKE :texto
-                    OR dni LIKE :texto
+                    OR cuil_cuit LIKE :texto
                 ORDER BY apellido,nombre
             ");
 
@@ -969,7 +969,7 @@ class AdminRepository
                 SELECT
                     nombre,
                     apellido,
-                    dni,
+                    cuil_cuit,
                     fecha_creacion
                 FROM usuarios
                 ORDER BY fecha_creacion DESC
@@ -1173,7 +1173,7 @@ class AdminRepository
                     u.nombre,
                     u.apellido,
                     u.email,
-                    u.dni,
+                    u.cuil_cuit,
 
                     i.id AS inscripcion_id,
                     i.curso_id,

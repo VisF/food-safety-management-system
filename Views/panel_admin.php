@@ -415,9 +415,9 @@ include __DIR__ . '/header.php';
                                 ?? ''
                             );
 
-                        $dni =
+                        $cuil_cuit =
                             (string)(
-                                $activity['dni']
+                                $activity['cuil_cuit']
                                 ?? ''
                             );
 
@@ -467,8 +467,8 @@ include __DIR__ . '/header.php';
                                         <?= $this->e($nombre) ?>
                                     </p>
 
-                                    <p class="panel-admin__dni">
-                                        DNI <?= $this->e($dni) ?>
+                                    <p class="panel-admin__cuil-cuit">
+                                        CUIL/CUIT <?= $this->e($cuil_cuit) ?>
                                     </p>
 
                                 </div>

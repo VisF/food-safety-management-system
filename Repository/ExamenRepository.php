@@ -465,7 +465,7 @@ class ExamenRepository
 
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
 
                 e.fecha,
@@ -543,7 +543,7 @@ class ExamenRepository
             SELECT
                 i.id AS inscripcion_id,
                 u.id AS usuario_id,
-                u.dni,
+                u.cuil_cuit,
                 u.apellido,
                 u.nombre,
                 u.email,

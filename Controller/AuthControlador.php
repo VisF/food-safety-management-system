@@ -170,7 +170,7 @@ class AuthControlador
             'nombre' => $datos['nombre'] ?? '',
             'apellido' => $datos['apellido'] ?? '',
             'email' => $datos['email'] ?? '',
-            'dni' => $datos['dni'] ?? '',
+            'cuilCuit' => $datos['cuil_cuit'] ?? '',
         ];
 
         $old =
@@ -326,7 +326,7 @@ class AuthControlador
         $apellido = trim((string)($datos['apellido'] ?? ''));
         $password = (string)($datos['password'] ?? '');
         $passwordConfirm = (string)($datos['password_confirm'] ?? '');
-        $dni = trim((string)($datos['dni'] ?? ''));
+        $cuilCuit = trim((string)($datos['cuil_cuit'] ?? ''));
 
         $errors = [];
 
@@ -345,10 +345,10 @@ class AuthControlador
         if ($password !== $passwordConfirm) {
             $errors['password_confirm'] = 'Las contraseñas no coinciden';
         }
-        $dniLimpio = preg_replace('/\D/', '', $dni);
+        $cuilCuitLimpio = preg_replace('/\D/', '', $cuilCuit);
 
-        if (strlen($dniLimpio) < 7 || strlen($dniLimpio) > 8) {
-            $errors['dni'] = 'DNI inválido';
+        if (strlen($cuilCuitLimpio) < 7 || strlen($cuilCuitLimpio) > 8) {
+            $errors['cuil_cuit'] = 'CUIL/CUIT inválido';
         }
 
         if (!empty($errors)) {
@@ -359,10 +359,10 @@ class AuthControlador
                     ];
                 }
 
-                if (isset($errors['dni'])) {
+                if (isset($errors['cuil_cuit'])) {
                     return [
                         'success' => false,
-                        'toast' => 'dni_invalido'
+                        'toast' => 'cuil_cuit_invalido'
                     ];
                 }
 
@@ -401,7 +401,7 @@ class AuthControlador
 
        if ($this->UsuarioService !== null 
             && method_exists( $this->UsuarioService,'obtenerPorEmail')
-            && method_exists($this->UsuarioService,'obtenerPorDni')) 
+            && method_exists($this->UsuarioService,'obtenerPorCuilCuit')) 
             {
             $usuarioExistente = $this->UsuarioService->obtenerPorEmail($email);
             if ($usuarioExistente) {
@@ -412,13 +412,13 @@ class AuthControlador
             }
             $usuarioExistente =
                     $this->UsuarioService
-                        ->obtenerPorDni($dni);
+                        ->obtenerPorCuilCuit($cuilCuit);
 
                 if ($usuarioExistente) {
 
                     return [
                         'success' => false,
-                        'toast' => 'dni_existente'
+                        'toast' => 'cuil_cuit_existente'
                     ];
                 }
 
@@ -427,7 +427,7 @@ class AuthControlador
                     'nombre' => $nombre,
                     'apellido' => $apellido,
                     'email' => $email,
-                    'dni' => $dni,
+                    'cuil_cuit' => $cuilCuit,
                     'password' => $password,
                     'telefono' => null
                 ]);

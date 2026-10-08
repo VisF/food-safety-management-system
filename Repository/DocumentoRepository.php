@@ -48,7 +48,7 @@ class DocumentoRepository
                 d.*,
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
             FROM documentos d
             INNER JOIN usuarios u
                 ON u.id = d.usuario_id
@@ -71,7 +71,7 @@ class DocumentoRepository
                 d.*,
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
             FROM documentos d
             INNER JOIN usuarios u
                 ON u.id = d.usuario_id
@@ -104,7 +104,7 @@ class DocumentoRepository
                 d.*,
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
             FROM documentos d
             INNER JOIN usuarios u
                 ON u.id = d.usuario_id
@@ -152,7 +152,7 @@ class DocumentoRepository
                 d.*,
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
             FROM documentos d
             INNER JOIN usuarios u
                 ON u.id = d.usuario_id
@@ -423,21 +423,21 @@ class DocumentoRepository
     /**
      * Obtiene la documentación para el panel administrativo.
      *
-     * Sin DNI:
+     * Sin CUIL/CUIT:
      * - Obtiene ciudadanos que tienen al menos un documento pendiente.
      * - Devuelve todos los documentos de esos ciudadanos.
      * - Permite paginar por ciudadano.
      *
-     * Con DNI:
+     * Con CUIL/CUIT:
      * - Obtiene todos los documentos del ciudadano buscado.
      * - No aplica paginación.
      *
-     * @param string|null $dni
+     * @param string|null $cuilCuit
      * @param int $limite
      * @param int $offset
      * @return array
      */
-    public function obtenerDocumentacionAdministracion(?string $dni = null,int $limite = 10,int $offset = 0): array {
+    public function obtenerDocumentacionAdministracion(?string $cuilCuit = null,int $limite = 10,int $offset = 0): array {
 
         /*
         * Los valores de paginación solamente
@@ -458,7 +458,7 @@ class DocumentoRepository
 
         /*
         * --------------------------------------------------
-        * BÚSQUEDA POR DNI
+        * BÚSQUEDA POR CUIL/CUIT
         * --------------------------------------------------
         *
         * Si se busca un ciudadano concreto,
@@ -468,8 +468,8 @@ class DocumentoRepository
         * corresponde a un único ciudadano.
         */
         if (
-            $dni !== null
-            && $dni !== ''
+            $cuilCuit !== null
+            && $cuilCuit !== ''
         ) {
 
             $sql = "
@@ -486,7 +486,7 @@ class DocumentoRepository
 
                     u.nombre,
                     u.apellido,
-                    u.dni,
+                    u.cuil_cuit,
                     u.email,
                     u.telefono,
                     u.domicilio
@@ -496,7 +496,7 @@ class DocumentoRepository
                 INNER JOIN usuarios u
                     ON u.id = d.usuario_id
 
-                WHERE u.dni = :dni
+                WHERE u.cuil_cuit = :cuilCuit
 
                 ORDER BY
                     u.apellido ASC,
@@ -512,8 +512,8 @@ class DocumentoRepository
 
 
             $stmt->bindValue(
-                ':dni',
-                $dni,
+                ':cuilCuit',
+                $cuilCuit,
                 \PDO::PARAM_STR
             );
 
@@ -637,7 +637,7 @@ class DocumentoRepository
 
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
                 u.telefono,
                 u.domicilio

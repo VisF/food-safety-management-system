@@ -29,8 +29,8 @@ class PerfilVista extends BaseVista
         $apellido =
             (string)($usuario['apellido'] ?? '');
 
-        $dni =
-            (string)($usuario['dni'] ?? '');
+        $cuil_cuit =
+            (string)($usuario['cuil_cuit'] ?? '');
 
         $email =
             (string)($usuario['email'] ?? '');
@@ -266,23 +266,23 @@ include __DIR__ . '/header.php';
                 <div class="perfil__campo">
 
                     <label
-                        for="dni"
+                        for="cuil_cuit"
                         class="perfil__label"
                     >
-                        DNI
+                        CUIL/CUIT
                     </label>
 
                     <input
                         type="text"
-                        id="dni"
-                        name="dni"
+                        id="cuil_cuit"
+                        name="cuil_cuit"
                         class="perfil__input perfil__input--readonly"
-                        value="<?= $this->e($dni) ?>"
+                        value="<?= $this->e($cuil_cuit) ?>"
                         readonly
                     >
 
                     <p class="perfil__ayuda">
-                        El DNI no puede modificarse.
+                        El CUIL/CUIT no puede modificarse.
                     </p>
 
                 </div>

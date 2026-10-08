@@ -135,7 +135,7 @@ include __DIR__ . '/header.php';
                 'id' => 0,
                 'nombre' => '',
                 'apellido' => '',
-                'dni' => '',
+                'cuil_cuit' => '',
                 'email' => ''
 
             ],
@@ -330,14 +330,14 @@ include __DIR__ . '/header.php';
 
                         <label class="app-form-label">
 
-                            DNI
+                            CUIL/CUIT
 
                         </label>
 
                         <p>
 
                             <?php echo $this->e(
-                                $data['alumno']['dni']
+                                $data['alumno']['cuil_cuit']
                             ); ?>
 
                         </p>

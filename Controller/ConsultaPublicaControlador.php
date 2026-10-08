@@ -20,16 +20,16 @@ class ConsultaPublicaControlador
      */
     public function mostrar(): void
     {
-        $dni =
+        $cuilCuit =
             trim(
                 (string)(
-                    $_GET['dni'] ?? ''
+                    $_GET['cuil_cuit'] ?? ''
                 )
             );
 
         $data =
             $this->consultaPublicaService
-                ->consultarPorDni($dni);
+                ->consultarPorCuilCuit($cuilCuit);
 
         $vista =
             new ConsultaPublicaVista();

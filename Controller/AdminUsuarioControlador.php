@@ -101,7 +101,7 @@ class AdminUsuarioControlador
      *   'nombre' => string,
      *   'apellido' => string,
      *   'email' => string,
-     *   'dni' => string,
+     *   'cuil_cuit' => string,
      *   'password' => string,
      *   'rol' => string|int
      * ]

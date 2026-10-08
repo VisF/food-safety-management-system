@@ -137,7 +137,7 @@ class ReporteRepository
                 id,
                 nombre,
                 apellido,
-                dni,
+                cuil_cuit,
                 email
             FROM usuarios
             WHERE id = :id
@@ -235,7 +235,7 @@ class ReporteRepository
                 nombre,
                 apellido,
                 email,
-                dni,
+                cuil_cuit,
                 creado_en AS fecha_creacion
             FROM usuarios
             ORDER BY id DESC
@@ -653,7 +653,7 @@ class ReporteRepository
         $sql = "
             SELECT
                 i.id,
-                u.dni,
+                u.cuil_cuit,
                 u.nombre,
                 u.apellido,
                 u.email,
@@ -713,7 +713,7 @@ class ReporteRepository
     {
         $sql = "
             SELECT
-                u.dni,
+                u.cuil_cuit,
                 u.nombre,
                 u.apellido,
                 r.nota,

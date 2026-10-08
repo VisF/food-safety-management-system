@@ -230,8 +230,8 @@ $router->map(
             'apellido' =>
                 $_POST['apellido'] ?? '',
 
-            'dni' =>
-                $_POST['dni'] ?? '',
+            'cuil_cuit' =>
+                $_POST['cuil_cuit'] ?? '',
 
             'email' =>
                 $_POST['email'] ?? ''
@@ -575,7 +575,7 @@ $router->map(
 ========================================================== */
 
 /**
- * Consulta pública por DNI.
+ * Consulta pública por CUIL/CUIT.
  */
 $router->map(
     'GET',
@@ -1411,7 +1411,7 @@ $router->map(
 
 
 /**
- * Buscar documentación por DNI.
+ * Buscar documentación por CUIL/CUIT.
  */
 $router->map(
     'GET',
@@ -1427,7 +1427,7 @@ $router->map(
         $controller =
             new AdminDocumentoControlador();
 
-        $controller->buscarPorDni();
+        $controller->buscarPorCuilCuit();
     }
 );
 
@@ -1481,6 +1481,30 @@ $router->map(
     }
 );
 
+
+/**
+ * Desaprobar asistencia.
+ */
+$router->map(
+    'POST',
+    '/admin/documentos/[i:id]/rechazar-asistencia',
+    function ($id) {
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['admin']);
+        CsrfMiddleware::validate();
+
+        require_once __DIR__ .
+            '/../Controller/AdminDocumentoControlador.php';
+
+        $controller =
+            new AdminDocumentoControlador();
+
+        $controller->rechazarAsistencia(
+            (int)$id
+        );
+    }
+);
 
 /**
  * Descargar documento desde administración.
@@ -1669,16 +1693,6 @@ $router->map(
 
 
 
-
-/* ==========================================================
-   ADMINISTRACIÓN — REPORTES
-========================================================== */
-
-/*
- * Las rutas de reportes se incorporarán aquí
- * una vez que trabajemos sobre el controlador
- * de reportes real.
- */
 
 
 /* ==========================================================

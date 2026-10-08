@@ -392,18 +392,18 @@ class AdminService
     // BUSQUEDAS
     //====================================================
 
-    public function buscarPorDni(
-        string $dni
+    public function buscarPorCuilCuit(
+        string $cuilCuit
     ): ?array
     {
-        $dni = preg_replace('/\D/', '', $dni);
+        $cuilCuit = preg_replace('/\D/', '', $cuilCuit);
 
-        if (strlen($dni) < 7) {
+        if (strlen($cuilCuit) < 7) {
             return null;
         }
 
         return $this->adminRepository
-            ->buscarPorDni($dni);
+            ->buscarPorCuilCuit($cuilCuit);
     }
 
     // Busca usuario.
@@ -528,10 +528,10 @@ class AdminService
 
     // Obtiene datos inspector.
     public function obtenerDatosInspector(
-        string $dni
+        string $cuilCuit
     ): ?array
     {
-        return $this->buscarPorDni($dni);
+        return $this->buscarPorCuilCuit($cuilCuit);
     }
 
     //====================================================

@@ -9,7 +9,7 @@ declare(strict_types=1);
  * Gestión administrativa de carnets.
  *
  * Responsabilidades:
- * - Buscar ciudadanos por DNI.
+ * - Buscar ciudadanos por CUIL/CUIT.
  * - Mostrar inscripciones aprobadas pendientes de carnet.
  * - Mostrar formulario para cargar un carnet.
  * - Mostrar carnets emitidos.
@@ -213,9 +213,9 @@ include __DIR__ .
                 )
             );
 
-        $dni =
+        $cuilCuit =
             (string)(
-                $inscripcion['dni']
+                $inscripcion['cuil_cuit']
                 ?? ''
             );
 
@@ -290,10 +290,10 @@ include __DIR__ .
                     <p>
 
                         <strong>
-                            DNI:
+                            CUIL/CUIT:
                         </strong>
 
-                        <?= $this->e($dni); ?>
+                        <?= $this->e($cuilCuit); ?>
 
                     </p>
 
@@ -878,7 +878,7 @@ include __DIR__ .
 
 
                 <!-- =================================================
-                     BÚSQUEDA POR DNI
+                     BÚSQUEDA POR CUIL/CUIT
                      ================================================= -->
 
                 <section
@@ -904,7 +904,7 @@ include __DIR__ .
                                 class="admin-carnets__seccion-descripcion"
                             >
 
-                                Busque por DNI para consultar si el
+                                Busque por CUIL/CUIT para consultar si el
                                 ciudadano tiene un examen aprobado
                                 pendiente de emisión.
 
@@ -928,23 +928,23 @@ include __DIR__ .
                         >
 
                             <label
-                                for="dni"
+                                for="cuil_cuit"
                                 class="app-form-label"
                             >
 
-                                DNI
+                                CUIL/CUIT
 
                             </label>
 
                             <input
                                 type="text"
-                                id="dni"
-                                name="dni"
+                                id="cuil_cuit"
+                                name="cuil_cuit"
                                 value="<?= $this->e(
                                     (string)$busqueda
                                 ); ?>"
                                 class="app-form-input"
-                                placeholder="Ingrese el DNI"
+                                placeholder="Ingrese el CUIL/CUIT"
                                 autocomplete="off"
                             >
 
@@ -1059,13 +1059,13 @@ include __DIR__ .
                                     <p>
 
                                         <strong>
-                                            DNI:
+                                            CUIL/CUIT:
                                         </strong>
 
                                         <?= $this->e(
                                             (string)(
                                                 $resultadoBusqueda[
-                                                    'dni'
+                                                    'cuil_cuit'
                                                 ]
                                                 ?? $busqueda
                                             )
@@ -1150,9 +1150,9 @@ include __DIR__ .
                                             href="<?= $this->getRoute(
                                                 'cargar_carnet',
                                                 $idInscripcionBusqueda
-                                            ); ?>?origen=busqueda&dni=<?= urlencode(
+                                            ); ?>?origen=busqueda&cuil_cuit=<?= urlencode(
                                                 (string)(
-                                                    $resultadoBusqueda['dni']
+                                                    $resultadoBusqueda['cuil_cuit']
                                                     ?? $busqueda
                                                 )
                                             ); ?>#resultado-busqueda"
@@ -1223,7 +1223,7 @@ include __DIR__ .
 
                                         No existe una inscripción con
                                         examen aprobado pendiente de
-                                        carnet para el DNI ingresado.
+                                        carnet para el CUIL/CUIT ingresado.
 
                                     </p>
 
@@ -1330,9 +1330,9 @@ include __DIR__ .
                                         )
                                     );
 
-                                $dni =
+                                $cuilCuit =
                                     (string)(
-                                        $pendiente['dni']
+                                        $pendiente['cuil_cuit']
                                         ?? ''
                                     );
 
@@ -1396,11 +1396,11 @@ include __DIR__ .
                                             <span>
 
                                                 <strong>
-                                                    DNI:
+                                                    CUIL/CUIT:
                                                 </strong>
 
                                                 <?= $this->e(
-                                                    $dni
+                                                    $cuilCuit
                                                 ); ?>
 
                                             </span>
@@ -1476,8 +1476,8 @@ include __DIR__ .
                                                     $this->getRoute(
                                                         'buscar_documentos'
                                                     )
-                                                    . '?dni='
-                                                    . urlencode($dni)
+                                                    . '?cuil_cuit='
+                                                    . urlencode($cuilCuit)
                                                 ); ?>"
                                                 class="app-vista-button
                                                     app-vista-button--secondary"
@@ -1536,8 +1536,8 @@ include __DIR__ .
                                                         $this->getRoute(
                                                             'buscar_documentos'
                                                         )
-                                                        . '?dni='
-                                                        . urlencode($dni)
+                                                        . '?cuil_cuit='
+                                                        . urlencode($cuilCuit)
                                                     ); ?>"
                                                     class="app-vista-button
                                                         app-vista-button--secondary"
@@ -1817,7 +1817,7 @@ include __DIR__ .
                                             </th>
 
                                             <th>
-                                                DNI
+                                                CUIL/CUIT
                                             </th>
 
                                             <th>
@@ -1875,9 +1875,9 @@ include __DIR__ .
                                                     )
                                                 );
 
-                                            $dni =
+                                            $cuilCuit =
                                                 (string)(
-                                                    $carnet['dni']
+                                                    $carnet['cuil_cuit']
                                                     ?? ''
                                                 );
 
@@ -1937,11 +1937,11 @@ include __DIR__ .
 
 
                                                 <td
-                                                    data-label="DNI"
+                                                    data-label="CUIL/CUIT"
                                                 >
 
                                                     <?= $this->e(
-                                                        $dni
+                                                        $cuilCuit
                                                     ); ?>
 
                                                 </td>

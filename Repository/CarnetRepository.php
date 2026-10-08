@@ -281,7 +281,7 @@ class CarnetRepository
                 u.id AS usuario_id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
 
                 e.id AS examen_id,
@@ -390,12 +390,12 @@ class CarnetRepository
     * Obtiene la inscripción aprobada de un ciudadano
     * que todavía no posee un carnet emitido.
     *
-    * @param string $dni
+    * @param string $cuilCuit
     * @param int $estadoAprobado
     * @return array|null
     */
-    public function obtenerPendienteEmisionPorDni(
-        string $dni,
+    public function obtenerPendienteEmisionPorCuilCuit(
+        string $cuilCuit,
         int $estadoAprobado
     ): ?array
     {
@@ -410,7 +410,7 @@ class CarnetRepository
                 u.id AS usuario_id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
 
                 e.id AS examen_id,
@@ -436,7 +436,7 @@ class CarnetRepository
                 ON c.inscripcion_id = i.id
 
             WHERE
-                u.dni = :dni
+                u.cuil_cuit = :cuilCuit
 
                 AND i.estado_tramite_id = :estado_aprobado
 
@@ -456,8 +456,8 @@ class CarnetRepository
 
         $stmt->execute([
 
-            ':dni' =>
-                $dni,
+            ':cuilCuit' =>
+                $cuilCuit,
 
             ':estado_aprobado' =>
                 $estadoAprobado
@@ -550,12 +550,12 @@ class CarnetRepository
     }
 
     /**
-     * Obtiene un carnet asociado a un DNI.
+     * Obtiene un carnet asociado a un CUIL/CUIT.
      *
-     * @param string $dni
+     * @param string $cuilCuit
      * @return array|null
      */
-    public function obtenerPorDni(string $dni): ?array
+    public function obtenerPorCuilCuit(string $cuilCuit): ?array
     {
         $sql = "
             SELECT c.*
@@ -564,14 +564,14 @@ class CarnetRepository
                 ON c.inscripcion_id = i.id
             INNER JOIN usuarios u
                 ON u.id = i.usuario_id
-            WHERE u.dni = :dni
+            WHERE u.cuil_cuit = :cuilCuit
             LIMIT 1
         ";
 
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->execute([
-            ':dni' => $dni
+            ':cuilCuit' => $cuilCuit
         ]);
 
         $resultado = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -699,7 +699,7 @@ class CarnetRepository
 
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email
 
             FROM carnets c
@@ -768,7 +768,7 @@ class CarnetRepository
                 u.id AS usuario_id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 u.email,
 
                 e.id AS examen_id,
@@ -860,8 +860,8 @@ class CarnetRepository
     /**
      * Obtiene la ruta del PDF del carnet.
      */
-    public function obtenerPdfPorDni(
-        string $dni
+    public function obtenerPdfPorCuilCuit(
+        string $cuilCuit
     ): ?string
     {
         $sql = "
@@ -875,7 +875,7 @@ class CarnetRepository
             INNER JOIN usuarios u
                 ON u.id = i.usuario_id
 
-            WHERE u.dni = :dni
+            WHERE u.cuil_cuit = :cuilCuit
 
             ORDER BY c.fecha_emision DESC
 
@@ -885,7 +885,7 @@ class CarnetRepository
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->execute([
-            ':dni' => $dni
+            ':cuilCuit' => $cuilCuit
         ]);
 
         $ruta = $stmt->fetchColumn();
@@ -929,7 +929,7 @@ class CarnetRepository
 
         return $carnet ?: null;
     }
-    public function obtenerCarnetPublicoPorDni(string $dni): ?array
+    public function obtenerCarnetPublicoPorCuilCuit(string $cuilCuit): ?array
     {
         $sql = "
             SELECT
@@ -944,7 +944,7 @@ class CarnetRepository
 
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
 
             FROM carnets c
 
@@ -954,7 +954,7 @@ class CarnetRepository
             INNER JOIN usuarios u
                 ON i.usuario_id = u.id
 
-            WHERE u.dni = :dni
+            WHERE u.cuil_cuit = :cuilCuit
 
             
 
@@ -966,7 +966,7 @@ class CarnetRepository
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->execute([
-            ':dni' => $dni
+            ':cuilCuit' => $cuilCuit
         ]);
 
         $carnet = $stmt->fetch(PDO::FETCH_ASSOC);

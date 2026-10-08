@@ -22,6 +22,7 @@ declare(strict_types=1);
 
 
 require_once __DIR__ . '/../Servicios/DocumentoService.php';
+require_once __DIR__ . '/../Servicios/InscripcionService.php';
 
 class AdminDocumentoControlador
 {
@@ -30,6 +31,7 @@ class AdminDocumentoControlador
 
 
     private DocumentoService $documentoService;
+    private InscripcionService $inscripcionService;
 
     // Inicializa las dependencias de la clase.
     public function __construct()
@@ -38,6 +40,9 @@ class AdminDocumentoControlador
 
         $this->documentoService =
             new DocumentoService();
+
+        $this->inscripcionService =
+            new InscripcionService();
     }
 
     /**
@@ -261,7 +266,34 @@ class AdminDocumentoControlador
                         $pagina,
                         $limite
                     );
+            foreach ($resultado['usuarios'] as &$usuario) {
 
+                $usuario['inscripcion_curso_id'] = null;
+                $usuario['curso_id'] = null;
+
+                $inscripciones =
+                    $this->inscripcionService
+                        ->obtenerPorUsuario(
+                            (int)$usuario['usuario_id']
+                        );
+
+                foreach ($inscripciones as $inscripcion) {
+
+                    if (
+                        $inscripcion->getTipoInscripcionId() === 1
+                    ) {
+                        $usuario['inscripcion_curso_id'] =
+                            $inscripcion->getId();
+
+                        $usuario['curso_id'] =
+                            $inscripcion->getCursoId();
+
+                        break;
+                    }
+                }
+            }
+
+            unset($usuario);
 
             /*
             * ==============================================
@@ -397,27 +429,28 @@ class AdminDocumentoControlador
         }
     }
    /**
-     * Busca la documentación de un ciudadano por DNI.
+     * Busca la documentación de un ciudadano por cuil/cuit.
      */
-    public function buscarPorDni(): void
+    public function buscarPorCuilCuit(): void
     {
-        $dni = '';
+        $cuilCuit = '';
 
         try {
 
-            $dni =
+            $cuilCuit =
                 trim(
-                    $_GET['dni']
+                    $_GET['cuil_cuit']
                     ?? ''
                 );
 
 
-            if ($dni === '') {
+
+            if ($cuilCuit === '') {
 
                 header(
                     'Location: ' .
                     '/manipulacionDeAlimentos/admin/documentos' .
-                    '?toast=dni_requerido'
+                    '?toast=cuil_cuit_requerido'
                 );
 
                 exit;
@@ -425,12 +458,12 @@ class AdminDocumentoControlador
 
 
             /*
-            * La búsqueda por DNI no utiliza paginación.
+            * La búsqueda por CUIL/CUIT no utiliza paginación.
             */
             $resultado =
                 $this->documentoService
                     ->obtenerDocumentacionAdministracion(
-                        $dni
+                        $cuilCuit
                     );
 
 
@@ -438,13 +471,36 @@ class AdminDocumentoControlador
                 $resultado['usuarios']
                 ?? [];
 
-
-            /*
-            * El resultado corresponde a un único ciudadano.
-            */
             $ciudadano =
                 $usuarios[0]
                 ?? null;
+
+            if ($ciudadano !== null) {
+
+                $ciudadano['inscripcion_curso_id'] = null;
+                $ciudadano['curso_id'] = null;
+
+                $inscripciones =
+                    $this->inscripcionService
+                        ->obtenerPorUsuario(
+                            (int)$ciudadano['usuario_id']
+                        );
+
+                foreach ($inscripciones as $inscripcion) {
+
+                    if (
+                        $inscripcion->getTipoInscripcionId() === 1
+                    ) {
+                        $ciudadano['inscripcion_curso_id'] =
+                            $inscripcion->getId();
+
+                        $ciudadano['curso_id'] =
+                            $inscripcion->getCursoId();
+
+                        break;
+                    }
+                }
+            }
 
 
             $data = [
@@ -464,11 +520,11 @@ class AdminDocumentoControlador
                     $ciudadano,
 
                 'busqueda' =>
-                    $dni,
+                    $cuilCuit,
 
                 /*
                 * No hay paginación en una búsqueda
-                * por DNI.
+                * por CUIL/CUIT.
                 */
                 'pagina' =>
                     1,
@@ -513,11 +569,11 @@ class AdminDocumentoControlador
         } catch (Throwable $e) {
 
             $this->log(
-                'Error al buscar documentación por DNI',
+                'Error al buscar documentación por CUIL/CUIT',
                 'ERROR',
                 [
-                    'dni' =>
-                        $dni,
+                    'cuil_cuit' =>
+                        $cuilCuit,
 
                     'error' =>
                         $e->getMessage()
@@ -666,6 +722,58 @@ class AdminDocumentoControlador
             exit;
         }
     }
+
+    /**
+     * Desaprobar asistencia sin requerir observaciones.
+     */
+    public function rechazarAsistencia(int $id): void
+    {
+        try {
+
+            $resultado =
+                $this->rechazarDocumento(
+                    $id,
+                    ''
+                );
+
+            if (
+                empty(
+                    $resultado['success']
+                )
+            ) {
+                header(
+                    'Location: /manipulacionDeAlimentos/admin/documentos?toast=error_rechazar_documento'
+                );
+
+                exit;
+            }
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/documentos?toast=documento_rechazado'
+            );
+
+            exit;
+
+        } catch (Throwable $e) {
+
+            $this->log(
+                'Error al desaprobar asistencia',
+                'ERROR',
+                [
+                    'id_documento' => $id,
+                    'error' => $e->getMessage()
+                ]
+            );
+
+            header(
+                'Location: /manipulacionDeAlimentos/admin/documentos?toast=error_rechazar_documento'
+            );
+
+            exit;
+        }
+    }
+
+
     /**
      * Descarga físicamente un documento.
      */
@@ -852,6 +960,7 @@ class AdminDocumentoControlador
      */
     public function validarDocumento(int $id,string $observaciones = ''): array
     {
+        
         try {
             $resultado =
                 $this->documentoService

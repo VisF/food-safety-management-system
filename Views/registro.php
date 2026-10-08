@@ -14,7 +14,7 @@ class RegistroVista extends BaseVista
 
         $nombre = $data['nombre'] ?? '';
         $apellido = $data['apellido'] ?? '';
-        $dni = $data['dni'] ?? '';
+        $cuil_cuit = $data['cuil_cuit'] ?? '';
         $email = $data['email'] ?? '';
 
         $ocultarAccionesHeader = true;
@@ -121,15 +121,15 @@ class RegistroVista extends BaseVista
                     </div>
 
                     <div class="registro__campo">
-                        <label for="dni">
-                            DNI
+                        <label for="cuil_cuit">
+                            CUIL/CUIT
                         </label>
 
                         <input
-                            id="dni"
-                            name="dni"
+                            id="cuil_cuit"
+                            name="cuil_cuit"
                             type="number"
-                            value="<?= $this->e($dni) ?>"
+                            value="<?= $this->e($cuil_cuit) ?>"
                             min="1"
                             inputmode="numeric"
                             autocomplete="off"

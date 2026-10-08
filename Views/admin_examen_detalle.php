@@ -338,7 +338,7 @@ include __DIR__ . '/header.php';
 
                         <tr>
 
-                            <th>DNI</th>
+                            <th>CUIL/CUIT</th>
 
                             <th>Apellido</th>
 
@@ -378,7 +378,7 @@ include __DIR__ . '/header.php';
 
                             <td>
 
-                                <?php echo $this->e($inscripto['dni']); ?>
+                                <?php echo $this->e($inscripto['cuil_cuit']); ?>
 
                             </td>
 

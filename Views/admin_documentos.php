@@ -9,7 +9,7 @@ declare(strict_types=1);
  * Gestión administrativa de documentación.
  *
  * Responsabilidades:
- * - Buscar ciudadanos por DNI.
+ * - Buscar ciudadanos por CUIL/CUIT.
  * - Mostrar ciudadanos con documentación pendiente.
  * - Mostrar el estado de cada documento.
  * - Acceder a la descarga de documentos.
@@ -227,7 +227,7 @@ include __DIR__ .
 
         /*
          * Resultado específico de una
-         * búsqueda por DNI.
+         * búsqueda por CUIL/CUIT.
          */
         $resultado =
             $data['resultado']
@@ -235,7 +235,7 @@ include __DIR__ .
 
 
         /*
-         * DNI introducido en el buscador.
+         * CUIL/CUIT introducido en el buscador.
          */
         $busqueda =
             $data['busqueda']
@@ -344,7 +344,7 @@ include __DIR__ .
 
 
                     <!-- ==========================================
-             BUSCADOR POR DNI
+             BUSCADOR POR CUIL/CUIT
         =========================================== -->
 
         <section
@@ -374,7 +374,7 @@ include __DIR__ .
                     </h2>
 
                     <p>
-                        Ingresá el DNI para consultar
+                        Ingresá el CUIL/CUIT para consultar
                         su documentación.
                     </p>
 
@@ -401,21 +401,21 @@ include __DIR__ .
                 >
 
                     <label
-                        for="dni"
+                        for="cuil_cuit"
                     >
-                        DNI
+                        CUIL/CUIT
                     </label>
 
                     <input
                         type="text"
-                        id="dni"
-                        name="dni"
+                        id="cuil_cuit"
+                        name="cuil_cuit"
                         value="<?php
                             echo $this->e(
                                 $busqueda
                             );
                         ?>"
-                        placeholder="Ingresá el DNI"
+                        placeholder="Ingresá el CUIL/CUIT"
                         autocomplete="off"
                         inputmode="numeric"
                     >
@@ -509,7 +509,7 @@ include __DIR__ .
                     </span>
 
                     <h2>
-                        Consulta por DNI
+                        Consulta por CUIL/CUIT
                     </h2>
 
                 </div>
@@ -559,12 +559,12 @@ include __DIR__ .
                         </h3>
 
                         <p>
-                            DNI:
+                            CUIL/CUIT:
 
                             <strong>
                                 <?php
                                 echo $this->e(
-                                    $resultado['dni']
+                                    $resultado['cuil_cuit']
                                 );
                                 ?>
                             </strong>
@@ -672,7 +672,9 @@ include __DIR__ .
                 )
             )
         );
-
+    if ($tipo === 'asistencia') {
+        continue;
+    }
 
     $tipoNombre = match ($tipo) {
 
@@ -1063,7 +1065,22 @@ include __DIR__ .
                 </article>
 
 <?php endforeach; ?>
+<?php
+$asistenciaId = null;
 
+foreach ($resultado['documentos'] ?? [] as $documento) {
+    if (
+        strtolower(
+            trim(
+                (string)($documento['tipo_documento'] ?? '')
+            )
+        ) === 'asistencia'
+    ) {
+        $asistenciaId = (int)$documento['id'];
+        break;
+    }
+}
+?>
 
     <!-- ==================================
         ASISTENCIA
@@ -1106,63 +1123,128 @@ include __DIR__ .
         </div>
 
 
-        <div
-            class="
-                admin-documentos-document-status
-                admin-documento-status-pendiente
-            "
-        >
+<?php
+$asistenciaEstado = 'pendiente';
 
-            <span
-                class="material-symbols-outlined"
-            >
-                schedule
-            </span>
+foreach ($resultado['documentos'] ?? [] as $documento) {
+    if (
+        strtolower(
+            trim(
+                (string)($documento['tipo_documento'] ?? '')
+            )
+        ) === 'asistencia'
+    ) {
+        $asistenciaEstado = strtolower(
+            trim(
+                (string)($documento['estado'] ?? 'pendiente')
+            )
+        );
+        break;
+    }
+}
 
-            Pendiente
+$asistenciaEstadoClase =
+    $asistenciaEstado === 'aprobado'
+        ? 'admin-documento-status-aprobado'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'admin-documento-status-rechazado'
+                : 'admin-documento-status-pendiente'
+        );
 
-        </div>
+$asistenciaEstadoIcono =
+    $asistenciaEstado === 'aprobado'
+        ? 'check_circle'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'cancel'
+                : 'schedule'
+        );
+
+$asistenciaEstadoNombre =
+    $asistenciaEstado === 'aprobado'
+        ? 'Aprobado'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'Rechazado'
+                : 'Pendiente'
+        );
+?>
+
+<div
+    class="
+        admin-documentos-document-status
+        <?= $asistenciaEstadoClase ?>
+    "
+>
+    <span class="material-symbols-outlined">
+        <?= $asistenciaEstadoIcono ?>
+    </span>
+
+    <?= $asistenciaEstadoNombre ?>
+</div>
 
 
         <div
             class="admin-documentos-document-actions"
         >
 
-            <button
-                type="button"
-                class="
-                    admin-documentos-btn
-                    admin-documentos-btn-success
-                "
+            <form
+                method="POST"
+                action="<?php
+                    echo $this->e(
+                        $this->getRoute(
+                            'aprobar_documento',
+                            (int)($asistenciaId ?? 0)
+                        )
+                    );
+                ?>"
             >
+                <?= $this->getCsrfInput() ?>
 
-                <span
-                    class="material-symbols-outlined"
+                <button
+                    type="submit"
+                    class="
+                        admin-documentos-btn
+                        admin-documentos-btn-success
+                    "
                 >
-                    check
-                </span>
+                    <span class="material-symbols-outlined">
+                        check
+                    </span>
 
-                Aprobar
+                    Aprobar
+                </button>
+            </form>
 
-            </button>
 
-
-            <button
-                type="button"
-                class="
-                    admin-documentos-btn
-                    admin-documentos-btn-danger"
+            <form
+                method="POST"
+                action="<?php
+                    echo $this->e(
+                        $this->getRoute(
+                            'desaprobar_asistencia',
+                            (int)($asistenciaId ?? 0)
+                        )
+                    );
+                ?>"
             >
+                <?= $this->getCsrfInput() ?>
 
-                <span
-                    class="material-symbols-outlined"
+                <button
+                    type="submit"
+                    class="
+                        admin-documentos-btn
+                        admin-documentos-btn-danger
+                    "
                 >
-                    close
-                </span>
+                    <span class="material-symbols-outlined">
+                        close
+                    </span>
 
-                Desaprobar
-
-            </button>
+                    Desaprobar
+                </button>
+            </form>
 
         </div>
 
@@ -1191,7 +1273,7 @@ include __DIR__ .
 
                 <p>
                     No encontramos documentación asociada
-                    al DNI ingresado.
+                    al CUIL/CUIT ingresado.
                 </p>
 
             </div>
@@ -1313,6 +1395,32 @@ include __DIR__ .
         }
     }
 
+    // ID del documento de asistencia de este usuario
+    $asistenciaId = null;
+
+    foreach (
+        $documentosUsuario
+        as $documento
+    ) {
+
+        if (
+            strtolower(
+                trim(
+                    (string)(
+                        $documento['tipo_documento']
+                        ?? ''
+                    )
+                )
+            ) === 'asistencia'
+        ) {
+
+            $asistenciaId =
+                (int)($documento['id'] ?? 0);
+
+            break;
+        }
+    }
+
 ?>
 
                 <article
@@ -1360,12 +1468,12 @@ include __DIR__ .
                                 </h3>
 
                                 <p>
-                                    DNI:
+                                    CUIL/CUIT:
 
                                     <strong>
                                         <?php
                                         echo $this->e(
-                                            $usuario['dni']
+                                            $usuario['cuil_cuit']
                                             ?? ''
                                         );
                                         ?>
@@ -1569,6 +1677,9 @@ include __DIR__ .
                 )
             )
         );
+    if ($tipo === 'asistencia') {
+        continue;
+    }
 
 
     $tipoNombre = match ($tipo) {
@@ -1953,64 +2064,128 @@ include __DIR__ .
         </div>
 
 
-        <div
-            class="
-                admin-documentos-document-status
-                admin-documento-status-pendiente
-            "
-        >
+<?php
+$asistenciaEstado = 'pendiente';
 
-            <span
-                class="material-symbols-outlined"
-            >
-                schedule
-            </span>
+foreach ($documentosUsuario as $documento) {
+    if (
+        strtolower(
+            trim(
+                (string)($documento['tipo_documento'] ?? '')
+            )
+        ) === 'asistencia'
+    ) {
+        $asistenciaEstado = strtolower(
+            trim(
+                (string)($documento['estado'] ?? 'pendiente')
+            )
+        );
+        break;
+    }
+}
 
-            Pendiente
+$asistenciaEstadoClase =
+    $asistenciaEstado === 'aprobado'
+        ? 'admin-documento-status-aprobado'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'admin-documento-status-rechazado'
+                : 'admin-documento-status-pendiente'
+        );
 
-        </div>
+$asistenciaEstadoIcono =
+    $asistenciaEstado === 'aprobado'
+        ? 'check_circle'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'cancel'
+                : 'schedule'
+        );
+
+$asistenciaEstadoNombre =
+    $asistenciaEstado === 'aprobado'
+        ? 'Aprobado'
+        : (
+            $asistenciaEstado === 'rechazado'
+                ? 'Rechazado'
+                : 'Pendiente'
+        );
+?>
+
+<div
+    class="
+        admin-documentos-document-status
+        <?= $asistenciaEstadoClase ?>
+    "
+>
+    <span class="material-symbols-outlined">
+        <?= $asistenciaEstadoIcono ?>
+    </span>
+
+    <?= $asistenciaEstadoNombre ?>
+</div>
 
 
         <div
             class="admin-documentos-document-actions"
         >
 
-            <button
-                type="button"
-                class="
-                    admin-documentos-btn
-                    admin-documentos-btn-success
-                "
+            <form
+                method="POST"
+                action="<?php
+                    echo $this->e(
+                        $this->getRoute(
+                            'aprobar_documento',
+                            (int)($asistenciaId ?? 0)
+                        )
+                    );
+                ?>"
             >
+                <?= $this->getCsrfInput() ?>
 
-                <span
-                    class="material-symbols-outlined"
+                <button
+                    type="submit"
+                    class="
+                        admin-documentos-btn
+                        admin-documentos-btn-success
+                    "
                 >
-                    check
-                </span>
+                    <span class="material-symbols-outlined">
+                        check
+                    </span>
 
-                Aprobar
+                    Aprobar
+                </button>
+            </form>
 
-            </button>
 
-
-            <button
-                type="button"
-                class="
-                    admin-documentos-btn
-                    admin-documentos-btn-danger
-                "
+            <form
+                method="POST"
+                action="<?php
+                    echo $this->e(
+                        $this->getRoute(
+                            'desaprobar_asistencia',
+                            (int)($asistenciaId ?? 0)
+                        )
+                    );
+                ?>"
             >
+                <?= $this->getCsrfInput() ?>
 
-                <span
-                    class="material-symbols-outlined"
+                <button
+                    type="submit"
+                    class="
+                        admin-documentos-btn
+                        admin-documentos-btn-danger
+                    "
                 >
-                    close
-                </span>
+                    <span class="material-symbols-outlined">
+                        close
+                    </span>
 
-                Desaprobar
-
-            </button>
+                    Desaprobar
+                </button>
+            </form>
 
         </div>
 

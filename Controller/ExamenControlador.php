@@ -16,7 +16,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../Servicios/ExamenService.php';
-require_once __DIR__ . '/../Servicios/AsistenciaService.php';
+
 
 class ExamenControlador
 {
@@ -24,7 +24,6 @@ class ExamenControlador
         __DIR__ . '/../logs/examen_controller.log';
 
     private ?ExamenService $examenService = null;
-    private ?AsistenciaService $asistenciaService = null;
 
     public function __construct()
     {
@@ -37,8 +36,6 @@ class ExamenControlador
         $this->examenService =
             new ExamenService();
 
-        $this->asistenciaService =
-            new AsistenciaService();
     }
 
     /**
@@ -263,29 +260,6 @@ class ExamenControlador
         }
     }
 
-    /**
-     * Obtiene la asistencia de una inscripción.
-     */
-    public function obtenerAsistencia(
-        int $idInscripcion
-    ): array {
-        try {
-            return
-                $this->asistenciaService
-                    ->obtenerTotalAsistencias(
-                        $idInscripcion
-                    );
-
-        } catch (\Exception $e) {
-            $this->registrarLog(
-                'ERROR_OBTENER_ASISTENCIA',
-                [
-                    'id_inscripcion' => $idInscripcion,
-                    'error' => $e->getMessage(),
-                ]
-            );
-
-            return [];
-        }
-    }
+    
+    
 }

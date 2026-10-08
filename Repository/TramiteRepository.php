@@ -228,7 +228,7 @@ class TramiteRepository
                 i.estado_tramite_id,
                 u.nombre,
                 u.apellido,
-                u.dni
+                u.cuil_cuit
 
             FROM comprobantes_tramite c
 

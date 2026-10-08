@@ -197,7 +197,7 @@ class AdminCarnetControlador
      * Muestra el panel administrativo de carnets.
      *
      * Incluye:
-     * - Búsqueda por DNI.
+     * - Búsqueda por CUIL/CUIT.
      * - Pendientes de emisión paginados.
      * - Carnets ya emitidos.
      * - Paginación inteligente.
@@ -208,13 +208,13 @@ class AdminCarnetControlador
 
             /*
             * ==============================================
-            * BÚSQUEDA POR DNI
+            * BÚSQUEDA POR cuil_cuit
             * ==============================================
             */
 
             $busqueda =
                 trim(
-                    $_GET['dni'] ?? ''
+                    $_GET['cuil_cuit'] ?? ''
                 );
 
             $resultado =
@@ -225,7 +225,7 @@ class AdminCarnetControlador
 
 
             /*
-            * Si se ingresó un DNI,
+            * Si se ingresó un CUIL/CUIT,
             * buscamos independientemente de la
             * paginación de pendientes.
             */
@@ -233,7 +233,7 @@ class AdminCarnetControlador
 
                 $resultado =
                     $this->carnetService
-                        ->obtenerPendienteEmisionPorDni(
+                        ->obtenerPendienteEmisionPorCuilCuit(
                             $busqueda
                         );
             }
@@ -365,14 +365,14 @@ class AdminCarnetControlador
 
 
                 /*
-                * Resultado de búsqueda por DNI.
+                * Resultado de búsqueda por CUIL/CUIT.
                 */
                 'resultado' =>
                     $resultado,
 
 
                 /*
-                * DNI ingresado.
+                * CUIL/CUIT ingresado.
                 */
                 'busqueda' =>
                     $busqueda,
@@ -489,7 +489,7 @@ class AdminCarnetControlador
      * Muestra el formulario para cargar un carnet.
      *
      * Mantiene el contexto desde el que se accedió:
-     * - Búsqueda por DNI.
+     * - Búsqueda por CUIL/CUIT.
      * - Listado paginado de pendientes.
      */
     public function mostrarCarga(
@@ -538,7 +538,7 @@ class AdminCarnetControlador
 
             $busqueda =
                 trim(
-                    $_GET['dni'] ?? ''
+                    $_GET['cuil_cuit'] ?? ''
                 );
 
 
@@ -557,7 +557,7 @@ class AdminCarnetControlador
 
 
             /*
-            * Si venimos de una búsqueda por DNI,
+            * Si venimos de una búsqueda por CUIL/CUIT,
             * usamos el resultado de esa búsqueda.
             */
             if (
@@ -567,7 +567,7 @@ class AdminCarnetControlador
 
                 $resultado =
                     $this->carnetService
-                        ->obtenerPendienteEmisionPorDni(
+                        ->obtenerPendienteEmisionPorCuilCuit(
                             $busqueda
                         );
 
@@ -624,7 +624,7 @@ class AdminCarnetControlador
 
                 if ($busqueda !== '') {
 
-                    $parametros['dni'] =
+                    $parametros['cuil_cuit'] =
                         $busqueda;
                 }
 
@@ -711,7 +711,7 @@ class AdminCarnetControlador
 
 
                 /*
-                * DNI conservado.
+                * CUIL/CUIT buscado.
                 */
                 'busqueda' =>
                     $busqueda,

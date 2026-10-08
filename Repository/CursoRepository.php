@@ -62,17 +62,12 @@ class CursoRepository
             SELECT
                 c.*,
                 (
-                    SELECT COUNT(*)
-                    FROM inscripciones i
-                    WHERE i.curso_id = c.id
-                    AND i.estado_tramite_id IN
-                    (
-                        :pendiente,
-                        :documentacion,
-                        :inscripto,
-                        :aprobado
-                    )
-                ) AS inscriptos
+                SELECT COUNT(*)
+                FROM inscripciones i
+                WHERE i.curso_id = c.id
+                AND i.tipo_inscripcion_id = 1
+                AND i.estado_tramite_id != :cancelado
+            ) AS inscriptos
             FROM cursos c
             ORDER BY c.fecha_inicio DESC, c.nombre ASC
         ";
@@ -80,26 +75,8 @@ class CursoRepository
         $stmt = $this->conexion->prepare($sql);
 
         $stmt->bindValue(
-            ':pendiente',
-            EstadoTramite::PENDIENTE,
-            \PDO::PARAM_INT
-        );
-
-        $stmt->bindValue(
-            ':documentacion',
-            EstadoTramite::DOCUMENTACION_APROBADA,
-            \PDO::PARAM_INT
-        );
-
-        $stmt->bindValue(
-            ':inscripto',
-            EstadoTramite::INSCRIPTO_EXAMEN,
-            \PDO::PARAM_INT
-        );
-
-        $stmt->bindValue(
-            ':aprobado',
-            EstadoTramite::APROBADO,
+            ':cancelado',
+            EstadoTramite::CANCELADO,
             \PDO::PARAM_INT
         );
 
@@ -296,20 +273,16 @@ class CursoRepository
             SELECT COUNT(*)
             FROM inscripciones
             WHERE curso_id = :curso
-            AND estado_tramite_id IN
-            (
-                :pendiente,
-                :documentacion,
-                :inscripto,
-                :aprobado
-            )
+            AND tipo_inscripcion_id = 1
+            AND estado_tramite_id != :cancelado
         ");
 
         $stmt->bindValue(':curso', $idCurso, \PDO::PARAM_INT);
-        $stmt->bindValue(':pendiente', EstadoTramite::PENDIENTE, \PDO::PARAM_INT);
-        $stmt->bindValue(':documentacion', EstadoTramite::DOCUMENTACION_APROBADA, \PDO::PARAM_INT);
-        $stmt->bindValue(':inscripto', EstadoTramite::INSCRIPTO_EXAMEN, \PDO::PARAM_INT);
-        $stmt->bindValue(':aprobado', EstadoTramite::APROBADO, \PDO::PARAM_INT);
+        $stmt->bindValue(
+            ':cancelado',
+            EstadoTramite::CANCELADO,
+            \PDO::PARAM_INT
+        );
 
         $stmt->execute();
 

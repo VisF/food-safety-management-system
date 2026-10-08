@@ -408,7 +408,7 @@ class InscripcionRepository
                 u.nombre,
                 u.apellido,
                 u.email,
-                u.dni,
+                u.cuil_cuit,
                 u.telefono,
                 u.domicilio,
 
@@ -522,7 +522,7 @@ class InscripcionRepository
                 u.id AS usuario_id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 et.nombre AS estado
             FROM inscripciones i
             INNER JOIN usuarios u
@@ -579,7 +579,7 @@ class InscripcionRepository
                 u.id AS usuario_id,
                 u.nombre,
                 u.apellido,
-                u.dni,
+                u.cuil_cuit,
                 et.nombre AS estado
             FROM inscripciones i
             INNER JOIN usuarios u

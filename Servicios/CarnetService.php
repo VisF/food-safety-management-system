@@ -68,14 +68,14 @@ class CarnetService
     }
 
     /**
-     * Obtiene un carnet por DNI.
+     * Obtiene un carnet por CUIL/CUIT.
      */
-    public function obtenerPorDni(
-        string $dni
+    public function obtenerPorCuilCuit(
+        string $cuilCuit
     ): ?array
     {
         return $this->carnetRepository
-            ->obtenerPorDni($dni);
+            ->obtenerPorCuilCuit($cuilCuit);
     }
 
     /**
@@ -236,20 +236,20 @@ class CarnetService
 
     /**
      * Obtiene una inscripción aprobada pendiente de emisión
-     * buscando al ciudadano por DNI.
+     * buscando al ciudadano por CUIL/CUIT.
      */
-    public function obtenerPendienteEmisionPorDni(string $dni): ?array
+    public function obtenerPendienteEmisionPorCuilCuit(string $cuilCuit): ?array
     {
-        $dni = trim($dni);
+        $cuilCuit = trim($cuilCuit);
 
-        if ($dni === '') {
+        if ($cuilCuit === '') {
 
             return null;
         }
 
         return $this->carnetRepository
-            ->obtenerPendienteEmisionPorDni(
-                $dni,
+            ->obtenerPendienteEmisionPorCuilCuit(
+                $cuilCuit,
                 EstadoTramite::APROBADO
             );
     }
@@ -703,11 +703,11 @@ class CarnetService
     /**
      * Obtiene el estado del carnet de un usuario.
      */
-    public function obtenerEstadoPorDni(
-        string $dni
+    public function obtenerEstadoPorCuilCuit(
+        string $cuilCuit
     ): ?array
     {
-        $carnet = $this->obtenerPorDni($dni);
+        $carnet = $this->obtenerPorCuilCuit($cuilCuit);
 
         if ($carnet === null) {
             return null;
@@ -740,13 +740,13 @@ class CarnetService
         ];
     }
     /**
-    * Verifica la vigencia de un carnet mediante DNI.
+    * Verifica la vigencia de un carnet mediante CUIL/CUIT.
     */
-    public function verificarVigenciaPorDni(
-        string $dni
+    public function verificarVigenciaPorCuilCuit(
+        string $cuilCuit
     ): array
     {
-        $carnet = $this->obtenerEstadoPorDni($dni);
+        $carnet = $this->obtenerEstadoPorCuilCuit($cuilCuit);
 
         if ($carnet === null) {
             return [
@@ -885,12 +885,12 @@ class CarnetService
     /**
      * Obtiene la ruta del PDF del carnet.
      */
-    public function obtenerPdfPorDni(
-        string $dni
+    public function obtenerPdfPorCuilCuit(
+        string $cuilCuit
     ): ?string
     {
         return $this->carnetRepository
-            ->obtenerPdfPorDni($dni);
+            ->obtenerPdfPorCuilCuit($cuilCuit);
     }
     /**
      * Obtener el último carnet de un usuario.

@@ -358,18 +358,22 @@ class DocumentoService
     }
 
     /**
-     * Busca la documentación de un ciudadano por DNI.
+     * Busca la documentación de un ciudadano por CUIL/CUIT.
      */
-    public function buscarDocumentacionPorDni(string $dni): array {
+    public function buscarDocumentacionPorCuilCuit(string $cuilCuit): array {
 
-        $dni = trim($dni);
+        $cuilCuit = trim($cuilCuit);
 
-        if ($dni === '') {
+        if ($cuilCuit === '') {
+            return [];
+        }
+
+        if (!preg_match('/^\d{11}$/', $cuilCuit)) {
             return [];
         }
 
         return $this->obtenerDocumentacionAdministracion(
-            $dni
+            $cuilCuit
         );
     }
 
@@ -377,21 +381,21 @@ class DocumentoService
      * Obtiene la documentación agrupada por ciudadano
      * para el panel administrativo.
      *
-     * Sin DNI:
+     * Sin CUIL/CUIT:
      * - Obtiene ciudadanos con al menos un documento pendiente.
      * - Aplica paginación.
      *
-     * Con DNI:
+     * Con CUIL/CUIT:
      * - Obtiene únicamente la documentación
      *   del ciudadano buscado.
      * - No aplica paginación.
      *
-     * @param string|null $dni
+     * @param string|null $cuilCuit
      * @param int $pagina
      * @param int $limite
      * @return array
      */
-    public function obtenerDocumentacionAdministracion(?string $dni = null,int $pagina = 1,int $limite = 10): array {
+    public function obtenerDocumentacionAdministracion(?string $cuilCuit = null,int $pagina = 1,int $limite = 10): array {
 
         /*
         * Normalizamos los valores de paginación.
@@ -411,7 +415,7 @@ class DocumentoService
 
         /*
         * ==================================================
-        * BÚSQUEDA POR DNI
+        * BÚSQUEDA POR CUIL/CUIT
         * ==================================================
         *
         * La búsqueda devuelve un único ciudadano.
@@ -419,14 +423,14 @@ class DocumentoService
         * No necesitamos paginación.
         */
         if (
-            $dni !== null
-            && trim($dni) !== ''
+            $cuilCuit !== null
+            && trim($cuilCuit) !== ''
         ) {
 
             $documentos =
                 $this->documentoRepository
                     ->obtenerDocumentacionAdministracion(
-                        trim($dni)
+                        trim($cuilCuit)
                     );
 
 
@@ -437,32 +441,35 @@ class DocumentoService
 
             foreach ($usuarios as &$usuario) {
 
-                $usuarioId =
-                    (int) (
-                        $usuario['usuario_id']
-                        ?? $usuario['id']
-                        ?? 0
+                $asistencia =
+                    $this->obtenerOCrearAsistencia(
+                        (int)$usuario['usuario_id']
                     );
 
-                if ($usuarioId > 0) {
+                $existeAsistencia =
+                    false;
 
-                    $asistencia =
-                        $this->obtenerOCrearAsistencia(
-                            $usuarioId
-                        );
+                foreach (
+                    $usuario['documentos']
+                    as $documento
+                ) {
 
                     if (
-                        !empty($asistencia)
-                        && !array_filter(
-                            $usuario['documentos'] ?? [],
-                            fn ($documento) =>
-                                ($documento['tipo_documento'] ?? '') === 'asistencia'
-                        )
+                        ($documento['tipo_documento'] ?? '')
+                        === 'asistencia'
                     ) {
 
-                        $usuario['documentos'][] =
-                            $asistencia;
+                        $existeAsistencia = true;
+                        break;
                     }
+                }
+
+                if (
+                    !$existeAsistencia
+                    && !empty($asistencia)
+                ) {
+
+                    $usuario['documentos'][] = $asistencia;
                 }
             }
 
@@ -493,7 +500,7 @@ class DocumentoService
                     false,
 
                 'busqueda' =>
-                    trim($dni)
+                    trim($cuilCuit)
             ];
         }
 
@@ -555,43 +562,50 @@ class DocumentoService
                 );
 
 
-        /*
-        * Agrupamos los documentos por ciudadano.
-        */
-        $usuarios =
+       $usuarios =
             $this->agruparDocumentacion(
                 $documentos
             );
+
         foreach ($usuarios as &$usuario) {
 
-            $usuarioId =
-                (int) (
-                    $usuario['usuario_id']
-                    ?? $usuario['id']
-                    ?? 0
+            $usuario['inscripcion_curso_id'] = null;
+
+            $asistencia =
+                $this->obtenerOCrearAsistencia(
+                    (int)$usuario['usuario_id']
                 );
 
-            if ($usuarioId > 0) {
+            $existeAsistencia =
+                false;
 
-                $asistencia =
-                    $this->obtenerOCrearAsistencia(
-                        $usuarioId
-                    );
+            foreach (
+                $usuario['documentos']
+                as $documento
+            ) {
 
                 if (
-                    !empty($asistencia)
-                    && !array_filter(
-                        $usuario['documentos'] ?? [],
-                        fn ($documento) =>
-                            ($documento['tipo_documento'] ?? '') === 'asistencia'
-                    )
+                    ($documento['tipo_documento'] ?? '')
+                    === 'asistencia'
                 ) {
 
-                    $usuario['documentos'][] =
-                        $asistencia;
+                    $existeAsistencia = true;
+                    break;
                 }
             }
+
+            if (
+                !$existeAsistencia
+                && !empty($asistencia)
+            ) {
+
+                $usuario['documentos'][] = $asistencia;
+            }
         }
+
+        unset($usuario);
+
+
 
         unset($usuario);
 
@@ -660,8 +674,8 @@ class DocumentoService
                     'apellido' =>
                         $documento['apellido'],
 
-                    'dni' =>
-                        $documento['dni'],
+                    'cuil_cuit' =>
+                        $documento['cuil_cuit'],
 
                     'email' =>
                         $documento['email'],

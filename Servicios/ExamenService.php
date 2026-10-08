@@ -451,7 +451,7 @@ class ExamenService
                 'id' => (int) $datos['usuario_id'],
                 'nombre' => $datos['nombre'],
                 'apellido' => $datos['apellido'],
-                'dni' => $datos['dni'],
+                'cuil_cuit' => $datos['cuil_cuit'],
                 'email' => $datos['email']
 
             ],

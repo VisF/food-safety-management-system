@@ -383,10 +383,10 @@ document.addEventListener('DOMContentLoaded', () => {
         );
 
         establecerTexto(
-            'editar-dni-visible',
-            usuario.dni
-                ? 'DNI ' + usuario.dni
-                : 'DNI no disponible'
+            'editar-cuil-cuit-visible',
+            usuario.cuil_cuit
+                ? 'CUIL/CUIT ' + usuario.cuil_cuit
+                : 'CUIL/CUIT no disponible'
         );
 
 

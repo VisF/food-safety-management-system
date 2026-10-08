@@ -452,7 +452,7 @@ public function mostrar(array $data = []): void
                             </th>
 
                             <th>
-                                DNI
+                                CUIL/CUIT
                             </th>
 
                             <th>
@@ -529,7 +529,7 @@ public function mostrar(array $data = []): void
 
                                     echo $this->e(
                                         (string)(
-                                            $inscripto['dni']
+                                            $inscripto['cuil_cuit']
                                             ?? ''
                                         )
                                     );
@@ -689,7 +689,7 @@ public function mostrar(array $data = []): void
                             >
 
                                 <span>
-                                    DNI
+                                    CUIL/CUIT
                                 </span>
 
                                 <strong>
@@ -698,13 +698,12 @@ public function mostrar(array $data = []): void
 
                                     echo $this->e(
                                         (string)(
-                                            $inscripto['dni']
+                                            $inscripto['cuil_cuit']
                                             ?? ''
                                         )
                                     );
 
                                     ?>
-
                                 </strong>
 
                             </div>

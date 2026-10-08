@@ -29,7 +29,7 @@ class ConsultaPublicaVista extends BaseVista
             'page_title' => 'Consulta Pública de Carnets',
 
             'formulario' => [
-                'dni' => '',
+                'cuil_cuit' => '',
             ],
 
             'resultado' => [
@@ -112,7 +112,7 @@ class ConsultaPublicaVista extends BaseVista
 
             <p class="consulta-publica-hero__descripcion">
                 Verifique la autenticidad y vigencia de un carnet oficial
-                ingresando el DNI del titular. Si el carnet existe podrá
+                ingresando el CUIL/CUIT del titular. Si el carnet existe podrá
                 consultar su estado y descargar la documentación asociada.
             </p>
 
@@ -142,24 +142,25 @@ class ConsultaPublicaVista extends BaseVista
 
                 <div>
 
-                    <label for="dni">
-                        DNI del titular
+
+                    <label for="cuil_cuit">
+                        CUIL/CUIT del titular
                     </label>
 
                     <input
-                        id="dni"
-                        name="dni"
+                        id="cuil_cuit"
+                        name="cuil_cuit"
                         type="text"
-                        maxlength="8"
-                        pattern="[0-9]{7,8}"
+                        maxlength="11"
+                        pattern="[0-9]{11}"
                         inputmode="numeric"
                         autocomplete="off"
                         required
                         value="<?= $this->e(
-                            $data['formulario']['dni']
+                            $data['formulario']['cuil_cuit']
                             ?? ''
                         ); ?>"
-                        placeholder="Ingrese el DNI"
+                        placeholder="Ingrese el CUIL/CUIT"
                     >
 
                 </div>
@@ -248,9 +249,9 @@ class ConsultaPublicaVista extends BaseVista
 
                     </h2>
 
-                    <p class="consulta-resultado__dni">
-                        DNI <?= $this->e(
-                            $resultado['dni']
+                    <p class="consulta-resultado__cuil-cuit">
+                        CUIL/CUIT <?= $this->e(
+                            $resultado['cuil_cuit']
                         ); ?>
                     </p>
 
@@ -406,7 +407,7 @@ class ConsultaPublicaVista extends BaseVista
                 </h2>
 
                 <p class="app-vista-section-subtitle">
-                    No existe un carnet asociado al DNI ingresado.
+                    No existe un carnet asociado al CUIL/CUIT ingresado.
                     Verifique el número e intente nuevamente.
                 </p>
 

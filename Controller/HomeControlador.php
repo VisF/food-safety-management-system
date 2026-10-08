@@ -514,9 +514,9 @@ class HomeControlador
 
             switch ($tipo) {
 
-                case 'DNI':
+                case 'CUIL_CUIT':
 
-                    $label = 'DNI';
+                    $label = 'CUIL/CUIT';
                     $descripcion =
                         'Documento de identidad';
                     $icono = 'badge';

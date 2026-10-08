@@ -49,12 +49,12 @@ class UsuarioService
             : null;
     }
 
-    // Obtiene por dni.
-    public function obtenerPorDni(string $dni): ?UsuarioDTO
+    // Obtiene por CUIL/CUIT.
+    public function obtenerPorCuilCuit(string $cuilCuit): ?UsuarioDTO
     {
         $usuario =
             $this->usuarioRepository
-                ->obtenerPorDni($dni);
+                ->obtenerPorCuilCuit($cuilCuit);
 
         return $usuario
             ? UsuarioDTO::fromArray($usuario)
@@ -141,10 +141,10 @@ class UsuarioService
         }
         if (
             $this->usuarioRepository
-                ->existeDni($datos['dni'])
+                ->existeCuilCuit($datos['cuil_cuit'])
         ) {
             throw new RuntimeException(
-                'El DNI ya está registrado'
+                'El CUIL/CUIT ya está registrado'
             );
         }
 
@@ -354,16 +354,16 @@ class UsuarioService
     /**
      * Obtiene los datos públicos de un usuario.
      *
-     * @param string $dni
+     * @param string $cuilCuit
      * @return array|null
      */
     public function obtenerDatosPublicos(
-        string $dni
+        string $cuilCuit
     ): ?array
     {
         $usuario =
             $this->usuarioRepository
-                ->obtenerPorDni($dni);
+                ->obtenerPorCuilCuit($cuilCuit);
 
         if (!$usuario) {
             return null;
@@ -372,8 +372,9 @@ class UsuarioService
         return [
             'id' => $usuario['id'],
             'nombre' => $usuario['nombre'],
-            'apellido' => $usuario['apellido'],
-            'dni' => $usuario['dni']
+            'email' => $usuario['email'],
+            'cuil_cuit' => $usuario['cuil_cuit'],
+            'apellido' => $usuario['apellido']
         ];
     }
     public function buscar(string $criterio,string $valor): array
@@ -395,12 +396,12 @@ class UsuarioService
                 );
     }
 
-    public function existeDni(string $dni,?int $ignorarUsuario = null): bool
+    public function existeCuilCuit(string $cuilCuit,?int $ignorarUsuario = null): bool
     {
         return
             $this->usuarioRepository
-                ->existeDni(
-                    $dni,
+                ->existeCuilCuit(
+                    $cuilCuit,
                     $ignorarUsuario
                 );
     }

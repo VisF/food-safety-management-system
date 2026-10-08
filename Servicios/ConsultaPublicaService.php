@@ -15,13 +15,21 @@ class ConsultaPublicaService
     }
 
 
-    public function consultarPorDni(string $dni): array
+
+
+    /**
+     * Consulta un carnet por CUIL/CUIT.
+     *
+     * @param string $cuilCuit
+     * @return array
+     */
+    public function consultarPorCuilCuit(string $cuilCuit): array
     {
         $data = [
             'page_title' => 'Consulta Pública de Carnets',
 
             'formulario' => [
-                'dni' => $dni
+                'cuil_cuit' => $cuilCuit
             ],
 
             'resultado' => [
@@ -30,13 +38,13 @@ class ConsultaPublicaService
             ]
         ];
 
-        $dni = trim($dni);
+        $cuilCuit = trim($cuilCuit);
 
-        if ($dni === '') {
+        if ($cuilCuit === '') {
             return $data;
         }
 
-        if (!preg_match('/^\d{7,8}$/', $dni)) {
+        if (!preg_match('/^\d{11}$/', $cuilCuit)) {
             return $data;
         }
 
@@ -44,7 +52,7 @@ class ConsultaPublicaService
 
         $carnet =
             $this->carnetRepository
-                ->obtenerCarnetPublicoPorDni($dni);
+                ->obtenerCarnetPublicoPorCuilCuit($cuilCuit);
 
         if (!$carnet) {
             return $data;
@@ -69,8 +77,8 @@ class ConsultaPublicaService
             'apellido' =>
                 $carnet['apellido'],
 
-            'dni' =>
-                $carnet['dni'],
+            'cuil_cuit' =>
+                $carnet['cuil_cuit'],
 
             'numero_carnet' =>
                 $carnet['numero_carnet'],

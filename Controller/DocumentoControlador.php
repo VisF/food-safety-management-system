@@ -464,8 +464,8 @@ class DocumentoControlador
         $requeridos = [
             'dni' => [
                 'icon' => 'badge',
-                'title' => 'DNI frente y dorso',
-                'description' => 'Ambos lados en una misma imagen o PDF.'
+                'title' => 'DNI',
+                'description' => 'Número de DNI.'
             ],
             'foto_carnet' => [
                 'icon' => 'account_circle',

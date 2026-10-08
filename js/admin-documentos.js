@@ -51,7 +51,7 @@ document.addEventListener(
  * Mobile:
  * - 5 ciudadanos por página.
  *
- * La búsqueda por DNI no se modifica,
+ * La búsqueda por CUIL/CUIT no se modifica,
  * ya que no utiliza paginación.
  */
 function ajustarLimiteDocumentacion() {
@@ -64,17 +64,17 @@ function ajustarLimiteDocumentacion() {
 
     /*
      * Si estamos realizando una búsqueda
-     * por DNI, no modificamos la URL.
+     * por CUIL/CUIT, no modificamos la URL.
      */
-    const dni =
+    const cuilCuit =
         url.searchParams.get(
-            'dni'
+            'cuil_cuit'
         );
 
 
     if (
-        dni !== null
-        && dni.trim() !== ''
+        cuilCuit !== null
+        && cuilCuit.trim() !== ''
     ) {
 
         return;
