@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../repositories/ReporteRepository.php';
+require_once __DIR__ . '/../Repository/ReporteRepository.php';
 
 class ReporteService
 {

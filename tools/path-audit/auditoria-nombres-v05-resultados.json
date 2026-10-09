@@ -1,0 +1,2487 @@
+{
+  "version": "0.5.0",
+  "fecha": "2026-10-09T19:43:00.476Z",
+  "raizProyecto": "C:\\xampp\\htdocs\\manipulacionDeAlimentos",
+  "modo": "SOLO LECTURA",
+  "exclusionesDeRecorrido": [
+    ".git",
+    ".venv",
+    "node_modules",
+    "vendor",
+    "target",
+    "build",
+    "dist",
+    "coverage",
+    ".idea",
+    ".vscode",
+    "path-audit"
+  ],
+  "resumen": {
+    "directoriosEscaneados": 37,
+    "archivosEscaneados": 272,
+    "archivosTextoAnalizados": 189,
+    "archivosGrandesOmitidos": 0,
+    "erroresLectura": 0,
+    "colisiones": 0,
+    "referenciasPHP": 174,
+    "referenciasCSS": 26,
+    "referenciasJavaScript": 0,
+    "referenciasHTMLNoVerificables": 0,
+    "referenciasRotas": 3,
+    "diferenciasMayusculas": 0,
+    "referenciasDinamicas": 85,
+    "referenciasNoVerificables": 2,
+    "referenciasAExclusiones": 1,
+    "nombresSospechosos": 0
+  },
+  "notas": [
+    "No se ejecuta código de la aplicación.",
+    "Se comprueban rutas PHP cuando el include/require usa un literal junto a __DIR__ o __FILE__.",
+    "Las URL HTML se clasifican como no verificables: requieren conocer document root y BASE_URL.",
+    "Las carpetas excluidas no se recorren, pero una referencia directa puede comprobarse contra el sistema de archivos.",
+    "Los imports de paquetes/alias JS se clasifican como no verificables.",
+    "Un hallazgo es un candidato a revisión; no se deben aplicar cambios automáticamente.",
+    "El único archivo escrito es el JSON de este informe dentro de tools/path-audit."
+  ],
+  "colisiones": [],
+  "nombresSospechosos": [],
+  "referenciasPHP": [
+    {
+      "archivo": "config/env.php",
+      "linea": 6,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/config/env.php",
+      "base": "__DIR__",
+      "estado": "NO_ENCONTRADO",
+      "destino": "config/config/env.php"
+    },
+    {
+      "archivo": "Controller/AdminCarnetControlador.php",
+      "linea": 23,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CarnetService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CarnetService.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CursoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CursoService.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 6,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 32,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_cursos.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_cursos.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 72,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_curso_inscriptos.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_curso_inscriptos.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 242,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_curso_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_curso_form.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 357,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_curso_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_curso_form.php"
+    },
+    {
+      "archivo": "Controller/AdminCursoControlador.php",
+      "linea": 664,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_curso_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_curso_form.php"
+    },
+    {
+      "archivo": "Controller/AdminDashboardControlador.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/AdminService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/AdminService.php"
+    },
+    {
+      "archivo": "Controller/AdminDocumentoControlador.php",
+      "linea": 24,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Controller/AdminDocumentoControlador.php",
+      "linea": 25,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 22,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ExamenService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ExamenService.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 23,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ConfiguracionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ConfiguracionService.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 50,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examen_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examen_form.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 122,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examen_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examen_form.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 201,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examen_detalle.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examen_detalle.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 248,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examen_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examen_form.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 291,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examen_form.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examen_form.php"
+    },
+    {
+      "archivo": "Controller/AdminExamenControlador.php",
+      "linea": 334,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_examenes.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_examenes.php"
+    },
+    {
+      "archivo": "Controller/AdminUsuarioControlador.php",
+      "linea": 24,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/UsuarioService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/UsuarioService.php"
+    },
+    {
+      "archivo": "Controller/AuthControlador.php",
+      "linea": 15,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Helpers/AuthHelper.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Helpers/AuthHelper.php"
+    },
+    {
+      "archivo": "Controller/AuthControlador.php",
+      "linea": 16,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Middleware/CsrfMiddleware.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Middleware/CsrfMiddleware.php"
+    },
+    {
+      "archivo": "Controller/AuthControlador.php",
+      "linea": 17,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/UsuarioService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/UsuarioService.php"
+    },
+    {
+      "archivo": "Controller/AuthControlador.php",
+      "linea": 187,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/registro.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/registro.php"
+    },
+    {
+      "archivo": "Controller/CarnetControlador.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Controller/CarnetControlador.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CarnetService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CarnetService.php"
+    },
+    {
+      "archivo": "Controller/ConsultaPublicaControlador.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ConsultaPublicaService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ConsultaPublicaService.php"
+    },
+    {
+      "archivo": "Controller/ConsultaPublicaControlador.php",
+      "linea": 6,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/consulta_publica.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/consulta_publica.php"
+    },
+    {
+      "archivo": "Controller/DocumentoControlador.php",
+      "linea": 29,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Controller/DocumentoControlador.php",
+      "linea": 30,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/DocumentoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/DocumentoRepository.php"
+    },
+    {
+      "archivo": "Controller/DocumentoControlador.php",
+      "linea": 31,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/UploadService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/UploadService.php"
+    },
+    {
+      "archivo": "Controller/DocumentoControlador.php",
+      "linea": 441,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/documentacion.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/documentacion.php"
+    },
+    {
+      "archivo": "Controller/ExamenControlador.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ExamenService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ExamenService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Helpers/AuthHelper.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Helpers/AuthHelper.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/HomeService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/HomeService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 21,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 22,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 23,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CursoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CursoService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 24,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ExamenService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ExamenService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 25,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CarnetService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CarnetService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 26,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ResultadoExamenService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ResultadoExamenService.php"
+    },
+    {
+      "archivo": "Controller/HomeControlador.php",
+      "linea": 30,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Controller/InscripcionControlador.php",
+      "linea": 14,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Controller/InscripcionControlador.php",
+      "linea": 17,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Controller/InscripcionControlador.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CursoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CursoService.php"
+    },
+    {
+      "archivo": "Controller/InscripcionControlador.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Controller/InscripcionControlador.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ExamenService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ExamenService.php"
+    },
+    {
+      "archivo": "Controller/MoodleControlador_no_se_si_sirve.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/MoodleService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/MoodleService.php"
+    },
+    {
+      "archivo": "Controller/MoodleControlador_no_se_si_sirve.php",
+      "linea": 13,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Controller/NotificacionControlador_posible_eliminar.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/NotificacionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/NotificacionService.php"
+    },
+    {
+      "archivo": "Controller/UsuarioControlador.php",
+      "linea": 33,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/UsuarioService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/UsuarioService.php"
+    },
+    {
+      "archivo": "index.php",
+      "linea": 7,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/config/config.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "config/config.php"
+    },
+    {
+      "archivo": "index.php",
+      "linea": 8,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/AltoRouter.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "AltoRouter.php"
+    },
+    {
+      "archivo": "index.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/vendor/autoload.php",
+      "base": "__DIR__",
+      "estado": "NO_ENCONTRADO",
+      "destino": "vendor/autoload.php"
+    },
+    {
+      "archivo": "index.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/Routes/web.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Routes/web.php"
+    },
+    {
+      "archivo": "Repository/AdminRepository.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/AdminRepository.php",
+      "linea": 14,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Repository/CarnetRepository.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/ConfiguracionRepository.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/CursoRepository.php",
+      "linea": 42,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/CursoRepository.php",
+      "linea": 43,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Repository/DocumentoRepository.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/ExamenRepository.php",
+      "linea": 30,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/HabilitacionExamenRepository.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/HabilitacionExamenRepository.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../DTO/HabilitacionExamenDTO.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "DTO/HabilitacionExamenDTO.php"
+    },
+    {
+      "archivo": "Repository/InscripcionRepository.php",
+      "linea": 45,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/NotificacionRepository.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/ReporteRepository.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/ResultadoExamenRepository.php",
+      "linea": 26,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/TramiteRepository.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/UsuarioRepository.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../db/Connection.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "db/Connection.php"
+    },
+    {
+      "archivo": "Repository/UsuarioRepository.php",
+      "linea": 13,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 9,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Middleware/AuthMiddleware.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Middleware/AuthMiddleware.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 10,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Middleware/RoleMiddleware.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Middleware/RoleMiddleware.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Middleware/CsrfMiddleware.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Middleware/CsrfMiddleware.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 710,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 732,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 755,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 777,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 802,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 827,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 852,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 873,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 892,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 916,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminCursoControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminCursoControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1232,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminExamenControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminExamenControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1557,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminUsuarioControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminUsuarioControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1558,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_usuarios.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_usuarios.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1580,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminUsuarioControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminUsuarioControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1581,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_usuarios.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_usuarios.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1608,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminUsuarioControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminUsuarioControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1609,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Views/admin_usuarios.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/admin_usuarios.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1639,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminUsuarioControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminUsuarioControlador.php"
+    },
+    {
+      "archivo": "Routes/web.php",
+      "linea": 1669,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Controller/AdminUsuarioControlador.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Controller/AdminUsuarioControlador.php"
+    },
+    {
+      "archivo": "Servicios/AdminService.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/AdminRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/AdminRepository.php"
+    },
+    {
+      "archivo": "Servicios/CarnetService.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/CarnetRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/CarnetRepository.php"
+    },
+    {
+      "archivo": "Servicios/CarnetService.php",
+      "linea": 13,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Servicios/CarnetService.php",
+      "linea": 14,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Servicios/CarnetService.php",
+      "linea": 16,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Servicios/ConfiguracionService.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/ConfiguracionRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/ConfiguracionRepository.php"
+    },
+    {
+      "archivo": "Servicios/ConsultaPublicaService.php",
+      "linea": 3,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/CarnetRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/CarnetRepository.php"
+    },
+    {
+      "archivo": "Servicios/ConsultaPublicaService.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/DocumentoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/DocumentoRepository.php"
+    },
+    {
+      "archivo": "Servicios/CursoService.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/CursoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/CursoRepository.php"
+    },
+    {
+      "archivo": "Servicios/DocumentoService.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../DTO/DocumentoDTO.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "DTO/DocumentoDTO.php"
+    },
+    {
+      "archivo": "Servicios/DocumentoService.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/DocumentoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/DocumentoRepository.php"
+    },
+    {
+      "archivo": "Servicios/ExamenService.php",
+      "linea": 34,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/ExamenRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/ExamenRepository.php"
+    },
+    {
+      "archivo": "Servicios/ExamenService.php",
+      "linea": 35,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/CarnetService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/CarnetService.php"
+    },
+    {
+      "archivo": "Servicios/ExamenService.php",
+      "linea": 37,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Servicios/HabilitacionExamenService.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/HabilitacionExamenRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/HabilitacionExamenRepository.php"
+    },
+    {
+      "archivo": "Servicios/HomeService.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Servicios/HomeService.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 32,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../DTO/InscripcionDTO.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "DTO/InscripcionDTO.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 34,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/InscripcionRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/InscripcionRepository.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 35,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/DocumentoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/DocumentoRepository.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 36,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/ExamenRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/ExamenRepository.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 37,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/CarnetRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/CarnetRepository.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 38,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/CursoRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/CursoRepository.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 40,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/DocumentoService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/DocumentoService.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 41,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Servicios/ConfiguracionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/ConfiguracionService.php"
+    },
+    {
+      "archivo": "Servicios/InscripcionService.php",
+      "linea": 43,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Constant/EstadoTramite.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Constant/EstadoTramite.php"
+    },
+    {
+      "archivo": "Servicios/NotificacionService.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/NotificacionRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/NotificacionRepository.php"
+    },
+    {
+      "archivo": "Servicios/NotificacionService.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/UsuarioRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/UsuarioRepository.php"
+    },
+    {
+      "archivo": "Servicios/ReporteService.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/ReporteRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/ReporteRepository.php"
+    },
+    {
+      "archivo": "Servicios/ResultadoExamenService.php",
+      "linea": 28,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/ResultadoExamenRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/ResultadoExamenRepository.php"
+    },
+    {
+      "archivo": "Servicios/TramiteService.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/TramiteRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/TramiteRepository.php"
+    },
+    {
+      "archivo": "Servicios/UsuarioService.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Repository/UsuarioRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/UsuarioRepository.php"
+    },
+    {
+      "archivo": "Servicios/UsuarioService.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../DTO/UsuarioDTO.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "DTO/UsuarioDTO.php"
+    },
+    {
+      "archivo": "test_recursante.php",
+      "linea": 3,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/Servicios/InscripcionService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/InscripcionService.php"
+    },
+    {
+      "archivo": "Tools/cron/enviar_alertas_vencimiento.php",
+      "linea": 3,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../../Servicios/AlertaService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/AlertaService.php"
+    },
+    {
+      "archivo": "Tools/cron/enviar_alertas_vencimiento.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../../Controller/NotificacionControlador.php",
+      "base": "__DIR__",
+      "estado": "NO_ENCONTRADO",
+      "destino": "Controller/NotificacionControlador.php"
+    },
+    {
+      "archivo": "Tools/cron/validar_recursantes.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../../Servicios/PlazoRecursanteService.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Servicios/PlazoRecursanteService.php"
+    },
+    {
+      "archivo": "Tools/cron/validar_recursantes.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../../Repository/InscripcionRepository.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Repository/InscripcionRepository.php"
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 9,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 69,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_carnets.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 89,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 17,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 92,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 136,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_documentos.php",
+      "linea": 23,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 97,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 107,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 17,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 79,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 20,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 108,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/admin_usuarios.php",
+      "linea": 17,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/admin_usuarios.php",
+      "linea": 55,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/confirmar_inscripcion_examen.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/confirmar_inscripcion_examen.php",
+      "linea": 35,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/consulta_publica.php",
+      "linea": 19,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/consulta_publica.php",
+      "linea": 52,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/detalle_examen.php",
+      "linea": 23,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/detalle_examen.php",
+      "linea": 46,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/documentacion.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/documentacion.php",
+      "linea": 25,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../Helpers/ToastHelper.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Helpers/ToastHelper.php"
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 148,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/menu_navegacion.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/menu_navegacion.php"
+    },
+    {
+      "archivo": "Views/index.php",
+      "linea": 21,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/index.php",
+      "linea": 201,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/login.php",
+      "linea": 18,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/login.php",
+      "linea": 80,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/login.php",
+      "linea": 246,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/footer.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/footer.php"
+    },
+    {
+      "archivo": "Views/panel_admin.php",
+      "linea": 12,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/panel_admin.php",
+      "linea": 110,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/perfil.php",
+      "linea": 5,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/perfil.php",
+      "linea": 93,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    },
+    {
+      "archivo": "Views/registro.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/BaseVista.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/BaseVista.php"
+    },
+    {
+      "archivo": "Views/registro.php",
+      "linea": 29,
+      "tipo": "PHP_INCLUDE",
+      "referencia": "/header.php",
+      "base": "__DIR__",
+      "estado": "EXISTE",
+      "destino": "Views/header.php"
+    }
+  ],
+  "referenciasCSS": [
+    {
+      "archivo": "css/app.css",
+      "linea": 1,
+      "referencia": "base/variables.css",
+      "estado": "EXISTE",
+      "destino": "css/base/variables.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 2,
+      "referencia": "base/reset.css",
+      "estado": "EXISTE",
+      "destino": "css/base/reset.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 3,
+      "referencia": "base/layout.css",
+      "estado": "EXISTE",
+      "destino": "css/base/layout.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 4,
+      "referencia": "base/buttons.css",
+      "estado": "EXISTE",
+      "destino": "css/base/buttons.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 5,
+      "referencia": "base/cards.css",
+      "estado": "EXISTE",
+      "destino": "css/base/cards.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 6,
+      "referencia": "base/forms.css",
+      "estado": "EXISTE",
+      "destino": "css/base/forms.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 7,
+      "referencia": "base/header.css",
+      "estado": "EXISTE",
+      "destino": "css/base/header.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 8,
+      "referencia": "base/footer.css",
+      "estado": "EXISTE",
+      "destino": "css/base/footer.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 10,
+      "referencia": "components/chips.css",
+      "estado": "EXISTE",
+      "destino": "css/components/chips.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 11,
+      "referencia": "components/typography.css",
+      "estado": "EXISTE",
+      "destino": "css/components/typography.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 12,
+      "referencia": "components/utilities.css",
+      "estado": "EXISTE",
+      "destino": "css/components/utilities.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 13,
+      "referencia": "components/toast.css",
+      "estado": "EXISTE",
+      "destino": "css/components/toast.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 14,
+      "referencia": "components/tables.css",
+      "estado": "EXISTE",
+      "destino": "css/components/tables.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 15,
+      "referencia": "components/entity-card.css",
+      "estado": "EXISTE",
+      "destino": "css/components/entity-card.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 17,
+      "referencia": "Views/home.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/home.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 18,
+      "referencia": "Views/admin.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/admin.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 19,
+      "referencia": "Views/admin-usuarios.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/admin-usuarios.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 20,
+      "referencia": "Views/admin-documentos.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/admin-documentos.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 21,
+      "referencia": "Views/admin-examenes.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/admin-examenes.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 22,
+      "referencia": "Views/admin-carnets.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/admin-carnets.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 23,
+      "referencia": "Views/crear-examen.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/crear-examen.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 24,
+      "referencia": "Views/detalle-examen.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/detalle-examen.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 25,
+      "referencia": "Views/inspector.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/inspector.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 26,
+      "referencia": "Views/consulta-publica.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/consulta-publica.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 27,
+      "referencia": "Views/subida-documentacion.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/subida-documentacion.css"
+    },
+    {
+      "archivo": "css/app.css",
+      "linea": 28,
+      "referencia": "Views/registro.css",
+      "estado": "EXISTE",
+      "destino": "css/Views/registro.css"
+    }
+  ],
+  "referenciasJavaScript": [],
+  "referenciasHTMLNoVerificables": [],
+  "referenciasRotas": [
+    {
+      "archivo": "config/env.php",
+      "linea": 6,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/config/env.php",
+      "destinoCalculado": "config/config/env.php",
+      "expresion": "require_once __DIR__ . '/config/env.php';",
+      "base": "__DIR__",
+      "comprobacion": {
+        "status": "NO_ENCONTRADO",
+        "esperado": "config/config/env.php",
+        "segmentoFaltante": "config",
+        "directorioPadre": "config",
+        "rutaParcialReal": "config"
+      }
+    },
+    {
+      "archivo": "index.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/vendor/autoload.php",
+      "destinoCalculado": "vendor/autoload.php",
+      "expresion": "require_once __DIR__ . '/vendor/autoload.php';",
+      "base": "__DIR__",
+      "comprobacion": {
+        "status": "NO_ENCONTRADO",
+        "esperado": "vendor/autoload.php",
+        "segmentoFaltante": "vendor",
+        "directorioPadre": "",
+        "rutaParcialReal": ""
+      }
+    },
+    {
+      "archivo": "Tools/cron/enviar_alertas_vencimiento.php",
+      "linea": 4,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/../../Controller/NotificacionControlador.php",
+      "destinoCalculado": "Controller/NotificacionControlador.php",
+      "expresion": "require_once __DIR__ . '/../../Controller/NotificacionControlador.php';",
+      "base": "__DIR__",
+      "comprobacion": {
+        "status": "NO_ENCONTRADO",
+        "esperado": "Controller/NotificacionControlador.php",
+        "segmentoFaltante": "NotificacionControlador.php",
+        "directorioPadre": "Controller",
+        "rutaParcialReal": "Controller"
+      }
+    }
+  ],
+  "diferenciasMayusculas": [],
+  "referenciasDinamicas": [
+    {
+      "archivo": "Controller/AuthControlador.php",
+      "linea": 146,
+      "tipo": "PHP_INCLUDE",
+      "expresion": "include $viewPath;",
+      "motivo": "La ruta depende de una variable o expresión dinámica."
+    },
+    {
+      "archivo": "Controller/DipaControlador.php",
+      "linea": 96,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "expresion": "require_once $pdoFile;",
+      "motivo": "La ruta depende de una variable o expresión dinámica."
+    },
+    {
+      "archivo": "Controller/DipaControlador.php",
+      "linea": 160,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "expresion": "require_once $pdoFile;",
+      "motivo": "La ruta depende de una variable o expresión dinámica."
+    },
+    {
+      "archivo": "db/Connection.php",
+      "linea": 16,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "expresion": "require_once $envLoader;",
+      "motivo": "La ruta depende de una variable o expresión dinámica."
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 58,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 64,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 65,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/actividad_reciente.php",
+      "linea": 66,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 49,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 67,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 71,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 75,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 79,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_cursos.php",
+      "linea": 151,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('crear_curso'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 52,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 70,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 74,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 78,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_form.php",
+      "linea": 82,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 77,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 101,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 106,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 111,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 116,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_curso_inscriptos.php",
+      "linea": 121,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/Views/admin-curso-inscriptos.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_documentos.php",
+      "linea": 164,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/admin-documentos.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 53,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 70,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 74,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 78,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 82,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 85,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/Views/admin-examenes.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 155,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('guardar_configuracion_recursante'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 229,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('admin_examenes'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 262,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('crear_examen'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 380,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('detalle_examen_admin', (int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 390,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 401,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('desactivar_examen', (int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 417,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('activar_examen', (int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 529,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('detalle_examen',(int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 539,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('editar_examen',(int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 551,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('desactivar_examen',(int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examenes.php",
+      "linea": 567,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?php echo $this->getRoute('activar_examen',(int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 67,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 85,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 89,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 93,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 97,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 324,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('editar_examen', (int)$examen['id']); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_detalle.php",
+      "linea": 441,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('admin_examenes'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 50,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 66,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 67,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 68,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 69,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_examen_form.php",
+      "linea": 288,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $this->getRoute('admin_examenes'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 68,
+      "tipo": "HTML_SRC",
+      "referencia": "<?php echo $assetBase; ?>/js/tailwind-config.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 86,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/base.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 90,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/components.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 94,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/ui.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_inscripcion_examen.php",
+      "linea": 98,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $assetBase; ?>/css/app.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_usuarios.php",
+      "linea": 60,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->baseURL ?>css/Views/admin-usuarios.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/admin_usuarios.php",
+      "linea": 1441,
+      "tipo": "HTML_SRC",
+      "referencia": "<?= $this->baseURL ?>js/admin-usuarios.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/confirmar_inscripcion_examen.php",
+      "linea": 40,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->baseURL; ?>css/Views/confirmar_inscripcion_examen.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/consulta_publica.php",
+      "linea": 57,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->baseURL; ?>css/Views/consulta-publica.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/detalle_examen.php",
+      "linea": 51,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->baseURL; ?>css/Views/detalle-examen.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/detalle_examen.php",
+      "linea": 220,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?= $this->getRoute('confirmar_inscripcion'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/detalle_examen.php",
+      "linea": 247,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->getRoute('inicio'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/documentacion.php",
+      "linea": 30,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->baseURL; ?>css/Views/subida-documentacion.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/footer.php",
+      "linea": 37,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $routeUrl('mensajes'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/footer.php",
+      "linea": 45,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $routeUrl('actividad_reciente'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/footer.php",
+      "linea": 53,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $routeUrl('index.php'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/footer.php",
+      "linea": 61,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $routeUrl('servicios'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/footer.php",
+      "linea": 69,
+      "tipo": "HTML_HREF",
+      "referencia": "<?php echo $routeUrl('contactos'); ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 85,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= htmlspecialchars($inicioUrl, ENT_QUOTES, 'UTF-8') ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 105,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= BASE_URL ?>/logout",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 125,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= BASE_URL ?>/login",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 181,
+      "tipo": "HTML_SRC",
+      "referencia": "<?= BASE_URL ?>/js/notificaciones.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 182,
+      "tipo": "HTML_SRC",
+      "referencia": "<?= $assetBase ?>/js/sample-data.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 267,
+      "tipo": "HTML_SRC",
+      "referencia": "<?= BASE_URL ?>/js/menu-navegacion.js",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/header.php",
+      "linea": 271,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= BASE_URL ?>/css/Views/menu-navegacion.css",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/index.php",
+      "linea": 573,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->e($hrefAccion) ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/registro.php",
+      "linea": 25,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->e($this->baseURL . 'css/Views/registro.css') ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/registro.php",
+      "linea": 83,
+      "tipo": "HTML_ACTION",
+      "referencia": "<?= $this->e($this->getRoute('registro')) ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    },
+    {
+      "archivo": "Views/registro.php",
+      "linea": 210,
+      "tipo": "HTML_HREF",
+      "referencia": "<?= $this->e($this->getRoute('login')) ?>",
+      "motivo": "URL construida en tiempo de ejecución; requiere conocer BASE_URL/document root."
+    }
+  ],
+  "referenciasNoVerificables": [
+    {
+      "archivo": "Tools/connect_header_footer.js",
+      "linea": 1,
+      "tipo": "JS_REQUIRE",
+      "referencia": "fs",
+      "motivo": "Paquete, módulo integrado o alias; no es una ruta local relativa."
+    },
+    {
+      "archivo": "Tools/connect_header_footer.js",
+      "linea": 2,
+      "tipo": "JS_REQUIRE",
+      "referencia": "path",
+      "motivo": "Paquete, módulo integrado o alias; no es una ruta local relativa."
+    }
+  ],
+  "referenciasAExclusiones": [
+    {
+      "archivo": "index.php",
+      "linea": 11,
+      "tipo": "PHP_REQUIRE_ONCE",
+      "referencia": "/vendor/autoload.php",
+      "destinoCalculado": "vendor/autoload.php",
+      "expresion": "require_once __DIR__ . '/vendor/autoload.php';",
+      "base": "__DIR__",
+      "comprobacion": {
+        "status": "NO_ENCONTRADO",
+        "esperado": "vendor/autoload.php",
+        "segmentoFaltante": "vendor",
+        "directorioPadre": "",
+        "rutaParcialReal": ""
+      },
+      "carpetaExcluida": "vendor"
+    }
+  ],
+  "erroresLectura": [],
+  "archivosGrandesOmitidos": []
+}

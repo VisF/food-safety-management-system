@@ -16,7 +16,7 @@ $router = new AltoRouter();
 
 $router->setBasePath('/manipulacionDeAlimentos');
 
-require_once __DIR__ . '/routes/web.php';
+require_once __DIR__ . '/Routes/web.php';
 
 
 $match = $router->match();

@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../config/Connection.php';
+require_once __DIR__ . '/../db/Connection.php';
 
 class NotificacionRepository
 {

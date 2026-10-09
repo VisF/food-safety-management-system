@@ -1,0 +1,37 @@
+{
+  "generatedAt": "2026-10-09T19:14:42.291Z",
+  "projectRoot": "C:\\xampp\\htdocs\\manipulacionDeAlimentos",
+  "mode": "READ_ONLY",
+  "scannedDirectories": 36,
+  "scannedFiles": 272,
+  "scannedTextFiles": 191,
+  "skippedLargeFiles": 0,
+  "unreadableFiles": 0,
+  "exclusions": [
+    ".git",
+    ".venv",
+    "node_modules",
+    "vendor",
+    "target",
+    "build",
+    "dist",
+    "coverage",
+    ".idea",
+    ".vscode",
+    "path-audit"
+  ],
+  "summary": {
+    "CASE_COLLISION": 0,
+    "CASE_MISMATCH": 0,
+    "POSSIBLE_MISSING_REFERENCE": 0,
+    "SUSPICIOUS_NAME": 0,
+    "REVIEW": 0
+  },
+  "findings": {
+    "CASE_COLLISION": [],
+    "CASE_MISMATCH": [],
+    "POSSIBLE_MISSING_REFERENCE": [],
+    "SUSPICIOUS_NAME": [],
+    "REVIEW": []
+  }
+}

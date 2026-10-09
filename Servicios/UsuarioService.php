@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../Repository/UsuarioRepository.php';
-require_once __DIR__ . '/../dto/UsuarioDTO.php';
+require_once __DIR__ . '/../DTO/UsuarioDTO.php';
 
 class UsuarioService
 {

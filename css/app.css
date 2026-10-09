@@ -14,15 +14,15 @@
 @import url("components/tables.css");
 @import url("components/entity-card.css");
 
-@import url("views/home.css");
-@import url("views/admin.css");
-@import url("views/admin-usuarios.css");
-@import url("views/admin-documentos.css");
-@import url("views/admin-examenes.css");
-@import url("views/admin-carnets.css");
-@import url("views/crear-examen.css");
-@import url("views/detalle-examen.css");
-@import url("views/inspector.css");
-@import url("views/consulta-publica.css");
-@import url("views/subida-documentacion.css");
-@import url("views/registro.css");
+@import url("Views/home.css");
+@import url("Views/admin.css");
+@import url("Views/admin-usuarios.css");
+@import url("Views/admin-documentos.css");
+@import url("Views/admin-examenes.css");
+@import url("Views/admin-carnets.css");
+@import url("Views/crear-examen.css");
+@import url("Views/detalle-examen.css");
+@import url("Views/inspector.css");
+@import url("Views/consulta-publica.css");
+@import url("Views/subida-documentacion.css");
+@import url("Views/registro.css");

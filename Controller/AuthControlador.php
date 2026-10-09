@@ -12,8 +12,8 @@ declare(strict_types=1);
 
 use App\Middleware\CsrfMiddleware;
 
-require_once __DIR__ . '/../helpers/AuthHelper.php';
-require_once __DIR__ . '/../middleware/CsrfMiddleware.php';
+require_once __DIR__ . '/../Helpers/AuthHelper.php';
+require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';
 require_once __DIR__ . '/../Servicios/UsuarioService.php';
 /**
  * AuthControlador - Gestión de autenticación y registro de usuarios

@@ -1,0 +1,674 @@
+{
+  "version": "3.0",
+  "generatedAt": "2026-10-08T21:43:33.369Z",
+  "projectRoot": "C:\\xampp\\htdocs\\manipulacionDeAlimentos",
+  "readOnly": true,
+  "directoriesScanned": 36,
+  "filesScanned": 271,
+  "textFilesScanned": 191,
+  "findings": [
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "AltoRouter.php",
+      "line": 237,
+      "evidence": "s://github.com/dannyvankooten/AltoRouter/issues/241)",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1018,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1286,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1292,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1317,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 831,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 834,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 120,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 99,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 102,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 110,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 112,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 122,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 226,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 229,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 237,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 239,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 249,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Controller\\DipaControlador.php",
+      "line": 159,
+      "evidence": "if (!file_exists($pdoFile)) throw new \\Exception('DB connection not available');",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 311,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "db\\Connection.php",
+      "line": 8,
+      "evidence": "public static function getPDO(): \\PDO",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Middleware\\AuditMiddleware.php",
+      "line": 5,
+      "evidence": "use App\\Config\\Database;",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 298,
+      "evidence": "s://github.com/VisF/food-safety-management-system.git",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 371,
+      "evidence": "s://github.com/VisF",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 372,
+      "evidence": "s://www.linkedin.com/in/facundo-vis/",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Repository\\ConfiguracionRepository.php",
+      "line": 38,
+      "evidence": "$configuracion = $stmt->fetch(\\PDO::FETCH_ASSOC);",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Repository\\DocumentoRepository.php",
+      "line": 92,
+      "evidence": "$documento = $stmt->fetch(\\PDO::FETCH_ASSOC);",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Repository\\DocumentoRepository.php",
+      "line": 330,
+      "evidence": "$documento = $stmt->fetch(\\PDO::FETCH_ASSOC);",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "LIKELY_WINDOWS_FS_SEPARATOR",
+      "file": "Repository\\DocumentoRepository.php",
+      "line": 390,
+      "evidence": "$documento = $stmt->fetch(\\PDO::FETCH_ASSOC);",
+      "message": "Backslash detectado en un contexto que parece representar una ruta de filesystem."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Servicios\\UploadService.php",
+      "line": 48,
+      "evidence": "x:///var/run/clamav/clamd.ctl",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "INFO",
+      "rule": "DIRECTORY_SEPARATOR_USAGE",
+      "file": "Servicios\\UploadService.php",
+      "line": 541,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR detectado. Es portable; verificar solamente que no se mezcle con separadores hard-coded."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 35,
+      "evidence": "text = text.replace(/<\\?php\\s+include\\s+__DIR__\\s*\\.\\s*['\"]\\/header\\.php['\"]\\s*;\\s*\\?>\\s*/i, '');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 36,
+      "evidence": "text = text.replace(/<\\?php\\s+include\\s+__DIR__\\s*\\.\\s*['\"]\\/footer\\.php['\"]\\s*;\\s*\\?>\\s*/i, '');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 44,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 60,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 63,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 99,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 104,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 110,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 116,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\admin_cursos.php",
+      "line": 24,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 51,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 55,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 59,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 63,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 23,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 54,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 58,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 66,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 81,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 86,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 91,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 96,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 103,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 108,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 114,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 120,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\admin_examenes.php",
+      "line": 26,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 55,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 58,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 66,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 69,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 73,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 77,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 81,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 25,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 52,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 56,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 60,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 64,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 70,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 74,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 78,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 82,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "MEDIUM",
+      "rule": "PORTABLE_BASE_WITH_BACKSLASH",
+      "file": "Views\\footer.php",
+      "line": 23,
+      "evidence": "$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Construcción basada en __DIR__/dirname()/realpath() que también contiene backslash. Revisar si el backslash es realmente un separador."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 213,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 220,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 227,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    },
+    {
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 234,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta dependiente de Windows. Debe construirse de forma portable."
+    }
+  ],
+  "summary": {
+    "CRITICAL": 0,
+    "HIGH": 48,
+    "MEDIUM": 15,
+    "LOW": 0,
+    "INFO": 19
+  }
+}

@@ -9,7 +9,7 @@ declare(strict_types=1);
  */
 
 require_once __DIR__ . '/../db/Connection.php';
-require_once __DIR__ . '/../dto/HabilitacionExamenDTO.php';
+require_once __DIR__ . '/../DTO/HabilitacionExamenDTO.php';
 
 class HabilitacionExamenRepository
 {

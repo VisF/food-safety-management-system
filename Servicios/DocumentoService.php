@@ -16,7 +16,7 @@ rechazarDocumento()
 
 */
 
-require_once __DIR__ . '/../dto/DocumentoDTO.php';
+require_once __DIR__ . '/../DTO/DocumentoDTO.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';
 
 class DocumentoService

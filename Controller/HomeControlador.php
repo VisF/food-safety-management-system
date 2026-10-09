@@ -15,7 +15,7 @@ declare(strict_types=1);
  * - Vistas:
  *   - vistas/index.php              (página principal del sitio)
  */
-require_once __DIR__ . '/../helpers/AuthHelper.php';
+require_once __DIR__ . '/../Helpers/AuthHelper.php';
 
 require_once __DIR__ . '/../Servicios/HomeService.php';
 require_once __DIR__ . '/../Servicios/InscripcionService.php';

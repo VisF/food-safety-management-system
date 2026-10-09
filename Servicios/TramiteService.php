@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-require_once __DIR__ . '/../repositories/TramiteRepository.php';
+require_once __DIR__ . '/../Repository/TramiteRepository.php';
 
 class TramiteService
 {

@@ -29,7 +29,7 @@
  * 
  * 
 */
-require_once __DIR__ . '/../dto/InscripcionDTO.php';
+require_once __DIR__ . '/../DTO/InscripcionDTO.php';
 
 require_once __DIR__ . '/../Repository/InscripcionRepository.php';
 require_once __DIR__ . '/../Repository/DocumentoRepository.php';

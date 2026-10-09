@@ -1,0 +1,4585 @@
+{
+  "version": "4.0",
+  "generatedAt": "2026-10-08T21:46:09.823Z",
+  "projectRoot": "C:\\xampp\\htdocs\\manipulacionDeAlimentos",
+  "readOnly": true,
+  "directoriesScanned": 36,
+  "filesScanned": 271,
+  "textFilesScanned": 191,
+  "summary": {
+    "REAL": {
+      "total": 48,
+      "HIGH": 48,
+      "MEDIUM": 0,
+      "LOW": 0
+    },
+    "REVIEW": {
+      "total": 3,
+      "HIGH": 0,
+      "MEDIUM": 3,
+      "LOW": 0
+    },
+    "SAFE": {
+      "total": 512
+    }
+  },
+  "findings": [
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "AltoRouter.php",
+      "line": 237,
+      "evidence": "s://github.com/dannyvankooten/AltoRouter/issues/241)",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REVIEW",
+      "severity": "MEDIUM",
+      "rule": "SYSTEM_COMMAND",
+      "file": "js\\crear-examen.js",
+      "line": 7,
+      "evidence": "const match = /^([0-9]{2})\\/([0-9]{2})\\/([0-9]{4})$/.exec(",
+      "message": "Se utiliza una función para ejecutar comandos del sistema. Revisar si el comando funciona en Windows y Linux."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 298,
+      "evidence": "s://github.com/VisF/food-safety-management-system.git",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 371,
+      "evidence": "s://github.com/VisF",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "README.md",
+      "line": 372,
+      "evidence": "s://www.linkedin.com/in/facundo-vis/",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REVIEW",
+      "severity": "MEDIUM",
+      "rule": "SYSTEM_COMMAND",
+      "file": "Repository\\AlertaRepository.php",
+      "line": 29,
+      "evidence": "$this->db->exec($sql);",
+      "message": "Se utiliza una función para ejecutar comandos del sistema. Revisar si el comando funciona en Windows y Linux."
+    },
+    {
+      "classification": "REVIEW",
+      "severity": "MEDIUM",
+      "rule": "SYSTEM_COMMAND",
+      "file": "Repository\\PlazoRecursanteRepository.php",
+      "line": 27,
+      "evidence": "$this->db->exec($sql);",
+      "message": "Se utiliza una función para ejecutar comandos del sistema. Revisar si el comando funciona en Windows y Linux."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Servicios\\UploadService.php",
+      "line": 48,
+      "evidence": "x:///var/run/clamav/clamd.ctl",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 60,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\actividad_reciente.php",
+      "line": 63,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 99,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 104,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 110,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_carnets.php",
+      "line": 116,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 51,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 55,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 59,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_cursos.php",
+      "line": 63,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 54,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 58,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_form.php",
+      "line": 66,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 81,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 86,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 91,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 96,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 103,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 108,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 114,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_documentos.php",
+      "line": 120,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 55,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 58,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 62,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examenes.php",
+      "line": 66,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 69,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 73,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 77,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 81,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 52,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 56,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 60,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_examen_form.php",
+      "line": 64,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 70,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 74,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 78,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 82,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 213,
+      "evidence": "s://cdn.tailwindcss.com",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 220,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 227,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    },
+    {
+      "classification": "REAL",
+      "severity": "HIGH",
+      "rule": "WINDOWS_ABSOLUTE_PATH",
+      "file": "Views\\header.php",
+      "line": 234,
+      "evidence": "s://fonts.googleapis.com/css2",
+      "message": "Ruta absoluta Windows detectada en el código."
+    }
+  ],
+  "safePatterns": [
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "AltoRouter.php",
+      "line": 237,
+      "evidence": "https://github.com/dannyvankooten/AltoRouter/issues/241)",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "basevistaexampletodelete.php",
+      "line": 331,
+      "evidence": "include __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "basevistaexampletodelete.php",
+      "line": 543,
+      "evidence": "include __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "config\\env.php",
+      "line": 6,
+      "evidence": "* Uso: require_once __DIR__ . '/config/env.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "config\\env.php",
+      "line": 10,
+      "evidence": "function load_dotenv(string $path = __DIR__ . '/../.env'): void",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "config\\env.php",
+      "line": 44,
+      "evidence": "load_dotenv(__DIR__ . '/../.env');",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 16,
+      "evidence": "__DIR__ . '/../logs/admin_carnet_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ . '/../Servicios/CarnetService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 26,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 52,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 456,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 801,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 980,
+      "evidence": "__DIR__",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1018,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1157,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1285,
+      "evidence": "dirname(__DIR__)",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1285,
+      "evidence": "dirname(__DIR__)",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1286,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1290,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1292,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1301,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1302,
+      "evidence": "dirname(__DIR__)",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1302,
+      "evidence": "dirname(__DIR__)",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1306,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 1317,
+      "evidence": ". DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../Servicios/CursoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 6,
+      "evidence": "require_once __DIR__ . '/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 32,
+      "evidence": "require_once __DIR__ . '/../Views/admin_cursos.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 72,
+      "evidence": "require_once __DIR__ . '/../Views/admin_curso_inscriptos.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 242,
+      "evidence": "require_once __DIR__ . '/../Views/admin_curso_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 357,
+      "evidence": "require_once __DIR__ . '/../Views/admin_curso_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminCursoControlador.php",
+      "line": 664,
+      "evidence": "require_once __DIR__ . '/../Views/admin_curso_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDashboardControlador.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Servicios/AdminService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDashboardControlador.php",
+      "line": 16,
+      "evidence": "__DIR__ . '/../logs/admin_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminDashboardControlador.php",
+      "line": 24,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminDashboardControlador.php",
+      "line": 44,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 24,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 25,
+      "evidence": "require_once __DIR__ . '/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 30,
+      "evidence": "__DIR__ . '/../logs/admin_documento_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 39,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 59,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 397,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 556,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 826,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 830,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 830,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 831,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 834,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 22,
+      "evidence": "require_once __DIR__ . '/../Servicios/ExamenService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ . '/../Servicios/ConfiguracionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 28,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/admin_examen_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 36,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 50,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examen_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 122,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examen_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 201,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examen_detalle.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 248,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examen_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 291,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examen_form.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 334,
+      "evidence": "require_once __DIR__ . '/../Views/admin_examenes.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 404,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminExamenControlador.php",
+      "line": 460,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminUsuarioControlador.php",
+      "line": 24,
+      "evidence": "require_once __DIR__ . '/../Servicios/UsuarioService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AdminUsuarioControlador.php",
+      "line": 28,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/admin_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AdminUsuarioControlador.php",
+      "line": 35,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AdminUsuarioControlador.php",
+      "line": 48,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Controller\\AuthControlador.php",
+      "line": 13,
+      "evidence": "\\Middleware\\CsrfMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 15,
+      "evidence": "require_once __DIR__ . '/../helpers/AuthHelper.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 16,
+      "evidence": "require_once __DIR__ . '/../middleware/CsrfMiddleware.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ . '/../Servicios/UsuarioService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 37,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/auth_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 41,
+      "evidence": "private const VIEW_LOGIN = __DIR__ . '/../Views/login.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 42,
+      "evidence": "private const VIEW_REGISTRO = __DIR__ . '/../Views/registro.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 43,
+      "evidence": "private const VIEW_PERFIL = __DIR__ . '/../Views/perfil.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\AuthControlador.php",
+      "line": 50,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\AuthControlador.php",
+      "line": 108,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\AuthControlador.php",
+      "line": 187,
+      "evidence": "require_once __DIR__ . '/../Views/registro.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 15,
+      "evidence": "__DIR__ . '/../logs/carnet_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/../Servicios/CarnetService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 22,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 38,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 96,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 100,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 101,
+      "evidence": "__DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 107,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 108,
+      "evidence": "__DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 120,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../Servicios/ConsultaPublicaService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 6,
+      "evidence": "require_once __DIR__ . '/../Views/consulta_publica.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 93,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 97,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 98,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 98,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 99,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 102,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 108,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 109,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 109,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 110,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 112,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 122,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 220,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 224,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 225,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 225,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 226,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 229,
+      "evidence": "DIRECTORY_SEPARATOR,",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 235,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 236,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 236,
+      "evidence": "dirname(__DIR__) .",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 237,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 239,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\ConsultaPublicaControlador.php",
+      "line": 249,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DipaControlador.php",
+      "line": 31,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/dipa_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\DipaControlador.php",
+      "line": 47,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\DipaControlador.php",
+      "line": 81,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DipaControlador.php",
+      "line": 94,
+      "evidence": "$pdoFile = __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DipaControlador.php",
+      "line": 158,
+      "evidence": "$pdoFile = __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Controller\\DipaControlador.php",
+      "line": 159,
+      "evidence": "\\Exception",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Controller\\DipaControlador.php",
+      "line": 178,
+      "evidence": "\\Exception",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DipaControlador.php",
+      "line": 320,
+      "evidence": "$ruta = __DIR__ . \"/../exports/{$nombre_archivo}\";",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 29,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 30,
+      "evidence": "require_once __DIR__ . '/../Repository/DocumentoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 31,
+      "evidence": "require_once __DIR__ . '/../Servicios/UploadService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 35,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/documento_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 44,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 59,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 289,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 293,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 294,
+      "evidence": "__DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 300,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 301,
+      "evidence": "__DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 311,
+      "evidence": "DIRECTORY_SEPARATOR",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 441,
+      "evidence": "require_once __DIR__ . '/../Views/documentacion.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ExamenControlador.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/../Servicios/ExamenService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\ExamenControlador.php",
+      "line": 24,
+      "evidence": "__DIR__ . '/../logs/examen_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\ExamenControlador.php",
+      "line": 31,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\ExamenControlador.php",
+      "line": 184,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/../helpers/AuthHelper.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/../Servicios/HomeService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 21,
+      "evidence": "require_once __DIR__ . '/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 22,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ . '/../Servicios/CursoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 24,
+      "evidence": "require_once __DIR__ . '/../Servicios/ExamenService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 25,
+      "evidence": "require_once __DIR__ . '/../Servicios/CarnetService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 26,
+      "evidence": "require_once __DIR__ . '/../Servicios/ResultadoExamenService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 30,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\HomeControlador.php",
+      "line": 35,
+      "evidence": "__DIR__ . '/../logs/home_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\HomeControlador.php",
+      "line": 56,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\HomeControlador.php",
+      "line": 90,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 14,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ . '/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/../Servicios/CursoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/../Servicios/ExamenService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 27,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/inscripcion_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 39,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 54,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\MoodleControlador_no_se_si_sirve.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../Servicios/MoodleService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\MoodleControlador_no_se_si_sirve.php",
+      "line": 13,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\NotificacionControlador_posible_eliminar.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../Servicios/NotificacionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 33,
+      "evidence": "require_once __DIR__ . '/../Servicios/UsuarioService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 37,
+      "evidence": "private const LOG_FILE = __DIR__ . '/../logs/usuario_controller.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 45,
+      "evidence": "@mkdir(dirname(self::LOG_FILE), 0755, true);",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 58,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 629,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Core\\Middleware.php",
+      "line": 13,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Core\\Middleware.php",
+      "line": 13,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Core\\Middleware.php",
+      "line": 16,
+      "evidence": "\\Exception",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Core\\Router.php",
+      "line": 54,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Core\\Router.php",
+      "line": 54,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "db\\Connection.php",
+      "line": 10,
+      "evidence": "\\PDO",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "db\\Connection.php",
+      "line": 14,
+      "evidence": "$envLoader = __DIR__ . '/../config/env.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "db\\Connection.php",
+      "line": 34,
+      "evidence": "\\PDO",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "db\\Connection.php",
+      "line": 36,
+      "evidence": "\\RuntimeException",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "index.php",
+      "line": 7,
+      "evidence": "require_once __DIR__ . '/config/config.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "index.php",
+      "line": 8,
+      "evidence": "require_once __DIR__ . '/AltoRouter.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "index.php",
+      "line": 10,
+      "evidence": "if (file_exists(__DIR__ . '/vendor/autoload.php')) {",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "index.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/vendor/autoload.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "index.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/routes/web.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Middleware\\AuditMiddleware.php",
+      "line": 5,
+      "evidence": "\\Config\\Database",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Middleware\\MaintenanceMiddleware.php",
+      "line": 8,
+      "evidence": "__DIR__ . '/../maintenance.flag';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "README.md",
+      "line": 298,
+      "evidence": "https://github.com/VisF/food-safety-management-system.git",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "README.md",
+      "line": 371,
+      "evidence": "https://github.com/VisF",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "README.md",
+      "line": 372,
+      "evidence": "https://www.linkedin.com/in/facundo-vis/",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\AdminRepository.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\AdminRepository.php",
+      "line": 14,
+      "evidence": "require_once __DIR__.'/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\CarnetRepository.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\ConfiguracionRepository.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\CursoRepository.php",
+      "line": 42,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\CursoRepository.php",
+      "line": 43,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\DocumentoRepository.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\ExamenRepository.php",
+      "line": 30,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Repository\\ExamenRepository.php",
+      "line": 854,
+      "evidence": "\\RuntimeException",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Repository\\ExamenRepository.php",
+      "line": 869,
+      "evidence": "\\RuntimeException",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\HabilitacionExamenRepository.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\HabilitacionExamenRepository.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../dto/HabilitacionExamenDTO.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\InscripcionRepository.php",
+      "line": 45,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Repository\\InscripcionRepository.php",
+      "line": 661,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\NotificacionRepository.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../config/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\ReporteRepository.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\ResultadoExamenRepository.php",
+      "line": 26,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\TramiteRepository.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\UsuarioRepository.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../db/Connection.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Repository\\UsuarioRepository.php",
+      "line": 13,
+      "evidence": "require_once __DIR__ .'/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 9,
+      "evidence": "require_once __DIR__ . '/../Middleware/AuthMiddleware.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 10,
+      "evidence": "require_once __DIR__ . '/../Middleware/RoleMiddleware.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Middleware/CsrfMiddleware.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Routes\\web.php",
+      "line": 13,
+      "evidence": "\\Middleware\\AuthMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Routes\\web.php",
+      "line": 14,
+      "evidence": "\\Middleware\\RoleMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Routes\\web.php",
+      "line": 15,
+      "evidence": "\\Middleware\\CsrfMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 89,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 92,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 121,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 142,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 181,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 202,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 263,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 286,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 308,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 333,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 355,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 376,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 403,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 425,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 454,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 517,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 520,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 562,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 585,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 604,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 625,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 653,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 656,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 684,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 710,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 732,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 755,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 777,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 802,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 827,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 852,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 873,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 892,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 916,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminCursoControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 941,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 963,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 986,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 989,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1061,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1085,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1110,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1135,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1160,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1184,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1209,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1232,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminExamenControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1258,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1280,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1305,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1329,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1354,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1402,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1424,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1447,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1472,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1497,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1520,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1557,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1558,
+      "evidence": "require_once __DIR__ . '/../Views/admin_usuarios.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1580,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1581,
+      "evidence": "require_once __DIR__ . '/../Views/admin_usuarios.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1608,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1609,
+      "evidence": "require_once __DIR__ . '/../Views/admin_usuarios.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1639,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Routes\\web.php",
+      "line": 1669,
+      "evidence": "require_once __DIR__ . '/../Controller/AdminUsuarioControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\AdminService.php",
+      "line": 12,
+      "evidence": "require_once __DIR__.'/../Repository/AdminRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\CarnetService.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Repository/CarnetRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\CarnetService.php",
+      "line": 13,
+      "evidence": "require_once __DIR__ . '/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\CarnetService.php",
+      "line": 14,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\CarnetService.php",
+      "line": 16,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ConfiguracionService.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../Repository/ConfiguracionRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ConsultaPublicaService.php",
+      "line": 3,
+      "evidence": "require_once __DIR__ . '/../Repository/CarnetRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ConsultaPublicaService.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../Repository/DocumentoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\CursoService.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Repository/CursoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\DocumentoService.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/../dto/DocumentoDTO.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\DocumentoService.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/../Repository/DocumentoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ExamenService.php",
+      "line": 34,
+      "evidence": "require_once __DIR__ . '/../Repository/ExamenRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ExamenService.php",
+      "line": 35,
+      "evidence": "require_once __DIR__ . '/../Servicios/CarnetService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ExamenService.php",
+      "line": 37,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\HabilitacionExamenService.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Repository/HabilitacionExamenRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\HomeService.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ .'/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\HomeService.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ .'/../Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 32,
+      "evidence": "require_once __DIR__ . '/../dto/InscripcionDTO.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 34,
+      "evidence": "require_once __DIR__ . '/../Repository/InscripcionRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 35,
+      "evidence": "require_once __DIR__ . '/../Repository/DocumentoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 36,
+      "evidence": "require_once __DIR__ . '/../Repository/ExamenRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 37,
+      "evidence": "require_once __DIR__ . '/../Repository/CarnetRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 38,
+      "evidence": "require_once __DIR__ . '/../Repository/CursoRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 40,
+      "evidence": "require_once __DIR__ . '/../Servicios/DocumentoService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 41,
+      "evidence": "require_once __DIR__ . '/../Servicios/ConfiguracionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 43,
+      "evidence": "require_once __DIR__ . '/../Constant/EstadoTramite.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 306,
+      "evidence": "\\DateTimeImmutable",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 329,
+      "evidence": "\\DateTimeImmutable",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 677,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\NotificacionService.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../Repository/NotificacionRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\NotificacionService.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../Repository/UsuarioRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ReporteService.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../repositories/ReporteRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\ResultadoExamenService.php",
+      "line": 28,
+      "evidence": "require_once __DIR__ . '/../Repository/ResultadoExamenRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\TramiteService.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../repositories/TramiteRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\TramiteService.php",
+      "line": 9,
+      "evidence": "__DIR__ . '/../logs/tramite_service.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Servicios\\TramiteService.php",
+      "line": 16,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UploadService.php",
+      "line": 13,
+      "evidence": "__DIR__ . '/../logs/upload_service.log';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UploadService.php",
+      "line": 51,
+      "evidence": "__DIR__ . '/../uploads';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UploadService.php",
+      "line": 54,
+      "evidence": "__DIR__ . '/../uploads/documentos';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UploadService.php",
+      "line": 57,
+      "evidence": "__DIR__ . '/../uploads/carnets';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Servicios\\UploadService.php",
+      "line": 65,
+      "evidence": "dirname(self::LOG_FILE),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "DIRECTORY_SEPARATOR",
+      "file": "Servicios\\UploadService.php",
+      "line": 541,
+      "evidence": "DIRECTORY_SEPARATOR .",
+      "message": "Uso de DIRECTORY_SEPARATOR. Es portable entre Windows y Linux."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Servicios\\UploadService.php",
+      "line": 687,
+      "evidence": "realpath($ruta);",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_REALPATH",
+      "file": "Servicios\\UploadService.php",
+      "line": 690,
+      "evidence": "realpath(",
+      "message": "Uso de realpath(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Servicios\\UploadService.php",
+      "line": 842,
+      "evidence": "\\r",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Servicios\\UploadService.php",
+      "line": 842,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UsuarioService.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ . '/../Repository/UsuarioRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Servicios\\UsuarioService.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/../dto/UsuarioDTO.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "test_recursante.php",
+      "line": 3,
+      "evidence": "require_once __DIR__ . '/Servicios/InscripcionService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 14,
+      "evidence": "const headerInclude = \"<?php include __DIR__ . '/header.php'; ?>\";",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 15,
+      "evidence": "const footerInclude = \"<?php include __DIR__ . '/footer.php'; ?>\";",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 35,
+      "evidence": "text = text.replace(/<\\?php\\s+include\\s+__DIR__\\s*\\.\\s*['\"]\\/header\\.php['\"]\\s*;\\s*\\?>\\s*/i, '');",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 36,
+      "evidence": "text = text.replace(/<\\?php\\s+include\\s+__DIR__\\s*\\.\\s*['\"]\\/footer\\.php['\"]\\s*;\\s*\\?>\\s*/i, '');",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 41,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 41,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 44,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 49,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 49,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 52,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\cron\\enviar_alertas_vencimiento.php",
+      "line": 3,
+      "evidence": "require_once __DIR__ . '/../../Servicios/AlertaService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\cron\\enviar_alertas_vencimiento.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../../Controller/NotificacionControlador.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Tools\\cron\\enviar_alertas_vencimiento.php",
+      "line": 28,
+      "evidence": "\\n",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\cron\\validar_recursantes.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../../Servicios/PlazoRecursanteService.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Tools\\cron\\validar_recursantes.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/../../Repository/InscripcionRepository.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\actividad_reciente.php",
+      "line": 9,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\actividad_reciente.php",
+      "line": 44,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\actividad_reciente.php",
+      "line": 44,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\actividad_reciente.php",
+      "line": 60,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\actividad_reciente.php",
+      "line": 62,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\actividad_reciente.php",
+      "line": 63,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\actividad_reciente.php",
+      "line": 69,
+      "evidence": "<?php $page_title = 'Actividad Reciente'; include __DIR__ . '/header.php'; ?>",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_carnets.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_carnets.php",
+      "line": 33,
+      "evidence": "dirname(",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_carnets.php",
+      "line": 37,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_carnets.php",
+      "line": 99,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_carnets.php",
+      "line": 104,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_carnets.php",
+      "line": 110,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_carnets.php",
+      "line": 116,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_carnets.php",
+      "line": 178,
+      "evidence": "include __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_cursos.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_cursos.php",
+      "line": 24,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_cursos.php",
+      "line": 24,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_cursos.php",
+      "line": 51,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_cursos.php",
+      "line": 55,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_cursos.php",
+      "line": 59,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_cursos.php",
+      "line": 63,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_cursos.php",
+      "line": 89,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_curso_form.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_curso_form.php",
+      "line": 23,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_curso_form.php",
+      "line": 23,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_form.php",
+      "line": 54,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_form.php",
+      "line": 58,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_form.php",
+      "line": 62,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_form.php",
+      "line": 66,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_curso_form.php",
+      "line": 92,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 28,
+      "evidence": "dirname($_SERVER['SCRIPT_NAME'] ?? ''),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 29,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 81,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 86,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 91,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 96,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_curso_inscriptos.php",
+      "line": 136,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_documentos.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_documentos.php",
+      "line": 39,
+      "evidence": "dirname(",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_documentos.php",
+      "line": 43,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_documentos.php",
+      "line": 103,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_documentos.php",
+      "line": 108,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_documentos.php",
+      "line": 114,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_documentos.php",
+      "line": 120,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_documentos.php",
+      "line": 181,
+      "evidence": "include __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examenes.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_examenes.php",
+      "line": 26,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_examenes.php",
+      "line": 26,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examenes.php",
+      "line": 55,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examenes.php",
+      "line": 58,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examenes.php",
+      "line": 62,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examenes.php",
+      "line": 66,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examenes.php",
+      "line": 97,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 29,
+      "evidence": "dirname($_SERVER['SCRIPT_NAME'] ?? ''),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 30,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 69,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 73,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 77,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 81,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examen_detalle.php",
+      "line": 107,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examen_form.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_examen_form.php",
+      "line": 25,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_examen_form.php",
+      "line": 25,
+      "evidence": "$assetBase = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_form.php",
+      "line": 52,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_form.php",
+      "line": 56,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_form.php",
+      "line": 60,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_examen_form.php",
+      "line": 64,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_examen_form.php",
+      "line": 79,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 28,
+      "evidence": "dirname($_SERVER['SCRIPT_NAME'] ?? ''),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 29,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 70,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 74,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 78,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 82,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_inscripcion_examen.php",
+      "line": 108,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_usuarios.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\admin_usuarios.php",
+      "line": 55,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\BaseVista.php",
+      "line": 682,
+      "evidence": "include __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\confirmar_inscripcion_examen.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\confirmar_inscripcion_examen.php",
+      "line": 35,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\consulta_publica.php",
+      "line": 19,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\consulta_publica.php",
+      "line": 52,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\detalle_examen.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\detalle_examen.php",
+      "line": 46,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\documentacion.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\documentacion.php",
+      "line": 25,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\footer.php",
+      "line": 23,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\footer.php",
+      "line": 23,
+      "evidence": "$basePath = rtrim(dirname($_SERVER['SCRIPT_NAME'] ?? ''), '/\\\\');",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\header.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/../Helpers/ToastHelper.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIRNAME",
+      "file": "Views\\header.php",
+      "line": 46,
+      "evidence": "dirname($_SERVER['SCRIPT_NAME'] ?? ''),",
+      "message": "Uso de dirname(). No se considera una dependencia de Windows por sí mismo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "ESCAPE_SEQUENCE",
+      "file": "Views\\header.php",
+      "line": 47,
+      "evidence": "\\\\",
+      "message": "Secuencia de escape reconocida; no se considera separador de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\header.php",
+      "line": 148,
+      "evidence": "<?php include __DIR__ . '/menu_navegacion.php'; ?>",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\header.php",
+      "line": 213,
+      "evidence": "https://cdn.tailwindcss.com?plugins=forms,container-queries",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\header.php",
+      "line": 220,
+      "evidence": "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\header.php",
+      "line": 227,
+      "evidence": "https://fonts.googleapis.com/css2?family=Poppins:wght@500;600;700;800&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "URL",
+      "file": "Views\\header.php",
+      "line": 234,
+      "evidence": "https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap",
+      "message": "URL reconocida; no se considera ruta de filesystem."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\index.php",
+      "line": 21,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\index.php",
+      "line": 201,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\login.php",
+      "line": 18,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\login.php",
+      "line": 80,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\login.php",
+      "line": 246,
+      "evidence": "<?php include __DIR__ . '/footer.php'; ?>",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\panel_admin.php",
+      "line": 12,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\panel_admin.php",
+      "line": 110,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\perfil.php",
+      "line": 5,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\perfil.php",
+      "line": 93,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\registro.php",
+      "line": 4,
+      "evidence": "require_once __DIR__ . '/BaseVista.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "Views\\registro.php",
+      "line": 29,
+      "evidence": "include __DIR__ . '/header.php';",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 8,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 11,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 14,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 17,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 20,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 23,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 26,
+      "evidence": "\\Middleware\\AuthMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 27,
+      "evidence": "\\Middleware\\RoleMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 28,
+      "evidence": "\\Middleware\\CsrfMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 29,
+      "evidence": "\\Middleware\\AuditMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 30,
+      "evidence": "\\Middleware\\MaintenanceMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_NAMESPACE",
+      "file": "webParaBorrar.php",
+      "line": 31,
+      "evidence": "\\Middleware\\GuestMiddleware",
+      "message": "Backslash identificado dentro de un namespace PHP."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 45,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 48,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 79,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 98,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 145,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 164,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 236,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 259,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 278,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 298,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 317,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 338,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 362,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 365,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 392,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 414,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 417,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 482,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 570,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 591,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 613,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 631,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 652,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 686,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 720,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 741,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 769,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 818,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 841,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 868,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 887,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 914,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 917,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1005,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1026,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1047,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1068,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1089,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1110,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1131,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1165,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1187,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1208,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1228,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1253,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1310,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1329,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1350,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1374,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    },
+    {
+      "classification": "SAFE",
+      "rule": "PHP_DIR",
+      "file": "webParaBorrar.php",
+      "line": 1396,
+      "evidence": "require_once __DIR__ .",
+      "message": "Uso de __DIR__. La construcción de la ruta parte de la ubicación real del archivo."
+    }
+  ]
+}

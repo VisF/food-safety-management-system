@@ -1,0 +1,394 @@
+{
+  "generatedAt": "2026-10-08T21:40:07.418Z",
+  "projectRoot": "C:\\xampp\\htdocs\\manipulacionDeAlimentos",
+  "scannerVersion": "2.0.0",
+  "counters": {
+    "filesScanned": 271,
+    "textFilesScanned": 190,
+    "directoriesScanned": 37
+  },
+  "summary": {
+    "totalFindings": 47,
+    "high": 0,
+    "medium": 38,
+    "low": 9
+  },
+  "findings": [
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "AltoRouter.php",
+      "line": 42,
+      "content": "''   => '[^/\\.]++'",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "AltoRouter.php",
+      "line": 160,
+      "content": "if (preg_match_all('`(/|\\.|)\\[([^:\\]]*+)(?::([^:\\]]*+))?\\](\\?|)`', $route, $matches, PREG_SET_ORDER)) {",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "AltoRouter.php",
+      "line": 271,
+      "content": "if (preg_match_all('`(/|\\.|)\\[([^:\\]]*+)(?::([^:\\]]*+))?\\](\\?|)`', $route, $matches, PREG_SET_ORDER)) {",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "AltoRouter.php",
+      "line": 280,
+      "content": "$pre = '\\.';",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\AdminCarnetControlador.php",
+      "line": 52,
+      "content": "\"[%s] Usuario: %s | Evento: %s | Datos: %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\AdminDashboardControlador.php",
+      "line": 44,
+      "content": "\"[%s] [%s] %s %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\AdminDocumentoControlador.php",
+      "line": 59,
+      "content": "\"[%s] [%s] %s %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\AdminUsuarioControlador.php",
+      "line": 48,
+      "content": "\"[%s] [%s] %s | %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\AuthControlador.php",
+      "line": 108,
+      "content": "\"[%s] [%s] IP: %s | %s | %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\CarnetControlador.php",
+      "line": 38,
+      "content": "\"[%s] Usuario: %s | Evento: %s | Datos: %s\\n\",",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\DipaControlador.php",
+      "line": 81,
+      "content": "$mensaje = \"[$timestamp] Usuario: $usuario_id | Evento: $evento | Datos: \" . json_encode($datos) . \"\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\DocumentoControlador.php",
+      "line": 59,
+      "content": "$mensaje = \"[$timestamp] Usuario: $usuario_id | Evento: $evento | Datos: \" . json_encode($datos, JSON_UNESCAPED_UNICODE) . \"\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\ExamenControlador.php",
+      "line": 184,
+      "content": "\"\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\HomeControlador.php",
+      "line": 90,
+      "content": "$message = \"[$timestamp] [$level] {$event} | {$contextStr}\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\InscripcionControlador.php",
+      "line": 54,
+      "content": "$mensaje = \"[$timestamp] Usuario: $usuario_id | Evento: $evento | Datos: \" . json_encode($datos) . \"\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Controller\\UsuarioControlador.php",
+      "line": 58,
+      "content": "$message = \"[$timestamp] [$level] {$event} | {$contextStr}\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Core\\Middleware.php",
+      "line": 13,
+      "content": "\"App\\\\Middleware\\\\{$middleware}\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Core\\Router.php",
+      "line": 54,
+      "content": "\"App\\\\Middleware\\\\{$middleware}\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\01-base-de-datos.md",
+      "line": 5,
+      "content": "La aplicación utiliza MySQL o MariaDB con codificación `utf8mb4` y cotejamiento `utf8mb4_unicode_ci`. El script principal es [`db/schema.sql`](../db/schema.sql). Crea la base `manipulacion_alimentos` y define claves primarias, índices únicos y claves foráneas.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\01-base-de-datos.md",
+      "line": 7,
+      "content": "La conexión se centraliza en [`db/Connection.php`](../db/Connection.php), que usa PDO, consultas preparadas nativas, excepciones como modo de error y resultados asociativos.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\01-base-de-datos.md",
+      "line": 56,
+      "content": "El archivo [`db/seed.sql`](../db/seed.sql) define, entre otros, los siguientes estados:",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\01-base-de-datos.md",
+      "line": 84,
+      "content": "1. Ejecutar [`db/schema.sql`](../db/schema.sql).",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\01-base-de-datos.md",
+      "line": 86,
+      "content": "3. Ejecutar [`db/seed.sql`](../db/seed.sql) en un entorno de desarrollo.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 11,
+      "content": "[`index.php`](../index.php) inicia la sesión, carga la configuración, crea el router, registra las rutas y despacha la coincidencia. Si no hay coincidencia devuelve HTTP 404.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 15,
+      "content": "[`Routes/web.php`](../Routes/web.php) declara método, patrón, middleware y callback de cada endpoint. También normaliza URLs quitando la barra final mediante una redirección 308.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 36,
+      "content": "La carpeta [`Servicios/`](../Servicios) concentra la lógica de aplicación. Los servicios coordinan validaciones, repositorios, cambios de estado, notificaciones, reportes, uploads y operaciones de carnet. Algunos módulos relevantes son `UsuarioService`, `CursoService`, `ExamenService`, `InscripcionService`, `DocumentoService`, `TramiteService`, `CarnetService`, `ReporteService` y `UploadService`.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 40,
+      "content": "La carpeta [`Repository/`](../Repository) encapsula el acceso a datos. Cada repositorio agrupa consultas de un área: usuarios, cursos, exámenes, documentos, inscripciones, trámites, resultados, carnets, configuración y auditoría.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 44,
+      "content": "Las vistas PHP de [`Views/`](../Views) renderizan HTML. [`Views/BaseVista.php`](../Views/BaseVista.php) centraliza escape HTML, generación de rutas, token CSRF y elementos comunes.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 76,
+      "content": "`UploadService` gestiona validación y almacenamiento de archivos. Las cargas de ciudadanos se guardan en `uploads/` y los carnets en `uploads/carnets/`. Los logs por módulo se encuentran en [`logs/`](../logs) y sirven para diagnosticar autenticación, documentos, exámenes, carnets, trámites y uploads.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\02-backend.md",
+      "line": 80,
+      "content": "[`Tools/cron/`](../Tools/cron) contiene procesos para alertas de vencimiento y validación de recursantes. En producción deben programarse mediante el mecanismo de tareas del servidor, con permisos limitados y registro de errores.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "PARENT_DIRECTORY_REFERENCE",
+      "confidence": "medium",
+      "file": "docs\\04-rutas.md",
+      "line": 3,
+      "content": "La base de la aplicación es `/manipulacionDeAlimentos`. Las rutas se declaran en [`Routes/web.php`](../Routes/web.php). Las rutas con `POST` requieren CSRF; las marcadas como administrativas requieren sesión y rol `admin`.",
+      "details": "Contains '../' or '..\\\\' relative path traversal."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Repository\\InscripcionRepository.php",
+      "line": 661,
+      "content": "':motivo' => \"\\nCancelación: \".$motivo,",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Servicios\\InscripcionService.php",
+      "line": 677,
+      "content": "\"\\nRechazo: \" . $motivo",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Servicios\\UploadService.php",
+      "line": 842,
+      "content": "\"\\r\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Servicios\\UploadService.php",
+      "line": 874,
+      "content": "'/(.+)\\s+FOUND/',",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 44,
+      "content": "text = headerInclude + '\\n' + text;",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Tools\\connect_header_footer.js",
+      "line": 52,
+      "content": "text = text + '\\n' + footerInclude;",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "POSSIBLE_WINDOWS_PATH_SEPARATOR",
+      "confidence": "medium",
+      "file": "Tools\\cron\\enviar_alertas_vencimiento.php",
+      "line": 28,
+      "content": "echo \"enviar_alertas_vencimiento: terminado\\n\";",
+      "details": "Possible filesystem path using Windows '\\\\' separators."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 11,
+      "content": "| [01-base-de-datos.md](./01-base-de-datos.md) | Modelo relacional, tablas, relaciones, estados y scripts SQL |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 12,
+      "content": "| [02-backend.md](./02-backend.md) | Arquitectura, flujo de una petición, capas, seguridad y módulos |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 13,
+      "content": "| [03-frontend.md](./03-frontend.md) | Vistas, estilos, JavaScript y criterios de interfaz |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 14,
+      "content": "| [04-rutas.md](./04-rutas.md) | Catálogo de rutas HTTP y permisos |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 15,
+      "content": "| [05-flujos-funcionales.md](./05-flujos-funcionales.md) | Flujos de ciudadanos, administradores e inspectores |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 16,
+      "content": "| [06-instalacion-y-operacion.md](./06-instalacion-y-operacion.md) | Requisitos, instalación, configuración, despliegue y mantenimiento |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "docs\\README.md",
+      "line": 17,
+      "content": "| [07-manual-de-usuario.md](./07-manual-de-usuario.md) | Manual breve para los perfiles del sistema |",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "README.md",
+      "line": 319,
+      "content": "Additional technical documentation is available in the [`docs`](./docs) directory.",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    },
+    {
+      "type": "CURRENT_DIRECTORY_REFERENCE",
+      "confidence": "low",
+      "file": "README.md",
+      "line": 330,
+      "content": "For the delivery-oriented documentation in Spanish, start with [`docs/README.md`](./docs/README.md). It provides separate documents for database, backend, frontend, routes, functional flows, installation and user operation.",
+      "details": "Contains './' or '.\\\\' relative filesystem path."
+    }
+  ]
+}
