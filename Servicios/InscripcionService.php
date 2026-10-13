@@ -647,6 +647,7 @@ class InscripcionService
             'success' => true
         ];
     }
+
     /**
      * Rechazar documentación.
      */
@@ -677,32 +678,11 @@ class InscripcionService
                 "\nRechazo: " . $motivo
             );
 
-        if (class_exists('NotificacionControlador')) {
-
-            try {
-
-                $nc = new NotificacionControlador();
-
-                if (method_exists($nc, 'enviarNotificacion')) {
-
-                    $nc->enviarNotificacion(
-                        (int)$inscripcion['usuario_id'],
-                        'documentacion_rechazada',
-                        [
-                            'motivo' => $motivo
-                        ]
-                    );
-                }
-
-            } catch (Throwable $e) {
-                // Ignorar error de notificación.
-            }
-        }
-
         return [
             'success' => true
         ];
     }
+
     public function obtenerModalidadCurso(int $idInscripcion): ?string
     {
         return $this->inscripcionRepository

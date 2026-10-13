@@ -1,31 +1,104 @@
-# Variables de entorno
+# ============================================================
+# VARIABLES DE ENTORNO Y CREDENCIALES
+# ============================================================
+
 .env
-config/.env
+.env.*
+!.env.example
+!.env.dist
 
-# Logs
-logs/
-*.log
+/config/.env
+/config/.env.*
+!/config/.env.example
+!/config/.env.dist
 
-# Archivos subidos por usuarios
-uploads/
+# ============================================================
+# DEPENDENCIAS Y ENTORNOS LOCALES
+# ============================================================
 
-# Entorno virtual Python
+/vendor/
+/node_modules/
 .venv/
 venv/
 env/
 
-# IDEs
-.vscode/
-.idea/
-*.iml
+# ============================================================
+# LOGS Y ARCHIVOS TEMPORALES
+# ============================================================
 
-# Sistema operativo
-.DS_Store
-Thumbs.db
-desktop.ini
+/logs/*
+!/logs/.gitkeep
 
-# Archivos temporales
+*.log
 *.tmp
 *.temp
 *.bak
+*.old
 *.swp
+*.swo
+*~
+
+# ============================================================
+# ARCHIVOS SUBIDOS POR USUARIOS
+# ============================================================
+
+/uploads/*
+!/uploads/.gitkeep
+
+# ============================================================
+# RESULTADOS DE AUDITORÍAS
+# ============================================================
+
+/tools/path-audit/*-resultados.json
+/tools/path-audit/*-resultados.txt
+/tools/path-audit/reporte-*.json
+/tools/path-audit/.venv/
+/tools/path-audit/node_modules/
+/tools/path-audit/package.json
+/tools/path-audit/package-lock.json
+/tools/path-audit/audit-before.json
+/tools/path-audit/audit-v*.json
+
+# ============================================================
+# COMPILACIONES, CACHÉ Y COBERTURA
+# ============================================================
+
+/build/
+/dist/
+/target/
+/coverage/
+/cache/
+/tmp/
+/temp/
+
+.phpunit.result.cache
+.php-cs-fixer.cache
+.phpstan/
+
+# ============================================================
+# BASES DE DATOS LOCALES Y COPIAS DE SEGURIDAD
+# ============================================================
+
+*.sqlite
+*.sqlite3
+*.db-journal
+*.sql.gz
+*.dump
+
+# ============================================================
+# IDEs Y EDITORES
+# ============================================================
+
+.vscode/
+.idea/
+*.iml
+*.code-workspace
+
+# ============================================================
+# SISTEMA OPERATIVO
+# ============================================================
+
+
+.DS_Store
+Thumbs.db
+desktop.ini

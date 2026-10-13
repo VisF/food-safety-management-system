@@ -20,7 +20,6 @@ DELETE FROM habilitaciones_examen;
 DELETE FROM inscripciones;
 DELETE FROM examenes;
 DELETE FROM cursos;
-DELETE FROM notificaciones;
 DELETE FROM recovery_tokens;
 DELETE FROM auditoria_acciones;
 DELETE FROM usuario_roles;
@@ -983,7 +982,6 @@ VALUES
 -- habilitaciones_examen
 -- comprobantes_tramite
 -- historial_tramite
--- notificaciones
 -- recovery_tokens
 -- auditoria_acciones
 
