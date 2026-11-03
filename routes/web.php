@@ -280,6 +280,7 @@ $router->map(
 /**
  * Mostrar formulario de recuperación de contraseña.
  */
+/*
 $router->map(
     'GET',
     '/recuperar-password',
@@ -294,6 +295,7 @@ $router->map(
 /**
  * Procesar solicitud de recuperación de contraseña.
  */
+/*
 $router->map(
     'POST',
     '/recuperar-password',
@@ -308,6 +310,7 @@ $router->map(
 /**
  * Mostrar formulario para restablecer contraseña.
  */
+/*
 $router->map(
     'GET',
     '/restablecer-password',
@@ -322,6 +325,7 @@ $router->map(
 /**
  * Procesar restablecimiento de contraseña.
  */
+/*
 $router->map(
     'POST',
     '/restablecer-password',
