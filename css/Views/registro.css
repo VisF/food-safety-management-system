@@ -1,11 +1,20 @@
+
+/* =====================================================
+   REGISTRO
+   ===================================================== */
+
 .registro {
+    width: 100%;
     max-width: 680px;
     margin: 0 auto;
+    box-sizing: border-box;
 }
+
+/* Encabezado */
 
 .registro__encabezado {
     text-align: center;
-    margin-bottom: 24px;
+    margin-bottom: 28px;
 }
 
 .registro__icono {
@@ -18,59 +27,162 @@
 .registro__titulo {
     margin: 0;
     color: #0a4e93;
-    font-size: 1.8rem;
+    font-size: 1.9rem;
+    line-height: 1.25;
     font-weight: 800;
 }
 
 .registro__descripcion {
-    margin: 8px 0 0;
+    margin: 10px 0 0;
     color: #5b6b80;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
+/* Tarjetas */
+
 .registro__card {
-    padding: 24px;
-    margin-bottom: 18px;
+    padding: 28px;
+    margin-bottom: 20px;
+    box-sizing: border-box;
 }
 
 .registro__formulario {
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    gap: 20px;
 }
+
+/* Campos */
 
 .registro__campo {
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 8px;
+    min-width: 0;
 }
 
 .registro__campo label {
+    font-size: 1rem;
+    line-height: 1.4;
     font-weight: 600;
     color: #243447;
 }
 
 .registro__campo input {
     width: 100%;
+    min-height: 48px;
     box-sizing: border-box;
-    padding: 12px;
+    padding: 12px 14px;
     border: 1px solid #d8e1ea;
     border-radius: 12px;
     background: #fff;
     color: #243447;
     font: inherit;
+    font-size: 1rem;
 }
 
 .registro__campo input:focus {
     outline: none;
     border-color: #0a4e93;
-    box-shadow: 0 0 0 2px rgba(10, 78, 147, 0.15);
+    box-shadow: 0 0 0 3px rgba(10, 78, 147, 0.15);
 }
+
+/* Contraseñas y botón de visibilidad */
+
+.registro__password-contenedor {
+    position: relative;
+    width: 100%;
+}
+
+.registro__password-contenedor input {
+    padding-right: 54px;
+}
+
+.registro__password-toggle {
+    position: absolute;
+    top: 50%;
+    right: 6px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 42px;
+    height: 42px;
+    padding: 0;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #5b6b80;
+    cursor: pointer;
+}
+
+.registro__password-toggle .material-symbols-outlined {
+    font-size: 22px;
+}
+
+.registro__password-toggle:hover {
+    background: #edf4fb;
+    color: #0a4e93;
+}
+
+.registro__password-toggle:focus-visible {
+    outline: 2px solid #0a4e93;
+    outline-offset: 1px;
+}
+
+/* Requisitos de contraseña */
+
+.registro__requisitos {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    list-style: none;
+    margin: 2px 0 0;
+    padding: 0;
+}
+
+.registro__requisitos li {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    color: #b42318;
+    font-size: 0.875rem;
+    line-height: 1.45;
+}
+
+.registro__requisitos li[data-valid="true"] {
+    color: #18794e;
+}
+
+.registro__requisitos .material-symbols-outlined {
+    flex-shrink: 0;
+    font-size: 18px;
+}
+
+.registro__confirmacion {
+    margin: 0;
+    font-size: 0.875rem;
+    line-height: 1.45;
+}
+
+.registro__confirmacion[data-valid="true"] {
+    color: #18794e;
+}
+
+.registro__confirmacion[data-valid="false"] {
+    color: #b42318;
+}
+
+/* Errores */
 
 .registro__error,
 .registro__errores {
     border-radius: 12px;
-    padding: 12px;
-    margin-bottom: 18px;
+    padding: 14px;
+    margin-bottom: 20px;
+    font-size: 0.95rem;
+    line-height: 1.5;
 }
 
 .registro__error {
@@ -86,42 +198,120 @@
 }
 
 .registro__errores ul {
-    margin: 8px 0 0;
-    padding-left: 20px;
+    margin: 10px 0 0;
+    padding-left: 22px;
 }
+
+/* Botones */
 
 .registro__boton {
     width: 100%;
+    min-height: 48px;
     margin-top: 4px;
+    font-size: 1rem;
 }
 
 .registro__login {
-    padding: 18px;
+    padding: 22px;
     text-align: center;
+    box-sizing: border-box;
 }
 
 .registro__login-texto {
-    margin: 0 0 12px;
+    margin: 0 0 14px;
+    font-size: 1rem;
+    line-height: 1.5;
 }
 
 .registro__login-boton {
     width: 100%;
+    min-height: 46px;
 }
+
+/* =====================================================
+   ADAPTACIÓN PARA CELULARES
+   ===================================================== */
 
 @media (max-width: 600px) {
     .registro {
         width: 100%;
+        max-width: none;
     }
 
-    .registro__card {
-        padding: 18px;
+    .registro__encabezado {
+        margin-bottom: 22px;
     }
 
     .registro__icono {
         font-size: 60px;
+        margin-bottom: 8px;
+    }
+
+    .registro__titulo {
+        font-size: 1.7rem;
+    }
+
+    .registro__descripcion {
+        font-size: 0.95rem;
+        padding: 0 4px;
+    }
+
+    .registro__card {
+        padding: 22px 18px;
+        margin-bottom: 16px;
+    }
+
+    .registro__formulario {
+        gap: 18px;
+    }
+
+    .registro__campo label {
+        font-size: 0.95rem;
+    }
+
+    .registro__campo input {
+        min-height: 50px;
+        padding: 13px 12px;
+        font-size: 16px;
+    }
+
+    .registro__password-contenedor input {
+        padding-right: 54px;
+    }
+
+    .registro__password-toggle {
+        width: 42px;
+        height: 42px;
+    }
+
+    .registro__requisitos li,
+    .registro__confirmacion {
+        font-size: 0.85rem;
+    }
+
+    .registro__error,
+    .registro__errores {
+        padding: 12px;
+        font-size: 0.9rem;
+    }
+
+    .registro__login {
+        padding: 20px 18px;
+    }
+}
+
+/* Celulares muy estrechos */
+
+@media (max-width: 360px) {
+    .registro__card {
+        padding: 18px 14px;
     }
 
     .registro__titulo {
         font-size: 1.55rem;
+    }
+
+    .registro__formulario {
+        gap: 16px;
     }
 }

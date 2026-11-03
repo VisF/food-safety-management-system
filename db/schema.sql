@@ -316,3 +316,30 @@ CREATE TABLE carnets (
 ) ENGINE=InnoDB
   DEFAULT CHARSET=utf8mb4
   COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- 13. TABLA: recovery_tokens
+-- ===========================================================
+
+
+
+CREATE TABLE `recovery_tokens` (
+    `id` BIGINT(20) UNSIGNED NOT NULL AUTO_INCREMENT,
+    `usuario_id` INT(10) UNSIGNED NOT NULL,
+    `token` VARCHAR(255) NOT NULL,
+    `expiracion` DATETIME NOT NULL,
+    `usado` TINYINT(1) NOT NULL DEFAULT 0,
+    `fecha_creacion` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    PRIMARY KEY (`id`),
+    UNIQUE KEY `rt_token_unique` (`token`),
+    KEY `rt_usuario_idx` (`usuario_id`),
+
+    CONSTRAINT `rt_usuario_fk`
+        FOREIGN KEY (`usuario_id`)
+        REFERENCES `usuarios` (`id`)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
+) ENGINE=InnoDB
+  DEFAULT CHARSET=utf8mb4
+  COLLATE=utf8mb4_unicode_ci;

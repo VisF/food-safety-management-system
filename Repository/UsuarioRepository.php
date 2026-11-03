@@ -690,24 +690,22 @@ class UsuarioRepository
         return $stmt->fetchAll(\PDO::FETCH_ASSOC);
     }
 
-    /**
-     * Cambiar contraseña.
-     */
     public function cambiarPassword(
         int $usuarioId,
         string $password
-    ): bool
-    {
+    ): bool {
         $stmt = $this->conexion->prepare("
             UPDATE usuarios
             SET password = :password
             WHERE id = :id
         ");
 
-        return $stmt->execute([
+        $stmt->execute([
             ':password' => $password,
-            ':id' => $usuarioId
+            ':id' => $usuarioId,
         ]);
+
+        return $stmt->rowCount() === 1;
     }
 
 

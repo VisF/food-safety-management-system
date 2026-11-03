@@ -43,6 +43,10 @@ class SubidaDocumentacionVista extends BaseVista
                 <p class="app-vista-section-subtitle subida-documentacion__hero-texto">
                     <?= $this->e($data['hero_text']); ?>
                 </p>
+                <p class="subida-documentacion__hero-texto">
+                    <strong>Formatos permitidos:</strong> PDF, JPG y PNG.
+                    <strong>Tamaño máximo:</strong> 5 MB por archivo.
+                </p>
 
             </section>
 

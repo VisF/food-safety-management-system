@@ -275,7 +275,38 @@ class AuthControlador
                 'error' => 'Credenciales inválidas'
             ];
         }
+        // Validar que el usuario tenga exactamente un rol
+        $roles = $usuario->getRoles();
 
+        if (!is_array($roles) || count($roles) !== 1) {
+            $this->log(
+                'Invalid user role configuration',
+                'WARNING',
+                [
+                    'usuario_id' => $usuario->getId()
+                ]
+            );
+
+            return [
+                'success' => false,
+                'error' => 'La cuenta no tiene un rol válido'
+            ];
+        }
+
+        $rol = $roles[0];
+
+        $rutasPorRol = [
+            'usuario'   => '/',
+            'admin'     => '/admin',
+            'inspector' => '/consulta-publica'
+        ];
+
+        if (!isset($rutasPorRol[$rol])) {
+            return [
+                'success' => false,
+                'error' => 'Rol de usuario no reconocido'
+            ];
+        }
         // Regenerar sesión
         session_regenerate_id(true);
 
@@ -288,12 +319,10 @@ class AuthControlador
         $_SESSION['usuario_email'] =
             $usuario->getEmail();
 
-        $_SESSION['usuario_roles'] =
-            $usuario->getRoles();
+        $_SESSION['usuario_roles'] = $roles;
 
         // Compatibilidad temporal con código viejo
-        $_SESSION['roles'] =
-            $usuario->getRoles();
+        $_SESSION['roles'] = $roles;
 
         $_SESSION['last_activity'] =
             time();
@@ -314,7 +343,8 @@ class AuthControlador
             'success' => true,
             'message' => 'Login exitoso',
             'usuario' => $usuario,
-            'csrf_token' => $_SESSION['csrf_token']
+            'csrf_token' => $_SESSION['csrf_token'],
+            'redirect' => $rutasPorRol[$rol]
         ];
     }
     // Procesa registro.
@@ -341,6 +371,16 @@ class AuthControlador
         }
         if (strlen($password) < 8) {
             $errors['password'] = 'La contraseña debe tener al menos 8 caracteres';
+        }
+
+        if (!preg_match('/[A-Z]/', $password)) {
+            $errors['password_mayuscula'] =
+                'La contraseña debe contener al menos una letra mayúscula';
+        }
+
+        if (!preg_match('/[a-z]/', $password)) {
+            $errors['password_minuscula'] =
+                'La contraseña debe contener al menos una letra minúscula';
         }
         if ($password !== $passwordConfirm) {
             $errors['password_confirm'] = 'Las contraseñas no coinciden';

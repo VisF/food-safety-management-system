@@ -24,6 +24,12 @@ class RegistroVista extends BaseVista
             rel="stylesheet"
             href="<?= $this->e($this->baseURL . 'css/Views/registro.css') ?>"
         >
+        <link
+            rel="stylesheet"
+            href="<?= $this->e(
+                $this->baseURL . 'css/app.css'
+            ) ?>"
+        >
 
         <?php
         include __DIR__ . '/header.php';
@@ -152,19 +158,50 @@ class RegistroVista extends BaseVista
                         >
                     </div>
 
+                    
                     <div class="registro__campo">
                         <label for="password">
                             Contraseña
                         </label>
 
-                        <input
-                            id="password"
-                            name="password"
-                            type="password"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <div class="registro__password-contenedor">
+                            <input
+                                id="password"
+                                name="password"
+                                type="password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                aria-describedby="password-requisitos"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="registro__password-toggle"
+                                data-password-toggle="password"
+                                aria-label="Mostrar contraseña"
+                                aria-pressed="false"
+                            >
+                                <span class="material-symbols-outlined" aria-hidden="true">
+                                    visibility
+                                </span>
+                            </button>
+                        </div>
+
+                        <ul id="password-requisitos" class="registro__requisitos" aria-live="polite">
+                            <li id="password-longitud" data-valid="false">
+                                <span class="material-symbols-outlined" aria-hidden="true">cancel</span>
+                                Al menos 8 caracteres
+                            </li>
+                            <li id="password-mayuscula" data-valid="false">
+                                <span class="material-symbols-outlined" aria-hidden="true">cancel</span>
+                                Al menos una mayúscula
+                            </li>
+                            <li id="password-minuscula" data-valid="false">
+                                <span class="material-symbols-outlined" aria-hidden="true">cancel</span>
+                                Al menos una minúscula
+                            </li>
+                        </ul>
                     </div>
 
                     <div class="registro__campo">
@@ -172,15 +209,37 @@ class RegistroVista extends BaseVista
                             Confirmar Contraseña
                         </label>
 
-                        <input
-                            id="password_confirm"
-                            name="password_confirm"
-                            type="password"
-                            minlength="8"
-                            autocomplete="new-password"
-                            required
-                        >
+                        <div class="registro__password-contenedor">
+                            <input
+                                id="password_confirm"
+                                name="password_confirm"
+                                type="password"
+                                minlength="8"
+                                autocomplete="new-password"
+                                aria-describedby="password-confirmacion"
+                                required
+                            >
+
+                            <button
+                                type="button"
+                                class="registro__password-toggle"
+                                data-password-toggle="password_confirm"
+                                aria-label="Mostrar confirmación de contraseña"
+                                aria-pressed="false"
+                            >
+                                <span class="material-symbols-outlined" aria-hidden="true">
+                                    visibility
+                                </span>
+                            </button>
+                        </div>
+
+                        <p
+                            id="password-confirmacion"
+                            class="registro__confirmacion"
+                            aria-live="polite"
+                        ></p>
                     </div>
+
 
                     <button
                         type="submit"
@@ -226,5 +285,11 @@ class RegistroVista extends BaseVista
 
         <?php
         $this->getFooter();
+        ?>
+        <script
+            src="<?= $this->e($this->baseURL . 'js/registro.js') ?>"
+            defer
+        ></script>
+        <?php
     }
 }

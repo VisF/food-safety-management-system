@@ -85,7 +85,8 @@ $router->map(
     'GET',
     '/',
     function () {
-
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
         require_once __DIR__ .
             '/../Controller/HomeControlador.php';
 
@@ -153,7 +154,7 @@ $router->map(
             header(
                 'Location: ' .
                 rtrim(BASE_URL, '/') .
-                '/'
+                $resultado['redirect']
             );
 
             exit;
@@ -270,6 +271,67 @@ $router->map(
     }
 );
 
+/* =========================================================
+   RECUPERACION DE CONTRASEÑA
+========================================================= */
+
+         
+
+/**
+ * Mostrar formulario de recuperación de contraseña.
+ */
+$router->map(
+    'GET',
+    '/recuperar-password',
+    function () {
+        require_once __DIR__ . '/../Controller/RecuperacionPasswordControlador.php';
+
+        $controller = new RecuperacionPasswordControlador();
+        $controller->mostrarSolicitud();
+    }
+);
+
+/**
+ * Procesar solicitud de recuperación de contraseña.
+ */
+$router->map(
+    'POST',
+    '/recuperar-password',
+    function () {
+        require_once __DIR__ . '/../Controller/RecuperacionPasswordControlador.php';
+
+        $controller = new RecuperacionPasswordControlador();
+        $controller->procesarSolicitud();
+    }
+);
+
+/**
+ * Mostrar formulario para restablecer contraseña.
+ */
+$router->map(
+    'GET',
+    '/restablecer-password',
+    function () {
+        require_once __DIR__ . '/../Controller/RecuperacionPasswordControlador.php';
+
+        $controller = new RecuperacionPasswordControlador();
+        $controller->mostrarRestablecimiento();
+    }
+);
+
+/**
+ * Procesar restablecimiento de contraseña.
+ */
+$router->map(
+    'POST',
+    '/restablecer-password',
+    function () {
+        require_once __DIR__ . '/../Controller/RecuperacionPasswordControlador.php';
+
+        $controller = new RecuperacionPasswordControlador();
+        $controller->procesarRestablecimiento();
+    }
+);
 
 /* ==========================================================
    INSCRIPCIONES A CURSOS
@@ -282,6 +344,9 @@ $router->map(
     'GET',
     '/inscripciones',
     function () {
+        
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
 
         require_once __DIR__ .
             '/../Controller/InscripcionControlador.php';
@@ -303,6 +368,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
         CsrfMiddleware::validate();
 
         require_once __DIR__ .
@@ -329,6 +395,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
 
         require_once __DIR__ .
             '/../Controller/DocumentoControlador.php';
@@ -350,6 +417,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
         CsrfMiddleware::validate();
 
         require_once __DIR__ .
@@ -372,6 +440,7 @@ $router->map(
     function ($id) {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
 
         require_once __DIR__ .
             '/../Controller/DocumentoControlador.php';
@@ -399,6 +468,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
 
         require_once __DIR__ .
             '/../Controller/UsuarioControlador.php';
@@ -420,6 +490,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
         CsrfMiddleware::validate();
 
         require_once __DIR__ .
@@ -449,6 +520,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
         CsrfMiddleware::validate();
 
         require_once __DIR__ .
@@ -513,7 +585,11 @@ $router->map(
     'GET',
     '/detalle_examen/[i:id]',
     function ($id) {
+        
 
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
+        
         require_once __DIR__ .
             '/../Controller/ExamenControlador.php';
 
@@ -558,6 +634,7 @@ $router->map(
     function () {
 
         AuthMiddleware::handle();
+        RoleMiddleware::handle(['usuario']);
 
         require_once __DIR__ .
             '/../Controller/CarnetControlador.php';
@@ -581,6 +658,9 @@ $router->map(
     'GET',
     '/consulta-publica',
     function () {
+        
+    AuthMiddleware::handle();
+    RoleMiddleware::handle(['inspector']);
 
         require_once __DIR__ .
             '/../Controller/ConsultaPublicaControlador.php';
@@ -601,6 +681,9 @@ $router->map(
     '/consulta-publica/carnet/[i:id]/descargar',
     function ($id) {
 
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['inspector']);
+        
         require_once __DIR__ .
             '/../Controller/ConsultaPublicaControlador.php';
 
@@ -621,6 +704,11 @@ $router->map(
     'GET',
     '/consulta-publica/carnet/[i:id]/foto',
     function ($id) {
+        
+
+        AuthMiddleware::handle();
+        RoleMiddleware::handle(['inspector']);
+
 
         require_once __DIR__ .
             '/../Controller/ConsultaPublicaControlador.php';

@@ -37,6 +37,12 @@ env/
 *.swp
 *.swo
 *~
+# ============================================================
+# Correos locales de prueba: contienen enlaces de recuperación  
+# de contraseña y otros datos sensibles
+# ============================================================
+
+/storage/mail-testing/
 
 # ============================================================
 # ARCHIVOS SUBIDOS POR USUARIOS

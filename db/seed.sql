@@ -11,9 +11,6 @@ START TRANSACTION;
 -- Primero se eliminan las tablas dependientes
 DELETE FROM carnets;
 DELETE FROM resultado_examen;
-DELETE FROM asistencias;
-DELETE FROM comprobantes_tramite;
-DELETE FROM historial_tramite;
 DELETE FROM documentos;
 DELETE FROM fecha_cursos;
 DELETE FROM habilitaciones_examen;
@@ -21,7 +18,6 @@ DELETE FROM inscripciones;
 DELETE FROM examenes;
 DELETE FROM cursos;
 DELETE FROM recovery_tokens;
-DELETE FROM auditoria_acciones;
 DELETE FROM usuario_roles;
 DELETE FROM usuarios;
 
@@ -92,7 +88,7 @@ INSERT INTO usuarios
     id,
     nombre,
     apellido,
-    dni,
+    cuil_cuit,
     email,
     password,
     telefono,
@@ -880,25 +876,9 @@ VALUES
     'Examen desaprobado.'
 );
 
--- ============================================================
--- 13. ASISTENCIAS
--- ============================================================
-
-INSERT INTO asistencias
-(
-    id,
-    inscripcion_id,
-    fecha,
-    presente,
-    observaciones
-)
-VALUES
-(1, 1, '2026-10-06', 1, 'Presente'),
-(2, 1, '2026-10-07', 1, 'Presente'),
-(3, 1, '2026-10-08', 1, 'Presente');
 
 -- ============================================================
--- 14. CARNETS
+-- 13. CARNETS
 -- ============================================================
 
 -- Carnet vigente
@@ -974,7 +954,7 @@ VALUES
 );
 
 -- ============================================================
--- 15. TABLAS HISTÓRICAS / AUXILIARES
+-- 14. TABLAS HISTÓRICAS / AUXILIARES
 -- ============================================================
 
 -- Se dejan vacías deliberadamente:

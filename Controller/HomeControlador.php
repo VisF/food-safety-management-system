@@ -93,6 +93,7 @@ class HomeControlador
 
     public function mostrarIndex(): array
     {
+
         $usuario =
             AuthHelper::usuarioActual();
 

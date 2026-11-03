@@ -32,6 +32,10 @@ class Connection
 
         try {
             self::$pdo = new \PDO($dsn, $user, $pass, $options);
+
+            // Configurar la zona horaria de esta conexión en UTC.
+            self::$pdo->exec("SET time_zone = '+00:00'");
+            
         } catch (\PDOException $e) {
             throw new \RuntimeException('Database connection failed: ' . $e->getMessage());
         }

@@ -42,3 +42,5 @@ if (!function_exists('load_dotenv')) {
 
 // Cargar por defecto si existe .env en la raíz del proyecto
 load_dotenv(__DIR__ . '/../.env');
+
+date_default_timezone_set('UTC');

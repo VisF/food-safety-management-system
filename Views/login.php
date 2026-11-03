@@ -212,8 +212,30 @@ include __DIR__ . '/header.php';
         </form>
 
     </article>
+    <article class="app-vista-card login-registro">
 
+            <p class="login-registro__texto">
+                ¿Olvidaste tu contraseña?
+            </p>
 
+            <a
+                href="<?= $this->e(
+                    $this->getRoute('recuperar_password')
+                ) ?>"
+                class="app-vista-button login-registro__boton"
+            >
+
+                <span
+                    class="material-symbols-outlined"
+                    aria-hidden="true"
+                >
+                    lock_reset
+                </span>
+
+                Recuperar Contraseña
+
+            </a>
+    </article>
     <article class="app-vista-card login-registro">
 
         <p class="login-registro__texto">

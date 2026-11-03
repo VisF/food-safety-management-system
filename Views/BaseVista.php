@@ -662,7 +662,34 @@ abstract class BaseVista
             'logout' =>
                 $this->baseURL .
                 'logout',
+                
+            /**
+             * Recuperación de contraseña.
+             */
+            'recuperar_password' =>
+                $this->baseURL .
+                'recuperar-password',
 
+            /**
+             * Procesar solicitud de recuperación.
+             */
+            'procesar_recuperar_password' =>
+                $this->baseURL .
+                'recuperar-password',
+
+            /**
+             * Mostrar formulario para restablecer contraseña.
+             */
+            'restablecer_password' =>
+                $this->baseURL .
+                'restablecer-password',
+
+            /**
+             * Procesar el restablecimiento de contraseña.
+             */
+            'procesar_restablecer_password' =>
+                $this->baseURL .
+                'restablecer-password',
 
             /* ==================================================
                RUTA DESCONOCIDA
