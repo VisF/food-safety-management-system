@@ -1,4 +1,4 @@
-# Auditoría de Portabilidad y Normalización de Rutas
+﻿# Auditoría de Portabilidad y Normalización de Rutas
 
 **Proyecto:** Manipulación de Alimentos  
 **Fecha:** Octubre de 2026  
@@ -6,6 +6,10 @@
 
 ---
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Objetivo
 
 Documentar la auditoría realizada sobre el proyecto para detectar problemas de portabilidad entre Windows/Linux, referencias de rutas potencialmente incorrectas y falsos positivos producidos por código PHP, JavaScript, expresiones regulares, URLs y documentación.
@@ -655,3 +659,54 @@ La regla principal es:
 > **Primero detectar, después clasificar, luego modificar y finalmente verificar.**
 
 No realizar modificaciones masivas sin una auditoría previa.
+---
+
+# English: Portability and Path Normalization Audit
+
+## Table of Contents
+
+1. [Purpose and scope](#purpose-and-scope)
+2. [Audit method and results](#audit-method-and-results)
+3. [Confirmed false positives](#confirmed-false-positives)
+4. [Real ClamAV dependency](#real-clamav-dependency)
+5. [Portable paths and safe policy](#portable-paths-and-safe-policy)
+6. [Future procedure](#future-procedure)
+
+## Purpose and scope
+
+This audit documents the review of Windows/Linux portability, route references, and false positives produced by PHP, JavaScript, regular expressions, URLs, namespaces, and Markdown links. The objective is not to replace every backslash with a slash or every slash with a backslash. Each match must be interpreted in its technical context.
+
+The review was performed in the Windows + XAMPP project environment with a Node.js development utility under `tools/path-audit`. Node.js is not a runtime dependency of the PHP application. Generated audit directories and unrelated build directories are excluded from the review.
+
+## Audit method and results
+
+The recommended sequence is: run the audit, classify each match, inspect the surrounding code, determine whether it is a real portability problem, modify only confirmed issues, and run a post-change audit. The V2 through V5 reports found that most matches were valid syntax or false positives. V5 reported no HIGH findings and its three MEDIUM findings were confirmed as false positives.
+
+A global replacement is unsafe because backslashes and slashes can be part of namespaces, escape sequences, regular expressions, URLs, URIs, connection strings, service endpoints, and valid relative links. Markdown references such as `../file.md` and `./document.md` are often exactly the portable links that should remain unchanged.
+
+## Confirmed false positives
+
+`RegExp.exec()` in JavaScript is a method call, not a path. `$this->db->exec($sql)` is a valid PDO operation, not a Windows route. PHP namespaces such as `\PDO::FETCH_ASSOC`, regular-expression patterns such as `rtrim(..., '/\\')`, and URLs such as `https://...` must not be rewritten. Relative Markdown links also remain valid unless the target itself is wrong.
+
+## Real ClamAV dependency
+
+`Servicios/UploadService.php` contains the real endpoint `unix:///var/run/clamav/clamd.ctl`. It is a Unix socket URI used by `stream_socket_client()` for file scanning, not a normal filesystem path. Rewriting it as a Windows path would break the service configuration and would not make ClamAV available on Windows.
+
+When ClamAV cannot be reached, the current code records the unavailable condition and follows its existing return behavior. That operational choice should be reviewed separately as a security and deployment decision; it must not be confused with path separator normalization.
+
+## Portable paths and safe policy
+
+Paths built from `__DIR__` and relative components such as `../logs`, `../uploads`, `../uploads/documentos`, and `../uploads/carnets` are portable because PHP resolves them from the actual source-file location. They should not be changed merely because an audit tool displays separators.
+
+| Element | Action |
+|---|---|
+| File and directory names | Change only under an explicit naming policy. |
+| `__DIR__` relative paths | Keep when they resolve to the intended location. |
+| PHP namespaces and regular expressions | Do not normalize. |
+| URLs, URIs, and service endpoints | Preserve their protocol-specific syntax. |
+| Relative Markdown links | Verify the target; do not rewrite by pattern alone. |
+| `AV_SOCKET` | Protect from generic source-content normalization. |
+
+## Future procedure
+
+Before changing a path or name, run the audit and inspect each finding. If a normalizer processes source content, protect special endpoints and syntax specifically rather than excluding an entire service file without reason. After the change, rerun the audit and manually verify ClamAV, uploads, logs, downloads, and all affected routes in the target environment.

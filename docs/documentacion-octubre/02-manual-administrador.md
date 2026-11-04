@@ -1,5 +1,9 @@
-# Manual administrativo
+﻿# Manual administrativo
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Acceso y responsabilidad
 
 El administrador ingresa con una cuenta que tenga el rol `admin`. Desde el
@@ -147,3 +151,56 @@ También verifique que la descarga del carnet funcione.
 - No compartir archivos descargados fuera de los canales autorizados.
 - Revisar actividad reciente ante una modificación inesperada.
 - Hacer respaldos de base de datos y archivos según la política operativa.
+---
+
+# English: Administrator Manual
+
+## Table of Contents
+
+1. [Access and operating principles](#access-and-operating-principles)
+2. [Recommended workflow](#recommended-workflow)
+3. [Courses and examinations](#courses-and-examinations)
+4. [Documents, attendance, and results](#documents-attendance-and-results)
+5. [Certificates and users](#certificates-and-users)
+6. [Verification and good practices](#verification-and-good-practices)
+
+## Access and operating principles
+
+Use an account with the `admin` role to open the administrative panel. Administrative actions change the process history, so confirm the person's identity, registration, and supporting documentation before approving, rejecting, or changing a state. Use the existing actions instead of creating duplicate registrations or records.
+
+Apply least privilege when assigning roles. A citizen should not receive administrative access merely to solve a problem with their own process, and an inspector should receive only the access required for verification.
+
+## Recommended workflow
+
+1. Create or update course and examination dates and configure capacity.
+2. Review registrations and identify pending requirements.
+3. Validate documents and write a specific observation when rejecting one.
+4. Record attendance for in-person courses.
+5. Record examination results, scores, and observations.
+6. Prepare the required information for the official DIPA process.
+7. Load the certificate issued by DIPA and verify its data.
+8. Check the final citizen view and public consultation result.
+
+Do not load a certificate before the registration and official document have been reviewed. Deactivate unavailable dates instead of deleting historical data when the application provides that option.
+
+## Courses and examinations
+
+When creating a course or examination, verify the modality, date, time, location, room, capacity, and active state. Before activating a date, check that its capacity and schedule are correct. Review the registration count before modifying a date or reducing its available places.
+
+The retake period is configured in the corresponding administration area. Confirm that the applicant has a failed result and remains within the configured number of days. For virtual courses, check the Moodle completion certificate; for renewals, verify the previous certificate in DIPA according to the current rule.
+
+## Documents, attendance, and results
+
+For each document, verify that the file is legible, complete, belongs to the correct person, and meets the requirement for the selected modality. Select **Approve** only after these checks. Select **Reject** with a clear, actionable observation, such as explaining which part of an identity image is missing or unreadable.
+
+Record attendance and examination results once, using the available administrative action. Confirm the examination, date, registration, score, approval status, and observation before saving. Correct an existing result through the supported correction process rather than creating a second registration.
+
+## Certificates and users
+
+When loading a DIPA certificate, compare the holder, CUIL/CUIT, certificate number, issue date, expiration date, PDF, and photograph with the official document. Save only after all fields match. Then verify that the citizen can see the certificate and that public consultation shows the intended limited information.
+
+In user management, review email, identity data, active state, and roles before saving. Use `usuario` for the citizen workflow, `inspector` for certificate verification, and `admin` only for full operational management.
+
+## Verification and good practices
+
+Use the recent activity view to investigate unexpected changes. Do not share downloaded personal documents through unauthorized channels. Keep observations clear and respectful, protect credentials, and follow the organization's backup, retention, privacy, and audit procedures. If a result is inconsistent, preserve the relevant record and report it through the technical or administrative support channel.

@@ -1,4 +1,4 @@
-# Documentación de uso
+﻿# Documentación de uso
 
 ## Sistema de gestión de carnets de manipuladores de alimentos
 
@@ -45,3 +45,35 @@ La aplicación no reemplaza los canales administrativos definidos por el Área
 de Manipulación de Alimentos. Si un trámite queda pendiente por una validación,
 consulte al personal responsable indicando su CUIL/CUIT y el estado que muestra
 la pantalla.
+---
+
+# English: User Documentation
+
+## Table of Contents
+
+1. [Purpose and audience](#purpose-and-audience)
+2. [Document map](#document-map)
+3. [Roles and responsibilities](#roles-and-responsibilities)
+4. [Navigation and privacy](#navigation-and-privacy)
+
+## Purpose and audience
+
+This directory contains the functional documentation for the application. It is written for citizens who register for a course or examination, administrative staff who validate and manage the process, inspectors who verify certificates, and technical staff who support the installation and operation of the system.
+
+The documentation describes the process from registration through document review, attendance, examination, result recording, official issuance in DIPA, certificate loading, and public verification. The system complements DIPA and does not issue the official certificate by itself.
+
+## Document map
+
+- **Citizen manual:** account creation, sign-in, document uploads, registrations, examination information, results, profile, and certificate download.
+- **Administrator manual:** dates, capacity, registrations, document review, attendance, results, certificates, users, roles, and operational controls.
+- **Public consultation:** CUIL/CUIT search, identity comparison, validity, download restrictions, and privacy.
+- **Workflows and states:** access modes, retakes, renewals, internal states, and transition rules.
+- **Operations and troubleshooting:** requirements, common failures, secure support reports, maintenance, backups, and system limits.
+
+## Roles and responsibilities
+
+Citizens provide accurate information, upload readable documents, attend the required activities, and correct rejected files. Administrators create dates, review evidence, record attendance and results, coordinate the DIPA step, and load the external certificate. Inspectors verify the certificate using the information authorized for their role. Public users receive only the minimum information required for a legitimate verification.
+
+## Navigation and privacy
+
+Use the canonical routes without a trailing slash and wait for confirmation after state-changing actions or uploads. Do not share credentials, recovery links, identity documents, photographs, certificate files, or internal observations through unauthorized channels. When a result is inconsistent, verify the CUIL/CUIT and identity first, then refer the case to administration instead of creating duplicate records.

@@ -1,4 +1,4 @@
-# Documentación del sistema
+﻿# Documentación del sistema
 
 ## Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos
 
@@ -47,3 +47,41 @@ Las respuestas HTML se construyen con vistas PHP ubicadas en `Views/`. Los recur
 
 La documentación describe el código presente en el repositorio y sus scripts actuales. Antes de una instalación limpia se debe comprobar que el `seed.sql` utilizado corresponda a la versión de `schema.sql`; el seed actual contiene referencias a tablas auxiliares que no aparecen en el esquema reducido vigente. Esta verificación evita que la carga de datos falle en un entorno nuevo.
 
+
+
+---
+
+# English: System Documentation
+
+## Table of Contents
+
+1. [Purpose and scope](#purpose-and-scope)
+2. [Documentation map](#documentation-map)
+3. [System architecture](#system-architecture)
+4. [Reference status](#reference-status)
+
+## Purpose and scope
+
+This directory contains the technical and functional documentation for the Food Handler Certificate Management System. The application centralizes course and examination registration, document submission and review, process tracking, and the registration of certificates issued externally by DIPA.
+
+The system supports the municipal workflow before and after official issuance. It does not replace DIPA: administrative staff continue to perform the official issuance in DIPA and then load the resulting certificate, dates, and file into this application.
+
+## Documentation map
+
+- **Database:** schema, entities, relationships, states, integrity, and initialization.
+- **Backend:** layers, request lifecycle, authentication, authorization, security, uploads, logs, and scheduled tasks.
+- **Frontend:** views, styles, JavaScript, interface conventions, privacy, and accessibility.
+- **Routes:** HTTP methods, paths, access levels, parameters, and administrative operations.
+- **Functional workflows:** citizen, administrator, inspector, course, examination, retake, renewal, and certificate flows.
+- **Installation and operations:** requirements, environment, database setup, XAMPP, deployment, backups, and maintenance.
+- **User manuals:** practical instructions for citizens, administrators, and public verification.
+
+## System architecture
+
+A request enters through `index.php`, is matched by the route definition, passes the applicable middleware, and reaches a controller. The controller delegates application rules to services. Services use repositories for PDO database access and return data to PHP views. CSS and JavaScript enhance the rendered interface without replacing server-side validation.
+
+The system uses sessions and role-based access. POST actions require CSRF protection, output is escaped before HTML rendering, and downloads must verify ownership or an authorized administrative or public-consultation rule.
+
+## Reference status
+
+The documentation describes the current repository and its scripts. Before a clean installation, verify that `db/seed.sql` matches `db/schema.sql`; the current seed references auxiliary tables that are not present in the reduced schema. Treat this check as a deployment prerequisite rather than assuming that a successful file import proves that the application is ready.

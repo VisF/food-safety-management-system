@@ -1,5 +1,9 @@
-# Instalación y operación
+﻿# Instalación y operación
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Requisitos
 
 - Apache con PHP habilitado.
@@ -70,4 +74,34 @@ El seed incluye cuentas de demostración con casos de documentación, aprobació
 - Ejecutar los cron de alertas y recursantes según la frecuencia acordada.
 - Actualizar dependencias de forma controlada y probar en desarrollo.
 - No eliminar usuarios ni documentos históricos sin una política de retención aprobada.
+---
 
+# English: Installation and Operations
+
+## Table of Contents
+
+1. [Requirements](#requirements)
+2. [Environment configuration](#environment-configuration)
+3. [Database initialization](#database-initialization)
+4. [XAMPP deployment](#xampp-deployment)
+5. [Delivery and maintenance](#delivery-and-maintenance)
+
+## Requirements
+
+Use Apache with PHP enabled, PHP PDO and PDO MySQL extensions, MySQL or MariaDB, a modern browser, Git, and write permissions for `uploads/` and `logs/`. The selected PHP version and database server must be compatible with the code and the schema scripts.
+
+## Environment configuration
+
+Copy `.env.example` to `.env` and set `DB_HOST`, `DB_NAME`, `DB_USER`, and `DB_PASS`. Adjust `BASE_URL` when the project is installed under a different directory. Keep `APP_DEBUG=true` only while developing. In production, protect `.env`, disable debug output, use HTTPS, and restrict access to logs and uploaded files.
+
+## Database initialization
+
+Run `db/schema.sql` first and review the seed before running `db/seed.sql`. The current seed references auxiliary tables that are not present in the reduced schema, so both files must be synchronized before a clean installation. Demonstration accounts and passwords are for development only and must be replaced or disabled before production use.
+
+## XAMPP deployment
+
+Place the project under `htdocs`, start Apache and MySQL from XAMPP, create the database, and open the configured base URL. Test registration, login, document upload, administrative review, examination workflows, certificate download, and public consultation. Confirm that uploads cannot execute scripts and that configuration and logs are not publicly browsable.
+
+## Delivery and maintenance
+
+Before delivery, verify environment secrets, debug settings, schema and seed compatibility, permissions, complete citizen and administrative flows, public privacy, backups, and server logs. Back up the database and `uploads/` before changes, rotate logs, review expiring certificates, run expiration and retake jobs according to the agreed schedule, and test dependency updates in development first.

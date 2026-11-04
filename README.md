@@ -1,4 +1,87 @@
-# Food Safety Management System
+﻿# Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos
+
+## Índice
+
+1. [Descripción y alcance](#descripción-y-alcance)
+2. [Funciones principales](#funciones-principales)
+3. [Arquitectura y estructura](#arquitectura-y-estructura)
+4. [Flujos principales](#flujos-principales)
+5. [Configuración y ejecución](#configuración-y-ejecución)
+6. [Documentación y estado](#documentación-y-estado)
+
+## Descripción y alcance
+
+El Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos es una aplicación web PHP para centralizar la capacitación, inscripción, documentación, evaluación y certificación de personas manipuladoras de alimentos. El sistema organiza el circuito municipal y ofrece accesos diferenciados para ciudadanos, personal administrativo e inspectores.
+
+La aplicación complementa a DIPA y no lo reemplaza. DIPA continúa siendo el sistema responsable de la emisión oficial del carnet. En este proyecto se registran las instancias previas, se valida la documentación, se siguen los estados del trámite y se carga el carnet oficial una vez emitido externamente.
+
+## Funciones principales
+
+### Portal ciudadano
+
+- Registro, autenticación, cierre de sesión y gestión del perfil.
+- Inscripción a cursos y mesas de examen.
+- Carga y seguimiento de DNI, foto carnet y certificado Moodle cuando corresponde.
+- Visualización de observaciones, estados, asistencia y resultados.
+- Consulta y descarga del carnet cargado por administración.
+- Avisos y notificaciones vinculados con el estado del trámite.
+
+### Gestión administrativa
+
+- Administración de usuarios, roles y estado de las cuentas.
+- Alta, edición, activación y desactivación de cursos y exámenes.
+- Gestión de fechas, modalidades, ubicaciones, cupos e inscriptos.
+- Revisión, aprobación y rechazo de documentación con observaciones.
+- Registro de asistencia, notas, resultados y estados del trámite.
+- Carga, descarga, consulta y anulación lógica de carnets emitidos por DIPA.
+- Consulta de actividad, reportes y datos necesarios para la operación.
+
+### Consulta pública e inspección
+
+La consulta pública permite verificar un carnet mediante CUIL/CUIT, revisar titularidad, vigencia, número y fechas, y acceder únicamente a los archivos que el sistema autorice. No debe mostrar domicilio, correo, documentación interna ni información ajena a la verificación necesaria.
+
+### Seguridad y auditoría
+
+La aplicación utiliza sesiones, roles, middleware, validación de entradas, protección CSRF, consultas PDO preparadas, validación de archivos, reglas de negocio, registros centralizados y auditoría de actividad administrativa. Las contraseñas se almacenan mediante funciones de hash y los archivos descargables deben comprobar la autorización antes de entregarse.
+
+## Arquitectura y estructura
+
+El proyecto sigue una arquitectura MVC por capas. El navegador envía la solicitud a `index.php`; las rutas y middleware determinan el acceso; los controladores coordinan casos de uso; los servicios concentran la lógica; los repositorios encapsulan la persistencia; y las vistas PHP generan HTML.
+
+```text
+Navegador
+   |
+   v
+index.php -> routes -> middleware -> controllers
+                                      |
+                                      v
+                                  servicios
+                                      |
+                                      v
+                                repositorios -> MySQL/MariaDB
+```
+
+Las carpetas principales son `Controller/`, `Core/`, `DTO/`, `Helpers/`, `Jobs/`, `Middleware/`, `Policy/`, `Repository/`, `Servicios/`, `Validators/`, `Views/`, `config/`, `db/`, `css/`, `js/`, `docs/`, `logs/` y `uploads/`. El frontend utiliza HTML/PHP renderizado en servidor, CSS organizado por componentes y JavaScript nativo.
+
+## Flujos principales
+
+El flujo general es: registro, inicio de sesión, curso o acceso habilitado a examen, carga y revisión de documentos, asistencia, examen, resultado, emisión oficial en DIPA, carga del carnet y consulta posterior.
+
+El curso presencial utiliza asistencia para habilitar el examen. El curso virtual requiere finalización en Moodle y certificado. La persona recursante puede rendir nuevamente dentro del plazo configurado sin repetir el curso cuando las reglas lo permiten. La renovación de un carnet vencido requiere examen y verificación del antecedente en DIPA.
+
+## Configuración y ejecución
+
+Copie `.env.example` como `.env` y configure host, nombre, usuario y contraseña de la base de datos. Ajuste `BASE_URL` cuando la instalación utilice otra carpeta. Mantenga `APP_DEBUG=true` solamente durante el desarrollo y proteja el archivo `.env`, los logs y los uploads en producción.
+
+Ejecute primero `db/schema.sql` y revise que `db/seed.sql` corresponda exactamente al esquema. El seed actual contiene referencias a tablas auxiliares que no aparecen en el esquema reducido, por lo que ambos archivos deben sincronizarse antes de una instalación limpia. En XAMPP, coloque el proyecto dentro de `htdocs`, inicie Apache y MySQL/MariaDB y abra la URL base configurada.
+
+## Documentación y estado
+
+La documentación técnica y funcional bilingüe se encuentra en [`docs/`](./docs). Consulte [`docs/README.md`](./docs/README.md) como índice general, los documentos técnicos para arquitectura e instalación y `docs/documentacion-octubre/` para manuales operativos.
+
+El proyecto se encuentra en desarrollo activo. La arquitectura central y los flujos principales están implementados, mientras continúan las tareas de integración, pruebas, refinamiento y preparación para despliegue. Antes de usarlo fuera de desarrollo, pruebe los flujos completos, cambie las credenciales de demostración y verifique las configuraciones de seguridad.
+
+---# Food Safety Management System
 
 A full-stack web application for managing the training, registration, examination, documentation, and certification process for food handlers.
 
@@ -135,7 +218,7 @@ Additional components such as middleware, policies, validators, jobs, helpers, a
 ## Project Structure
 
 ```text
-food-safety-management-system/
+manipulacionDeAlimentos/
 │
 ├── Controller/          # HTTP request handling and application flows
 ├── Core/                # Core application components
@@ -301,7 +384,7 @@ git clone https://github.com/VisF/food-safety-management-system.git
 Move the project into your local web server directory, for example:
 
 ```text
-xampp/htdocs/food-safety-management-system
+xampp/htdocs/manipulacionDeAlimentos
 ```
 
 Configure the environment:

@@ -1,5 +1,9 @@
-# Base de datos
+﻿# Base de datos
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Tecnología y creación
 
 La aplicación utiliza MySQL o MariaDB con codificación `utf8mb4` y cotejamiento `utf8mb4_unicode_ci`. El script principal es [`db/schema.sql`](../db/schema.sql). Crea la base `manipulacion_alimentos` y define claves primarias, índices únicos y claves foráneas.
@@ -87,4 +91,44 @@ Orden recomendado:
 4. Cambiar todas las contraseñas de ejemplo antes de utilizar el sistema fuera de desarrollo.
 
 **Observación de entrega:** el seed vigente contiene `DELETE` e inserciones para tablas auxiliares como `asistencias`, `comprobantes_tramite`, `historial_tramite`, `fecha_cursos`, `habilitaciones_examen`, `notificaciones`, `recovery_tokens` y `auditoria_acciones`, mientras que el `schema.sql` reducido actual no las define. Para un despliegue limpio se debe sincronizar uno de los dos archivos antes de ejecutar la carga inicial.
+---
 
+# English: Database
+
+## Table of Contents
+
+1. [Technology and connection](#technology-and-connection)
+2. [Main entities](#main-entities)
+3. [Relationships and process states](#relationships-and-process-states)
+4. [Integrity and data access](#integrity-and-data-access)
+5. [Initial loading](#initial-loading)
+
+## Technology and connection
+
+The application uses MySQL or MariaDB with `utf8mb4` encoding and the `utf8mb4_unicode_ci` collation. The current schema is defined in [`db/schema.sql`](../db/schema.sql). It creates the application database and defines primary keys, unique indexes, foreign keys, and the relationships used by the process.
+
+[`db/Connection.php`](../db/Connection.php) centralizes the PDO connection. Repositories receive this connection and should use native prepared statements, exception mode, and associative results. Database credentials must come from the environment and must not be copied into source files or committed to the repository.
+
+## Main entities
+
+The security catalog contains `roles`, `usuario_roles`, process states, registration types, and system configuration. `usuarios` stores identity, contact, password hash, active state, and creation date. A user's identity and email are unique, while the active flag allows the account to be disabled without deleting its history.
+
+The training and evaluation entities are `cursos`, `examenes`, `inscripciones`, and `resultado_examen`. A course describes modality, date, time, location, capacity, and active state. An examination describes the session and capacity. A registration links a person to the selected activity and stores type, process state, observations, and dates. The result stores score, approval, observations, and result date.
+
+The certification entities are `documentos` and `carnets`. Documents store type, path, review state, and observations. The certificate stores number, issue and expiration dates, PDF path, validity information, and active state.
+
+## Relationships and process states
+
+A user can have multiple roles, registrations, and documents. Courses and examinations can have many registrations. A registration can have examination results and one associated certificate. The certificate number and the registration relationship are unique where the schema requires it.
+
+The seed catalog includes pending, documentation pending, documentation approved, examination registered, approved, failed, rejected, cancelled, and certificate issued states. These are catalog values; the transition rules are enforced by application services and controllers and should not be changed directly from a view.
+
+## Integrity and data access
+
+Repositories encapsulate SQL and must receive parameters instead of concatenating user input. Services coordinate operations that affect several tables and may use transactions through the process repository. Foreign keys preserve relationships and configured cascade or `SET NULL` actions determine what happens when an associated record is removed.
+
+Files are stored in `uploads/`; the database stores their paths and metadata rather than the binary contents. Download authorization must be checked before serving a stored path. Historical users, registrations, documents, and audit information should not be deleted without an approved retention policy.
+
+## Initial loading
+
+Run [`db/schema.sql`](../db/schema.sql) first, verify that [`db/seed.sql`](../db/seed.sql) matches the same schema, and then run the seed only in a controlled development or deployment procedure. The current seed references auxiliary tables that are not present in the reduced schema, so the two scripts must be synchronized before a clean installation. Replace demonstration passwords and review default roles before exposing the application.

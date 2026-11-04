@@ -1,8 +1,14 @@
-PLAN DE TRABAJO – PRÁCTICAS PROFESIONALES SUPERVISADAS (PPS)
+﻿ÍNDICE BILINGÜE
+
+1. Plan de trabajo y objetivos
+2. Alcance, roles y seguridad
+3. Flujos funcionales
+4. English summary
+`r`n`r`nPLAN DE TRABAJO – PRÁCTICAS PROFESIONALES SUPERVISADAS (PPS)
 Proyecto: Sistema Integral de Gestión de Carnets de Manipuladores de Alimentos
 Carrera: Tecnicatura Universitaria en Desarrollo de Aplicaciones Informáticas (TUDAI)
 Carga horaria: 200 horas
-Institución beneficiaria: Área de Manipulacion de Alimentos
+Institución beneficiaria: Área de Manipulación de Alimentos
 Duración estimada: 3 a 4 meses
 1. Fundamentación
 El proceso actual de gestión de manipuladores de alimentos presenta una fuerte fragmentación de herramientas (formularios, planillas, campus virtual, correo electrónico) y una alta carga de gestión manual. Esto genera problemas de trazabilidad, duplicación de datos, pérdida de información y dificultades para verificar el estado del trámite de los carnets.
@@ -123,7 +129,7 @@ La carga y validación de la documentación será requisito previo para acceder 
 FLUJOS DEL SISTEMA – USUARIOS ADMINISTRATIVO E INSPECTOR
 1. Introducción
 Este apartado describe los flujos de trabajo de los perfiles administrativo e inspector dentro del sistema, detallando sus responsabilidades y acciones principales.
-2. Usuario Administrativo (Manipulacion de Alimentos)
+2. Usuario Administrativo (Manipulación de Alimentos)
 •	Crear fechas de cursos y exámenes
 •	Gestionar cupos
 •	Ver inscriptos
@@ -170,3 +176,31 @@ Desaprobado
 Carnet emitido
 Rechazado (no cumple con alguna condición)
 
+
+
+======================================================================
+ENGLISH SUMMARY
+======================================================================
+
+TABLE OF CONTENTS
+
+1. Project and objectives
+2. Scope, roles, and security
+3. Functional workflows
+4. Acceptance criteria
+
+1. PROJECT AND OBJECTIVES
+
+This project proposes a web system for managing the food-handler certificate process, from registration and document submission to examination, certificate status, and public verification. It complements DIPA, which remains responsible for official certificate issuance.
+
+2. SCOPE, ROLES, AND SECURITY
+
+The scope includes user registration, course and examination registration, document upload and validation, dates and capacity, attendance, results, process states, DIPA certificate uploads, certificate status, and differentiated roles. Public access must not expose addresses or private documents.
+
+3. FUNCTIONAL WORKFLOWS
+
+In-person courses use attendance to enable the examination. Virtual courses require Moodle completion and an in-person examination. Retakes are allowed within the configured three-month period, and renewals require verification in DIPA. Administrators create dates, validate documents, record attendance and results, upload issued certificates, and update process states. Inspectors verify certificate status and validity.
+
+4. ACCEPTANCE CRITERIA
+
+The system must support registration and document submission, complete administrative management, public consultation, web operation, and protection of sensitive personal data.

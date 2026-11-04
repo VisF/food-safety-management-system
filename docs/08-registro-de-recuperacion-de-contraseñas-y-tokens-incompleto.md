@@ -1,4 +1,4 @@
-
+﻿
 # Registro de trabajo — Recuperación de contraseñas y tokens
 
 **Proyecto:** Manipulación de Alimentos  
@@ -7,6 +7,10 @@
 
 ---
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Motivo de la pausa
 
 Se interrumpió el trabajo sobre recuperación de contraseñas y tokens porque se confirmó que esta funcionalidad no es necesaria para la etapa actual del proyecto.
@@ -274,3 +278,40 @@ Tampoco se confirmó la eliminación del archivo temporal `test_timezone.php` ni
 **Decisión:** pausar el desarrollo y las pruebas de recuperación de contraseñas porque se confirmó que no es un requisito de la etapa actual del proyecto.
 
 **Criterio para retomarlo:** partir de este registro, inspeccionar el estado actual de los archivos y continuar únicamente si la funcionalidad vuelve a formar parte del alcance.
+---
+
+# English: Password Recovery and Token Work Log
+
+## Table of Contents
+
+1. [Scope and pause decision](#scope-and-pause-decision)
+2. [Reviewed components](#reviewed-components)
+3. [Changes and technical observations](#changes-and-technical-observations)
+4. [Verification performed](#verification-performed)
+5. [Pending tests and restart criteria](#pending-tests-and-restart-criteria)
+
+## Scope and pause decision
+
+This work log records a review of password recovery and recovery-token handling that was paused because the feature was confirmed to be outside the current project stage. The record is not an approval of the complete flow. It preserves the findings and the checks that must be repeated before the feature is enabled or considered complete.
+
+## Reviewed components
+
+The review covered environment loading and PHP time zone configuration, the shared PDO connection, `RecoveryTokenService`, `RecoveryTokenRepository`, `UsuarioRepository::cambiarPassword()`, and the `recovery_tokens` table. It also considered token generation, SHA-256 storage, expiration, conditional consumption, password hashing, transaction boundaries, invalidation of previous tokens, and cleanup of old tokens.
+
+## Changes and technical observations
+
+The reviewed changes align PHP and the PDO session with UTC, include `fecha_creacion` in the valid-token query, construct dates explicitly with a UTC time zone, consume a token conditionally before changing the password, invalidate other pending tokens, and roll back when a transactional operation fails. A 72-byte password limit was documented because bcrypt has a length limitation.
+
+The token format must be verified literally in the real source file as `/\A[a-f0-9]{64}\z/`. A redundant creation-date query method was identified as a candidate for removal, but its final deletion was not confirmed. Temporary verification files must also be confirmed as removed before deployment.
+
+## Verification performed
+
+The constructors were inspected to confirm that the service and repositories use the shared PDO connection. A time-zone check showed that PHP and the MariaDB session used UTC. The `recovery_tokens` table was reviewed as InnoDB with unique token and user indexes and a cascading user relationship. PHP syntax checks for the four reviewed files returned no syntax errors at that time.
+
+These checks prove syntax and selected configuration only. They do not prove that email delivery, token validation, password replacement, login regression, or concurrent requests work correctly in the real application.
+
+## Pending tests and restart criteria
+
+Before resuming this feature, test request creation, email delivery, valid, expired, used, malformed, and unknown tokens, password replacement, login with the new password, link reuse, rollback, concurrent reset attempts, concurrent token generation, cleanup, and regression of existing login flows.
+
+First inspect the current files rather than relying on copied chat fragments. Confirm the actual service path, the password-update return value, error handling for token invalidation, the 72-byte rule and its UI message, and the removal of temporary files and redundant methods. Only then decide whether integration and security testing should continue.

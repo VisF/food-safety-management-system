@@ -1,5 +1,9 @@
-# Flujos y estados del trámite
+﻿# Flujos y estados del trámite
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Flujo general
 
 ```text
@@ -94,3 +98,49 @@ de referencia del sistema.
 - El carnet solo aparece cuando administración carga la emisión externa.
 - La vigencia depende de la fecha de vencimiento registrada.
 - La consulta pública no modifica estados.
+---
+
+# English: Workflows and Process States
+
+## Table of Contents
+
+1. [End-to-end workflow](#end-to-end-workflow)
+2. [Access modes](#access-modes)
+3. [Internal states](#internal-states)
+4. [Responsibilities and transition rules](#responsibilities-and-transition-rules)
+
+## End-to-end workflow
+
+The complete process begins with registration and sign-in. Depending on the person's situation, the next step is an in-person course, a virtual course followed by an examination registration, a retake, or a renewal. The person uploads the required documents, administration reviews them, attendance and examination results are recorded, and the approved case continues to the official DIPA issuance process.
+
+DIPA remains the official issuing system. This application records the municipal workflow before issuance and stores the certificate information and file after authorized staff receive and load the external document. Public consultation can verify the loaded certificate but cannot change a process state.
+
+## Access modes
+
+For an in-person course, the citizen registers for a course, uploads identity documents, attends the required classes, and waits for administration to record attendance. When the attendance condition is met, the examination can become available according to the configured rules.
+
+For a virtual course, the citizen completes Moodle, obtains the completion certificate, registers for an in-person examination, and uploads the identity and Moodle documents. Administration validates the material before the examination.
+
+A retake is available to a person with a previous failed examination when the new registration falls within the configured period. A renewal may allow a person with an expired certificate to take an examination without repeating the course, subject to the current administrative rule and verification in DIPA.
+
+## Internal states
+
+| Internal state | Operational meaning |
+|---|---|
+| `pending` | The process exists but the next condition has not been completed. |
+| `documentation_pending` | A required document is missing, pending review, or must be corrected. |
+| `documentation_approved` | The required documents have been reviewed and approved. |
+| `exam_registered` | The person is registered for an examination session. |
+| `approved` | The examination result meets the approval condition. |
+| `failed` | The examination result does not meet the approval condition. |
+| `rejected` | A process or validation was rejected and requires attention. |
+| `cancelled` | The registration or process was cancelled. |
+| `certificate_issued` | The official certificate was loaded into the application. |
+
+The label shown to users may be translated or formatted differently by the view, but the internal state is the reference for services, reports, and administrative decisions.
+
+## Responsibilities and transition rules
+
+An uploaded file remains pending until administration reviews it. A rejected document must be corrected before the process can advance. An approved examination does not create a certificate automatically; the external DIPA issuance and the administrative upload are separate steps. The validity status depends on the expiration date stored with the certificate.
+
+Citizens submit information and attend the required activities. Administration creates dates, validates evidence, records attendance and results, loads certificates, and resolves inconsistencies. Inspectors verify the certificate without changing workflow data.

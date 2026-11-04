@@ -1,5 +1,9 @@
-# Manual del ciudadano
+﻿# Manual del ciudadano
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Crear una cuenta
 
 1. Abra la pantalla **Registro**.
@@ -136,3 +140,44 @@ No comparta credenciales ni enlaces de recuperación.
 | No hay cursos o exámenes | Esperar una fecha activa o consultar a administración |
 | No está habilitado para rendir | Revisar documentación, asistencia y modalidad |
 | Carnet no visible | La aprobación no implica que DIPA ya haya emitido el carnet; consultar a administración |
+---
+
+# English: Citizen Manual
+
+## Table of Contents
+
+1. [Creating and protecting an account](#creating-and-protecting-an-account)
+2. [Signing in and understanding the dashboard](#signing-in-and-understanding-the-dashboard)
+3. [Uploading documents](#uploading-documents)
+4. [Registering for courses and examinations](#registering-for-courses-and-examinations)
+5. [Results, certificates, and profile data](#results-certificates-and-profile-data)
+
+## Creating and protecting an account
+
+Open **Registration** and enter the identity information requested by the application, including the CUIL/CUIT, email address, and password. Use an email account that you can access because it may be used for notifications or account recovery. The identifier must belong to the person who owns the process. Do not create a second account to bypass a pending validation or registration.
+
+Choose a password that satisfies the rules shown by the form and do not share it with another person. When using a shared device, always sign out after completing the task. If the recovery option is enabled, request a new link when an old link has expired or has already been used.
+
+## Signing in and understanding the dashboard
+
+Use **Sign in** with the registered email and password. The dashboard summarizes the process: document progress, the next recommended step, examination results, and certificate information when administration has loaded it. A status such as pending or rejected requires an action or an administrative review; it does not mean that the entire process has failed.
+
+Use the navigation menu to open **My profile**, **Documents**, **Registrations**, **Examinations**, and **My certificate**. Read confirmation messages before closing the page, especially after an upload or registration.
+
+## Uploading documents
+
+Open **Documents**, select the requested document type, choose a readable and complete file, and submit the form. Keep the original documents and do not upload files protected by a password unless the application explicitly accepts them. Wait for the confirmation message and then check the individual status.
+
+A file that was uploaded is not automatically approved. Administration reviews identity, legibility, completeness, and correspondence with the requirement. If a document is rejected, read the observation, correct the specific problem, and upload a new version instead of repeatedly submitting the same invalid file.
+
+## Registering for courses and examinations
+
+Before confirming a course or examination registration, check its date, time, modality, location, and available capacity. For a virtual course, the system may require a Moodle completion certificate. For a retake, the application may require a previous failed examination and a registration within the configured period. A renewal may require an expired certificate and administrative verification in DIPA.
+
+If the registration button is not available, review the process status and mandatory documents first. Do not submit a second registration when the first one is already confirmed; contact administration if the displayed state appears inconsistent.
+
+## Results, certificates, and profile data
+
+Attendance and examination results are recorded by administration. After the examination, check the dashboard for the result, score, or observation. If the result is failed, the system may show whether a retake is available under the current rule.
+
+The official certificate is issued externally by DIPA. Once administration loads it, **My certificate** shows the number, issue date, expiration date, validity status, remaining days, and the authorized download. Review your name, CUIL/CUIT, and contact information in **My profile** before an examination and report discrepancies through the official channel.

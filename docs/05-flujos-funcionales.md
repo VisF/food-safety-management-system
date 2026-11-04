@@ -1,5 +1,9 @@
-# Flujos funcionales
+﻿# Flujos funcionales
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Alta y acceso
 
 1. La persona completa nombre, apellido, DNI, correo y contraseña.
@@ -72,4 +76,40 @@ El ciudadano visualiza el estado y debe volver a cargar el archivo cuando sea ne
 | Administrador | Gestión integral de cursos, exámenes, usuarios, documentos, trámites y carnets |
 | Inspector | Verificación de carnets según los permisos habilitados |
 | Público | Consulta limitada de vigencia/estado |
+---
 
+# English: Functional Workflows
+
+## Table of Contents
+
+1. [Registration and access](#registration-and-access)
+2. [In-person and virtual courses](#in-person-and-virtual-courses)
+3. [Retakes and renewals](#retakes-and-renewals)
+4. [Documents, results, and certificates](#documents-results-and-certificates)
+5. [Roles](#roles)
+
+## Registration and access
+
+A person submits name, surname, identity identifier, email, and password. The application validates required fields and uniqueness, creates the account with a password hash and citizen role, and establishes a session after successful authentication. The session contains the user identifier and authorized roles, not the password.
+
+## In-person and virtual courses
+
+For an in-person course, the citizen chooses an active date, registers, uploads identity and photograph documents, and attends the required classes. Administration reviews the files and records attendance. When the attendance rule is met, the person becomes eligible for the examination according to the current process rules.
+
+For a virtual course, the citizen completes Moodle, obtains a completion certificate, registers for an in-person examination, and uploads the identity, photograph, and Moodle documents. Administration validates the documents before recording the examination result.
+
+## Retakes and renewals
+
+A retake starts from a failed examination. The application checks that the new registration is within the configured period, allows the person to choose a new examination session, and records the new result without requiring the course again when the rule permits it.
+
+A renewal starts from an expired certificate. The person registers for an examination, administration checks the documentation and previous DIPA record, and a new certificate is loaded only after the result and official process are complete. If no previous record exists, the person may need to complete the full course.
+
+## Documents, results, and certificates
+
+Every uploaded file begins as `pending`. Administration can approve it and record a review date, or reject it with a concrete observation. The citizen sees the state and must upload a corrected file when necessary. Attendance, score, approval, failure, observations, and cancellation are recorded by authorized staff.
+
+An approved result does not create an official certificate automatically. Administration continues the issuance process in DIPA and then loads the number, dates, and official file into this application. The citizen can download it after loading, and authorized users can verify it through public consultation.
+
+## Roles
+
+Citizens manage their own registration and documents. Administrators manage dates, capacity, validation, results, users, process states, and certificates. Inspectors verify certificates within their permissions. Public users receive only the limited information necessary to confirm validity.

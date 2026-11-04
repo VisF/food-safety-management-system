@@ -1,5 +1,9 @@
-# Backend
+﻿# Backend
 
+## Índice
+
+- Sección en español
+- English section
 ## 1. Responsabilidades
 
 El backend implementa autenticación, autorización, reglas del trámite, persistencia, manejo de archivos, generación de respuestas HTML y registro de actividad. Está desarrollado en PHP orientado a objetos y sigue una arquitectura MVC por capas.
@@ -78,4 +82,48 @@ Las vistas PHP de [`Views/`](../Views) renderizan HTML. [`Views/BaseVista.php`](
 ## 7. Tareas auxiliares
 
 [`Tools/cron/`](../Tools/cron) contiene procesos para alertas de vencimiento y validación de recursantes. En producción deben programarse mediante el mecanismo de tareas del servidor, con permisos limitados y registro de errores.
+---
 
+# English: Backend
+
+## Table of Contents
+
+1. [Responsibilities and layers](#responsibilities-and-layers)
+2. [Request lifecycle](#request-lifecycle)
+3. [Authentication and authorization](#authentication-and-authorization)
+4. [Input, output, and files](#input-output-and-files)
+5. [Jobs and logging](#jobs-and-logging)
+
+## Responsibilities and layers
+
+The backend is an object-oriented PHP application organized as a layered MVC architecture. It handles authentication, authorization, process rules, persistence, file management, HTML responses, notifications, and activity logging. Each layer should keep its responsibility: routes dispatch, controllers coordinate use cases, services apply application rules, repositories access data, and views render output.
+
+[`index.php`](../index.php) starts the session, loads configuration, creates the router, registers routes, and dispatches the matched request. [`Routes/web.php`](../Routes/web.php) declares method, pattern, middleware, and callback. The `Servicios/` layer coordinates validation, repositories, state changes, reports, uploads, notifications, and certificates. The `Repository/` layer encapsulates SQL and the `Views/` layer renders escaped HTML.
+
+## Request lifecycle
+
+1. Apache forwards the request to `index.php`.
+2. The application starts or restores the session and loads environment configuration.
+3. Routes are registered and the router matches method and pattern.
+4. Middleware checks authentication, role, maintenance mode, and CSRF when applicable.
+5. The controller validates the use-case input and calls a service.
+6. The service applies business rules and coordinates one or more repositories.
+7. The controller renders a view or redirects with a controlled status message.
+
+Errors should be visible in logs and communicated with an appropriate user-facing message. A successful response must not hide a failed database operation or invalid file upload.
+
+## Authentication and authorization
+
+`AuthMiddleware` requires the authenticated user identifier in the session. `RoleMiddleware` compares the session roles with the roles permitted by the route. Administrative endpoints require an authenticated `admin` role, while inspector and citizen access must remain limited to their intended operations.
+
+Passwords must be created with `password_hash` and checked with `password_verify`. Sessions must not expose password material. Role assignment and account activation are administrative actions and should be audited.
+
+## Input, output, and files
+
+POST forms use CSRF tokens generated and checked by the middleware. `BaseVista::e()` escapes values with UTF-8 before rendering them in HTML. Repositories use native prepared PDO statements with emulated prepares disabled. Controllers and services validate identifiers, states, dates, roles, and uploaded files before persistence.
+
+`UploadService` validates and stores files under `uploads/`; certificates use the certificates subdirectory. A download must confirm ownership or an authorized administrative/public-consultation rule before opening the path. Logs under `logs/` are operational records and must not become a public data source.
+
+## Jobs and logging
+
+Scheduled tools handle certificate expiration notices and retake validation. Production scheduling must use restricted permissions, an explicit environment, and error logging. Jobs should be idempotent where possible so that a retry does not duplicate notifications or change a process unexpectedly.
